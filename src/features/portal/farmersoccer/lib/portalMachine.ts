@@ -5,7 +5,7 @@ import { loadPortal } from "../actions/loadPortal";
 import { CONFIG } from "lib/config";
 import { claimArcadeToken } from "../actions/claimArcadeToken";
 import { Client, Room } from "colyseus.js";
-import { PlazaRoomState } from "features/world/types/Room";
+import { FarmerSoccerRoomState } from "./FarmerSoccerRoomState";
 import { SPAWNS } from "features/world/lib/spawn";
 import { decodeToken } from "features/auth/actions/login";
 
@@ -33,7 +33,7 @@ export interface Context {
   id: number;
   jwt: string;
   state: GameState;
-  mmoServer?: Room<PlazaRoomState>;
+  mmoServer?: Room<FarmerSoccerRoomState>;
 }
 
 export type PortalEvent =
@@ -114,20 +114,23 @@ export const portalMachine = createMachine({
           });
 
           // Join the MMO Server
-          let mmoServer: Room<PlazaRoomState> | undefined;
-          const serverName = getServer() ?? "sunflorea_bliss";
+          let mmoServer: Room<FarmerSoccerRoomState> | undefined;
+          const serverName = getServer() ?? "farmer_soccer";
           const mmoUrl = CONFIG.ROOM_URL;
           if (serverName && mmoUrl) {
             const client = new Client(mmoUrl);
-            mmoServer = await client?.joinOrCreate<PlazaRoomState>(serverName, {
-              jwt: context.jwt,
-              bumpkin: game?.bumpkin,
-              farmId,
-              x: SPAWNS().farmer_soccer.default.x,
-              y: SPAWNS().farmer_soccer.default.y,
-              sceneId: "farmer_soccer",
-              experience: game.bumpkin?.experience ?? 0,
-            });
+            mmoServer = await client?.joinOrCreate<FarmerSoccerRoomState>(
+              serverName,
+              {
+                jwt: context.jwt,
+                bumpkin: game?.bumpkin,
+                farmId,
+                x: SPAWNS().farmer_soccer.default.x,
+                y: SPAWNS().farmer_soccer.default.y,
+                sceneId: "farmer_soccer",
+                experience: game.bumpkin?.experience ?? 0,
+              }
+            );
           }
 
           return { game, mmoServer, farmId };

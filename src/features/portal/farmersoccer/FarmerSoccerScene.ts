@@ -19,7 +19,7 @@ export const GoblinNPC2: Clothing = {
   pants: "Farmer Pants",
   tool: "",
 };
-
+const SEND_PACKET_RATE = 1;
 // import {
 //   authorisePortal,
 //   goHome,
@@ -27,16 +27,26 @@ export const GoblinNPC2: Clothing = {
 
 export class FarmerSoccerScene extends BaseScene {
   graphics: any;
+  lastBallState: any;
   paths: Phaser.Curves.Path[] = [];
   followers = [];
   NPCs: BumpkinContainer[] = [];
   sceneId: SceneId = "farmer_soccer";
   ball: ImageWithDynamicBody;
+  packetSentAt = 0;
+  isSending = false;
   leftScoreText: any;
   rightScoreText: any;
   leftScore = 0;
   rightScore = 0;
-  gameAssets = {};
+  gameAssets = {
+    sfx: {
+      goal: Phaser.Sound.HTML5AudioSound,
+      whistle1: Phaser.Sound.NoAudioSound,
+      whistle2: Phaser.Sound.NoAudioSound,
+      kick: Phaser.Sound.NoAudioSound,
+    },
+  };
   constructor() {
     super({
       name: "farmer_soccer",
@@ -92,12 +102,11 @@ export class FarmerSoccerScene extends BaseScene {
   }
 
   async create() {
-    this.physics.world.drawDebug = true;
     this.map = this.make.tilemap({
       key: "farmer_soccer",
     });
     super.create();
-    this.gameAssets.sfx = {};
+    this.physics.world.drawDebug = true;
     this.gameAssets.sfx.goal = this.sound.add("goal");
     this.gameAssets.sfx.whistle1 = this.sound.add("whistle1");
     this.gameAssets.sfx.whistle2 = this.sound.add("whistle2");
@@ -105,11 +114,18 @@ export class FarmerSoccerScene extends BaseScene {
     this.setupBasicPhysics(this);
     this.setupBall(this);
     this.drawField(this);
-    this.addGoblin1(this);
-    this.addGoblin2(this);
-    this.time.delayedCall(1000, () => {
-      this.resetBall();
-    });
+    // this.addGoblin1(this);
+    // this.addGoblin2(this);
+    if (this.mmoServer) {
+      // this.mmoServer.state.actions.onAdd(async (action) => {
+      //   if (action.event === "kaboom") {
+      //     this.kaboom(action.x as number, action.y as number, "otherPlayer");
+      //   }
+      // });
+    }
+    // this.time.delayedCall(1000, () => {
+    //   this.resetBall();
+    // });
   }
   addGoblin1(scene: FarmerSoccerScene) {
     let index = scene.NPCs.push(
@@ -256,22 +272,75 @@ export class FarmerSoccerScene extends BaseScene {
     this.leftScoreText.text = this.leftScore;
     this.rightScoreText.text = this.rightScore;
     this.ball.rotation += 0.01;
-    this.graphics.clear();
-    this.graphics.lineStyle(0.5, 0xffffff, 1);
-    this.graphics.fillStyle(0xff0000, 1);
-    for (let i = 0; i < this.paths.length; i++) {
-      if (this.physics.world.drawDebug) this.paths[i].draw(this.graphics);
+    // this.graphics.clear();
+    // this.graphics.lineStyle(0.5, 0xffffff, 1);
+    // this.graphics.fillStyle(0xff0000, 1);
+    // for (let i = 0; i < this.paths.length; i++) {
+    //   if (this.physics.world.drawDebug) this.paths[i].draw(this.graphics);
 
-      this.paths[i].getPoint(this.followers[i].t, this.followers[i].vec);
+    //   this.paths[i].getPoint(this.followers[i].t, this.followers[i].vec);
 
-      this.NPCs[i].setPosition(
-        this.followers[i].vec.x,
-        this.followers[i].vec.y
-      );
-    }
+    //   this.NPCs[i].setPosition(
+    //     this.followers[i].vec.x,
+    //     this.followers[i].vec.y
+    //   );
+    // }
 
     //this.graphics.fillCircle(this.follower.vec.x, this.follower.vec.y, 12);
+    this.updateBallPosition();
     this.updateOtherPlayers();
+  }
+  updateBallPosition() {
+    const server = this.mmoServer;
+    if (!server) return;
+    if (
+      typeof this.lastBallState == "undefined" ||
+      server.state.ballPositionX != this.lastBallState.ballPositionX ||
+      server.state.ballPositionY != this.lastBallState.ballPositionY
+    ) {
+      const ballPosition = {
+        ballPositionX: server.state.ballPositionX,
+        ballPositionY: server.state.ballPositionY,
+        ballVelocityX: server.state.ballVelocityX,
+        ballVelocityY: server.state.ballVelocityY,
+      };
+      this.lastBallState = ballPosition;
+      this.ball.setPosition(
+        server.state.ballPositionX,
+        server.state.ballPositionY
+      );
+      this.ball.body.setVelocity(
+        server.state.ballVelocityX,
+        server.state.ballVelocityY
+      );
+    }
+  }
+  sendBallPositionToServer() {
+    if (!this.currentPlayer) {
+      return;
+    }
+    if (
+      // Hasn't sent to server recently
+      //  Date.now() - this.packetSentAt > 1000 / 1
+      !this.isSending
+    ) {
+      this.isSending = true;
+      const ballPosition = {
+        ballPositionX: this.ball.x,
+        ballPositionY: this.ball.y,
+        ballVelocityX: this.ball.body.velocity.x,
+        ballVelocityY: this.ball.body.velocity.y,
+      };
+      this.lastBallState = ballPosition;
+      this.packetSentAt = Date.now();
+      const server = this.mmoServer;
+      if (server) {
+        server.send(1, ballPosition);
+      }
+      this.time.delayedCall(1000 / 3, () => {
+        this.isSending = false;
+      });
+    }
   }
 
   resetBall() {
@@ -293,6 +362,7 @@ export class FarmerSoccerScene extends BaseScene {
   bounceBallSound() {
     (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(true);
     this.gameAssets.sfx.kick.play();
+    this.sendBallPositionToServer();
   }
   setupBasicPhysics(scene: FarmerSoccerScene) {
     scene.physics.world.setBounds(16, 16, 320, 128);
@@ -308,15 +378,15 @@ export class FarmerSoccerScene extends BaseScene {
     scene.add
       .line(0, 0, 16 * 11 + 0.5, 16 * 5, 16 * 11 + 0.5, 16 * 13, 0xffffff, 1)
       .setLineWidth(0.5, 0.5);
-    const rect1 = this.add.rectangle(16 * 11, 16 * 5, 0.1, 16 * 8, 0xffffff, 0);
-    scene.physics.add.existing(rect1, true);
-    scene.physics.add.collider(
-      rect1 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      scene.stopPlayer,
-      undefined,
-      scene
-    );
+    // const rect1 = this.add.rectangle(16 * 11, 16 * 5, 0.1, 16 * 8, 0xffffff, 0);
+    // scene.physics.add.existing(rect1, true);
+    // scene.physics.add.collider(
+    //   rect1 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   scene.stopPlayer,
+    //   undefined,
+    //   scene
+    // );
   }
   setupBall(scene: FarmerSoccerScene) {
     scene.ball = scene.physics.add.image(116, 56, "ball");
@@ -614,7 +684,7 @@ export class FarmerSoccerScene extends BaseScene {
     this.ball.body.stop();
     this.ball.setPosition(16 * 11, 16 * 1);
     this.time.delayedCall(3000, () => {
-      this.resetBall();
+      //this.resetBall();
     });
   }
   addRightGoal() {
@@ -623,7 +693,7 @@ export class FarmerSoccerScene extends BaseScene {
     this.ball.body.stop();
     this.ball.setPosition(16 * 11, 16 * 1);
     this.time.delayedCall(3000, () => {
-      this.resetBall();
+      //this.resetBall();
     });
   }
 }
