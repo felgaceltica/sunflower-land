@@ -96,7 +96,7 @@ export const Recipes: React.FC<Props> = ({
           {t("cook")}
         </Button>
         {crafting && (
-          <p className="text-xxs sm:text-xs text-center my-1">
+          <p className="sm:text-xs text-center my-1">
             {t("sceneDialogues.chefIsBusy")}
           </p>
         )}
@@ -124,6 +124,7 @@ export const Recipes: React.FC<Props> = ({
           details={{
             item: selected.name,
           }}
+          hideDescription
           requirements={{
             resources: selected.ingredients,
             xp: new Decimal(
@@ -163,7 +164,7 @@ export const Recipes: React.FC<Props> = ({
               />
             ))}
           </div>
-          {hasFeatureAccess(state, "COOKING_BOOST") && buildingId ? (
+          {buildingId ? (
             <BuildingOilTank
               buildingName={buildingName}
               buildingId={buildingId}

@@ -8,6 +8,7 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { useNavigate } from "react-router-dom";
 import { OuterPanel } from "components/ui/Panel";
 import { useSound } from "lib/utils/hooks/useSound";
+import { hasFeatureAccess } from "lib/flags";
 
 const showDebugBorders = false;
 
@@ -49,14 +50,7 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           onClose();
         }}
       >
-        <span
-          className="text-xs sm:text-sm"
-          style={
-            {
-              "-webkit-text-stroke": "1px black",
-            } as any
-          }
-        >
+        <span className="balance-text text-xxs sm:text-sm">
           {t("world.home")}
         </span>
       </div>
@@ -77,17 +71,33 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           onClose();
         }}
       >
-        <span
-          className="text-xs sm:text-sm"
-          style={
-            {
-              "-webkit-text-stroke": "1px black",
-            } as any
-          }
-        >
+        <span className="balance-text text-xxs sm:text-sm">
           {t("world.plaza")}
         </span>
       </div>
+
+      {hasFeatureAccess(gameService.state.context.state, "KINGDOM") && (
+        <div
+          style={{
+            width: "18%",
+            height: "24%",
+            border: showDebugBorders ? "2px solid red" : "",
+            position: "absolute",
+            left: "35%",
+            bottom: "50%",
+          }}
+          className="flex justify-center items-center cursor-pointer"
+          onClick={() => {
+            travel.play();
+            navigate("/world/kingdom");
+            onClose();
+          }}
+        >
+          <span className="balance-text text-xxs sm:text-sm">
+            {t("world.kingdom")}
+          </span>
+        </div>
+      )}
 
       <div
         style={{
@@ -105,14 +115,7 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           onClose();
         }}
       >
-        <span
-          className="text-xs sm:text-sm"
-          style={
-            {
-              "-webkit-text-stroke": "1px black",
-            } as any
-          }
-        >
+        <span className="balance-text text-xxs sm:text-sm">
           {t("world.beach")}
         </span>
       </div>
@@ -133,14 +136,7 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           onClose();
         }}
       >
-        <span
-          className="text-xs sm:text-sm"
-          style={
-            {
-              "-webkit-text-stroke": "1px black",
-            } as any
-          }
-        >
+        <span className="balance-text text-xxs sm:text-sm">
           {t("world.woodlands")}
         </span>
       </div>
@@ -161,10 +157,15 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         }}
         >
         <span
-          className="text-xs sm:text-sm"
+                   className="text-xs sm:text-sm"
+          style={{
+             textShadow:
+              "1px 1px 0 white, -1px 1px 0 white, 1px -1px 0 white,-1px -1px 0 white,1px 0 0 white,-1px 0 0 white,0 1px 0 white,0 -1px 0 white",
+           
+          }}
           style={
             {
-              "-webkit-text-stroke": "1px black",
+              
             } as any
           }
         >
@@ -189,14 +190,7 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           onClose();
         }}
       >
-        <span
-          className="text-xs sm:text-sm"
-          style={
-            {
-              "-webkit-text-stroke": "1px black",
-            } as any
-          }
-        >
+        <span className="balance-text text-xxs sm:text-sm">
           {t("world.retreat")}
         </span>
       </div>

@@ -111,10 +111,15 @@ export const Buildings: React.FC<Props> = ({ onClose }) => {
       return (
         <Label type="danger">
           {t("islandupgrade.requiredIsland", {
-            islandType: capitalize(
-              buildingBlueprints[nextBlueprintIndex]
-                .requiredIsland as IslandType
-            ),
+            islandType:
+              buildingBlueprints[nextBlueprintIndex].requiredIsland === "spring"
+                ? "Petal Paradise"
+                : t("islandupgrade.otherIsland", {
+                    island: capitalize(
+                      buildingBlueprints[nextBlueprintIndex]
+                        .requiredIsland as IslandType
+                    ),
+                  }),
           })}
         </Label>
       );
@@ -135,7 +140,11 @@ export const Buildings: React.FC<Props> = ({ onClose }) => {
       );
 
     if (isAlreadyCrafted) {
-      return <p className="text-xxs text-center mb-1">{t("alr.crafted")}</p>;
+      return (
+        <p className="text-xxs text-center mb-1 font-secondary">
+          {t("alr.crafted")}
+        </p>
+      );
     }
 
     return (

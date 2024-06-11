@@ -1,3 +1,4 @@
+import { getKeys } from "features/game/types/craftables";
 import { GameState } from "features/game/types/game";
 import { CONFIG } from "lib/config";
 
@@ -10,6 +11,10 @@ const clashOfFactionsFeatureFlag = () => {
   if (testnetFeatureFlag()) return true;
 
   return Date.now() > new Date("2024-05-01T00:00:00Z").getTime();
+};
+
+const timeBasedFeatureFlag = (date: Date) => () => {
+  return testnetFeatureFlag() || Date.now() > date.getTime();
 };
 /*
  * How to Use:
@@ -28,10 +33,10 @@ export type FeatureName =
   | "PRESTIGE_DESERT"
   | "CHICKEN_RESCUE"
   | "CROP_MACHINE"
-  | "COOKING_BOOST"
   | "DESERT_RECIPES"
   | "KINGDOM"
-  | "FACTION_HOUSE";
+  | "FACTION_HOUSE"
+  | "CLAIM_EMBLEMS";
 
 // Used for testing production features
 export const ADMIN_IDS = [1, 2, 3, 39488];
@@ -43,7 +48,15 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   DESERT_RECIPES: defaultFeatureFlag,
-  KINGDOM: defaultFeatureFlag,
+  KINGDOM: (game) => {
+    const hasCastleBud = getKeys(game.buds ?? {}).some(
+      (id) => game.buds?.[id].type === "Castle"
+    );
+
+    if (hasCastleBud) return true;
+
+    return defaultFeatureFlag(game);
+  },
   FACTION_HOUSE: defaultFeatureFlag,
   EASTER: (game) => {
     // Event ended
@@ -57,8 +70,9 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   FACTION_LEADERBOARD: clashOfFactionsFeatureFlag,
   BANNER_SALES: clashOfFactionsFeatureFlag,
   PRESTIGE_DESERT: defaultFeatureFlag,
-  CROP_MACHINE: defaultFeatureFlag,
-  COOKING_BOOST: defaultFeatureFlag,
+  // Just in case we need to disable the crop machine, leave the flag in temporarily
+  CROP_MACHINE: () => true,
+  CLAIM_EMBLEMS: timeBasedFeatureFlag(new Date("2024-06-14T00:00:00Z")),
 };
 
 export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {

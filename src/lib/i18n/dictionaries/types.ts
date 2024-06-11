@@ -1,24 +1,17 @@
 export type GeneralTerms =
   | "2x.sale"
   | "achievements"
-  | "accept"
-  | "accepting.terms"
-  | "advanced"
-  | "already.own.item"
   | "amount.matic"
   | "are.you.sure"
   | "deposit"
   | "add.liquidity"
   | "add"
   | "addSFL"
-  | "alr.bought"
   | "alr.claim"
   | "alr.completed"
   | "alr.crafted"
   | "alr.minted"
   | "auction"
-  | "auctions"
-  | "available.all.year"
   | "available"
   | "back"
   | "bait"
@@ -27,7 +20,6 @@ export type GeneralTerms =
   | "banner"
   | "banners"
   | "basket"
-  | "beach.bounty"
   | "beta"
   | "bid"
   | "bounty"
@@ -36,7 +28,6 @@ export type GeneralTerms =
   | "bought"
   | "cancel"
   | "card.cash"
-  | "caught"
   | "check"
   | "chest"
   | "chores"
@@ -49,12 +40,10 @@ export type GeneralTerms =
   | "coins"
   | "collect"
   | "coming.soon"
-  | "common"
   | "completed"
   | "complete"
   | "confirm"
   | "congrats"
-  | "connected"
   | "connecting"
   | "continue"
   | "cook"
@@ -64,13 +53,9 @@ export type GeneralTerms =
   | "copy.failed"
   | "coupons"
   | "craft"
-  | "craft"
-  | "crafting"
   | "crops"
-  | "currently.Unavailable"
   | "danger"
   | "date"
-  | "decoration"
   | "deliver"
   | "deliveries"
   | "delivery"
@@ -78,12 +63,7 @@ export type GeneralTerms =
   | "details"
   | "donate"
   | "donating"
-  | "donation"
   | "donations"
-  | "drafting.noitem"
-  | "drafting.select"
-  | "drafting.trade.detail"
-  | "dragMe"
   | "earn"
   | "easter.eggs"
   | "egg"
@@ -97,7 +77,6 @@ export type GeneralTerms =
   | "expand"
   | "explore"
   | "faction"
-  | "farm.storage"
   | "farm"
   | "featured"
   | "fee"
@@ -109,31 +88,24 @@ export type GeneralTerms =
   | "flowers"
   | "flowers.found"
   | "for"
-  | "for.info.wearable"
   | "forbidden"
   | "free"
   | "fruit"
   | "fruits"
   | "gift"
   | "go.home"
-  | "goblin.delivery"
-  | "goblin.exchange"
   | "gotIt"
-  | "goto"
   | "grant.wish"
   | "greenhouse"
+  | "growing"
   | "guide"
-  | "harvested"
   | "honey"
   | "hungry?"
   | "info"
   | "item"
-  | "kick"
-  | "land.id"
   | "land"
   | "last.updated"
   | "left"
-  | "let'sDoThis"
   | "lets.go"
   | "linked.wallet"
   | "limit"
@@ -146,8 +118,6 @@ export type GeneralTerms =
   | "maintenance"
   | "make.wish"
   | "making.wish"
-  | "message"
-  | "messages"
   | "max"
   | "max.reached"
   | "minimum"
@@ -163,9 +133,6 @@ export type GeneralTerms =
   | "no.obsessions"
   | "no.thanks"
   | "no"
-  | "no.event"
-  | "no.have.bumpkin"
-  | "not.required"
   | "ocean.fishing"
   | "off"
   | "offer.end"
@@ -174,8 +141,6 @@ export type GeneralTerms =
   | "open"
   | "open.gift"
   | "optional"
-  | "p2p.trading"
-  | "pass.required"
   | "pay.attention.feedback"
   | "place"
   | "place.map"
@@ -184,17 +149,12 @@ export type GeneralTerms =
   | "plant"
   | "player"
   | "play.again"
-  | "please.wait"
   | "please.try.again"
   | "print"
-  | "promo.code"
-  | "providing.liquidity"
   | "purchased"
   | "purchasing"
   | "rank"
-  | "rare"
   | "read.more"
-  | "ready.trade"
   | "refresh"
   | "refreshing"
   | "remaining"
@@ -208,7 +168,6 @@ export type GeneralTerms =
   | "required"
   | "requires"
   | "requirements"
-  | "resale"
   | "resources"
   | "restock"
   | "retry"
@@ -216,9 +175,7 @@ export type GeneralTerms =
   | "reward.discovered"
   | "save"
   | "saving"
-  | "search"
   | "searching"
-  | "seasonal.treasure"
   | "seeds"
   | "selected"
   | "select.resource"
@@ -226,43 +183,30 @@ export type GeneralTerms =
   | "sell.one"
   | "sell.ten"
   | "sell"
-  | "session.expire"
   | "session.expired"
-  | "settings"
   | "sfl/coins"
   | "share"
-  | "shopping"
   | "skillPts"
   | "skills"
   | "skipping"
   | "skip.order"
   | "sound.effects"
-  | "special.event"
-  | "spin"
   | "start"
-  | "start.new.chore"
   | "submit"
   | "submitting"
   | "success"
-  | "support.team"
   | "swapping"
   | "syncing"
   | "task"
-  | "terms.condition"
   | "test"
   | "thank.you"
-  | "time"
   | "tools"
   | "total"
   | "trades"
   | "trading"
   | "transfer"
-  | "trash.collection"
-  | "travel"
-  | "traveller.ready"
   | "try.again"
   | "uhOh"
-  | "uncommon"
   | "unlock.land"
   | "unlocking"
   | "unmute"
@@ -271,20 +215,13 @@ export type GeneralTerms =
   | "version"
   | "viewAll"
   | "visit"
-  | "visit.enter.land"
-  | "visit.friend"
-  | "visit.land"
-  | "wallet"
   | "warning"
   | "welcome"
   | "wish"
   | "wishing.well"
   | "withdraw"
-  | "withdrawing"
   | "yes.please"
   | "yes"
-  | "you.are.here"
-  | "hoarding.check"
   | "opensea"
   | "layouts"
   | "labels"
@@ -299,13 +236,6 @@ export type GeneralTerms =
   | "collectibles"
   | "buds"
   | "wearables"
-  | "bumpkin"
-  | "storage"
-  | "upcoming"
-  | "collection"
-  | "purchase"
-  | "listing"
-  | "cancelling"
   | "skip"
   | "docs"
   | "exit"
@@ -318,9 +248,7 @@ export type GeneralTerms =
   | "buildings"
   | "boosts"
   | "decorations"
-  | "goblin.deliveries"
-  | "vipAccess"
-  | "vip";
+  | "vipAccess";
 
 export type TimeUnits =
   // Singular
@@ -403,8 +331,7 @@ export type AchievementsTerms =
   | "treasureHunter.two"
   | "eggcellentCollection.description"
   | "eggcellentCollection.one"
-  | "eggcellentCollection.two"
-  | "task.harvestSunflowers";
+  | "eggcellentCollection.two";
 
 export type Auction =
   | "auction.title"
@@ -430,20 +357,17 @@ export type AvailableSeeds =
   | "quickSelect.label"
   | "quickSelect.empty";
 
-export type Base = "base.missing" | "base.far.away" | "base.iam.far.away";
+export type Base = "base.far.away" | "base.iam.far.away";
 
 export type BasicTreasure =
   | "basic.treasure.missingKey"
   | "basic.treasure.needKey"
-  | "rare.treasure.needKey"
-  | "luxury.treasure.needKey"
   | "basic.treasure.getKey"
-  | "basic.treasure.goodLuck"
-  | "basic.treasure.key"
   | "basic.treasure.congratsKey"
   | "basic.treasure.openChest"
+  | "rare.treasure.needKey"
+  | "luxury.treasure.needKey"
   | "giftGiver.label"
-  | "giftGiver.opened"
   | "giftGiver.description"
   | "budBox.open"
   | "budBox.opened"
@@ -456,19 +380,11 @@ export type BasicTreasure =
   | "raffle.how"
   | "raffle.enter";
 
-export type Beach = "beach.party" | "beach.ready";
-
 export type Beehive =
   | "beehive.harvestHoney"
   | "beehive.noFlowersGrowing"
   | "beehive.beeSwarm"
   | "beehive.pollinationCelebration";
-
-export type BeachLuck =
-  | "beachLuck.tryLuck"
-  | "beachLuck.uncleFound"
-  | "beachLuck.grabShovel"
-  | "beachLuck.refreshesIn";
 
 export type BirdiePlaza =
   | "birdieplaza.birdieIntro"
@@ -662,7 +578,8 @@ export type BoostEffectDescriptions =
   | "description.pan.boost"
   | "description.vinny.boost"
   | "description.rice.panda.boost"
-  | "description.olive.shirt.boost";
+  | "description.olive.shirt.boost"
+  | "description.tofu.mask.boost";
 
 export type BountyDescription =
   | "description.clam.shell"
@@ -706,10 +623,6 @@ export type BuildingDescriptions =
   | "cooking.building.runtime";
 
 export type BumpkinDelivery =
-  | "bumpkin.delivery.haveFlower"
-  | "bumpkin.delivery.notFavorite"
-  | "bumpkin.delivery.loveFlower"
-  | "bumpkin.delivery.favoriteFlower"
   | "bumpkin.delivery.selectFlower"
   | "bumpkin.delivery.noFlowers"
   | "bumpkin.delivery.thanks"
@@ -831,7 +744,8 @@ export type BumpkinTrade =
   | "bumpkinTrade.minimumFloor"
   | "bumpkinTrade.maximumFloor"
   | "bumpkinTrade.floorPrice"
-  | "bumpkinTrade.sellConfirmation";
+  | "bumpkinTrade.sellConfirmation"
+  | "bumpkinTrade.cant.sell.all";
 
 export type GoblinTrade =
   | "goblinTrade.select"
@@ -903,7 +817,9 @@ export type ChumDetails =
   | "chumDetails.redPansy"
   | "chumDetails.richChicken"
   | "chumDetails.fatChicken"
-  | "chumDetails.speedChicken";
+  | "chumDetails.speedChicken"
+  | "chumDetails.horseMackerel"
+  | "chumDetails.sunfish";
 
 export type Community = "community.toast" | "community.url" | "comunity.Travel";
 
@@ -920,7 +836,9 @@ export type ComposterDescription =
 
 export type ConfirmSkill = "confirm.skillClaim";
 
-export type ConfirmationTerms = "confirmation.sellCrops";
+export type ConfirmationTerms =
+  | "confirmation.sellCrops"
+  | "confirmation.buyCrops";
 
 export type Conversations =
   | "hank-intro.headline"
@@ -939,6 +857,8 @@ export type Conversations =
   | "betty.market-intro.two"
   | "betty.market-intro.three"
   | "betty.market-intro.four"
+  | "firepit-intro.one"
+  | "firepit-intro.two"
   | "bruce-intro.headline"
   | "bruce-intro.one"
   | "bruce-intro.two"
@@ -1061,7 +981,11 @@ export type CropMachine =
   | "cropMachine.harvestAllCrops"
   | "cropMachine.maxRuntime"
   | "cropMachine.oilToAdd"
-  | "cropMachine.totalRuntime";
+  | "cropMachine.totalRuntime"
+  | "cropMachine.running"
+  | "cropMachine.stopped"
+  | "cropMachine.idle"
+  | "cropMachine.name";
 
 export type DeliveryItem =
   | "deliveryitem.inventory"
@@ -1264,12 +1188,12 @@ export type DecorationDescriptions =
   | "description.Farmhand"
   | "description.Beehive"
   | "description.battleCryDrum"
-  | "description.bullseyBoard"
+  | "description.bullseyeBoard"
   | "description.chessRug"
   | "description.cluckapult"
   | "description.goldenGallant"
   | "description.goldenGarrison"
-  | "description.goldenGurdian"
+  | "description.goldenGuardian"
   | "description.noviceKnight"
   | "description.regularPawn"
   | "description.rookieRook"
@@ -1386,7 +1310,11 @@ export type DiscordBonus =
   | "discord.bonus.communityInfo"
   | "discord.bonus.farmingTips"
   | "discord.bonus.freeGift"
-  | "discord.bonus.connect";
+  | "discord.bonus.connect"
+  | "fontReward.bonus.claim"
+  | "fontReward.bonus.intro1"
+  | "fontReward.bonus.intro2"
+  | "fontReward.bonus.intro3";
 
 export type DraftBid =
   | "draftBid.howAuctionWorks"
@@ -1437,8 +1365,6 @@ export type ErrorTerms =
   | "error.composterAlreadyBoosted"
   | "error.missingEggs"
   | "error.insufficientSFL"
-  | "error.insufficientCoins"
-  | "error.insufficientSpaceForChickens"
   | "error.dailyAttemptsExhausted"
   | "error.missingRod"
   | "error.missingBait"
@@ -1461,13 +1387,7 @@ export type ErrorTerms =
   | "error.requiredBuildingNotExist"
   | "error.cookingInProgress"
   | "error.insufficientIngredient"
-  | "error.itemNotExist"
-  | "error.notEnoughStock"
-  | "error.tooEarly"
-  | "error.tooLate"
   | "error.insufficientSFL"
-  | "error.decorationCollides"
-  | "error.idAlreadyExists"
   | "error.ClientRPC"
   | "error.walletInUse.one"
   | "error.walletInUse.two"
@@ -1508,7 +1428,37 @@ export type Factions =
   | "faction.seasonal.delivery.start.at"
   | "faction.points.with.number"
   | "faction.points.title"
-  | "faction.points.pledge.warning";
+  | "faction.points.pledge.warning"
+  | "faction.emblemAirdrop"
+  | "faction.emblemAirdrop.closes"
+  // Kingdom
+  | "faction.restrited.area"
+  | "faction.not.pledged"
+  | "faction.cost"
+  | "faction.pledge.reward"
+  | "faction.welcome"
+  | "faction.greeting.goblins"
+  | "faction.greeting.sunflorians"
+  | "faction.greeting.bumpkins"
+  | "faction.greeting.nightshades"
+  // Emblem Airdrop
+  | "faction.claimEmblems.alreadyClaimed"
+  | "faction.claimEmblems.emblemsEarned"
+  | "faction.claimEmblems.yourRank"
+  | "faction.claimEmblems.yourPercentile"
+  | "faction.claimEmblems.yourEmblems"
+  | "faction.claimEmblems.noContribution"
+  | "faction.claimEmblems.statistics"
+  | "faction.claimEmblems.thankYou"
+  | "faction.claimEmblems.claimMessage"
+  | "faction.claimEmblems.claim"
+  | "faction.claimEmblems.congratulations"
+  | "faction.claimEmblems.comparison"
+  | "faction.claimEmblems.totalMembers"
+  | "faction.claimEmblems.totalEmblems"
+  | "faction.claimEmblems.percentile"
+  | "faction.claimEmblems.travelNow"
+  | "faction.claimEmblems.visitMe";
 
 export type FestiveTree =
   | "festivetree.greedyBumpkin"
@@ -1586,6 +1536,7 @@ export type FishermanModal =
   | "fishermanModal.fishBenefits"
   | "fishermanModal.baitAndResources"
   | "fishermanModal.crazyHappening"
+  | "fishermanModal.fullMoon"
   | "fishermanModal.bonusFish"
   | "fishermanModal.dailyLimitReached"
   | "fishermanModal.needCraftRod"
@@ -1719,7 +1670,7 @@ export type FoodDescriptions =
   | "description.riceBun"
   | "description.slowJuice"
   | "description.steamedRedRice"
-  | "description.sushirRoll"
+  | "description.sushiRoll"
   | "description.theLot"
   | "description.tofuScramble"
   | "description.antipasto"
@@ -1829,7 +1780,12 @@ export type GameDescriptions =
   | "description.pink.egg"
   | "description.purple.egg"
   //Home
-  | "description.homeOwnerPainting";
+  | "description.homeOwnerPainting"
+  | "description.goblin.emblem"
+  | "description.sunflorian.emblem"
+  | "description.bumpkin.emblem"
+  | "description.nightshade.emblem"
+  | "description.faction.mark";
 
 export type GameTerms =
   | "auction.winner"
@@ -2041,7 +1997,8 @@ export type Islandupgrade =
   | "islandupgrade.notReadyExpandMore"
   | "islandupgrade.exoticResourcesDescription"
   | "islandupgrade.desertResourcesDescription"
-  | "islandupgrade.requiredIsland";
+  | "islandupgrade.requiredIsland"
+  | "islandupgrade.otherIsland";
 
 export type InteractableModals =
   | "interactableModals.returnhome.message"
@@ -2115,6 +2072,7 @@ export type IslandName =
   | "island.home"
   | "island.pumpkin.plaza"
   | "island.beach"
+  | "island.kingdom"
   | "island.woodlands"
   | "island.helios"
   | "island.goblin.retreat";
@@ -2244,7 +2202,9 @@ export type Noaccount =
   | "noaccount.createNewFarm"
   | "noaccount.selectNFTID"
   | "noaccount.welcomeMessage"
-  | "noaccount.promoCodeLabel";
+  | "noaccount.promoCodeLabel"
+  | "noaccount.haveFarm"
+  | "noaccount.letsGo";
 
 export type NoBumpkin =
   | "noBumpkin.readyToFarm"
@@ -2399,7 +2359,34 @@ export type NPC_MESSAGE =
   | "npcMessages.shelly.msg5"
   | "npcMessages.shelly.msg6"
   | "npcMessages.shelly.msg7"
-  | "npcMessages.shelly.msg8";
+  | "npcMessages.shelly.msg8"
+  | "npcMessages.gambit.msg1"
+  | "npcMessages.gambit.msg2"
+  | "npcMessages.gambit.msg3"
+  | "npcMessages.gambit.msg4"
+  | "npcMessages.gambit.msg5"
+  | "npcMessages.gambit.msg6"
+  | "npcMessages.gambit.msg7"
+  | "npcMessages.gambit.msg8"
+  | "npcMessages.gambit.msg9"
+  | "npcMessages.queenVictoria.msg1"
+  | "npcMessages.queenVictoria.msg2"
+  | "npcMessages.queenVictoria.msg3"
+  | "npcMessages.queenVictoria.msg4"
+  | "npcMessages.queenVictoria.msg5"
+  | "npcMessages.queenVictoria.msg6"
+  | "npcMessages.queenVictoria.msg7"
+  | "npcMessages.queenVictoria.msg8"
+  | "npcMessages.queenVictoria.msg9"
+  | "npcMessages.jester.msg1"
+  | "npcMessages.jester.msg2"
+  | "npcMessages.jester.msg3"
+  | "npcMessages.jester.msg4"
+  | "npcMessages.jester.msg5"
+  | "npcMessages.jester.msg6"
+  | "npcMessages.jester.msg7"
+  | "npcMessages.jester.msg8"
+  | "npcMessages.jester.msg9";
 
 export type Npc =
   | "npc.Modal.Hammer"
@@ -2688,11 +2675,71 @@ export type NpcDialogues =
   | "npcDialogues.tywin.badFlower"
   | "npcDialogues.tywin.goodFlower"
 
-  // Glinteye dialogue
-  | "npcDialogues.glinteye.intro1"
-  | "npcDialogues.glinteye.intro2"
-  | "npcDialogues.glinteye.intro3"
-  | "npcDialogues.glinteye.intro4";
+  // Queen Victoria NoOrde
+  | "npcDialogues.queenVictoria.intro1"
+  | "npcDialogues.queenVictoria.intro2"
+  | "npcDialogues.queenVictoria.intro3"
+  | "npcDialogues.queenVictoria.intro4"
+  | "npcDialogues.queenVictoria.intro5"
+  | "npcDialogues.queenVictoria.positiveDelivery1"
+  | "npcDialogues.queenVictoria.positiveDelivery2"
+  | "npcDialogues.queenVictoria.positiveDelivery3"
+  | "npcDialogues.queenVictoria.positiveDelivery4"
+  | "npcDialogues.queenVictoria.positiveDelivery5"
+  | "npcDialogues.queenVictoria.negativeDelivery1"
+  | "npcDialogues.queenVictoria.negativeDelivery2"
+  | "npcDialogues.queenVictoria.negativeDelivery3"
+  | "npcDialogues.queenVictoria.negativeDelivery4"
+  | "npcDialogues.queenVictoria.negativeDelivery5"
+  | "npcDialogues.queenVictoria.noOrder1"
+  | "npcDialogues.queenVictoria.noOrder2"
+  | "npcDialogues.queenVictoria.reward"
+  | "npcDialogues.queenVictoria.flowerIntro"
+  | "npcDialogues.queenVictoria.averageFlower"
+  | "npcDialogues.queenVictoria.badFlower"
+  | "npcDialogues.queenVictoria.goodFlower"
+  // Gambit
+  | "npcDialogues.gambit.intro1"
+  | "npcDialogues.gambit.intro2"
+  | "npcDialogues.gambit.intro3"
+  | "npcDialogues.gambit.intro4"
+  | "npcDialogues.gambit.intro5"
+  | "npcDialogues.gambit.positiveDelivery1"
+  | "npcDialogues.gambit.positiveDelivery2"
+  | "npcDialogues.gambit.positiveDelivery3"
+  | "npcDialogues.gambit.positiveDelivery4"
+  | "npcDialogues.gambit.positiveDelivery5"
+  | "npcDialogues.gambit.negativeDelivery1"
+  | "npcDialogues.gambit.negativeDelivery2"
+  | "npcDialogues.gambit.negativeDelivery3"
+  | "npcDialogues.gambit.negativeDelivery4"
+  | "npcDialogues.gambit.negativeDelivery5"
+  | "npcDialogues.gambit.noOrder1"
+  | "npcDialogues.gambit.noOrder2"
+  // Jester
+  | "npcDialogues.jester.intro1"
+  | "npcDialogues.jester.intro2"
+  | "npcDialogues.jester.intro3"
+  | "npcDialogues.jester.intro4"
+  | "npcDialogues.jester.intro5"
+  | "npcDialogues.jester.positiveDelivery1"
+  | "npcDialogues.jester.positiveDelivery2"
+  | "npcDialogues.jester.positiveDelivery3"
+  | "npcDialogues.jester.positiveDelivery4"
+  | "npcDialogues.jester.positiveDelivery5"
+  | "npcDialogues.jester.negativeDelivery1"
+  | "npcDialogues.jester.negativeDelivery2"
+  | "npcDialogues.jester.negativeDelivery3"
+  | "npcDialogues.jester.negativeDelivery4"
+  | "npcDialogues.jester.negativeDelivery5"
+  | "npcDialogues.jester.noOrder1"
+  | "npcDialogues.jester.noOrder2"
+  | "npcDialogues.jester.reward"
+  | "npcDialogues.jester.flowerIntro"
+  | "npcDialogues.jester.averageFlower"
+  | "npcDialogues.jester.badFlower"
+  | "npcDialogues.jester.goodFlower"
+  | "npcDialogues.tywin.goodFlower";
 
 export type NyeButton = "plaza.magicButton.query";
 
@@ -2832,8 +2879,7 @@ export type RemoveKuebiko =
 
 export type RemoveCropMachine =
   | "removeCropMachine.title"
-  | "removeCropMachine.description"
-  | "removeCropMachine.removeSeeds";
+  | "removeCropMachine.description";
 
 export type Resale = "resale.actionText";
 
@@ -2843,7 +2889,11 @@ export type ResourceTerms =
   | "wildMushroom.description"
   | "honey.description";
 
-export type Restock = "restock.one.buck" | "restock.sure" | "restock.seed.buy";
+export type Restock =
+  | "restock.one.buck"
+  | "restock.sure"
+  | "restock.tooManySeeds"
+  | "seeds.reachingInventoryLimit";
 
 export type RetreatTerms =
   | "retreatTerms.lookingForRareItems"
@@ -3356,7 +3406,8 @@ export type RestrictionReason =
   | "restrictionReason.festiveSeason"
   | "restrictionReason.noRestriction"
   | "restrictionReason.genieLampRubbed"
-  | "restrictionReason.oilReserveDrilled";
+  | "restrictionReason.oilReserveDrilled"
+  | "restrictionReason.buildingInUse";
 
 export type Leaderboard =
   | "leaderboard.leaderboard"
@@ -3380,6 +3431,10 @@ export type GameOptions =
   | "gameOptions.generalSettings.connectDiscord"
   | "gameOptions.generalSettings.assignRole"
   | "gameOptions.generalSettings.changeLanguage"
+  | "gameOptions.generalSettings.darkMode"
+  | "gameOptions.generalSettings.lightMode"
+  | "gameOptions.generalSettings.font"
+  | "gameOptions.generalSettings.appearance"
   | "gameOptions.generalSettings.disableAnimations"
   | "gameOptions.generalSettings.enableAnimations"
   | "gameOptions.generalSettings.share"
@@ -3412,6 +3467,19 @@ export type Minigame =
 
 export type KitchenKeys = "kitchen.oilRemaining";
 
+export type EasterEggKeys =
+  | "easterEgg.lostKnight"
+  | "easterEgg.queensDiary"
+  | "easterEgg.jesterDiary"
+  | "easterEgg.tywinDiary"
+  | "easterEgg.kingDiary"
+  | "easterEgg.kingdomBook1"
+  | "easterEgg.kingdomBook2"
+  | "easterEgg.kingdomBook3"
+  | "easterEgg.kingdomBook4"
+  | "easterEgg.kingdomBook5"
+  | "easterEgg.knight";
+
 export type TranslationKeys =
   | AchievementsTerms
   | Auction
@@ -3419,9 +3487,7 @@ export type TranslationKeys =
   | AvailableSeeds
   | Base
   | BasicTreasure
-  | Beach
   | Beehive
-  | BeachLuck
   | BirdiePlaza
   | BoostDescriptions
   | BoostEffectDescriptions
@@ -3590,4 +3656,5 @@ export type TranslationKeys =
   | NyonStatue
   | Trading
   | RestrictionReason
-  | Leaderboard;
+  | Leaderboard
+  | EasterEggKeys;
