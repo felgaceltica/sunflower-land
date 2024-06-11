@@ -98,8 +98,8 @@ export const SPAWNS: () => SpawnLocation = () => ({
   },
   farmer_soccer: {
     default: {
-      x: 96 + randomXOffset,
-      y: 80 + randomYOffset,
+      x: 16 * 11 + randomXOffset,
+      y: 16 * 11 + randomYOffset,
     },
   },
 });

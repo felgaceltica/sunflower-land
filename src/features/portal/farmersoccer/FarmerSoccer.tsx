@@ -8,9 +8,9 @@ import { PortalContext, PortalProvider } from "./lib/PortalProvider";
 import { Ocean } from "features/world/ui/Ocean";
 import { FarmerSoccerHud } from "./components/FarmerSoccerHud";
 import { FarmerSoccerPhaser } from "./FarmerSoccerPhaser";
+import { FarmerSoccerModals } from "./components/FarmerSoccerModals";
 import { Label } from "components/ui/Label";
 import { authorisePortal } from "features/portal/farmersoccer/lib/portalUtil";
-//import { CropBoomRules } from "./components/CropBoomRules";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
 export const FarmerSoccerApp: React.FC = () => {
@@ -27,7 +27,6 @@ export const FarmerSoccer: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const [portalState] = useActor(portalService);
   const { t } = useAppTranslation();
-
   return (
     <div>
       {portalState.matches("unauthorised") && (
@@ -45,6 +44,7 @@ export const FarmerSoccer: React.FC = () => {
         <>
           <FarmerSoccerHud />
           <FarmerSoccerPhaser />
+          <FarmerSoccerModals />
         </>
       )}
     </div>
