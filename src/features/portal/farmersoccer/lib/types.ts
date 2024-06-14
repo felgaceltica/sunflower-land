@@ -8,7 +8,7 @@ export interface Clothing {
 }
 import { Equipped } from "features/game/types/bumpkin";
 
-export type NPCName = "RedTeamNPC" | "BlueTeamNPC";
+export type NPCName = "RedTeamNPC" | "BlueTeamNPC" | "DonationNPC";
 export const FARMER_SOCCER_NPCS: Record<NPCName, Equipped> = {
   RedTeamNPC: {
     body: "Goblin Potion",
@@ -25,5 +25,15 @@ export const FARMER_SOCCER_NPCS: Record<NPCName, Equipped> = {
     shirt: "Blue Farmer Shirt",
     pants: "Farmer Pants",
     tool: "",
+  },
+  DonationNPC: {
+    body: "Light Brown Farmer Potion",
+    shirt: "Pirate Leather Polo",
+    hat: "Feather Hat",
+    hair: "Sun Spots",
+    tool: "Merch Coffee Mug",
+    pants: "Farmer Pants",
+    background: "Seashore Background",
+    shoes: "Brown Boots",
   },
 };

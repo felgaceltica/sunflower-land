@@ -5,17 +5,35 @@ import { Panel } from "components/ui/Panel";
 import { Button } from "components/ui/Button";
 import { FARMER_SOCCER_NPCS } from "../lib/types";
 import PubSub from "pubsub-js";
+import { CountdownLabel } from "components/ui/CountdownLabel";
+import { FarmerSoccerDonations } from "./FarmerSoccerDonations";
 
 export const FarmerSoccerModals: React.FC = () => {
   const [showJoinRedModal, setshowJoinRedModal] = useState(false);
   const [showLeaveRedModal, setshowLeaveRedModal] = useState(false);
-  const [showAnotherTeamRedModal, setshowAnotherTeamRedModal] = useState(false);
+  const [showReadyRedModal, setshowReadyRedModal] = useState(false);
   const [showJoinBlueModal, setshowJoinBlueModal] = useState(false);
   const [showLeaveBlueModal, setshowLeaveBlueModal] = useState(false);
-  const [showAnotherTeamBlueModal, setshowAnotherTeamBlueModal] =
-    useState(false);
+  const [showReadyBlueModal, setshowReadyBlueModal] = useState(false);
+
+  const [showDonationModal, setshowDonationModal] = useState(false);
+  const [showWinnerModal, setshowWinnerModal] = useState(false);
+  const [showLoserModal, setshowLoserModal] = useState(false);
+  const [showAbandonModal, setshowAbandonModal] = useState(false);
+  const [showAnotherTeamModal, setshowAnotherTeamModal] = useState(false);
+  const [NPC, setNPC] = useState(FARMER_SOCCER_NPCS.RedTeamNPC);
+
+  const [time, setTime] = useState(30);
+  const [time5, setTime5] = useState(5);
+  const [leave, setLeave] = useState(false);
+  let confirmTime = Date.now();
+
+  let interval: NodeJS.Timer;
 
   useEffect(() => {
+    PubSub.subscribe("showDonationModal", () => {
+      setshowDonationModal(true);
+    });
     PubSub.subscribe("showJoinRedModal", () => {
       setshowJoinRedModal(true);
     });
@@ -23,7 +41,41 @@ export const FarmerSoccerModals: React.FC = () => {
       setshowLeaveRedModal(true);
     });
     PubSub.subscribe("showAnotherTeamRedModal", () => {
-      setshowAnotherTeamRedModal(true);
+      setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+      setshowAnotherTeamModal(true);
+    });
+    PubSub.subscribe("showReadyRedModal", () => {
+      confirmTime = Date.now();
+      if (!showReadyRedModal) {
+        setshowLeaveRedModal(false);
+        setshowReadyRedModal(true);
+        setLeave(true);
+        interval = setInterval(() => {
+          const timeLeft = 30 - (Date.now() - confirmTime) / 1000;
+          setTime(timeLeft);
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            setshowReadyRedModal(false);
+            if (leave) LeaveRedTeam();
+          }
+        }, 1000);
+      }
+    });
+    PubSub.subscribe("showRedAbandonModal", () => {
+      confirmTime = Date.now();
+      if (!showAbandonModal) {
+        setshowReadyBlueModal(false);
+        setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+        setshowAbandonModal(true);
+        interval = setInterval(() => {
+          const timeLeft = 5 - (Date.now() - confirmTime) / 1000;
+          setTime5(timeLeft);
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            setshowAbandonModal(false);
+          }
+        }, 1000);
+      }
     });
     PubSub.subscribe("showJoinBlueModal", () => {
       setshowJoinBlueModal(true);
@@ -32,9 +84,60 @@ export const FarmerSoccerModals: React.FC = () => {
       setshowLeaveBlueModal(true);
     });
     PubSub.subscribe("showAnotherTeamBlueModal", () => {
-      setshowAnotherTeamBlueModal(true);
+      setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+      setshowAnotherTeamModal(true);
+    });
+    PubSub.subscribe("showReadyBlueModal", () => {
+      confirmTime = Date.now();
+      if (!showReadyBlueModal) {
+        setshowLeaveBlueModal(false);
+        setshowReadyBlueModal(true);
+        setLeave(true);
+        interval = setInterval(() => {
+          const timeLeft = 30 - (Date.now() - confirmTime) / 1000;
+          setTime(timeLeft);
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            setshowReadyBlueModal(false);
+            if (leave) LeaveBlueTeam();
+          }
+        }, 1000);
+      }
+    });
+    PubSub.subscribe("showBlueAbandonModal", () => {
+      confirmTime = Date.now();
+      if (!showAbandonModal) {
+        setshowReadyRedModal(false);
+        setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+        setshowAbandonModal(true);
+        interval = setInterval(() => {
+          const timeLeft = 5 - (Date.now() - confirmTime) / 1000;
+          setTime5(timeLeft);
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            setshowAbandonModal(false);
+          }
+        }, 1000);
+      }
+    });
+    PubSub.subscribe("showWinnerModalRed", () => {
+      setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+      setshowWinnerModal(true);
+    });
+    PubSub.subscribe("showWinnerModalBlue", () => {
+      setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+      setshowWinnerModal(true);
+    });
+    PubSub.subscribe("showLoserModalRed", () => {
+      setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+      setshowLoserModal(true);
+    });
+    PubSub.subscribe("showLoserModalBlue", () => {
+      setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+      setshowLoserModal(true);
     });
   });
+
   return (
     <div>
       <Modal show={showJoinRedModal}>
@@ -81,20 +184,37 @@ export const FarmerSoccerModals: React.FC = () => {
           </div>
         </Panel>
       </Modal>
-      <Modal show={showAnotherTeamRedModal}>
+      <Modal show={showReadyRedModal}>
         <Panel bumpkinParts={FARMER_SOCCER_NPCS.RedTeamNPC}>
           <div className="p-2">
-            <p className="mb-2">
-              {`You already joined the other team, get outta here!`}
-            </p>
+            <p className="mb-2">{`Are you ready? The rules are simple, the first to score 2 goals wins.`}</p>
+            {/* { <p className="text-sm mb-1">{time}</p> } */}
+            <CountdownLabel timeLeft={time} />
           </div>
           <div className="flex">
-            <Button onClick={() => setshowAnotherTeamRedModal(false)}>
-              {`Close`}
+            <Button
+              onClick={() => {
+                setshowReadyRedModal(false);
+                setLeave(false);
+                ReadyRedTeam();
+              }}
+            >
+              {`Ready`}
+            </Button>
+            &nbsp;
+            <Button
+              onClick={() => {
+                setshowReadyRedModal(false);
+                setLeave(false);
+                LeaveRedTeam();
+              }}
+            >
+              {`No, leave the queue`}
             </Button>
           </div>
         </Panel>
       </Modal>
+
       <Modal show={showJoinBlueModal}>
         <Panel bumpkinParts={FARMER_SOCCER_NPCS.BlueTeamNPC}>
           <div className="p-2">
@@ -139,16 +259,101 @@ export const FarmerSoccerModals: React.FC = () => {
           </div>
         </Panel>
       </Modal>
-      <Modal show={showAnotherTeamBlueModal}>
+      <Modal show={showReadyBlueModal}>
         <Panel bumpkinParts={FARMER_SOCCER_NPCS.BlueTeamNPC}>
+          <div className="p-2">
+            <p className="mb-2">{`Are you ready? The rules are simple, the first to score 2 goals wins.`}</p>
+            {/* <p className="text-sm mb-1">{`You will join the queue to play for our team.`}</p> */}
+            <CountdownLabel timeLeft={time} />
+          </div>
+          <div className="flex">
+            <Button
+              onClick={() => {
+                setshowReadyBlueModal(false);
+                setLeave(false);
+                ReadyBlueTeam();
+              }}
+            >
+              {`Ready`}
+            </Button>
+            &nbsp;
+            <Button
+              onClick={() => {
+                setshowReadyBlueModal(false);
+                setLeave(false);
+                LeaveBlueTeam();
+              }}
+            >
+              {`No, leave the queue`}
+            </Button>
+          </div>
+        </Panel>
+      </Modal>
+
+      <Modal show={showAbandonModal}>
+        <Panel bumpkinParts={NPC}>
+          <div className="p-2">
+            <p className="mb-2">{`Your opponent fled, you will return to first in the waiting queue.`}</p>
+            <CountdownLabel timeLeft={time5} />
+          </div>
+          <div className="flex">
+            <Button
+              onClick={() => {
+                setshowAbandonModal(false);
+              }}
+            >
+              {`OK`}
+            </Button>
+          </div>
+        </Panel>
+      </Modal>
+      <Modal show={showAnotherTeamModal}>
+        <Panel bumpkinParts={NPC}>
           <div className="p-2">
             <p className="mb-2">
               {`You already joined the other team, get outta here!`}
             </p>
           </div>
           <div className="flex">
-            <Button onClick={() => setshowAnotherTeamBlueModal(false)}>
+            <Button onClick={() => setshowAnotherTeamModal(false)}>
               {`Close`}
+            </Button>
+          </div>
+        </Panel>
+      </Modal>
+      <Modal show={showWinnerModal}>
+        <Panel bumpkinParts={NPC}>
+          <div className="p-2">
+            <p className="mb-2">
+              {`Congratulations, you won! Enter the queue to play again.`}
+            </p>
+          </div>
+          <div className="flex">
+            <Button onClick={() => setshowWinnerModal(false)}>{`Close`}</Button>
+          </div>
+        </Panel>
+      </Modal>
+      <Modal show={showLoserModal}>
+        <Panel bumpkinParts={NPC}>
+          <div className="p-2">
+            <p className="mb-2">
+              {`You lost! Enter the queue to keep practicing.`}
+            </p>
+          </div>
+          <div className="flex">
+            <Button onClick={() => setshowLoserModal(false)}>{`Close`}</Button>
+          </div>
+        </Panel>
+      </Modal>
+      <Modal show={showDonationModal}>
+        <Panel bumpkinParts={FARMER_SOCCER_NPCS.DonationNPC}>
+          <div className="p-2">
+            <p className="mb-2">{`Please consider donating to keep the servers running.`}</p>
+          </div>
+          <FarmerSoccerDonations />
+          <div className="flex">
+            <Button onClick={() => setshowDonationModal(false)}>
+              {`Not now`}
             </Button>
           </div>
         </Panel>
@@ -158,18 +363,20 @@ export const FarmerSoccerModals: React.FC = () => {
 };
 
 export async function JoinRedTeam() {
-  //console.log('joinRedTeam');
   PubSub.publish("joinRedTeam");
 }
 export async function LeaveRedTeam() {
-  //console.log('leaveRedTeam');
   PubSub.publish("leaveRedTeam");
 }
+export async function ReadyRedTeam() {
+  PubSub.publish("readyRedTeam");
+}
 export async function JoinBlueTeam() {
-  //console.log('joinBlueTeam');
   PubSub.publish("joinBlueTeam");
 }
 export async function LeaveBlueTeam() {
-  //console.log('leaveBlueTeam');
   PubSub.publish("leaveBlueTeam");
+}
+export async function ReadyBlueTeam() {
+  PubSub.publish("readyBlueTeam");
 }

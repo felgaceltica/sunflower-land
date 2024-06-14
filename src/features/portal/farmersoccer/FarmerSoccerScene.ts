@@ -3,6 +3,7 @@ import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { FARMER_SOCCER_NPCS } from "./lib/types";
+import { SPAWNS } from "features/world/lib/spawn";
 import PubSub from "pubsub-js";
 
 export class FarmerSoccerScene extends BaseScene {
@@ -15,12 +16,15 @@ export class FarmerSoccerScene extends BaseScene {
   leftScoreText: any;
   rightScoreText: any;
   statusText: any;
+  inTheField = false;
+  readyToPlay = false;
+  waitingConfirmation = false;
   gameAssets = {
     sfx: {
       goal: Phaser.Sound.HTML5AudioSound,
-      whistle1: Phaser.Sound.NoAudioSound,
-      whistle2: Phaser.Sound.NoAudioSound,
-      kick: Phaser.Sound.NoAudioSound,
+      whistle1: Phaser.Sound.HTML5AudioSound,
+      whistle2: Phaser.Sound.HTML5AudioSound,
+      kick: Phaser.Sound.HTML5AudioSound,
     },
   };
   constructor() {
@@ -46,6 +50,10 @@ export class FarmerSoccerScene extends BaseScene {
     this.load.image(
       "rightgoal",
       "/src/features/portal/farmersoccer/assets/rightgoal.png"
+    );
+    this.load.image(
+      "donate",
+      "/src/features/portal/farmersoccer/assets/donate.png"
     );
     this.load.audio(
       "goal",
@@ -86,11 +94,12 @@ export class FarmerSoccerScene extends BaseScene {
   }
 
   async create() {
+    const server = this.mmoServer;
     this.map = this.make.tilemap({
       key: "farmer_soccer",
     });
     super.create();
-    this.physics.world.drawDebug = true;
+    this.physics.world.drawDebug = false;
     this.gameAssets.sfx.goal = this.sound.add("goal");
     this.gameAssets.sfx.whistle1 = this.sound.add("whistle1");
     this.gameAssets.sfx.whistle2 = this.sound.add("whistle2");
@@ -98,10 +107,52 @@ export class FarmerSoccerScene extends BaseScene {
     this.setupBasicPhysics(this);
     this.setupBall(this);
     this.drawField(this);
+    this.drawObstacles(this);
     this.createNPCs();
-    if (this.mmoServer) {
-      //console.log(this.mmoServer);
-      // console.log(this.currentPlayer);
+    if (server) {
+      server.onMessage("countdown", (message) => {
+        if (message >= 0) {
+          this.statusText.text = "MATCH STARTING IN " + message;
+        }
+      });
+      server.onMessage("abandon", (message) => {
+        if (message == "left" && server.state.rightTeam.has(server.sessionId)) {
+          this.ReSpawPlayer();
+          PubSub.publish("showBlueAbandonModal");
+        }
+        if (message == "right" && server.state.leftTeam.has(server.sessionId)) {
+          this.ReSpawPlayer();
+          PubSub.publish("showRedAbandonModal");
+        }
+      });
+      server.onMessage("goal", (message) => {
+        this.gameAssets.sfx.goal.play();
+      });
+      server.onMessage("whistle", (message) => {
+        if (message == 1) {
+          this.gameAssets.sfx.whistle1.play();
+        }
+      });
+      server.onMessage("winner", (message) => {
+        if (message.players.indexOf(server.sessionId) != -1) {
+          this.ReSpawPlayer();
+          if (message.side == "left") {
+            PubSub.publish("showWinnerModalBlue");
+          } else {
+            PubSub.publish("showWinnerModalRed");
+          }
+        }
+      });
+      server.onMessage("loser", (message) => {
+        if (message.players.indexOf(server.sessionId) != -1) {
+          this.ReSpawPlayer();
+          if (message.side == "left") {
+            PubSub.publish("showLoserModalBlue");
+          } else {
+            PubSub.publish("showLoserModalRed");
+          }
+        }
+      });
     }
     PubSub.subscribe("joinRedTeam", () => {
       this.JoinRedTeam();
@@ -109,11 +160,17 @@ export class FarmerSoccerScene extends BaseScene {
     PubSub.subscribe("leaveRedTeam", () => {
       this.LeaveRedTeam();
     });
+    PubSub.subscribe("readyRedTeam", () => {
+      this.ReadyRedTeam();
+    });
     PubSub.subscribe("joinBlueTeam", () => {
       this.JoinBlueTeam();
     });
     PubSub.subscribe("leaveBlueTeam", () => {
       this.LeaveBlueTeam();
+    });
+    PubSub.subscribe("readyBlueTeam", () => {
+      this.ReadyBlueTeam();
     });
 
     this.statusText = this.add
@@ -127,6 +184,12 @@ export class FarmerSoccerScene extends BaseScene {
       })
       .setOrigin(0.5);
   }
+  ReSpawPlayer() {
+    this.readyToPlay = false;
+    this.inTheField = false;
+    this.currentPlayer.x = SPAWNS().farmer_soccer.default.x;
+    this.currentPlayer.y = SPAWNS().farmer_soccer.default.y;
+  }
   JoinRedTeam() {
     const server = this.mmoServer;
     if (server) {
@@ -137,6 +200,13 @@ export class FarmerSoccerScene extends BaseScene {
     const server = this.mmoServer;
     if (server) {
       server.send(3, this.mmoServer.sessionId);
+    }
+  }
+  ReadyRedTeam() {
+    const server = this.mmoServer;
+    if (server) {
+      this.readyToPlay = true;
+      server.send(6, this.mmoServer.sessionId);
     }
   }
   JoinBlueTeam() {
@@ -151,6 +221,13 @@ export class FarmerSoccerScene extends BaseScene {
       server.send(5, this.mmoServer.sessionId);
     }
   }
+  ReadyBlueTeam() {
+    const server = this.mmoServer;
+    if (server) {
+      server.send(7, this.mmoServer.sessionId);
+      this.readyToPlay = true;
+    }
+  }
 
   update() {
     const server = this.mmoServer;
@@ -160,23 +237,77 @@ export class FarmerSoccerScene extends BaseScene {
     }
     this.leftScoreText.text = server.state.scoreLeft;
     this.rightScoreText.text = server.state.scoreRight;
-    this.statusText.text = "";
+    //console.log(server.state.matchState);
     switch (server.state.matchState) {
       case "waiting":
         this.statusText.text = "WAITING FOR PLAYERS";
         break;
+      case "counting":
+        this.ball.rotation += 0.01;
+        break;
       case "playing":
         this.ball.rotation += 0.01;
+        this.statusText.text = "";
+        break;
+      case "leftAbandon":
+      case "rightAbandon":
+        this.statusText.text = "MATCH RESTARTING";
         break;
       default:
         this.statusText.text = "";
         break;
     }
 
-    //console.log(server.state);
-
+    this.managePlayersOnField();
     this.updateBallPosition();
     this.updateOtherPlayers();
+  }
+  managePlayersOnField() {
+    const server = this.mmoServer;
+    switch (server.state.matchState) {
+      case "waiting":
+        this.waitingConfirmation = false;
+        this.readyToPlay = false;
+        break;
+      case "starting":
+        if (
+          server.state.rightTeam.has(server.sessionId) &&
+          !this.readyToPlay &&
+          !this.waitingConfirmation
+        ) {
+          this.waitingConfirmation = true;
+          PubSub.publish("showReadyRedModal");
+        }
+        if (
+          server.state.leftTeam.has(server.sessionId) &&
+          !this.readyToPlay &&
+          !this.waitingConfirmation
+        ) {
+          this.waitingConfirmation = true;
+          PubSub.publish("showReadyBlueModal");
+        }
+        break;
+      case "countdown":
+        break;
+    }
+    if (
+      server.state.leftTeam.has(server.sessionId) &&
+      !this.inTheField &&
+      this.readyToPlay
+    ) {
+      this.inTheField = true;
+      this.currentPlayer.x = 16 * 8;
+      this.currentPlayer.y = 16 * 5;
+    }
+    if (
+      server.state.rightTeam.has(server.sessionId) &&
+      !this.inTheField &&
+      this.readyToPlay
+    ) {
+      this.inTheField = true;
+      this.currentPlayer.x = 16 * 14;
+      this.currentPlayer.y = 16 * 5;
+    }
   }
   updateBallPosition() {
     const server = this.mmoServer;
@@ -203,6 +334,9 @@ export class FarmerSoccerScene extends BaseScene {
         server.state.ballVelocityX,
         server.state.ballVelocityY
       );
+      if (server.state.matchState == "playing") {
+        this.gameAssets.sfx.kick.play();
+      }
     }
   }
 
@@ -219,17 +353,17 @@ export class FarmerSoccerScene extends BaseScene {
       onClick: () => {
         const server = this.mmoServer;
         if (
-          server.state.leftTeam.has(server.sessionId) ||
-          server.state.rightTeam.has(server.sessionId)
-        )
-          return;
-
-        if (server.state.leftQueue.has(server.sessionId)) {
+          server.state.rightTeam.has(server.sessionId) ||
+          server.state.rightQueue.has(server.sessionId)
+        ) {
+          PubSub.publish("showLeaveRedModal");
+        } else if (
+          server.state.leftQueue.has(server.sessionId) ||
+          server.state.leftTeam.has(server.sessionId)
+        ) {
           PubSub.publish("showAnotherTeamRedModal");
         } else {
-          if (!server.state.rightQueue.has(server.sessionId))
-            PubSub.publish("showJoinRedModal");
-          else PubSub.publish("showLeaveRedModal");
+          PubSub.publish("showJoinRedModal");
         }
       },
     });
@@ -242,23 +376,36 @@ export class FarmerSoccerScene extends BaseScene {
         updatedAt: 0,
       },
       direction: "right",
-      onClick: function () {
-        const server = scene.mmoServer;
+      onClick: () => {
+        const server = this.mmoServer;
         if (
           server.state.leftTeam.has(server.sessionId) ||
+          server.state.leftQueue.has(server.sessionId)
+        ) {
+          PubSub.publish("showLeaveBlueModal");
+        } else if (
+          server.state.rightQueue.has(server.sessionId) ||
           server.state.rightTeam.has(server.sessionId)
-        )
-          return;
-
-        if (server.state.rightQueue.has(server.sessionId)) {
+        ) {
           PubSub.publish("showAnotherTeamBlueModal");
         } else {
-          if (!server.state.leftQueue.has(server.sessionId))
-            PubSub.publish("showJoinBlueModal");
-          else PubSub.publish("showLeaveBlueModal");
+          PubSub.publish("showJoinBlueModal");
         }
       },
     });
+    // new BumpkinContainer({
+    //   scene: this,
+    //   x: 16 * 2.5,
+    //   y: 16 * 10.75,
+    //   clothing: {
+    //     ...FARMER_SOCCER_NPCS.DonationNPC,
+    //     updatedAt: 0,
+    //   },
+    //   direction: "right",
+    //   onClick: () => {
+    //       PubSub.publish("showDonationModal");
+    //   },
+    // });
   }
 
   sendBallPositionToServer() {
@@ -334,6 +481,75 @@ export class FarmerSoccerScene extends BaseScene {
       scene
     );
     this.ball.setDepth(9999);
+  }
+  drawObstacles(scene: FarmerSoccerScene) {
+    const rectblueteam = this.add.rectangle(
+      16 * 2.5,
+      16 * 11,
+      16 * 1.5,
+      16 * 1.5,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rectblueteam, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rectblueteam as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+
+    const rectbluebox = this.add.rectangle(
+      16 * 4,
+      16 * 9.5,
+      16 * 1,
+      16 * 1,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rectbluebox, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rectbluebox as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+
+    const rectredteam = this.add.rectangle(
+      16 * 19.5,
+      16 * 11,
+      16 * 1.5,
+      16 * 1.5,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rectredteam, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rectredteam as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+
+    const rectredbox = this.add.rectangle(
+      16 * 18,
+      16 * 9.5,
+      16 * 1,
+      16 * 1,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rectredbox, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rectredbox as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
   }
   drawField(scene: FarmerSoccerScene) {
     scene.add.image(16 * 9.5, 16 * 0.5, "blueBanner").setDisplaySize(8, 17);
@@ -434,6 +650,15 @@ export class FarmerSoccerScene extends BaseScene {
       .image(16 * 20 + 6, 16 * 5, "rightgoal")
       .setDisplaySize(12, 40)
       .setDepth(99999);
+    const donateimage = scene.add
+      .image(16 * 16, 16 * 0.6, "donate")
+      .setDisplaySize(74, 11)
+      .setDepth(99999);
+    donateimage.setInteractive({ useHandCursor: true });
+
+    donateimage.on("pointerdown", () => {
+      PubSub.publish("showDonationModal");
+    });
 
     const rect = this.add.rectangle(16 * 2, 16 * 2.42, 0.1, 43.5, 0xffffff, 0);
     scene.physics.add.existing(rect, true);
@@ -582,6 +807,72 @@ export class FarmerSoccerScene extends BaseScene {
       scene
     );
 
+    const rect8 = this.add.rectangle(
+      16 * 2.5,
+      16 * 5,
+      0.1,
+      16 * 8,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rect8, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rect8 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+
+    const rect9 = this.add.rectangle(
+      16 * 10.5,
+      16 * 5,
+      0.1,
+      16 * 8,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rect9, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rect9 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+    const rect10 = this.add.rectangle(
+      16 * 11.5,
+      16 * 5,
+      0.1,
+      16 * 8,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rect10, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rect10 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+    const rect11 = this.add.rectangle(
+      16 * 19.5,
+      16 * 5,
+      0.1,
+      16 * 8,
+      0xffffff,
+      0
+    );
+    scene.physics.add.existing(rect11, true);
+    scene.physics.add.collider(
+      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      rect11 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      scene.stopPlayer,
+      undefined,
+      scene
+    );
+
     const leftgoal = this.add.rectangle(16 * 1.3, 16 * 5, 0.1, 40, 0xffffff, 0);
     scene.physics.add.existing(leftgoal, true);
     scene.physics.add.overlap(
@@ -675,21 +966,23 @@ export class FarmerSoccerScene extends BaseScene {
   }
 
   addLeftGoal() {
-    this.gameAssets.sfx.goal.play();
-    this.leftScore++;
     this.ball.body.stop();
     this.ball.setPosition(16 * 11, 16 * 5);
-    this.time.delayedCall(3000, () => {
-      //this.resetBall();
-    });
+    const server = this.mmoServer;
+    if (server) {
+      if (server.state.rightTeam.has(server.sessionId)) {
+        server.send(8);
+      }
+    }
   }
   addRightGoal() {
-    this.rightScore++;
-    this.gameAssets.sfx.goal.play();
     this.ball.body.stop();
     this.ball.setPosition(16 * 11, 16 * 5);
-    this.time.delayedCall(3000, () => {
-      //this.resetBall();
-    });
+    const server = this.mmoServer;
+    if (server) {
+      if (server.state.leftTeam.has(server.sessionId)) {
+        server.send(9);
+      }
+    }
   }
 }
