@@ -411,6 +411,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
   inventory: {
     Axe: new Decimal(100),
     Pickaxe: new Decimal(100),
+    Warehouse: new Decimal(1),
     Wheat: new Decimal(100),
     Oil: new Decimal(500),
     Manor: new Decimal(1),
@@ -452,7 +453,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Yellow Daffodil": new Decimal(3),
     "White Daffodil": new Decimal(3),
     "Red Daffodil": new Decimal(3),
-    Sunflower: new Decimal(5000),
+    Sunflower: new Decimal(7),
     Scarecrow: new Decimal(1),
     Shovel: new Decimal(1),
     Carrot: new Decimal(500),
@@ -481,6 +482,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Gaucho Rug": new Decimal(1),
     "Sunstone Rock": new Decimal(0),
     "Fruit Patch": new Decimal(0),
+    "Flower Bed": new Decimal(1),
     "Battlecry Drum": new Decimal(5),
     "Bullseye Board": new Decimal(5),
     "Chess Rug": new Decimal(5),
@@ -497,7 +499,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Trainee Target": new Decimal(5),
     "Twister Rug": new Decimal(5),
     Egg: new Decimal(12),
-    Beehive: new Decimal(0),
+    Beehive: new Decimal(1),
     Banana: new Decimal(12),
     Crimstone: new Decimal(20),
     "Block Buck": new Decimal(200),
@@ -651,6 +653,9 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Farm Background": 1,
     "Santa Beard": 1,
     "Sunflower Amulet": 2,
+    "Beekeeper Hat": 1,
+    "Honeycomb Shield": 1,
+    "Bee Suit": 1,
   },
   previousWardrobe: {
     "Elf Suit": 1,
@@ -774,7 +779,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
         readyAt: 0,
       },
     ],
-    Workbench: [
+    Market: [
       {
         coordinates: {
           x: -5,
@@ -785,7 +790,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
         createdAt: 0,
       },
     ],
-    Toolshed: [
+    "Fire Pit": [
       {
         coordinates: {
           x: -5,
@@ -1319,6 +1324,15 @@ export const STATIC_OFFLINE_FARM: GameState = {
         resources: {},
       },
       totalItems: {},
+    },
+    kitchen: {
+      week: 1,
+      requests: [
+        { item: "Sunflower", amount: 1, deliveryCount: 0 },
+        { item: "Honey", amount: 1, deliveryCount: 0 },
+        { item: "Tuna", amount: 1, deliveryCount: 0 },
+      ],
+      points: 0,
     },
   },
 };

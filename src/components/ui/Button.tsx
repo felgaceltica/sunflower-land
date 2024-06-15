@@ -54,7 +54,8 @@ export const Button: React.FC<Props> = ({
     <button
       className={classnames(
         "w-full p-1 text-sm object-contain justify-center items-center hover:brightness-90 cursor-pointer flex disabled:opacity-50",
-        className
+        className,
+        { "cursor-not-allowed": disabled }
       )}
       type={type}
       disabled={disabled}
