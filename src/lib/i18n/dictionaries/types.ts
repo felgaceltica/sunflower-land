@@ -105,7 +105,6 @@ export type GeneralTerms =
   | "item"
   | "land"
   | "last.updated"
-  | "left"
   | "lets.go"
   | "linked.wallet"
   | "limit"
@@ -251,17 +250,41 @@ export type GeneralTerms =
   | "vipAccess";
 
 export type TimeUnits =
-  // Singular
-  | "sec"
-  | "min"
-  | "hr"
-  | "day"
+  // Full Singular
+  | "time.second.full"
+  | "time.minute.full"
+  | "time.hour.full"
+  | "time.day.full"
 
-  //Plural
-  | "secs"
-  | "mins"
-  | "hrs"
-  | "days";
+  // Full Plural
+  | "time.seconds.full"
+  | "time.minutes.full"
+  | "time.hours.full"
+  | "time.days.full"
+
+  // Medium Singular
+  | "time.sec.med"
+  | "time.min.med"
+  | "time.hr.med"
+  | "time.day.med"
+
+  // Medium Plural
+  | "time.secs.med"
+  | "time.mins.med"
+  | "time.hrs.med"
+  | "time.days.med"
+
+  // Short
+  | "time.second.short"
+  | "time.minute.short"
+  | "time.hour.short"
+  | "time.day.short"
+
+  // Relative time
+  | "time.seconds.ago"
+  | "time.minutes.ago"
+  | "time.hours.ago"
+  | "time.days.ago";
 
 export type AchievementsTerms =
   | "breadWinner.description"
@@ -384,7 +407,15 @@ export type Beehive =
   | "beehive.harvestHoney"
   | "beehive.noFlowersGrowing"
   | "beehive.beeSwarm"
-  | "beehive.pollinationCelebration";
+  | "beehive.pollinationCelebration"
+  | "beehive.honeyProductionPaused"
+  | "beehive.yield"
+  | "beehive.honeyPerFullHive"
+  | "beehive.speed"
+  | "beehive.fullHivePerDay"
+  | "beehive.estimatedFull"
+  | "beehive.hive.singular"
+  | "beehive.hives.plural";
 
 export type BirdiePlaza =
   | "birdieplaza.birdieIntro"
@@ -783,7 +814,8 @@ export type ChoresStart =
   | "chores.helpWithTrees"
   | "chores.noChore"
   | "chores.newSeason"
-  | "chores.choresFrozen";
+  | "chores.choresFrozen"
+  | "chores.left";
 
 export type ChumDetails =
   | "chumDetails.gold"
@@ -859,6 +891,7 @@ export type Conversations =
   | "betty.market-intro.four"
   | "firepit-intro.one"
   | "firepit-intro.two"
+  | "firepit.increasedXP"
   | "bruce-intro.headline"
   | "bruce-intro.one"
   | "bruce-intro.two"
@@ -1441,6 +1474,11 @@ export type Factions =
   | "faction.greeting.sunflorians"
   | "faction.greeting.bumpkins"
   | "faction.greeting.nightshades"
+  | "faction.kitchen.opensIn"
+  | "faction.kitchen.notReady"
+  | "faction.kitchen.gatherResources"
+  | "faction.kitchen.preparing"
+  | "faction.kitchen.newRequests"
   // Emblem Airdrop
   | "faction.claimEmblems.alreadyClaimed"
   | "faction.claimEmblems.emblemsEarned"
@@ -1458,7 +1496,14 @@ export type Factions =
   | "faction.claimEmblems.totalEmblems"
   | "faction.claimEmblems.percentile"
   | "faction.claimEmblems.travelNow"
-  | "faction.claimEmblems.visitMe";
+  | "faction.claimEmblems.visitMe"
+  | "faction.openingSoon"
+  | "faction.emblems"
+  | "faction.emblems.intro.one"
+  | "faction.emblems.intro.two"
+  | "faction.emblems.intro.three"
+  | "faction.tradeEmblems"
+  | "faction.marksBoost";
 
 export type FestiveTree =
   | "festivetree.greedyBumpkin"
@@ -1809,7 +1854,9 @@ export type GameTerms =
   | "compost.complete"
   | "aoe.locked"
   | "sunflowerLandCodex"
-  | "visiting.farmId";
+  | "visiting.farmId"
+  | "stock.left"
+  | "stock.inStock";
 
 export type GarbageCollector =
   | "garbageCollector.welcome"
@@ -1847,15 +1894,16 @@ export type GOBLIN_MESSAGES =
 export type GoldTooth = "goldTooth.intro.part1" | "goldTooth.intro.part2";
 
 export type GuideCompost =
-  | "guide.compost.add.eggs.speed"
-  | "guide.compost.add.eggs"
+  | "guide.compost.addEggs.speed"
+  | "guide.compost.addEggs"
   | "guide.compost.eggs"
   | "guide.compost.cropGrowthTime"
   | "guide.compost.fishingBait"
   | "guide.compost.placeCrops"
   | "guide.compost.compostCycle"
   | "guide.compost.yieldsWorms"
-  | "guide.compost.useEggs";
+  | "guide.compost.useEggs"
+  | "guide.compost.addEggs.confirmation";
 
 export type GuideTerms =
   | "guide.intro"
@@ -3114,7 +3162,6 @@ export type Statements =
   | "statements.water.well.needed.one"
   | "statements.water.well.needed.two"
   | "statements.soldOut"
-  | "statements.inStock"
   | "statements.soldOutWearables"
   | "statements.wallet.to.inventory.transfer"
   | "statements.crop.water"
@@ -3126,8 +3173,6 @@ export type Statements =
   | "statements.startgame"
   | "statements.session.expired"
   | "statements.price.change"
-  | "statements.translation.want2contribute"
-  | "statements.translation.contribution"
   | "statements.translation.joinDiscord";
 
 export type StopGoblin =
@@ -3331,7 +3376,11 @@ export type WornDescription =
 export type World =
   | "world.intro.one"
   | "world.intro.two"
-  | "world.intro.three"
+  | "world.intro.missingDelivery"
+  | "world.intro.delivery"
+  | "world.intro.findNPC"
+  | "world.intro.find"
+  | "world.intro.levelUpToTravel"
   | "world.intro.visit"
   | "world.intro.craft"
   | "world.intro.carf.limited"
@@ -3346,7 +3395,10 @@ export type World =
   | "world.retreat"
   | "world.woodlands"
   | "world.home"
-  | "world.kingdom";
+  | "world.kingdom"
+  | "world.retreatShort"
+  | "world.plazaShort"
+  | "world.travelTo";
 
 export type Event =
   | "event.christmas"
@@ -3407,7 +3459,8 @@ export type RestrictionReason =
   | "restrictionReason.noRestriction"
   | "restrictionReason.genieLampRubbed"
   | "restrictionReason.oilReserveDrilled"
-  | "restrictionReason.buildingInUse";
+  | "restrictionReason.buildingInUse"
+  | "restrictionReason.beehiveInUse";
 
 export type Leaderboard =
   | "leaderboard.leaderboard"
@@ -3463,7 +3516,9 @@ export type Minigame =
   | "minigame.confirm"
   | "minigame.purchase"
   | "minigame.comingSoon"
-  | "minigame.chickenRescueHelp";
+  | "minigame.chickenRescueHelp"
+  | "minigame.discovered.one"
+  | "minigame.discovered.two";
 
 export type KitchenKeys = "kitchen.oilRemaining";
 
@@ -3479,6 +3534,11 @@ export type EasterEggKeys =
   | "easterEgg.kingdomBook4"
   | "easterEgg.kingdomBook5"
   | "easterEgg.knight";
+
+export type ChangeLanguage =
+  | "changeLanguage.confirm"
+  | "changeLanguage.contribute"
+  | "changeLanguage.contribute.message";
 
 export type TranslationKeys =
   | AchievementsTerms
@@ -3500,11 +3560,12 @@ export type TranslationKeys =
   | BumpkinSkillsDescription
   | BumpkinTrade
   | BuyFarmHand
-  | ClaimAchievement
+  | ChangeLanguage
   | Chat
   | ChickenWinner
   | ChoresStart
   | ChumDetails
+  | ClaimAchievement
   | Community
   | CompostDescription
   | ComposterDescription

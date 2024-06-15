@@ -176,10 +176,11 @@ import {
   RemoveCropMachine,
   Username,
   EasterEggKeys,
+  ChangeLanguage,
 } from "./types";
 
 const generalTerms: Record<GeneralTerms, string> = {
-  "2x.sale": "2x Sale",
+  "2x.sale": "2x Coins",
   achievements: "Achievements",
   "amount.matic": "Amount in MATIC",
   deposit: "Deposit",
@@ -284,7 +285,6 @@ const generalTerms: Record<GeneralTerms, string> = {
   item: "Item:",
   land: "Land",
   "last.updated": "Last updated:",
-  left: "Left",
   "lets.go": "Let's Go!",
   limit: "Limit",
   "linked.wallet": "Linked wallet",
@@ -432,16 +432,41 @@ const generalTerms: Record<GeneralTerms, string> = {
 };
 
 const timeUnits: Record<TimeUnits, string> = {
-  // time
-  sec: "sec",
-  min: "min",
-  hr: "hr",
-  day: "day",
+  // Full Singular
+  "time.second.full": "second",
+  "time.minute.full": "minute",
+  "time.hour.full": "hour",
+  "time.day.full": "day",
 
-  secs: "secs",
-  mins: "mins",
-  hrs: "hrs",
-  days: "days",
+  // Full Plural
+  "time.seconds.full": "seconds",
+  "time.minutes.full": "minutes",
+  "time.hours.full": "hours",
+  "time.days.full": "days",
+
+  // Medium Singular
+  "time.sec.med": "sec",
+  "time.min.med": "min",
+  "time.hr.med": "hr",
+  "time.day.med": "day",
+
+  // Medium Plural
+  "time.secs.med": "secs",
+  "time.mins.med": "mins",
+  "time.hrs.med": "hrs",
+  "time.days.med": "days",
+
+  // Short
+  "time.second.short": "s",
+  "time.minute.short": "m",
+  "time.hour.short": "h",
+  "time.day.short": "d",
+
+  // Relative Time
+  "time.seconds.ago": "{{time}} {{secondORseconds}} ago",
+  "time.minutes.ago": "{{time}} {{minuteORminutes}} ago ",
+  "time.hours.ago": "{{time}} {{hourORhours}} ago ",
+  "time.days.ago": "{{time}} {{dayORdays}} ago",
 };
 
 const achievementTerms: Record<AchievementsTerms, string> = {
@@ -618,6 +643,14 @@ const beehive: Record<Beehive, string> = {
   "beehive.beeSwarm": "Bee swarm",
   "beehive.pollinationCelebration":
     "Pollination celebration! Your crops are in for a treat with a 0.2 boost from a friendly bee swarm!",
+  "beehive.honeyProductionPaused": "Honey production paused",
+  "beehive.yield": "Yield",
+  "beehive.honeyPerFullHive": "{{multiplier}} honey / full hive",
+  "beehive.speed": "Speed",
+  "beehive.fullHivePerDay": "{{speed}} full {{hive}} / day",
+  "beehive.estimatedFull": "Estimated full",
+  "beehive.hive.singular": "hive",
+  "beehive.hives.plural": "hives",
 };
 
 const birdiePlaza: Record<BirdiePlaza, string> = {
@@ -1084,6 +1117,14 @@ const buyFarmHand: Record<BuyFarmHand, string> = {
     "I am your new farmhand. I can't wait to get to work!",
 };
 
+const changeLanguage: Record<ChangeLanguage, string> = {
+  "changeLanguage.confirm":
+    "This action will refresh the browser. Are you sure you want to change your language?",
+  "changeLanguage.contribute": "Want to contribute your Language?",
+  "changeLanguage.contribute.message":
+    "If you are interested in contributing translations for your preferred language, please contact one of the Moderators in the Sunflower Land Discord Server:",
+};
+
 const chat: Record<Chat, string> = {
   "chat.Fail": "Connection failed",
   "chat.mute": "You are muted",
@@ -1110,6 +1151,7 @@ const choresStart: Record<ChoresStart, string> = {
   "chores.noChore": "Sorry, I don't have any chores that need doing right now.",
   "chores.newSeason": "A new season approaches, chores will temporarily close.",
   "chores.choresFrozen": "New seasonal chores will be available soon.",
+  "chores.left": "{{chores}} left",
 };
 
 const chumDetails: Record<ChumDetails, string> = {
@@ -1224,7 +1266,7 @@ const conversations: Record<Conversations, string> = {
   "firepit-intro.one": "Congratulations Bumpkin...You're a natural!",
   "firepit-intro.two":
     "If you want to level up & unlock new abilities, gather crops and visit my fire pit. I can cook some nutritious food for you.",
-
+  "firepit.increasedXP": "Increased XP",
   "bruce-intro.headline": "Cooking Introduction",
   "bruce-intro.one": "I'm the owner of this lovely little bistro.",
   "bruce-intro.two":
@@ -1991,7 +2033,7 @@ const factions: Record<Factions, string> = {
   "faction.donation.bulk.resources.unlimited.per.day":
     "{{donatedToday}}/unlimited per day",
   "faction.donation.confirm":
-    "Are you sure you want to donate the following for a total of {{factionPoints}} faction points?",
+    "Are you sure you want to donate the following for a total of {{factionPoints}} {{reward}}?",
   "faction.seasonal.delivery.start.at": "Seasonal Deliveries begin in {{days}}",
   "faction.points.with.number": "Faction points: {{points}}",
   "faction.points.title": "Faction Points",
@@ -2040,6 +2082,27 @@ const factions: Record<Factions, string> = {
   "faction.claimEmblems.travelNow": "Travel Now",
   "faction.claimEmblems.visitMe":
     "Visit me, {{recruiterName}}, in the Kingdom to claim your emblems.",
+
+  "faction.kitchen.opensIn": "Opens in {{time}}",
+  "faction.kitchen.notReady":
+    "Ahhh I love your enthusiasm! However, the kitchen is not open yet. Please come back later.",
+  "faction.kitchen.gatherResources":
+    "So many new recruits... how will we feed them all! Can you help me gather some resources?",
+  "faction.kitchen.preparing":
+    "I'm still preparing my orders! Please come back in a few minutes.",
+  "faction.kitchen.newRequests": "New requests: {{time}}",
+  "faction.openingSoon":
+    "Faction houses are opening on July 1st. Earn marks, compete for glory and claim rewards!",
+  "faction.emblems": "Emblems",
+  "faction.emblems.intro.one":
+    "Wow, look at all those emblems. You are a true warrior!",
+  "faction.emblems.intro.two":
+    "On July 1st the Faction House will open. You will be able to complete tasks, earn marks and claim rewards.",
+  "faction.emblems.intro.three":
+    "The more emblems you have, the higher your rank and more marks you can earn.",
+  "faction.tradeEmblems": "Trade emblems to climb the ranks and attain perks.",
+  "faction.marksBoost":
+    "Marks boost applies to faction activities coming July 1st.",
 };
 
 const festiveTree: Record<FestiveTree, string> = {
@@ -2522,6 +2585,8 @@ const gameTerms: Record<GameTerms, string> = {
   "aoe.locked": "AOE Locked",
   sunflowerLandCodex: "Sunflower Land Codex",
   "visiting.farmId": "Visting #{{farmId}}",
+  "stock.inStock": "{{stock}} in stock",
+  "stock.left": "{{stock}} left",
 };
 
 const garbageCollector: Record<GarbageCollector, string> = {
@@ -2579,8 +2644,8 @@ const goldTooth: Record<GoldTooth, string> = {
 };
 
 const guideCompost: Record<GuideCompost, string> = {
-  "guide.compost.add.eggs.speed": "Add eggs to speed up production",
-  "guide.compost.add.eggs": "Add Eggs",
+  "guide.compost.addEggs.speed": "Add eggs to speed up production",
+  "guide.compost.addEggs": "Add Eggs",
   "guide.compost.eggs": "Eggs",
   "guide.compost.cropGrowthTime": "-50% Crop Growth Time",
   "guide.compost.fishingBait": "Fishing bait",
@@ -2591,6 +2656,8 @@ const guideCompost: Record<GuideCompost, string> = {
     "Each compost yields worms that can be used as bait for fishing",
   "guide.compost.useEggs":
     "Tired of waiting? Use Eggs to speed up the compost production",
+  "guide.compost.addEggs.confirmation":
+    "Are you sure you want to add {{noEggs}} Eggs to reduce compost production time by {{time}}?",
 };
 
 const guideTerms: Record<GuideTerms, string> = {
@@ -4662,7 +4729,6 @@ const statements: Record<Statements, string> = {
   "statements.water.well.needed.two":
     "In order to support more crops, build a well.",
   "statements.soldOut": "Sold out",
-  "statements.inStock": "in stock",
   "statements.soldOutWearables": "View sold out wearables",
   "statements.craft.composter": "Craft at Composter",
   "statements.wallet.to.inventory.transfer": "Deposit items from your wallet",
@@ -4677,9 +4743,6 @@ const statements: Record<Statements, string> = {
 
   "statements.session.expired":
     "It looks like your session has expired. Please refresh the page to continue playing.",
-  "statements.translation.want2contribute": "Want to contribute your Language?",
-  "statements.translation.contribution":
-    "If you are interested in contributing translations for your preferred language, please contact one of the Moderators in the Sunflower Land Discord Server:",
   "statements.translation.joinDiscord": "Join Discord",
 };
 
@@ -4973,7 +5036,13 @@ const world: Record<World, string> = {
     "Howdy Bumpkin, welcome to the Pumpkin Plaza. Here Bumpkins from far and wide come together to trade, complete deliveries and play mini-games.",
   "world.intro.two":
     "Explore the Plaza and find Bumpkins who are waiting for your deliveries. In exchange, they will give you rewards!",
-  "world.intro.three": "A few quick hints before you begin your adventure:",
+  "world.intro.missingDelivery":
+    "Hmmm, it looks like you haven't gathered resources for a delivery yet. You can still explore in the meantime.",
+  "world.intro.delivery":
+    "Oh great, it looks like you've got the resources for a delivery!",
+  "world.intro.levelUpToTravel": "Level up to travel",
+  "world.intro.findNPC": "Explore the plaza and find {{name}}.",
+  "world.intro.find": "Find",
   "world.intro.visit":
     "Visit NPCs and complete deliveries to earn SFL, Coins and rare rewards.",
   "world.intro.craft":
@@ -4996,6 +5065,9 @@ const world: Record<World, string> = {
   "world.retreat": "Retreat",
   "world.home": "Home",
   "world.kingdom": "Kingdom",
+  "world.travelTo": "Travel to",
+  "world.plazaShort": "Plaza",
+  "world.retreatShort": "Retreat",
 };
 
 const wornDescription: Record<WornDescription, string> = {
@@ -5043,6 +5115,7 @@ const restrictionReason: Record<RestrictionReason, string> = {
   "restrictionReason.genieLampRubbed": "Genie Lamp rubbed",
   "restrictionReason.oilReserveDrilled": "Oil reserves are drilled",
   "restrictionReason.buildingInUse": "Building is in use",
+  "restrictionReason.beehiveInUse": "Beehive in use",
 };
 
 export const leaderboardTerms: Record<Leaderboard, string> = {
@@ -5115,6 +5188,9 @@ const minigame: Record<Minigame, string> = {
   "minigame.playNow": "Play now",
   "minigame.purchase": "Purchase",
   "minigame.chickenRescueHelp": "Can you help me rescue the chickens?",
+  "minigame.discovered.one": "Howdy Bumpkin, you've discovered a portal!",
+  "minigame.discovered.two":
+    "Step into the magical realm to earn rewards and glory. Good luck!",
 };
 
 export const easterEggTerms: Record<EasterEggKeys, string> = {
@@ -5156,6 +5232,7 @@ export const ENGLISH_TERMS: Record<TranslationKeys, string> = {
   ...bumpkinSkillsDescription,
   ...bumpkinTrade,
   ...buyFarmHand,
+  ...changeLanguage,
   ...chat,
   ...chickenWinner,
   ...choresStart,
