@@ -246,7 +246,7 @@ export class FarmerSoccerScene extends BaseScene {
     const server = this.mmoServer;
     this.updatePlayer();
     this.calculateQueuePosition();
-    if (Date.now() - this.packetSentAt > 1000 / 10) {
+    if (Date.now() - this.packetSentAt > 1000 / 60) {
       this.isSending = false;
     }
     this.leftScoreText.text = server.state.scoreLeft;
@@ -287,13 +287,15 @@ export class FarmerSoccerScene extends BaseScene {
       server.state.leftTeam.has(server.sessionId) ||
       server.state.leftQueue.has(server.sessionId)
     ) {
-      server.state.rightTeam.forEach((value, at) => {
-        if (value == server.sessionId) {
-          position = index + 1;
-          color = "#FF0000";
-        }
-        index++;
-      });
+      if (server.state.matchState != "playing") {
+        server.state.rightTeam.forEach((value, at) => {
+          if (value == server.sessionId) {
+            position = index + 1;
+            color = "#FF0000";
+          }
+          index++;
+        });
+      }
       index = 0;
       server.state.rightQueue.forEach((value, at) => {
         if (value == server.sessionId) {
@@ -303,13 +305,15 @@ export class FarmerSoccerScene extends BaseScene {
         index++;
       });
       index = 0;
-      server.state.leftTeam.forEach((value, at) => {
-        if (value == server.sessionId) {
-          position = index + 1;
-          color = "#0095E9";
-        }
-        index++;
-      });
+      if (server.state.matchState != "playing") {
+        server.state.leftTeam.forEach((value, at) => {
+          if (value == server.sessionId) {
+            position = index + 1;
+            color = "#0095E9";
+          }
+          index++;
+        });
+      }
       index = 0;
       server.state.leftQueue.forEach((value, at) => {
         if (value == server.sessionId) {
