@@ -4,10 +4,6 @@ import { CollectionSchema } from "@colyseus/schema";
 export interface FarmerSoccerRoomState extends PlazaRoomState {
   scoreLeft: number;
   scoreRight: number;
-  ballPositionX: number;
-  ballPositionY: number;
-  ballVelocityX: number;
-  ballVelocityY: number;
 
   matchState: string;
   leftTeam: CollectionSchema<string>;

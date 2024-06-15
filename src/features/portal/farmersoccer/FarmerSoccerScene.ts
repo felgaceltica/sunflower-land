@@ -154,6 +154,9 @@ export class FarmerSoccerScene extends BaseScene {
           }
         }
       });
+      server.onMessage("ballPosition", (ballPosition) => {
+        this.updateBallPosition(ballPosition);
+      });
       this.positionTag = this.createPlayerText({
         x: 0,
         y: 0,
@@ -273,7 +276,7 @@ export class FarmerSoccerScene extends BaseScene {
     }
 
     this.managePlayersOnField();
-    this.updateBallPosition();
+    //this.updateBallPosition();
     this.updateOtherPlayers();
   }
   calculateQueuePosition() {
@@ -378,34 +381,18 @@ export class FarmerSoccerScene extends BaseScene {
       this.currentPlayer.y = 16 * 5;
     }
   }
-  updateBallPosition() {
+  updateBallPosition(ballPosition: any) {
     const server = this.mmoServer;
-    if (!server || this.isSending) return;
-    if (
-      typeof this.lastBallState == "undefined" ||
-      server.state.ballPositionX != this.lastBallState.ballPositionX ||
-      server.state.ballPositionY != this.lastBallState.ballPositionY ||
-      server.state.ballVelocityX != this.lastBallState.ballVelocityX ||
-      server.state.ballVelocityY != this.lastBallState.ballVelocityY
-    ) {
-      const ballPosition = {
-        ballPositionX: server.state.ballPositionX,
-        ballPositionY: server.state.ballPositionY,
-        ballVelocityX: server.state.ballVelocityX,
-        ballVelocityY: server.state.ballVelocityY,
-      };
-      this.lastBallState = ballPosition;
-      this.ball.setPosition(
-        server.state.ballPositionX,
-        server.state.ballPositionY
-      );
-      this.ball.body.setVelocity(
-        server.state.ballVelocityX,
-        server.state.ballVelocityY
-      );
-      if (server.state.matchState == "playing") {
-        this.gameAssets.sfx.kick.play();
-      }
+    this.ball.setPosition(
+      ballPosition.ballPositionX,
+      ballPosition.ballPositionY
+    );
+    this.ball.body.setVelocity(
+      ballPosition.ballVelocityX,
+      ballPosition.ballVelocityY
+    );
+    if (server.state.matchState == "playing") {
+      this.gameAssets.sfx.kick.play();
     }
   }
 
