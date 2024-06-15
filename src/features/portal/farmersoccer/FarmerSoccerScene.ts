@@ -19,6 +19,7 @@ export class FarmerSoccerScene extends BaseScene {
   inTheField = false;
   readyToPlay = false;
   waitingConfirmation = false;
+  positionTag: any;
   gameAssets = {
     sfx: {
       goal: Phaser.Sound.HTML5AudioSound,
@@ -153,6 +154,18 @@ export class FarmerSoccerScene extends BaseScene {
           }
         }
       });
+      this.positionTag = this.createPlayerText({
+        x: 0,
+        y: 0,
+        text: ``,
+        color: "#fee761",
+      });
+      this.positionTag.name = "positionTag";
+      this.currentPlayer.add(this.positionTag);
+      this.positionTag.setPosition(
+        0,
+        16 + (this.currentPlayer.list.length - 4) * 4
+      );
     }
     PubSub.subscribe("joinRedTeam", () => {
       this.JoinRedTeam();
@@ -232,6 +245,7 @@ export class FarmerSoccerScene extends BaseScene {
   update() {
     const server = this.mmoServer;
     this.updatePlayer();
+    this.calculateQueuePosition();
     if (Date.now() - this.packetSentAt > 1000 / 10) {
       this.isSending = false;
     }
@@ -261,6 +275,57 @@ export class FarmerSoccerScene extends BaseScene {
     this.managePlayersOnField();
     this.updateBallPosition();
     this.updateOtherPlayers();
+  }
+  calculateQueuePosition() {
+    let position = 0;
+    let color = "black";
+    const server = this.mmoServer;
+    let index = 0;
+    if (
+      server.state.rightTeam.has(server.sessionId) ||
+      server.state.rightQueue.has(server.sessionId) ||
+      server.state.leftTeam.has(server.sessionId) ||
+      server.state.leftQueue.has(server.sessionId)
+    ) {
+      server.state.rightTeam.forEach((value, at) => {
+        if (value == server.sessionId) {
+          position = index + 1;
+          color = "#FF0000";
+        }
+        index++;
+      });
+      index = 0;
+      server.state.rightQueue.forEach((value, at) => {
+        if (value == server.sessionId) {
+          position = index + 1 + server.state.rightTeam.size;
+          color = "#FF0000";
+        }
+        index++;
+      });
+      index = 0;
+      server.state.leftTeam.forEach((value, at) => {
+        if (value == server.sessionId) {
+          position = index + 1;
+          color = "#0095E9";
+        }
+        index++;
+      });
+      index = 0;
+      server.state.leftQueue.forEach((value, at) => {
+        if (value == server.sessionId) {
+          position = index + 1 + server.state.leftTeam.size;
+          color = "#0095E9";
+        }
+        index++;
+      });
+    }
+    if (position > 0) {
+      this.positionTag.text = `QUEUE POSITION: ${position}`;
+      this.positionTag.setColor(color);
+      this.positionTag.visible = true;
+    } else {
+      this.positionTag.visible = false;
+    }
   }
   managePlayersOnField() {
     const server = this.mmoServer;

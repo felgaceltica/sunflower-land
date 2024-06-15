@@ -12,7 +12,7 @@ export type NPCName = "RedTeamNPC" | "BlueTeamNPC" | "DonationNPC";
 export const FARMER_SOCCER_NPCS: Record<NPCName, Equipped> = {
   RedTeamNPC: {
     body: "Goblin Potion",
-    hat: "",
+    hat: undefined,
     hair: "Sun Spots",
     shirt: "Red Farmer Shirt",
     pants: "Farmer Pants",
@@ -20,7 +20,7 @@ export const FARMER_SOCCER_NPCS: Record<NPCName, Equipped> = {
   },
   BlueTeamNPC: {
     body: "Beige Farmer Potion",
-    hat: "",
+    hat: undefined,
     hair: "Sun Spots",
     shirt: "Blue Farmer Shirt",
     pants: "Farmer Pants",

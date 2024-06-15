@@ -29,7 +29,7 @@ export const acknowledgeCropBoomRules = () => {
   localStorage.setItem("rules.read", new Date().toISOString());
 };
 
-export interface Context {
+export interface FarmerSoccerContext {
   id: number;
   jwt: string;
   state: GameState;
@@ -53,17 +53,21 @@ export type PortalState = {
     | "claiming"
     | "completed"
     | "rules";
-  context: Context;
+  context: FarmerSoccerContext;
 };
 
 export type MachineInterpreter = Interpreter<
-  Context,
+  FarmerSoccerContext,
   any,
   PortalEvent,
   PortalState
 >;
 
-export type PortalMachineState = State<Context, PortalEvent, PortalState>;
+export type PortalMachineState = State<
+  FarmerSoccerContext,
+  PortalEvent,
+  PortalState
+>;
 
 export const portalMachine = createMachine({
   id: "portalMachine",
