@@ -25,68 +25,17 @@ export const INITIAL_RESOURCES: Pick<
   crops: {
     1: {
       createdAt: Date.now(),
-      crop: { name: "Sunflower", plantedAt: 0, amount: 1 },
+      crop: {
+        name: "Sunflower",
+        plantedAt: 0,
+        amount: 1,
+        reward: {
+          coins: 100,
+          // items: {},
+        },
+      },
       x: -2,
       y: 0,
-      height: 1,
-      width: 1,
-    },
-    2: {
-      createdAt: Date.now(),
-      crop: { name: "Potato", plantedAt: Date.now(), amount: 1 },
-      x: -1,
-      y: 0,
-      height: 1,
-      width: 1,
-    },
-    3: {
-      createdAt: Date.now(),
-      crop: { name: "Pumpkin", plantedAt: Date.now(), amount: 1 },
-      x: 0,
-      y: 0,
-      height: 1,
-      width: 1,
-    },
-    4: {
-      createdAt: Date.now(),
-      x: -2,
-      y: -1,
-      height: 1,
-      width: 1,
-    },
-    5: {
-      createdAt: Date.now(),
-      x: -1,
-      y: -1,
-      height: 1,
-      width: 1,
-    },
-    6: {
-      createdAt: Date.now(),
-      x: 0,
-      y: -1,
-      height: 1,
-      width: 1,
-    },
-
-    7: {
-      createdAt: Date.now(),
-      x: -2,
-      y: 1,
-      height: 1,
-      width: 1,
-    },
-    8: {
-      createdAt: Date.now(),
-      x: -1,
-      y: 1,
-      height: 1,
-      width: 1,
-    },
-    9: {
-      createdAt: Date.now(),
-      x: 0,
-      y: 1,
       height: 1,
       width: 1,
     },
@@ -316,8 +265,18 @@ export const STATIC_OFFLINE_FARM: GameState = {
         startAt: new Date("2023-01-01").getTime(),
         endAt: new Date("2025-01-01").getTime(),
         score: 2,
-        factionPoints: undefined,
-        marks: 15,
+        items: {},
+        wearables: {},
+      },
+      "festival-of-colors": {
+        coins: 0,
+        startAt: new Date().getTime() - 500,
+        endAt: new Date().getTime() + 5000000,
+        score: 5,
+        items: {},
+        wearables: {
+          "Red Farmer Shirt": 1,
+        },
       },
     },
   },
@@ -409,6 +368,12 @@ export const STATIC_OFFLINE_FARM: GameState = {
     } as Record<ChoreV2Name, ChoreV2>,
   },
   inventory: {
+    "Paint Can": new Decimal(1),
+    "Jelly Lamp": new Decimal(1),
+    "Splendor Flag": new Decimal(5),
+    "Benevolence Flag": new Decimal(1),
+    "Generosity Flag": new Decimal(1),
+    "Devotion Flag": new Decimal(1),
     Axe: new Decimal(100),
     Pickaxe: new Decimal(100),
     Warehouse: new Decimal(1),
@@ -416,6 +381,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     Oil: new Decimal(500),
     Manor: new Decimal(1),
     House: new Decimal(1),
+    "Sunflower Seed": new Decimal(100),
     "Rice Seed": new Decimal(10),
     "Grape Seed": new Decimal(10),
     "Olive Seed": new Decimal(10),
@@ -470,7 +436,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Town Center": new Decimal(1),
     Market: new Decimal(1),
     Workbench: new Decimal(1),
-    "Basic Land": new Decimal(3),
+    "Basic Land": new Decimal(10),
     "Gold Pass": new Decimal(1),
     "Crop Plot": new Decimal(OFFLINE_FARM_CROPS),
     "Water Well": new Decimal(4),
@@ -526,7 +492,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Sunpetal Seed": new Decimal(20),
     "Bloom Seed": new Decimal(10),
     "Lily Seed": new Decimal(5),
-    "Sunflower Seed": new Decimal(992),
+    // "Sunflower Seed": new Decimal(992),
 
     // Foods
     "Pumpkin Soup": new Decimal(1),
@@ -674,7 +640,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Sunflower Amulet": 2,
   },
 
-  createdAt: new Date().getTime(),
+  createdAt: new Date("2024-06-16").getTime(),
 
   conversations: ["hank-intro"],
 
@@ -757,6 +723,29 @@ export const STATIC_OFFLINE_FARM: GameState = {
     },
   },
   buildings: {
+    "Crop Machine": [
+      {
+        coordinates: {
+          x: -2,
+          y: 6,
+        },
+        createdAt: 0,
+        id: "1",
+        readyAt: 0,
+        oil: 100,
+        queue: [
+          {
+            amount: 10,
+            crop: "Sunflower",
+            readyAt: Date.now() - 1000,
+            startTime: Date.now() - 61500,
+            seeds: 10,
+            totalGrowTime: 60000,
+            growTimeRemaining: 0,
+          },
+        ],
+      },
+    ],
     "Town Center": [
       {
         coordinates: {
@@ -768,7 +757,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
         readyAt: 0,
       },
     ],
-    "Hen House": [
+    Greenhouse: [
       {
         coordinates: {
           x: -5,
@@ -825,6 +814,20 @@ export const STATIC_OFFLINE_FARM: GameState = {
           items: {},
         },
         id: "1",
+        items: {
+          Sunflower: 20,
+          Potato: 20,
+          Pumpkin: 20,
+        },
+      },
+      {
+        createdAt: Date.now(),
+        readyAt: Date.now(),
+        from: "victoria",
+        reward: {
+          coins: 10000,
+        },
+        id: "12",
         items: {
           Sunflower: 20,
           Potato: 20,

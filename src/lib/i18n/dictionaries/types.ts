@@ -378,7 +378,10 @@ export type AvailableSeeds =
   | "availableSeeds.select"
   | "availableSeeds.select.plant"
   | "quickSelect.label"
-  | "quickSelect.empty";
+  | "quickSelect.empty"
+  | "quickSelect.purchase"
+  | "quickSelect.cropSeeds"
+  | "quickSelect.greenhouseSeeds";
 
 export type Base = "base.far.away" | "base.iam.far.away";
 
@@ -885,6 +888,9 @@ export type Conversations =
   | "betty-intro.one"
   | "betty-intro.two"
   | "betty-intro.three"
+  | "home-intro.one"
+  | "home-intro.two"
+  | "home-intro.three"
   | "betty.market-intro.one"
   | "betty.market-intro.two"
   | "betty.market-intro.three"
@@ -1011,7 +1017,7 @@ export type CropMachine =
   | "cropMachine.seedPacks"
   | "cropMachine.readyCropPacks"
   | "cropMachine.readyCropPacks.description"
-  | "cropMachine.harvestAllCrops"
+  | "cropMachine.harvestCropPack"
   | "cropMachine.maxRuntime"
   | "cropMachine.oilToAdd"
   | "cropMachine.totalRuntime"
@@ -1301,7 +1307,13 @@ export type DecorationDescriptions =
   | "description.fancy.rug"
   | "description.clock"
   | "description.vinny"
-  | "description.ricePanda";
+  | "description.ricePanda"
+  | "description.splendorFlag"
+  | "description.benevolenceFlag"
+  | "description.devotionFlag"
+  | "description.generosityFlag"
+  | "description.jellyLamp"
+  | "description.paintCan";
 
 export type Delivery =
   | "delivery.resource"
@@ -3212,6 +3224,7 @@ export type TransactionTerms =
   | "transaction.creditCard"
   | "transaction.estimated.fee"
   | "transaction.excludeFees"
+  | "transaction.starterOffer"
   | "transaction.id"
   | "transaction.termsOfService"
   | "transaction.matic"
@@ -3396,8 +3409,6 @@ export type World =
   | "world.woodlands"
   | "world.home"
   | "world.kingdom"
-  | "world.retreatShort"
-  | "world.plazaShort"
   | "world.travelTo";
 
 export type Event =
@@ -3518,7 +3529,12 @@ export type Minigame =
   | "minigame.comingSoon"
   | "minigame.chickenRescueHelp"
   | "minigame.discovered.one"
-  | "minigame.discovered.two";
+  | "minigame.discovered.two"
+  | "minigame.festivalOfColors"
+  | "minigame.communityEvent"
+  | "minigame.festivalOfColors.intro"
+  | "minigame.festivalOfColors.mission"
+  | "minigame.festivalOfColors.comingSoon";
 
 export type KitchenKeys = "kitchen.oilRemaining";
 
