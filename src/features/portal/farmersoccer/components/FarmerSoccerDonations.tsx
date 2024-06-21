@@ -6,7 +6,7 @@ import { Loading, roundToOneDecimal } from "features/auth/components";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
-import { GameWallet } from "features/wallet/Wallet";
+import { PortalWallet } from "../PortalWallet";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
 const VALID_INTEGER = new RegExp(/^\d+$/);
@@ -134,12 +134,12 @@ export const FarmerSoccerDonations: React.FC = () => {
         </div>
       )}
       {state.matches("confirming") && (
-        <GameWallet action="donate">
+        <PortalWallet action="donate">
           <p className="m-2">{`${donation} (MATIC)`}</p>
           <Button className="w-full ml-1" onClick={donate}>
             <span className="text-xs whitespace-nowrap">{t("confirm")}</span>
           </Button>
-        </GameWallet>
+        </PortalWallet>
       )}
     </>
   );

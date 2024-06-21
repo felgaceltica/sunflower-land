@@ -12,14 +12,17 @@ import { FarmerSoccerModals } from "./components/FarmerSoccerModals";
 import { Label } from "components/ui/Label";
 import { authorisePortal } from "features/portal/farmersoccer/lib/portalUtil";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
+import { WalletProvider } from "features/wallet/WalletProvider";
 
 export const FarmerSoccerApp: React.FC = () => {
   return (
-    <PortalProvider>
-      <Ocean>
-        <FarmerSoccer />
-      </Ocean>
-    </PortalProvider>
+    <WalletProvider>
+      <PortalProvider>
+        <Ocean>
+          <FarmerSoccer />
+        </Ocean>
+      </PortalProvider>
+    </WalletProvider>
   );
 };
 

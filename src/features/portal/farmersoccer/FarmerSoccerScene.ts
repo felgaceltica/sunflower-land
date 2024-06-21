@@ -100,7 +100,7 @@ export class FarmerSoccerScene extends BaseScene {
       key: "farmer_soccer",
     });
     super.create();
-    this.physics.world.drawDebug = false;
+    this.physics.world.drawDebug = true;
     this.gameAssets.sfx.goal = this.sound.add("goal");
     this.gameAssets.sfx.whistle1 = this.sound.add("whistle1");
     this.gameAssets.sfx.whistle2 = this.sound.add("whistle2");
@@ -247,6 +247,23 @@ export class FarmerSoccerScene extends BaseScene {
 
   update() {
     const server = this.mmoServer;
+    if (this.inTheField) {
+      if (server.state.leftTeam.has(server.sessionId)) {
+        if (this.currentPlayer.x < 16 * 3) this.currentPlayer.x = 16 * 3;
+        if (this.currentPlayer.x > 16 * 9.5) this.currentPlayer.x = 16 * 9.5;
+      }
+      if (server.state.rightTeam.has(server.sessionId)) {
+        if (this.currentPlayer.x < 16 * 12.5) this.currentPlayer.x = 16 * 12.5;
+        if (this.currentPlayer.x > 16 * 19) this.currentPlayer.x = 16 * 19;
+      }
+      if (
+        server.state.leftTeam.has(server.sessionId) ||
+        server.state.rightTeam.has(server.sessionId)
+      ) {
+        if (this.currentPlayer.y < 16 * 1.6) this.currentPlayer.y = 16 * 1.6;
+        if (this.currentPlayer.y > 16 * 8.2) this.currentPlayer.y = 16 * 8.2;
+      }
+    }
     this.updatePlayer();
     this.calculateQueuePosition();
     if (Date.now() - this.packetSentAt > 1000 / 60) {
@@ -708,7 +725,7 @@ export class FarmerSoccerScene extends BaseScene {
       .setDepth(99999);
     const donateimage = scene.add
       .image(16 * 16, 16 * 0.6, "donate")
-      .setDisplaySize(74, 11)
+      .setDisplaySize(77, 11)
       .setDepth(99999);
     donateimage.setInteractive({ useHandCursor: true });
 
@@ -863,71 +880,71 @@ export class FarmerSoccerScene extends BaseScene {
       scene
     );
 
-    const rect8 = this.add.rectangle(
-      16 * 2.5,
-      16 * 5,
-      0.1,
-      16 * 8,
-      0xffffff,
-      0
-    );
-    scene.physics.add.existing(rect8, true);
-    scene.physics.add.collider(
-      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      rect8 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      scene.stopPlayer,
-      undefined,
-      scene
-    );
+    // const rect8 = this.add.rectangle(
+    //   16 * 2.5,
+    //   16 * 5,
+    //   0.1,
+    //   16 * 8,
+    //   0xffffff,
+    //   0
+    // );
+    // scene.physics.add.existing(rect8, true);
+    // scene.physics.add.collider(
+    //   scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   rect8 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   scene.stopPlayer,
+    //   undefined,
+    //   scene
+    // );
 
-    const rect9 = this.add.rectangle(
-      16 * 10.5,
-      16 * 5,
-      0.1,
-      16 * 8,
-      0xffffff,
-      0
-    );
-    scene.physics.add.existing(rect9, true);
-    scene.physics.add.collider(
-      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      rect9 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      scene.stopPlayer,
-      undefined,
-      scene
-    );
-    const rect10 = this.add.rectangle(
-      16 * 11.5,
-      16 * 5,
-      0.1,
-      16 * 8,
-      0xffffff,
-      0
-    );
-    scene.physics.add.existing(rect10, true);
-    scene.physics.add.collider(
-      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      rect10 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      scene.stopPlayer,
-      undefined,
-      scene
-    );
-    const rect11 = this.add.rectangle(
-      16 * 19.5,
-      16 * 5,
-      0.1,
-      16 * 8,
-      0xffffff,
-      0
-    );
-    scene.physics.add.existing(rect11, true);
-    scene.physics.add.collider(
-      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      rect11 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      scene.stopPlayer,
-      undefined,
-      scene
-    );
+    // const rect9 = this.add.rectangle(
+    //   16 * 10.5,
+    //   16 * 5,
+    //   0.1,
+    //   16 * 8,
+    //   0xffffff,
+    //   0
+    // );
+    // scene.physics.add.existing(rect9, true);
+    // scene.physics.add.collider(
+    //   scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   rect9 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   scene.stopPlayer,
+    //   undefined,
+    //   scene
+    // );
+    // const rect10 = this.add.rectangle(
+    //   16 * 11.5,
+    //   16 * 5,
+    //   0.1,
+    //   16 * 8,
+    //   0xffffff,
+    //   0
+    // );
+    // scene.physics.add.existing(rect10, true);
+    // scene.physics.add.collider(
+    //   scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   rect10 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   scene.stopPlayer,
+    //   undefined,
+    //   scene
+    // );
+    // const rect11 = this.add.rectangle(
+    //   16 * 19.5,
+    //   16 * 5,
+    //   0.1,
+    //   16 * 8,
+    //   0xffffff,
+    //   0
+    // );
+    // scene.physics.add.existing(rect11, true);
+    // scene.physics.add.collider(
+    //   scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   rect11 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+    //   scene.stopPlayer,
+    //   undefined,
+    //   scene
+    // );
 
     const leftgoal = this.add.rectangle(16 * 1.3, 16 * 5, 0.1, 40, 0xffffff, 0);
     scene.physics.add.existing(leftgoal, true);
@@ -1026,9 +1043,9 @@ export class FarmerSoccerScene extends BaseScene {
     this.ball.setPosition(16 * 11, 16 * 5);
     const server = this.mmoServer;
     if (server) {
-      if (server.state.rightTeam.has(server.sessionId)) {
-        server.send(8);
-      }
+      //if (server.state.leftTeam.has(server.sessionId)) {
+      server.send(8);
+      //}
     }
   }
   addRightGoal() {
@@ -1036,9 +1053,9 @@ export class FarmerSoccerScene extends BaseScene {
     this.ball.setPosition(16 * 11, 16 * 5);
     const server = this.mmoServer;
     if (server) {
-      if (server.state.leftTeam.has(server.sessionId)) {
-        server.send(9);
-      }
+      //if (server.state.rightTeam.has(server.sessionId)) {
+      server.send(9);
+      //}
     }
   }
 }

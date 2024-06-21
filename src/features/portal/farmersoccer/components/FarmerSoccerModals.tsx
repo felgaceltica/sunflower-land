@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { Modal } from "components/ui/Modal";
 import { Panel } from "components/ui/Panel";
 import { Button } from "components/ui/Button";
@@ -345,18 +345,25 @@ export const FarmerSoccerModals: React.FC = () => {
           </div>
         </Panel>
       </Modal>
-      <Modal show={showDonationModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.DonationNPC}>
+      <Modal
+        show={showDonationModal}
+        onHide={() => setshowDonationModal(false)}
+      >
+        <CloseButtonPanel
+          title="Enjoying this game?"
+          bumpkinParts={FARMER_SOCCER_NPCS.DonationNPC}
+          onClose={() => setshowDonationModal(false)}
+        >
           <div className="p-2">
             <p className="mb-2">{`Please consider donating to keep the servers running.`}</p>
           </div>
           <FarmerSoccerDonations />
-          <div className="flex">
+          {/* <div className="flex">
             <Button onClick={() => setshowDonationModal(false)}>
               {`Not now`}
             </Button>
-          </div>
-        </Panel>
+          </div> */}
+        </CloseButtonPanel>
       </Modal>
     </div>
   );
