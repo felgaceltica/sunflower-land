@@ -100,7 +100,7 @@ export class FarmerSoccerScene extends BaseScene {
       key: "farmer_soccer",
     });
     super.create();
-    this.physics.world.drawDebug = true;
+    this.physics.world.drawDebug = false;
     this.gameAssets.sfx.goal = this.sound.add("goal");
     this.gameAssets.sfx.whistle1 = this.sound.add("whistle1");
     this.gameAssets.sfx.whistle2 = this.sound.add("whistle2");
