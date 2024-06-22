@@ -21,6 +21,8 @@ import { Box } from "components/ui/Box";
 import { getKeys } from "features/game/types/craftables";
 import { ITEM_DETAILS } from "features/game/types/images";
 
+import sflIcon from "assets/icons/sfl.webp";
+
 interface Props {
   portalName: MinigameName;
   onClose: () => void;
@@ -28,7 +30,7 @@ interface Props {
 
 type PortalPurchase = {
   sfl: number;
-  items: Partial<Record<InventoryItemName, number>>;
+  items?: Partial<Record<InventoryItemName, number>>;
 };
 
 export const Portal: React.FC<Props> = ({ portalName, onClose }) => {
@@ -167,7 +169,7 @@ export const Portal: React.FC<Props> = ({ portalName, onClose }) => {
           items: prize?.items ?? {},
           wearables: prize?.wearables ?? {},
           sfl: 0,
-          coins: prize.coins,
+          coins: prize?.coins ?? 0,
         }}
       />
     );
@@ -207,12 +209,12 @@ export const Portal: React.FC<Props> = ({ portalName, onClose }) => {
                 <p className="text-sm">{`${t("minigame.confirm")}`}</p>
                 {!!purchase.sfl && (
                   <div className="flex mb-1  items-center">
-                    <Box image="sfl" />
+                    <Box image={sflIcon} />
                     <span className="ml-1">{`${purchase.sfl} x  SFL`}</span>
                   </div>
                 )}
-                {getKeys(purchase.items).map((key) => {
-                  const item = purchase.items[key];
+                {getKeys(purchase.items ?? {}).map((key) => {
+                  const item = purchase.items?.[key] ?? 0;
                   return (
                     <div className="flex mb-1 items-center" key={key}>
                       <Box image={ITEM_DETAILS[key].image} />
