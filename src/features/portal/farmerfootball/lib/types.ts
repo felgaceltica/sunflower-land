@@ -9,7 +9,7 @@ export interface Clothing {
 import { Equipped } from "features/game/types/bumpkin";
 
 export type NPCName = "RedTeamNPC" | "BlueTeamNPC" | "DonationNPC";
-export const FARMER_SOCCER_NPCS: Record<NPCName, Equipped> = {
+export const FARMER_FOOTBALL_NPCS: Record<NPCName, Equipped> = {
   RedTeamNPC: {
     body: "Goblin Potion",
     hat: undefined,

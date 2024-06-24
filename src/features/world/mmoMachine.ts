@@ -20,7 +20,7 @@ export type Scenes = {
   beach: Room<PlazaRoomState> | undefined;
   crop_boom: Room<PlazaRoomState> | undefined;
   mushroom_forest: Room<PlazaRoomState> | undefined;
-  farmer_soccer: Room<PlazaRoomState> | undefined;
+  farmer_football: Room<PlazaRoomState> | undefined;
   retreat: Room<PlazaRoomState> | undefined;
   kingdom: Room<PlazaRoomState> | undefined;
   faction_house: Room<PlazaRoomState> | undefined;

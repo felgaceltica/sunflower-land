@@ -1,15 +1,15 @@
-import mapJson from "./farmersoccer.json";
+import mapJson from "./farmerfootball.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
-import { FARMER_SOCCER_NPCS } from "./lib/types";
+import { FARMER_FOOTBALL_NPCS } from "./lib/types";
 import { SPAWNS } from "features/world/lib/spawn";
 import PubSub from "pubsub-js";
 
-export class FarmerSoccerScene extends BaseScene {
+export class FarmerFootballScene extends BaseScene {
   graphics: any;
   lastBallState: any;
-  sceneId: SceneId = "farmer_soccer";
+  sceneId: SceneId = "farmer_football";
   ball: ImageWithDynamicBody;
   packetSentAt = 0;
   isSending = false;
@@ -30,7 +30,7 @@ export class FarmerSoccerScene extends BaseScene {
   };
   constructor() {
     super({
-      name: "farmer_soccer",
+      name: "farmer_football",
       map: { json: mapJson, padding: [10, 10] },
       audio: { fx: { walk_key: "dirt_footstep" } },
     });
@@ -42,43 +42,43 @@ export class FarmerSoccerScene extends BaseScene {
     //this.load.path = "./public/";
     this.load.image(
       "ball",
-      "/src/features/portal/farmersoccer/assets/ball.png"
+      "/src/features/portal/farmerfootball/assets/ball.png"
     );
     this.load.image(
       "leftgoal",
-      "/src/features/portal/farmersoccer/assets/leftgoal.png"
+      "/src/features/portal/farmerfootball/assets/leftgoal.png"
     );
     this.load.image(
       "rightgoal",
-      "/src/features/portal/farmersoccer/assets/rightgoal.png"
+      "/src/features/portal/farmerfootball/assets/rightgoal.png"
     );
     this.load.image(
       "donate",
-      "/src/features/portal/farmersoccer/assets/donate.png"
+      "/src/features/portal/farmerfootball/assets/donate.png"
     );
     this.load.audio(
       "goal",
-      "/src/features/portal/farmersoccer/assets/goal.wav"
+      "/src/features/portal/farmerfootball/assets/goal.wav"
     );
     this.load.audio(
       "whistle1",
-      "/src/features/portal/farmersoccer/assets/whistle1.wav"
+      "/src/features/portal/farmerfootball/assets/whistle1.wav"
     );
     this.load.audio(
       "whistle2",
-      "/src/features/portal/farmersoccer/assets/whistle2.wav"
+      "/src/features/portal/farmerfootball/assets/whistle2.wav"
     );
     this.load.audio(
       "kick",
-      "/src/features/portal/farmersoccer/assets/kick.wav"
+      "/src/features/portal/farmerfootball/assets/kick.wav"
     );
     this.load.image(
       "blueBanner",
-      "/src/features/portal/farmersoccer/assets/blueBanner.png"
+      "/src/features/portal/farmerfootball/assets/blueBanner.png"
     );
     this.load.image(
       "redBanner",
-      "/src/features/portal/farmersoccer/assets/redBanner.png"
+      "/src/features/portal/farmerfootball/assets/redBanner.png"
     );
     // Ambience SFX
     // if (!this.sound.get("nature_1")) {
@@ -97,7 +97,7 @@ export class FarmerSoccerScene extends BaseScene {
   async create() {
     const server = this.mmoServer;
     this.map = this.make.tilemap({
-      key: "farmer_soccer",
+      key: "farmer_football",
     });
     super.create();
     this.physics.world.drawDebug = false;
@@ -203,8 +203,8 @@ export class FarmerSoccerScene extends BaseScene {
   ReSpawPlayer() {
     this.readyToPlay = false;
     this.inTheField = false;
-    this.currentPlayer.x = SPAWNS().farmer_soccer.default.x;
-    this.currentPlayer.y = SPAWNS().farmer_soccer.default.y;
+    this.currentPlayer.x = SPAWNS().farmer_football.default.x;
+    this.currentPlayer.y = SPAWNS().farmer_football.default.y;
   }
   JoinRedTeam() {
     const server = this.mmoServer;
@@ -419,7 +419,7 @@ export class FarmerSoccerScene extends BaseScene {
       x: 16 * 19.5,
       y: 16 * 10.75,
       clothing: {
-        ...FARMER_SOCCER_NPCS.RedTeamNPC,
+        ...FARMER_FOOTBALL_NPCS.RedTeamNPC,
         updatedAt: 0,
       },
       direction: "left",
@@ -445,7 +445,7 @@ export class FarmerSoccerScene extends BaseScene {
       x: 16 * 2.5,
       y: 16 * 10.75,
       clothing: {
-        ...FARMER_SOCCER_NPCS.BlueTeamNPC,
+        ...FARMER_FOOTBALL_NPCS.BlueTeamNPC,
         updatedAt: 0,
       },
       direction: "right",
@@ -471,7 +471,7 @@ export class FarmerSoccerScene extends BaseScene {
     //   x: 16 * 2.5,
     //   y: 16 * 10.75,
     //   clothing: {
-    //     ...FARMER_SOCCER_NPCS.DonationNPC,
+    //     ...FARMER_FOOTBALL_NPCS.DonationNPC,
     //     updatedAt: 0,
     //   },
     //   direction: "right",
@@ -522,7 +522,7 @@ export class FarmerSoccerScene extends BaseScene {
     this.gameAssets.sfx.kick.play();
     this.sendBallPositionToServer();
   }
-  setupBasicPhysics(scene: FarmerSoccerScene) {
+  setupBasicPhysics(scene: FarmerFootballScene) {
     scene.physics.world.setBounds(16, 16, 16 * 20, 16 * 12);
     (scene.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(true);
     (scene.currentPlayer.body as Phaser.Physics.Arcade.Body)
@@ -537,7 +537,7 @@ export class FarmerSoccerScene extends BaseScene {
       .line(0, 0, 16 * 11 + 0.5, 16 * 5, 16 * 11 + 0.5, 16 * 13, 0xffffff, 1)
       .setLineWidth(0.5, 0.5);
   }
-  setupBall(scene: FarmerSoccerScene) {
+  setupBall(scene: FarmerFootballScene) {
     scene.ball = scene.physics.add.image(116, 56, "ball");
     scene.ball.setDisplaySize(8, 8);
     scene.ball.body.setCircle(10);
@@ -555,7 +555,7 @@ export class FarmerSoccerScene extends BaseScene {
     );
     this.ball.setDepth(9999);
   }
-  drawObstacles(scene: FarmerSoccerScene) {
+  drawObstacles(scene: FarmerFootballScene) {
     const rectblueteam = this.add.rectangle(
       16 * 2.5,
       16 * 11,
@@ -624,7 +624,7 @@ export class FarmerSoccerScene extends BaseScene {
       scene
     );
   }
-  drawField(scene: FarmerSoccerScene) {
+  drawField(scene: FarmerFootballScene) {
     scene.add.image(16 * 9.5, 16 * 0.5, "blueBanner").setDisplaySize(8, 17);
     scene.add.image(16 * 12.5, 16 * 0.5, "redBanner").setDisplaySize(8, 17);
     this.leftScoreText = this.add

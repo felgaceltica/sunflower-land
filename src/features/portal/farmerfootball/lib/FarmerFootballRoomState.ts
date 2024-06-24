@@ -1,7 +1,7 @@
 import { PlazaRoomState } from "features/world/types/Room";
 import { CollectionSchema } from "@colyseus/schema";
 
-export interface FarmerSoccerRoomState extends PlazaRoomState {
+export interface FarmerFootballRoomState extends PlazaRoomState {
   scoreLeft: number;
   scoreRight: number;
 

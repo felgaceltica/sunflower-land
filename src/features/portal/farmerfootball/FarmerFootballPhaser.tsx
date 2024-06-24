@@ -4,21 +4,21 @@ import NinePatchPlugin from "phaser3-rex-plugins/plugins/ninepatch-plugin.js";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
 import { Preloader } from "features/world/scenes/Preloader";
-import { FarmerSoccerScene } from "./FarmerSoccerScene";
+import { FarmerFootballScene } from "./FarmerFootballScene";
 import { PortalContext } from "./lib/PortalProvider";
 import { useActor } from "@xstate/react";
 import { InteractableModals } from "features/world/ui/InteractableModals";
 
-export const FarmerSoccerPhaser: React.FC = () => {
+export const FarmerFootballPhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const [portalState] = useActor(portalService);
 
   const [loaded, setLoaded] = useState(false);
   const game = useRef<Game>();
 
-  const scene = "farmer_soccer";
+  const scene = "farmer_football";
 
-  const scenes = [Preloader, FarmerSoccerScene];
+  const scenes = [Preloader, FarmerFootballScene];
 
   useEffect(() => {
     const config: Phaser.Types.Core.GameConfig = {

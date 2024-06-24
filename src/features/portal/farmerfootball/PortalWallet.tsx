@@ -20,7 +20,7 @@ import {
 import { WalletContext } from "features/wallet/WalletProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Loading } from "features/auth/components";
-import { PortalContext } from "features/portal/farmersoccer/lib/PortalProvider";
+import { PortalContext } from "features/portal/farmerfootball/lib/PortalProvider";
 
 interface Props {
   action: WalletAction;

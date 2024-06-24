@@ -5,7 +5,7 @@ import { loadPortal } from "../actions/loadPortal";
 import { CONFIG } from "lib/config";
 import { claimArcadeToken } from "../actions/claimArcadeToken";
 import { Client, Room } from "colyseus.js";
-import { FarmerSoccerRoomState } from "./FarmerSoccerRoomState";
+import { FarmerFootballRoomState } from "./FarmerFootballRoomState";
 import { SPAWNS } from "features/world/lib/spawn";
 import { decodeToken } from "features/auth/actions/login";
 
@@ -29,11 +29,11 @@ export const acknowledgeCropBoomRules = () => {
   localStorage.setItem("rules.read", new Date().toISOString());
 };
 
-export interface FarmerSoccerContext {
+export interface FarmerFootballContext {
   id: number;
   jwt: string;
   state: GameState;
-  mmoServer?: Room<FarmerSoccerRoomState>;
+  mmoServer?: Room<FarmerFootballRoomState>;
 }
 
 export type PortalEvent =
@@ -53,18 +53,18 @@ export type PortalState = {
     | "claiming"
     | "completed"
     | "rules";
-  context: FarmerSoccerContext;
+  context: FarmerFootballContext;
 };
 
 export type MachineInterpreter = Interpreter<
-  FarmerSoccerContext,
+  FarmerFootballContext,
   any,
   PortalEvent,
   PortalState
 >;
 
 export type PortalMachineState = State<
-  FarmerSoccerContext,
+  FarmerFootballContext,
   PortalEvent,
   PortalState
 >;
@@ -118,20 +118,20 @@ export const portalMachine = createMachine({
           });
 
           // Join the MMO Server
-          let mmoServer: Room<FarmerSoccerRoomState> | undefined;
-          const serverName = getServer() ?? "farmer_soccer";
+          let mmoServer: Room<FarmerFootballRoomState> | undefined;
+          const serverName = getServer() ?? "farmer_football";
           const mmoUrl = CONFIG.ROOM_URL;
           if (serverName && mmoUrl) {
             const client = new Client(mmoUrl);
-            mmoServer = await client?.joinOrCreate<FarmerSoccerRoomState>(
+            mmoServer = await client?.joinOrCreate<FarmerFootballRoomState>(
               serverName,
               {
                 jwt: context.jwt,
                 bumpkin: game?.bumpkin,
                 farmId,
-                x: SPAWNS().farmer_soccer.default.x,
-                y: SPAWNS().farmer_soccer.default.y,
-                sceneId: "farmer_soccer",
+                x: SPAWNS().farmer_football.default.x,
+                y: SPAWNS().farmer_football.default.y,
+                sceneId: "farmer_football",
                 experience: game.bumpkin?.experience ?? 0,
               }
             );

@@ -6,27 +6,27 @@ import { Panel } from "components/ui/Panel";
 import { Button } from "components/ui/Button";
 import { PortalContext, PortalProvider } from "./lib/PortalProvider";
 import { Ocean } from "features/world/ui/Ocean";
-import { FarmerSoccerHud } from "./components/FarmerSoccerHud";
-import { FarmerSoccerPhaser } from "./FarmerSoccerPhaser";
-import { FarmerSoccerModals } from "./components/FarmerSoccerModals";
+import { FarmerFootballHud } from "./components/FarmerFootballHud";
+import { FarmerFootballPhaser } from "./FarmerFootballPhaser";
+import { FarmerFootballModals } from "./components/FarmerFootballModals";
 import { Label } from "components/ui/Label";
-import { authorisePortal } from "features/portal/farmersoccer/lib/portalUtil";
+import { authorisePortal } from "features/portal/farmerfootball/lib/portalUtil";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { WalletProvider } from "features/wallet/WalletProvider";
 
-export const FarmerSoccerApp: React.FC = () => {
+export const FarmerFootballApp: React.FC = () => {
   return (
     <WalletProvider>
       <PortalProvider>
         <Ocean>
-          <FarmerSoccer />
+          <FarmerFootball />
         </Ocean>
       </PortalProvider>
     </WalletProvider>
   );
 };
 
-export const FarmerSoccer: React.FC = () => {
+export const FarmerFootball: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const [portalState] = useActor(portalService);
   const { t } = useAppTranslation();
@@ -45,9 +45,9 @@ export const FarmerSoccer: React.FC = () => {
       )}
       {portalState.context.state && (
         <>
-          <FarmerSoccerHud />
-          <FarmerSoccerPhaser />
-          <FarmerSoccerModals />
+          <FarmerFootballHud />
+          <FarmerFootballPhaser />
+          <FarmerFootballModals />
         </>
       )}
     </div>

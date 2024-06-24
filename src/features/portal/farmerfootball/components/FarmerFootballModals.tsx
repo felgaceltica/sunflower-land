@@ -3,12 +3,12 @@ import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { Modal } from "components/ui/Modal";
 import { Panel } from "components/ui/Panel";
 import { Button } from "components/ui/Button";
-import { FARMER_SOCCER_NPCS } from "../lib/types";
+import { FARMER_FOOTBALL_NPCS } from "../lib/types";
 import PubSub from "pubsub-js";
 import { CountdownLabel } from "components/ui/CountdownLabel";
-import { FarmerSoccerDonations } from "./FarmerSoccerDonations";
+import { FarmerFootballDonations } from "./FarmerFootballDonations";
 
-export const FarmerSoccerModals: React.FC = () => {
+export const FarmerFootballModals: React.FC = () => {
   const [showJoinRedModal, setshowJoinRedModal] = useState(false);
   const [showLeaveRedModal, setshowLeaveRedModal] = useState(false);
   const [showReadyRedModal, setshowReadyRedModal] = useState(false);
@@ -21,7 +21,7 @@ export const FarmerSoccerModals: React.FC = () => {
   const [showLoserModal, setshowLoserModal] = useState(false);
   const [showAbandonModal, setshowAbandonModal] = useState(false);
   const [showAnotherTeamModal, setshowAnotherTeamModal] = useState(false);
-  const [NPC, setNPC] = useState(FARMER_SOCCER_NPCS.RedTeamNPC);
+  const [NPC, setNPC] = useState(FARMER_FOOTBALL_NPCS.RedTeamNPC);
 
   const [time, setTime] = useState(30);
   const [time5, setTime5] = useState(5);
@@ -41,7 +41,7 @@ export const FarmerSoccerModals: React.FC = () => {
       setshowLeaveRedModal(true);
     });
     PubSub.subscribe("showAnotherTeamRedModal", () => {
-      setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+      setNPC(FARMER_FOOTBALL_NPCS.RedTeamNPC);
       setshowAnotherTeamModal(true);
     });
     PubSub.subscribe("showReadyRedModal", () => {
@@ -65,7 +65,7 @@ export const FarmerSoccerModals: React.FC = () => {
       confirmTime = Date.now();
       if (!showAbandonModal) {
         setshowReadyBlueModal(false);
-        setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+        setNPC(FARMER_FOOTBALL_NPCS.BlueTeamNPC);
         setshowAbandonModal(true);
         interval = setInterval(() => {
           const timeLeft = 5 - (Date.now() - confirmTime) / 1000;
@@ -84,7 +84,7 @@ export const FarmerSoccerModals: React.FC = () => {
       setshowLeaveBlueModal(true);
     });
     PubSub.subscribe("showAnotherTeamBlueModal", () => {
-      setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+      setNPC(FARMER_FOOTBALL_NPCS.BlueTeamNPC);
       setshowAnotherTeamModal(true);
     });
     PubSub.subscribe("showReadyBlueModal", () => {
@@ -108,7 +108,7 @@ export const FarmerSoccerModals: React.FC = () => {
       confirmTime = Date.now();
       if (!showAbandonModal) {
         setshowReadyRedModal(false);
-        setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+        setNPC(FARMER_FOOTBALL_NPCS.RedTeamNPC);
         setshowAbandonModal(true);
         interval = setInterval(() => {
           const timeLeft = 5 - (Date.now() - confirmTime) / 1000;
@@ -121,19 +121,19 @@ export const FarmerSoccerModals: React.FC = () => {
       }
     });
     PubSub.subscribe("showWinnerModalRed", () => {
-      setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+      setNPC(FARMER_FOOTBALL_NPCS.RedTeamNPC);
       setshowWinnerModal(true);
     });
     PubSub.subscribe("showWinnerModalBlue", () => {
-      setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+      setNPC(FARMER_FOOTBALL_NPCS.BlueTeamNPC);
       setshowWinnerModal(true);
     });
     PubSub.subscribe("showLoserModalRed", () => {
-      setNPC(FARMER_SOCCER_NPCS.RedTeamNPC);
+      setNPC(FARMER_FOOTBALL_NPCS.RedTeamNPC);
       setshowLoserModal(true);
     });
     PubSub.subscribe("showLoserModalBlue", () => {
-      setNPC(FARMER_SOCCER_NPCS.BlueTeamNPC);
+      setNPC(FARMER_FOOTBALL_NPCS.BlueTeamNPC);
       setshowLoserModal(true);
     });
   });
@@ -141,7 +141,7 @@ export const FarmerSoccerModals: React.FC = () => {
   return (
     <div>
       <Modal show={showJoinRedModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.RedTeamNPC}>
+        <Panel bumpkinParts={FARMER_FOOTBALL_NPCS.RedTeamNPC}>
           <div className="p-2">
             <p className="mb-2">{`Hey, do you wanna join the Red Team?`}</p>
             <p className="text-sm mb-1">{`You will join the queue to play for our team.`}</p>
@@ -163,7 +163,7 @@ export const FarmerSoccerModals: React.FC = () => {
         </Panel>
       </Modal>
       <Modal show={showLeaveRedModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.RedTeamNPC}>
+        <Panel bumpkinParts={FARMER_FOOTBALL_NPCS.RedTeamNPC}>
           <div className="p-2">
             <p className="mb-2">{`Hey, you are already on the Team!`}</p>
             <p className="text-sm mb-1">{`Wait your turn to play.`}</p>
@@ -185,7 +185,7 @@ export const FarmerSoccerModals: React.FC = () => {
         </Panel>
       </Modal>
       <Modal show={showReadyRedModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.RedTeamNPC}>
+        <Panel bumpkinParts={FARMER_FOOTBALL_NPCS.RedTeamNPC}>
           <div className="p-2">
             <p className="mb-2">{`Are you ready? The rules are simple, the first to score 2 goals wins.`}</p>
             {/* { <p className="text-sm mb-1">{time}</p> } */}
@@ -216,7 +216,7 @@ export const FarmerSoccerModals: React.FC = () => {
       </Modal>
 
       <Modal show={showJoinBlueModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.BlueTeamNPC}>
+        <Panel bumpkinParts={FARMER_FOOTBALL_NPCS.BlueTeamNPC}>
           <div className="p-2">
             <p className="mb-2">{`Hey, do you wanna join the Blue Team?`}</p>
             <p className="text-sm mb-1">{`You will join the queue to play for our team.`}</p>
@@ -238,7 +238,7 @@ export const FarmerSoccerModals: React.FC = () => {
         </Panel>
       </Modal>
       <Modal show={showLeaveBlueModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.BlueTeamNPC}>
+        <Panel bumpkinParts={FARMER_FOOTBALL_NPCS.BlueTeamNPC}>
           <div className="p-2">
             <p className="mb-2">{`Hey, you are already on the Team!`}</p>
             <p className="text-sm mb-1">{`Wait your turn to play.`}</p>
@@ -260,7 +260,7 @@ export const FarmerSoccerModals: React.FC = () => {
         </Panel>
       </Modal>
       <Modal show={showReadyBlueModal}>
-        <Panel bumpkinParts={FARMER_SOCCER_NPCS.BlueTeamNPC}>
+        <Panel bumpkinParts={FARMER_FOOTBALL_NPCS.BlueTeamNPC}>
           <div className="p-2">
             <p className="mb-2">{`Are you ready? The rules are simple, the first to score 2 goals wins.`}</p>
             {/* <p className="text-sm mb-1">{`You will join the queue to play for our team.`}</p> */}
@@ -351,13 +351,13 @@ export const FarmerSoccerModals: React.FC = () => {
       >
         <CloseButtonPanel
           title="Enjoying this game?"
-          bumpkinParts={FARMER_SOCCER_NPCS.DonationNPC}
+          bumpkinParts={FARMER_FOOTBALL_NPCS.DonationNPC}
           onClose={() => setshowDonationModal(false)}
         >
           <div className="p-2">
             <p className="mb-2">{`Please consider donating to keep the servers running.`}</p>
           </div>
-          <FarmerSoccerDonations />
+          <FarmerFootballDonations />
           {/* <div className="flex">
             <Button onClick={() => setshowDonationModal(false)}>
               {`Not now`}

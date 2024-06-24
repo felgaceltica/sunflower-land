@@ -17,12 +17,12 @@ const MAX_SFL = 150;
 
 const CONTRIBUTORS = ["Felga"];
 
-export const FarmerSoccerDonations: React.FC = () => {
+export const FarmerFootballDonations: React.FC = () => {
   const { t } = useAppTranslation();
 
   const [state, send] = useMachine(donationMachine);
   const [donation, setDonation] = useState(1);
-  const FARMER_SOCCER_DONATION_ADDRESS =
+  const FARMER_FOOTBALL_DONATION_ADDRESS =
     "0xB5228e9f7B488aE9B79ea655Fb43C50A1499a0F3";
   const onDonationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // If keyboard input "" convert to 0
@@ -44,7 +44,7 @@ export const FarmerSoccerDonations: React.FC = () => {
   const donate = () => {
     send("DONATE", {
       donation,
-      to: FARMER_SOCCER_DONATION_ADDRESS,
+      to: FARMER_FOOTBALL_DONATION_ADDRESS,
     });
   };
 
