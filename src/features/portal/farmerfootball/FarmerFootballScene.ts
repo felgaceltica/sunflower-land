@@ -18,6 +18,8 @@ export class FarmerFootballScene extends BaseScene {
   leftScoreText: any;
   rightScoreText: any;
   statusText: any;
+  debugText: any;
+  debugMode = true;
   inTheField = false;
   readyToPlay = false;
   waitingConfirmation = false;
@@ -188,6 +190,13 @@ export class FarmerFootballScene extends BaseScene {
         color: "#ffffff",
       })
       .setOrigin(0.5);
+    this.debugText = this.add.text(16 * 11 + 2, 16 * 8 - 2, "debugText", {
+      fontSize: "3px",
+      resolution: 4,
+      align: "left",
+      //padding: { x: 2, y: 2 },
+      color: "#000",
+    });
 
     (this.goalSound = this.sound.add("goal")),
       (this.whistle1Sound = this.sound.add("whistle1")),
@@ -289,6 +298,7 @@ export class FarmerFootballScene extends BaseScene {
         case "leftAbandon":
         case "rightAbandon":
           this.statusText.text = "MATCH RESTARTING";
+          this.waitingConfirmation = false;
           break;
         default:
           this.statusText.text = "";
@@ -298,6 +308,18 @@ export class FarmerFootballScene extends BaseScene {
       this.managePlayersOnField();
       //this.updateBallPosition();
       this.updateOtherPlayers();
+      if (this.debugMode) {
+        this.debugText.text = [
+          "Debug Info:",
+          "matchState: " + server.state.matchState,
+          "leftTeam: " + server.state.leftTeam.size,
+          "leftQueue: " + server.state.leftQueue.size,
+          "rightTeam: " + server.state.rightTeam.size,
+          "rightQueue: " + server.state.rightQueue.size,
+        ];
+      } else {
+        this.debugText.text = "";
+      }
     }
   }
   calculateQueuePosition() {

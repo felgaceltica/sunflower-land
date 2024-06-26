@@ -50,12 +50,14 @@ export const FarmerFootballModals: React.FC = () => {
         setshowLeaveRedModal(false);
         setshowReadyRedModal(true);
         setLeave(true);
+        if (interval) clearInterval(interval);
         interval = setInterval(() => {
           const timeLeft = 30 - (Date.now() - confirmTime) / 1000;
           setTime(timeLeft);
           if (timeLeft <= 0) {
             clearInterval(interval);
             setshowReadyRedModal(false);
+            setTime(30);
             if (leave) LeaveRedTeam();
           }
         }, 1000);
@@ -67,12 +69,14 @@ export const FarmerFootballModals: React.FC = () => {
         setshowReadyBlueModal(false);
         setNPC(FARMER_FOOTBALL_NPCS.BlueTeamNPC);
         setshowAbandonModal(true);
+        if (interval) clearInterval(interval);
         interval = setInterval(() => {
           const timeLeft = 5 - (Date.now() - confirmTime) / 1000;
           setTime5(timeLeft);
           if (timeLeft <= 0) {
             clearInterval(interval);
             setshowAbandonModal(false);
+            setTime5(5);
           }
         }, 1000);
       }
@@ -93,12 +97,14 @@ export const FarmerFootballModals: React.FC = () => {
         setshowLeaveBlueModal(false);
         setshowReadyBlueModal(true);
         setLeave(true);
+        if (interval) clearInterval(interval);
         interval = setInterval(() => {
           const timeLeft = 30 - (Date.now() - confirmTime) / 1000;
           setTime(timeLeft);
           if (timeLeft <= 0) {
             clearInterval(interval);
             setshowReadyBlueModal(false);
+            setTime(30);
             if (leave) LeaveBlueTeam();
           }
         }, 1000);
@@ -110,12 +116,14 @@ export const FarmerFootballModals: React.FC = () => {
         setshowReadyRedModal(false);
         setNPC(FARMER_FOOTBALL_NPCS.RedTeamNPC);
         setshowAbandonModal(true);
+        if (interval) clearInterval(interval);
         interval = setInterval(() => {
           const timeLeft = 5 - (Date.now() - confirmTime) / 1000;
           setTime5(timeLeft);
           if (timeLeft <= 0) {
             clearInterval(interval);
             setshowAbandonModal(false);
+            setTime5(5);
           }
         }, 1000);
       }

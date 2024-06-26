@@ -33,6 +33,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=6144
           CI: false
           VITE_NETWORK: "amoy"
+          VITE_CLIENT_VERSION: ${{ steps.date.outputs.date }}
           VITE_PRIVATE_IMAGE_URL: "https://sunflower-land.com/testnet-assets"
           VITE_API_URL: "https://api-dev.sunflower-land.com"
           VITE_ROOM_URL: "wss://br-sao-d0055d69.colyseus.cloud"

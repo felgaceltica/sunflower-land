@@ -13,6 +13,8 @@ import { Label } from "components/ui/Label";
 import { authorisePortal } from "features/portal/farmerfootball/lib/portalUtil";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { WalletProvider } from "features/wallet/WalletProvider";
+import { Loading } from "features/auth/components";
+import { CONFIG } from "lib/config";
 
 export const FarmerFootballApp: React.FC = () => {
   return (
@@ -43,6 +45,17 @@ export const FarmerFootball: React.FC = () => {
           </Panel>
         </Modal>
       )}
+      {portalState.matches("loading") && (
+        <Modal show>
+          <Panel>
+            <Loading />
+            <span className="text-xs">
+              {`${t("last.updated")}:${CONFIG.CLIENT_VERSION}`}
+            </span>
+          </Panel>
+        </Modal>
+      )}
+
       {portalState.context.state && (
         <>
           <FarmerFootballHud />
