@@ -283,6 +283,7 @@ const generalTerms: Record<GeneralTerms, string> = {
   info: "Bilgi",
   item: "Öğe",
   land: "Ada",
+  landscaping: ENGLISH_TERMS.landscaping,
   "last.updated": "Son güncelleme:",
   "lets.go": "Hadi Gidelim!",
   limit: "Sınır",
@@ -348,6 +349,7 @@ const generalTerms: Record<GeneralTerms, string> = {
   retry: "Tekrar Dene",
   reward: "Ödül",
   "reward.discovered": "Ödül Keşfedildi",
+  "reward.whatsNew": ENGLISH_TERMS["reward.whatsNew"],
   save: "Kaydet",
   saving: "Kaydediliyor",
   seeds: "Tohumlar",
@@ -1480,6 +1482,7 @@ const cropMachine: Record<CropMachine, string> = {
   "cropMachine.addOil": ENGLISH_TERMS["cropMachine.addOil"],
   "cropMachine.addSeedPack": ENGLISH_TERMS["cropMachine.addSeedPack"],
   "cropMachine.addSeeds": ENGLISH_TERMS["cropMachine.addSeeds"],
+  "cropMachine.all": ENGLISH_TERMS["cropMachine.all"],
   "cropMachine.availableInventory":
     ENGLISH_TERMS["cropMachine.availableInventory"],
   "cropMachine.boosted": ENGLISH_TERMS["cropMachine.boosted"],

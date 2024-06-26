@@ -277,6 +277,7 @@ const generalTerms: Record<GeneralTerms, string> = {
   info: "Informações",
   item: "Item",
   land: "Terra",
+  landscaping: ENGLISH_TERMS.landscaping,
   "last.updated": "Última atualização",
   "lets.go": "Vamos lá!",
   limit: "Limite",
@@ -330,6 +331,7 @@ const generalTerms: Record<GeneralTerms, string> = {
   restock: "Reabastecer",
   retry: "Tentar Novamente",
   "reward.discovered": "Recompensa Descoberta",
+  "reward.whatsNew": ENGLISH_TERMS["reward.whatsNew"],
   save: "Salvar",
   saving: "Salvando",
   searching: "Buscando",
@@ -1491,6 +1493,7 @@ const cropMachine: Record<CropMachine, string> = {
   "cropMachine.addOil": ENGLISH_TERMS["cropMachine.addOil"],
   "cropMachine.addSeedPack": ENGLISH_TERMS["cropMachine.addSeedPack"],
   "cropMachine.addSeeds": ENGLISH_TERMS["cropMachine.addSeeds"],
+  "cropMachine.all": ENGLISH_TERMS["cropMachine.all"],
   "cropMachine.availableInventory":
     ENGLISH_TERMS["cropMachine.availableInventory"],
   "cropMachine.boosted": ENGLISH_TERMS["cropMachine.boosted"],
