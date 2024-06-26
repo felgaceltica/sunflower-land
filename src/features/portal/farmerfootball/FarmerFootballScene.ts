@@ -296,58 +296,60 @@ export class FarmerFootballScene extends BaseScene {
     this.updateOtherPlayers();
   }
   calculateQueuePosition() {
-    let position = 0;
-    let color = "black";
     const server = this.farmerFootballMmoServer;
-    let index = 0;
-    if (
-      server.state.rightTeam.has(server.sessionId) ||
-      server.state.rightQueue.has(server.sessionId) ||
-      server.state.leftTeam.has(server.sessionId) ||
-      server.state.leftQueue.has(server.sessionId)
-    ) {
-      if (server.state.matchState != "playing") {
-        server.state.rightTeam.forEach((value, at) => {
+    if (server) {
+      let position = 0;
+      let color = "black";
+      let index = 0;
+      if (
+        server.state.rightTeam.has(server.sessionId) ||
+        server.state.rightQueue.has(server.sessionId) ||
+        server.state.leftTeam.has(server.sessionId) ||
+        server.state.leftQueue.has(server.sessionId)
+      ) {
+        if (server.state.matchState != "playing") {
+          server.state.rightTeam.forEach((value, at) => {
+            if (value == server.sessionId) {
+              position = index + 1;
+              color = "#FF0000";
+            }
+            index++;
+          });
+        }
+        index = 0;
+        server.state.rightQueue.forEach((value, at) => {
           if (value == server.sessionId) {
-            position = index + 1;
+            position = index + 1 + server.state.rightTeam.size;
             color = "#FF0000";
           }
           index++;
         });
-      }
-      index = 0;
-      server.state.rightQueue.forEach((value, at) => {
-        if (value == server.sessionId) {
-          position = index + 1 + server.state.rightTeam.size;
-          color = "#FF0000";
+        index = 0;
+        if (server.state.matchState != "playing") {
+          server.state.leftTeam.forEach((value, at) => {
+            if (value == server.sessionId) {
+              position = index + 1;
+              color = "#0095E9";
+            }
+            index++;
+          });
         }
-        index++;
-      });
-      index = 0;
-      if (server.state.matchState != "playing") {
-        server.state.leftTeam.forEach((value, at) => {
+        index = 0;
+        server.state.leftQueue.forEach((value, at) => {
           if (value == server.sessionId) {
-            position = index + 1;
+            position = index + 1 + server.state.leftTeam.size;
             color = "#0095E9";
           }
           index++;
         });
       }
-      index = 0;
-      server.state.leftQueue.forEach((value, at) => {
-        if (value == server.sessionId) {
-          position = index + 1 + server.state.leftTeam.size;
-          color = "#0095E9";
-        }
-        index++;
-      });
-    }
-    if (position > 0) {
-      this.positionTag.text = `QUEUE POSITION: ${position}`;
-      this.positionTag.setColor(color);
-      this.positionTag.visible = true;
-    } else {
-      this.positionTag.visible = false;
+      if (position > 0) {
+        this.positionTag.text = `QUEUE POSITION: ${position}`;
+        this.positionTag.setColor(color);
+        this.positionTag.visible = true;
+      } else {
+        this.positionTag.visible = false;
+      }
     }
   }
   managePlayersOnField() {
