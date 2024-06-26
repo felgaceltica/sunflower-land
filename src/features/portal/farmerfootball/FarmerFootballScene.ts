@@ -59,46 +59,16 @@ export class FarmerFootballScene extends BaseScene {
     super.preload();
     //authorisePortal();
     //this.load.path = "./public/";
-    this.load.image(
-      "ball",
-      "/src/features/portal/farmerfootball/assets/ball.png"
-    );
-    this.load.image(
-      "leftgoal",
-      "/src/features/portal/farmerfootball/assets/leftgoal.png"
-    );
-    this.load.image(
-      "rightgoal",
-      "/src/features/portal/farmerfootball/assets/rightgoal.png"
-    );
-    this.load.image(
-      "donate",
-      "/src/features/portal/farmerfootball/assets/donate.png"
-    );
-    this.load.audio(
-      "goal",
-      "/src/features/portal/farmerfootball/assets/goal.wav"
-    );
-    this.load.audio(
-      "whistle1",
-      "/src/features/portal/farmerfootball/assets/whistle1.wav"
-    );
-    this.load.audio(
-      "whistle2",
-      "/src/features/portal/farmerfootball/assets/whistle2.wav"
-    );
-    this.load.audio(
-      "kick",
-      "/src/features/portal/farmerfootball/assets/kick.wav"
-    );
-    this.load.image(
-      "blueBanner",
-      "/src/features/portal/farmerfootball/assets/blueBanner.png"
-    );
-    this.load.image(
-      "redBanner",
-      "/src/features/portal/farmerfootball/assets/redBanner.png"
-    );
+    this.load.image("ball", "/src/assets/farmerfootball/ball.png");
+    this.load.image("leftgoal", "/src/assets/farmerfootball/leftgoal.png");
+    this.load.image("rightgoal", "/src/assets/farmerfootball/rightgoal.png");
+    this.load.image("donate", "/src/assets/farmerfootball/donate.png");
+    this.load.audio("goal", "/src/assets/farmerfootball/goal.wav");
+    this.load.audio("whistle1", "/src/assets/farmerfootball/whistle1.wav");
+    this.load.audio("whistle2", "/src/assets/farmerfootball/whistle2.wav");
+    this.load.audio("kick", "/src/assets/farmerfootball/kick.wav");
+    this.load.image("blueBanner", "/src/assets/farmerfootball/blueBanner.png");
+    this.load.image("redBanner", "/src/assets/farmerfootball/redBanner.png");
     // Ambience SFX
     // if (!this.sound.get("nature_1")) {
     //   const nature1 = this.sound.add("nature_1");
