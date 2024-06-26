@@ -15,7 +15,9 @@ export class FarmerFootballScene extends BaseScene {
   ball: any;
   packetSentAt = 0;
   isSending = false;
+  leftQueueText: any;
   leftScoreText: any;
+  rightQueueText: any;
   rightScoreText: any;
   statusText: any;
   debugText: any;
@@ -190,6 +192,7 @@ export class FarmerFootballScene extends BaseScene {
         color: "#ffffff",
       })
       .setOrigin(0.5);
+
     this.debugText = this.add.text(16 * 11 + 2, 16 * 8 - 2, "debugText", {
       fontSize: "3px",
       resolution: 4,
@@ -197,6 +200,32 @@ export class FarmerFootballScene extends BaseScene {
       //padding: { x: 2, y: 2 },
       color: "#000",
     });
+
+    this.leftQueueText = this.add
+      .text(16 * 2 - 2, 16 * 10 + 3.1, "QUEUE: 0", {
+        fontSize: "2.8px",
+        backgroundColor: "#FFF",
+        resolution: 4,
+        fixedHeight: 3,
+        fixedWidth: 20,
+        align: "left",
+        padding: { top: 0.25, left: 0.4 },
+        color: "#0095E9",
+      })
+      .setDepth(99999999);
+
+    this.rightQueueText = this.add
+      .text(16 * 19 - 2, 16 * 10 + 3.1, "QUEUE: 0", {
+        fontSize: "2.8px",
+        backgroundColor: "#FFF",
+        resolution: 4,
+        fixedHeight: 3,
+        fixedWidth: 20,
+        align: "left",
+        padding: { top: 0.25, left: 0.4 },
+        color: "#FF0000",
+      })
+      .setDepth(99999999);
 
     (this.goalSound = this.sound.add("goal")),
       (this.whistle1Sound = this.sound.add("whistle1")),
@@ -378,6 +407,14 @@ export class FarmerFootballScene extends BaseScene {
         this.positionTag.visible = false;
       }
     }
+    let leftQueueSize = server.state.leftQueue.size;
+    let rightQueueSize = server.state.rightQueue.size;
+    if (server.state.matchState != "playing") {
+      leftQueueSize += server.state.leftTeam.size;
+      rightQueueSize += server.state.rightTeam.size;
+    }
+    this.leftQueueText.text = "QUEUE: " + leftQueueSize;
+    this.rightQueueText.text = "QUEUE: " + rightQueueSize;
   }
   managePlayersOnField() {
     const server = this.farmerFootballMmoServer;
