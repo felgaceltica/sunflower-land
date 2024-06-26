@@ -59,16 +59,16 @@ export class FarmerFootballScene extends BaseScene {
     super.preload();
     //authorisePortal();
     //this.load.path = "./public/";
-    this.load.image("ball", "assets/farmerfootball/ball.png");
-    this.load.image("leftgoal", "assets/farmerfootball/leftgoal.png");
-    this.load.image("rightgoal", "assets/farmerfootball/rightgoal.png");
-    this.load.image("donate", "assets/farmerfootball/donate.png");
-    this.load.audio("goal", "assets/farmerfootball/goal.wav");
-    this.load.audio("whistle1", "assets/farmerfootball/whistle1.wav");
-    this.load.audio("whistle2", "assets/farmerfootball/whistle2.wav");
-    this.load.audio("kick", "assets/farmerfootball/kick.wav");
-    this.load.image("blueBanner", "assets/farmerfootball/blueBanner.png");
-    this.load.image("redBanner", "assets/farmerfootball/redBanner.png");
+    this.load.image("ball", "world/farmerfootball/ball.png");
+    this.load.image("leftgoal", "world/farmerfootball/leftgoal.png");
+    this.load.image("rightgoal", "world/farmerfootball/rightgoal.png");
+    this.load.image("donate", "world/farmerfootball/donate.png");
+    this.load.audio("goal", "world/farmerfootball/goal.mp3");
+    this.load.audio("whistle1", "world/farmerfootball/whistle1.mp3");
+    this.load.audio("whistle2", "world/farmerfootball/whistle2.mp3");
+    this.load.audio("kick", "world/farmerfootball/kick.mp3");
+    this.load.image("blueBanner", "world/farmerfootball/blueBanner.png");
+    this.load.image("redBanner", "world/farmerfootball/redBanner.png");
     // Ambience SFX
     // if (!this.sound.get("nature_1")) {
     //   const nature1 = this.sound.add("nature_1");
@@ -153,7 +153,7 @@ export class FarmerFootballScene extends BaseScene {
         this.positionTag.name = "positionTag";
         this.positionTag.setPosition(
           0,
-          16 + (this.currentPlayer.list.length - 4) * 4
+          16 + (this.currentPlayer.list.length - 3) * 4
         );
 
         this.currentPlayer.add(this.positionTag);
