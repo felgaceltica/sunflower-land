@@ -243,57 +243,62 @@ export class FarmerFootballScene extends BaseScene {
 
   update() {
     const server = this.farmerFootballMmoServer;
-    if (this.inTheField) {
-      if (this.currentPlayer) {
-        if (server.state.leftTeam.has(server.sessionId)) {
-          if (this.currentPlayer.x < 16 * 3) this.currentPlayer.x = 16 * 3;
-          if (this.currentPlayer.x > 16 * 9.5) this.currentPlayer.x = 16 * 9.5;
-        }
-        if (server.state.rightTeam.has(server.sessionId)) {
-          if (this.currentPlayer.x < 16 * 12.5)
-            this.currentPlayer.x = 16 * 12.5;
-          if (this.currentPlayer.x > 16 * 19) this.currentPlayer.x = 16 * 19;
-        }
-        if (
-          server.state.leftTeam.has(server.sessionId) ||
-          server.state.rightTeam.has(server.sessionId)
-        ) {
-          if (this.currentPlayer.y < 16 * 1.6) this.currentPlayer.y = 16 * 1.6;
-          if (this.currentPlayer.y > 16 * 8.2) this.currentPlayer.y = 16 * 8.2;
+    if (server) {
+      if (this.inTheField) {
+        if (this.currentPlayer) {
+          if (server.state.leftTeam.has(server.sessionId)) {
+            if (this.currentPlayer.x < 16 * 3) this.currentPlayer.x = 16 * 3;
+            if (this.currentPlayer.x > 16 * 9.5)
+              this.currentPlayer.x = 16 * 9.5;
+          }
+          if (server.state.rightTeam.has(server.sessionId)) {
+            if (this.currentPlayer.x < 16 * 12.5)
+              this.currentPlayer.x = 16 * 12.5;
+            if (this.currentPlayer.x > 16 * 19) this.currentPlayer.x = 16 * 19;
+          }
+          if (
+            server.state.leftTeam.has(server.sessionId) ||
+            server.state.rightTeam.has(server.sessionId)
+          ) {
+            if (this.currentPlayer.y < 16 * 1.6)
+              this.currentPlayer.y = 16 * 1.6;
+            if (this.currentPlayer.y > 16 * 8.2)
+              this.currentPlayer.y = 16 * 8.2;
+          }
         }
       }
-    }
-    this.updatePlayer();
-    this.calculateQueuePosition();
-    if (Date.now() - this.packetSentAt > 1000 / 60) {
-      this.isSending = false;
-    }
-    this.leftScoreText.text = server.state.scoreLeft;
-    this.rightScoreText.text = server.state.scoreRight;
-    //console.log(server.state.matchState);
-    switch (server.state.matchState) {
-      case "waiting":
-        this.statusText.text = "WAITING FOR PLAYERS";
-        break;
-      case "counting":
-        this.ball.rotation += 0.01;
-        break;
-      case "playing":
-        this.ball.rotation += 0.01;
-        this.statusText.text = "";
-        break;
-      case "leftAbandon":
-      case "rightAbandon":
-        this.statusText.text = "MATCH RESTARTING";
-        break;
-      default:
-        this.statusText.text = "";
-        break;
-    }
+      this.updatePlayer();
+      this.calculateQueuePosition();
+      if (Date.now() - this.packetSentAt > 1000 / 60) {
+        this.isSending = false;
+      }
+      this.leftScoreText.text = server.state.scoreLeft;
+      this.rightScoreText.text = server.state.scoreRight;
+      //console.log(server.state.matchState);
+      switch (server.state.matchState) {
+        case "waiting":
+          this.statusText.text = "WAITING FOR PLAYERS";
+          break;
+        case "counting":
+          this.ball.rotation += 0.01;
+          break;
+        case "playing":
+          this.ball.rotation += 0.01;
+          this.statusText.text = "";
+          break;
+        case "leftAbandon":
+        case "rightAbandon":
+          this.statusText.text = "MATCH RESTARTING";
+          break;
+        default:
+          this.statusText.text = "";
+          break;
+      }
 
-    this.managePlayersOnField();
-    //this.updateBallPosition();
-    this.updateOtherPlayers();
+      this.managePlayersOnField();
+      //this.updateBallPosition();
+      this.updateOtherPlayers();
+    }
   }
   calculateQueuePosition() {
     const server = this.farmerFootballMmoServer;
