@@ -16,7 +16,9 @@ export const FARMER_FOOTBALL_NPCS: Record<NPCName, Equipped> = {
     hair: "Sun Spots",
     shirt: "Red Farmer Shirt",
     pants: "Farmer Pants",
-    tool: "",
+    tool: "Goblin Axe",
+    background: "Seashore Background",
+    shoes: "Goblin Sabatons",
   },
   BlueTeamNPC: {
     body: "Beige Farmer Potion",
@@ -24,7 +26,9 @@ export const FARMER_FOOTBALL_NPCS: Record<NPCName, Equipped> = {
     hair: "Sun Spots",
     shirt: "Blue Farmer Shirt",
     pants: "Farmer Pants",
-    tool: "",
+    tool: "Farmer Pitchfork",
+    background: "Seashore Background",
+    shoes: "Black Farmer Boots",
   },
   DonationNPC: {
     body: "Light Brown Farmer Potion",

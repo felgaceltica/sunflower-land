@@ -5,12 +5,14 @@ import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { FARMER_FOOTBALL_NPCS } from "./lib/types";
 import { SPAWNS } from "features/world/lib/spawn";
 import PubSub from "pubsub-js";
+import { Room } from "colyseus.js";
+import { FarmerFootballRoomState } from "./lib/FarmerFootballRoomState";
 
 export class FarmerFootballScene extends BaseScene {
   graphics: any;
   lastBallState: any;
   sceneId: SceneId = "farmer_football";
-  ball: ImageWithDynamicBody;
+  ball: any;
   packetSentAt = 0;
   isSending = false;
   leftScoreText: any;
@@ -20,20 +22,37 @@ export class FarmerFootballScene extends BaseScene {
   readyToPlay = false;
   waitingConfirmation = false;
   positionTag: any;
-  gameAssets = {
-    sfx: {
-      goal: Phaser.Sound.HTML5AudioSound,
-      whistle1: Phaser.Sound.HTML5AudioSound,
-      whistle2: Phaser.Sound.HTML5AudioSound,
-      kick: Phaser.Sound.HTML5AudioSound,
-    },
-  };
+  goalSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  whistle1Sound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  whistle2Sound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  bounceSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  // gameAssets = {sfx: {
+  //   goal: {},
+  //   whistle1: {},
+  //   whistle2: {},
+  //   bounce: {}
+  // }}
   constructor() {
     super({
       name: "farmer_football",
       map: { json: mapJson, padding: [10, 10] },
       audio: { fx: { walk_key: "dirt_footstep" } },
     });
+  }
+  public get farmerFootballMmoServer() {
+    return this.registry.get("mmoServer") as Room<FarmerFootballRoomState>;
   }
 
   preload() {
@@ -95,16 +114,13 @@ export class FarmerFootballScene extends BaseScene {
   }
 
   async create() {
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     this.map = this.make.tilemap({
       key: "farmer_football",
     });
     super.create();
     this.physics.world.drawDebug = false;
-    this.gameAssets.sfx.goal = this.sound.add("goal");
-    this.gameAssets.sfx.whistle1 = this.sound.add("whistle1");
-    this.gameAssets.sfx.whistle2 = this.sound.add("whistle2");
-    this.gameAssets.sfx.kick = this.sound.add("kick");
+
     this.setupBasicPhysics(this);
     this.setupBall(this);
     this.drawField(this);
@@ -127,11 +143,11 @@ export class FarmerFootballScene extends BaseScene {
         }
       });
       server.onMessage("goal", (message) => {
-        this.gameAssets.sfx.goal.play();
+        if (this.goalSound) this.goalSound.play();
       });
       server.onMessage("whistle", (message) => {
         if (message == 1) {
-          this.gameAssets.sfx.whistle1.play();
+          if (this.whistle1Sound) this.whistle1Sound.play();
         }
       });
       server.onMessage("winner", (message) => {
@@ -157,18 +173,21 @@ export class FarmerFootballScene extends BaseScene {
       server.onMessage("ballPosition", (ballPosition) => {
         this.updateBallPosition(ballPosition);
       });
-      this.positionTag = this.createPlayerText({
-        x: 0,
-        y: 0,
-        text: ``,
-        color: "#fee761",
-      });
-      this.positionTag.name = "positionTag";
-      this.currentPlayer.add(this.positionTag);
-      this.positionTag.setPosition(
-        0,
-        16 + (this.currentPlayer.list.length - 4) * 4
-      );
+      if (this.currentPlayer) {
+        this.positionTag = this.createPlayerText({
+          x: 0,
+          y: 0,
+          text: ``,
+          color: "#fee761",
+        });
+        this.positionTag.name = "positionTag";
+        this.positionTag.setPosition(
+          0,
+          16 + (this.currentPlayer.list.length - 4) * 4
+        );
+
+        this.currentPlayer.add(this.positionTag);
+      }
     }
     PubSub.subscribe("joinRedTeam", () => {
       this.JoinRedTeam();
@@ -199,12 +218,19 @@ export class FarmerFootballScene extends BaseScene {
         color: "#ffffff",
       })
       .setOrigin(0.5);
+
+    (this.goalSound = this.sound.add("goal")),
+      (this.whistle1Sound = this.sound.add("whistle1")),
+      (this.whistle2Sound = this.sound.add("whistle2")),
+      (this.bounceSound = this.sound.add("kick"));
   }
   ReSpawPlayer() {
     this.readyToPlay = false;
     this.inTheField = false;
-    this.currentPlayer.x = SPAWNS().farmer_football.default.x;
-    this.currentPlayer.y = SPAWNS().farmer_football.default.y;
+    if (this.currentPlayer) {
+      this.currentPlayer.x = SPAWNS().farmer_football.default.x;
+      this.currentPlayer.y = SPAWNS().farmer_football.default.y;
+    }
   }
   JoinRedTeam() {
     const server = this.mmoServer;
@@ -246,22 +272,25 @@ export class FarmerFootballScene extends BaseScene {
   }
 
   update() {
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     if (this.inTheField) {
-      if (server.state.leftTeam.has(server.sessionId)) {
-        if (this.currentPlayer.x < 16 * 3) this.currentPlayer.x = 16 * 3;
-        if (this.currentPlayer.x > 16 * 9.5) this.currentPlayer.x = 16 * 9.5;
-      }
-      if (server.state.rightTeam.has(server.sessionId)) {
-        if (this.currentPlayer.x < 16 * 12.5) this.currentPlayer.x = 16 * 12.5;
-        if (this.currentPlayer.x > 16 * 19) this.currentPlayer.x = 16 * 19;
-      }
-      if (
-        server.state.leftTeam.has(server.sessionId) ||
-        server.state.rightTeam.has(server.sessionId)
-      ) {
-        if (this.currentPlayer.y < 16 * 1.6) this.currentPlayer.y = 16 * 1.6;
-        if (this.currentPlayer.y > 16 * 8.2) this.currentPlayer.y = 16 * 8.2;
+      if (this.currentPlayer) {
+        if (server.state.leftTeam.has(server.sessionId)) {
+          if (this.currentPlayer.x < 16 * 3) this.currentPlayer.x = 16 * 3;
+          if (this.currentPlayer.x > 16 * 9.5) this.currentPlayer.x = 16 * 9.5;
+        }
+        if (server.state.rightTeam.has(server.sessionId)) {
+          if (this.currentPlayer.x < 16 * 12.5)
+            this.currentPlayer.x = 16 * 12.5;
+          if (this.currentPlayer.x > 16 * 19) this.currentPlayer.x = 16 * 19;
+        }
+        if (
+          server.state.leftTeam.has(server.sessionId) ||
+          server.state.rightTeam.has(server.sessionId)
+        ) {
+          if (this.currentPlayer.y < 16 * 1.6) this.currentPlayer.y = 16 * 1.6;
+          if (this.currentPlayer.y > 16 * 8.2) this.currentPlayer.y = 16 * 8.2;
+        }
       }
     }
     this.updatePlayer();
@@ -299,7 +328,7 @@ export class FarmerFootballScene extends BaseScene {
   calculateQueuePosition() {
     let position = 0;
     let color = "black";
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     let index = 0;
     if (
       server.state.rightTeam.has(server.sessionId) ||
@@ -352,7 +381,7 @@ export class FarmerFootballScene extends BaseScene {
     }
   }
   managePlayersOnField() {
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     switch (server.state.matchState) {
       case "waiting":
         this.waitingConfirmation = false;
@@ -379,27 +408,29 @@ export class FarmerFootballScene extends BaseScene {
       case "countdown":
         break;
     }
-    if (
-      server.state.leftTeam.has(server.sessionId) &&
-      !this.inTheField &&
-      this.readyToPlay
-    ) {
-      this.inTheField = true;
-      this.currentPlayer.x = 16 * 8;
-      this.currentPlayer.y = 16 * 5;
-    }
-    if (
-      server.state.rightTeam.has(server.sessionId) &&
-      !this.inTheField &&
-      this.readyToPlay
-    ) {
-      this.inTheField = true;
-      this.currentPlayer.x = 16 * 14;
-      this.currentPlayer.y = 16 * 5;
+    if (this.currentPlayer) {
+      if (
+        server.state.leftTeam.has(server.sessionId) &&
+        !this.inTheField &&
+        this.readyToPlay
+      ) {
+        this.inTheField = true;
+        this.currentPlayer.x = 16 * 8;
+        this.currentPlayer.y = 16 * 5;
+      }
+      if (
+        server.state.rightTeam.has(server.sessionId) &&
+        !this.inTheField &&
+        this.readyToPlay
+      ) {
+        this.inTheField = true;
+        this.currentPlayer.x = 16 * 14;
+        this.currentPlayer.y = 16 * 5;
+      }
     }
   }
   updateBallPosition(ballPosition: any) {
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     this.ball.setPosition(
       ballPosition.ballPositionX,
       ballPosition.ballPositionY
@@ -409,7 +440,7 @@ export class FarmerFootballScene extends BaseScene {
       ballPosition.ballVelocityY
     );
     if (server.state.matchState == "playing") {
-      this.gameAssets.sfx.kick.play();
+      if (this.bounceSound) this.bounceSound.play();
     }
   }
 
@@ -424,7 +455,7 @@ export class FarmerFootballScene extends BaseScene {
       },
       direction: "left",
       onClick: () => {
-        const server = this.mmoServer;
+        const server = this.farmerFootballMmoServer;
         if (
           server.state.rightTeam.has(server.sessionId) ||
           server.state.rightQueue.has(server.sessionId)
@@ -450,7 +481,7 @@ export class FarmerFootballScene extends BaseScene {
       },
       direction: "right",
       onClick: () => {
-        const server = this.mmoServer;
+        const server = this.farmerFootballMmoServer;
         if (
           server.state.leftTeam.has(server.sessionId) ||
           server.state.leftQueue.has(server.sessionId)
@@ -501,7 +532,7 @@ export class FarmerFootballScene extends BaseScene {
   }
 
   resetBall() {
-    this.gameAssets.sfx.whistle1.play();
+    if (this.whistle1Sound) this.whistle1Sound.play();
     this.ball.setPosition(16 * 11, 16 * 5);
     this.time.delayedCall(100, () => {
       const angle = Phaser.Math.Between(0, 360);
@@ -511,24 +542,40 @@ export class FarmerFootballScene extends BaseScene {
   }
 
   stopPlayer() {
-    (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(false);
+    if (this.currentPlayer) {
+      (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
+        false
+      );
+    }
   }
   bounceBall() {
-    (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(true);
+    if (this.currentPlayer) {
+      (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
+        true
+      );
+    }
     //this.sendBallPositionToServer();
   }
   bounceBallSound() {
-    (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(true);
-    this.gameAssets.sfx.kick.play();
+    if (this.currentPlayer) {
+      (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
+        true
+      );
+    }
+    if (this.bounceSound) this.bounceSound.play();
     this.sendBallPositionToServer();
   }
   setupBasicPhysics(scene: FarmerFootballScene) {
     scene.physics.world.setBounds(16, 16, 16 * 20, 16 * 12);
-    (scene.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(true);
-    (scene.currentPlayer.body as Phaser.Physics.Arcade.Body)
-      .setCircle(7)
-      .setBounce(1, 1)
-      .setOffset(2, 3);
+    if (scene.currentPlayer) {
+      (scene.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
+        true
+      );
+      (scene.currentPlayer.body as Phaser.Physics.Arcade.Body)
+        .setCircle(7)
+        .setBounce(1, 1)
+        .setOffset(2, 3);
+    }
     scene.physics.world.enable(
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       Phaser.Physics.Arcade.DYNAMIC_BODY

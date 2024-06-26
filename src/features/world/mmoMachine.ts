@@ -9,6 +9,7 @@ import { INITIAL_BUMPKIN } from "features/game/lib/constants";
 import { SPAWNS } from "./lib/spawn";
 import { Moderation } from "features/game/lib/gameMachine";
 import { MAX_PLAYERS } from "./lib/availableRooms";
+import { FarmerFootballRoomState } from "features/portal/farmerfootball/lib/FarmerFootballRoomState";
 
 export type Scenes = {
   plaza: Room<PlazaRoomState> | undefined;
@@ -20,7 +21,7 @@ export type Scenes = {
   beach: Room<PlazaRoomState> | undefined;
   crop_boom: Room<PlazaRoomState> | undefined;
   mushroom_forest: Room<PlazaRoomState> | undefined;
-  farmer_football: Room<PlazaRoomState> | undefined;
+  farmer_football: Room<FarmerFootballRoomState> | undefined;
   retreat: Room<PlazaRoomState> | undefined;
   kingdom: Room<PlazaRoomState> | undefined;
   faction_house: Room<PlazaRoomState> | undefined;
