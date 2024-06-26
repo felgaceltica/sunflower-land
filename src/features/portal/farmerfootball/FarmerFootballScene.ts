@@ -1,4 +1,4 @@
-import mapJson from "./farmerfootball.json";
+import mapJson from "assets/map/farmer_football.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
@@ -59,16 +59,16 @@ export class FarmerFootballScene extends BaseScene {
     super.preload();
     //authorisePortal();
     //this.load.path = "./public/";
-    this.load.image("ball", "/src/assets/farmerfootball/ball.png");
-    this.load.image("leftgoal", "/src/assets/farmerfootball/leftgoal.png");
-    this.load.image("rightgoal", "/src/assets/farmerfootball/rightgoal.png");
-    this.load.image("donate", "/src/assets/farmerfootball/donate.png");
-    this.load.audio("goal", "/src/assets/farmerfootball/goal.wav");
-    this.load.audio("whistle1", "/src/assets/farmerfootball/whistle1.wav");
-    this.load.audio("whistle2", "/src/assets/farmerfootball/whistle2.wav");
-    this.load.audio("kick", "/src/assets/farmerfootball/kick.wav");
-    this.load.image("blueBanner", "/src/assets/farmerfootball/blueBanner.png");
-    this.load.image("redBanner", "/src/assets/farmerfootball/redBanner.png");
+    this.load.image("ball", "assets/farmerfootball/ball.png");
+    this.load.image("leftgoal", "assets/farmerfootball/leftgoal.png");
+    this.load.image("rightgoal", "assets/farmerfootball/rightgoal.png");
+    this.load.image("donate", "assets/farmerfootball/donate.png");
+    this.load.audio("goal", "assets/farmerfootball/goal.wav");
+    this.load.audio("whistle1", "assets/farmerfootball/whistle1.wav");
+    this.load.audio("whistle2", "assets/farmerfootball/whistle2.wav");
+    this.load.audio("kick", "assets/farmerfootball/kick.wav");
+    this.load.image("blueBanner", "assets/farmerfootball/blueBanner.png");
+    this.load.image("redBanner", "assets/farmerfootball/redBanner.png");
     // Ambience SFX
     // if (!this.sound.get("nature_1")) {
     //   const nature1 = this.sound.add("nature_1");
