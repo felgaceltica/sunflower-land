@@ -253,7 +253,10 @@ export class FarmerFootballScene extends BaseScene {
     if (server) server.send("ping", dados);
   }
   PingResponse(dados: any) {
-    this.pingTime = new Date().getUTCMilliseconds() - dados.tick;
+    const pingTime = new Date().getUTCMilliseconds() - dados.tick;
+    if (pingTime > 0) {
+      this.pingTime = pingTime;
+    }
   }
   ReSpawPlayer() {
     this.readyToPlay = false;
