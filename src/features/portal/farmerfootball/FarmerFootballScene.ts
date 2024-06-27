@@ -26,6 +26,9 @@ export class FarmerFootballScene extends BaseScene {
   readyToPlay = false;
   waitingConfirmation = false;
   positionTag: any;
+  pingTimer: any;
+  lastPing: any;
+  pingTime = 0;
   goalSound?:
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
@@ -147,6 +150,9 @@ export class FarmerFootballScene extends BaseScene {
       server.onMessage("ballPosition", (ballPosition) => {
         this.updateBallPosition(ballPosition);
       });
+      server.onMessage("pingResponse", (ballPosition) => {
+        this.PingResponse();
+      });
       if (this.currentPlayer) {
         this.positionTag = this.createPlayerText({
           x: 0,
@@ -193,7 +199,7 @@ export class FarmerFootballScene extends BaseScene {
       })
       .setOrigin(0.5);
 
-    this.debugText = this.add.text(16 * 11 + 2, 16 * 8 - 2, "debugText", {
+    this.debugText = this.add.text(16 * 11 + 2, 16 * 7.5, "debugText", {
       fontSize: "3px",
       resolution: 4,
       align: "left",
@@ -231,6 +237,28 @@ export class FarmerFootballScene extends BaseScene {
       (this.whistle1Sound = this.sound.add("whistle1")),
       (this.whistle2Sound = this.sound.add("whistle2")),
       (this.bounceSound = this.sound.add("kick"));
+    if (this.debugMode) {
+      this.pingTimer = this.time.addEvent({
+        callback: this.PingServer,
+        callbackScope: this,
+        delay: 500,
+        loop: true,
+      });
+    }
+  }
+  PingServer() {
+    this.lastPing = new Date().getUTCMilliseconds();
+    const server = this.farmerFootballMmoServer;
+    const ballPosition = {
+      ballPositionX: this.ball.x,
+      ballPositionY: this.ball.y,
+      ballVelocityX: this.ball.body.velocity.x,
+      ballVelocityY: this.ball.body.velocity.y,
+    };
+    if (server) server.send("ping", ballPosition);
+  }
+  PingResponse() {
+    this.pingTime = new Date().getUTCMilliseconds() - this.lastPing;
   }
   ReSpawPlayer() {
     this.readyToPlay = false;
@@ -340,6 +368,7 @@ export class FarmerFootballScene extends BaseScene {
       if (this.debugMode) {
         this.debugText.text = [
           "Debug Info:",
+          "ping: " + this.pingTime,
           "matchState: " + server.state.matchState,
           "leftTeam: " + server.state.leftTeam.size,
           "leftQueue: " + server.state.leftQueue.size,
