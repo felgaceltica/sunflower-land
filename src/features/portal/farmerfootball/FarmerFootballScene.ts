@@ -27,7 +27,6 @@ export class FarmerFootballScene extends BaseScene {
   waitingConfirmation = false;
   positionTag: any;
   pingTimer: any;
-  lastPing: any;
   pingTime = 0;
   goalSound?:
     | Phaser.Sound.NoAudioSound
@@ -150,8 +149,8 @@ export class FarmerFootballScene extends BaseScene {
       server.onMessage("ballPosition", (ballPosition) => {
         this.updateBallPosition(ballPosition);
       });
-      server.onMessage("pingResponse", (ballPosition) => {
-        this.PingResponse();
+      server.onMessage("pingResponse", (dados) => {
+        this.PingResponse(dados);
       });
       if (this.currentPlayer) {
         this.positionTag = this.createPlayerText({
@@ -247,18 +246,14 @@ export class FarmerFootballScene extends BaseScene {
     }
   }
   PingServer() {
-    this.lastPing = new Date().getUTCMilliseconds();
     const server = this.farmerFootballMmoServer;
-    const ballPosition = {
-      ballPositionX: this.ball.x,
-      ballPositionY: this.ball.y,
-      ballVelocityX: this.ball.body.velocity.x,
-      ballVelocityY: this.ball.body.velocity.y,
+    const dados = {
+      tick: new Date().getUTCMilliseconds(),
     };
-    if (server) server.send("ping", ballPosition);
+    if (server) server.send("ping", dados);
   }
-  PingResponse() {
-    this.pingTime = new Date().getUTCMilliseconds() - this.lastPing;
+  PingResponse(dados: any) {
+    this.pingTime = new Date().getUTCMilliseconds() - dados.tick;
   }
   ReSpawPlayer() {
     this.readyToPlay = false;
