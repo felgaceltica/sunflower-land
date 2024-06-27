@@ -28,6 +28,8 @@ export class FarmerFootballScene extends BaseScene {
   positionTag: any;
   pingTimer: any;
   pingTime = 0;
+  lastPingTime = 0;
+  lastBallChanged = 0;
   goalSound?:
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
@@ -146,9 +148,9 @@ export class FarmerFootballScene extends BaseScene {
           }
         }
       });
-      server.onMessage("ballPosition", (ballPosition) => {
-        this.updateBallPosition(ballPosition);
-      });
+      // server.onMessage("ballPosition", (ballPosition) => {
+      //   this.updateBallPosition(ballPosition);
+      // });
       server.onMessage("pingResponse", (dados) => {
         this.PingResponse(dados);
       });
@@ -237,12 +239,12 @@ export class FarmerFootballScene extends BaseScene {
       (this.whistle2Sound = this.sound.add("whistle2")),
       (this.bounceSound = this.sound.add("kick"));
     if (this.debugMode) {
-      this.pingTimer = this.time.addEvent({
-        callback: this.PingServer,
-        callbackScope: this,
-        delay: 500,
-        loop: true,
-      });
+      // this.pingTimer = this.time.addEvent({
+      //   callback: this.PingServer,
+      //   callbackScope: this,
+      //   delay: 500,
+      //   loop: true,
+      // });
     }
   }
   PingServer() {
@@ -332,6 +334,15 @@ export class FarmerFootballScene extends BaseScene {
         }
       }
       this.updatePlayer();
+      if (this.lastBallChanged < server.state.ballChanged) {
+        const ballPosition = {
+          ballPositionX: server.state.ballX,
+          ballPositionY: server.state.ballY,
+          ballVelocityX: server.state.ballVX,
+          ballVelocityY: server.state.ballVY,
+        };
+        this.updateBallPosition(ballPosition);
+      }
       this.calculateQueuePosition();
       if (Date.now() - this.packetSentAt > 1000 / 60) {
         this.isSending = false;
@@ -364,6 +375,13 @@ export class FarmerFootballScene extends BaseScene {
       //this.updateBallPosition();
       this.updateOtherPlayers();
       if (this.debugMode) {
+        if (
+          this.lastPingTime != 0 &&
+          this.lastPingTime != server.state.currentTime
+        ) {
+          this.pingTime = server.state.currentTime - this.lastPingTime;
+        }
+        this.lastPingTime = server.state.currentTime;
         this.debugText.text = [
           "Debug Info:",
           "ping: " + this.pingTime,
@@ -494,6 +512,7 @@ export class FarmerFootballScene extends BaseScene {
   }
   updateBallPosition(ballPosition: any) {
     const server = this.farmerFootballMmoServer;
+    this.lastBallChanged = server.state.ballChanged;
     this.ball.setPosition(
       ballPosition.ballPositionX,
       ballPosition.ballPositionY
@@ -591,6 +610,7 @@ export class FarmerFootballScene extends BaseScene {
     const server = this.mmoServer;
     if (server) {
       server.send(1, ballPosition);
+      this.lastBallChanged++;
     }
   }
 

@@ -11,4 +11,11 @@ export interface FarmerFootballRoomState extends PlazaRoomState {
 
   leftQueue: CollectionSchema<string>;
   rightQueue: CollectionSchema<string>;
+
+  currentTime: number;
+  ballChanged: number;
+  ballX: number;
+  ballY: number;
+  ballVX: number;
+  ballVY: number;
 }
