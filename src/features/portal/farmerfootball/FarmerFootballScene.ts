@@ -239,12 +239,12 @@ export class FarmerFootballScene extends BaseScene {
       (this.whistle2Sound = this.sound.add("whistle2")),
       (this.bounceSound = this.sound.add("kick"));
     if (this.debugMode) {
-      this.pingTimer = this.time.addEvent({
-        callback: this.PingServer,
-        callbackScope: this,
-        delay: 500,
-        loop: true,
-      });
+      // this.pingTimer = this.time.addEvent({
+      //   callback: this.PingServer,
+      //   callbackScope: this,
+      //   delay: 500,
+      //   loop: true,
+      // });
     }
   }
   PingServer() {
@@ -375,13 +375,13 @@ export class FarmerFootballScene extends BaseScene {
       //this.updateBallPosition();
       this.updateOtherPlayers();
       if (this.debugMode) {
-        // if (
-        //   this.lastPingTime != 0 &&
-        //   this.lastPingTime != server.state.currentTime
-        // ) {
-        //   this.pingTime = server.state.currentTime - this.lastPingTime;
-        // }
-        // this.lastPingTime = server.state.currentTime;
+        if (
+          this.lastPingTime != 0 &&
+          this.lastPingTime != server.state.currentTime
+        ) {
+          this.pingTime = server.state.currentTime - this.lastPingTime;
+        }
+        this.lastPingTime = server.state.currentTime;
         this.debugText.text = [
           "Debug Info:",
           "ping: " + this.pingTime,
