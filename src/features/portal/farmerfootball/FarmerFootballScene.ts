@@ -30,6 +30,9 @@ export class FarmerFootballScene extends BaseScene {
   pingTime = 0;
   lastPingTime = 0;
   lastBallChanged = 0;
+  lastUpdateMoment = 0;
+  forcedUpdateMoment = 0;
+  isWaiting4ActualUpdateEvent = true;
   goalSound?:
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
@@ -246,6 +249,9 @@ export class FarmerFootballScene extends BaseScene {
         loop: true,
       });
     }
+    setInterval(() => {
+      this.awayUpdate();
+    }, 1000);
   }
   PingServer() {
     const server = this.farmerFootballMmoServer;
@@ -306,8 +312,20 @@ export class FarmerFootballScene extends BaseScene {
       this.readyToPlay = true;
     }
   }
-
-  update() {
+  awayUpdate() {
+    if (this.lastUpdateMoment > this.forcedUpdateMoment + 5000) {
+      this.forcedUpdateMoment = this.lastUpdateMoment;
+    } else {
+      this.update(this.forcedUpdateMoment + 10000, 10000);
+      this.forcedUpdateMoment = this.lastUpdateMoment;
+    }
+  }
+  update(t: number, dt: number) {
+    this.lastUpdateMoment = t;
+    if (this.isWaiting4ActualUpdateEvent) {
+      this.forcedUpdateMoment = this.lastUpdateMoment;
+      this.isWaiting4ActualUpdateEvent = false;
+    }
     const server = this.farmerFootballMmoServer;
     if (server) {
       if (this.inTheField) {
@@ -390,6 +408,10 @@ export class FarmerFootballScene extends BaseScene {
           "leftQueue: " + server.state.leftQueue.size,
           "rightTeam: " + server.state.rightTeam.size,
           "rightQueue: " + server.state.rightQueue.size,
+          // "sessionId: " + server.sessionId,
+          // "inTheField: " + this.inTheField,
+          // "readyToPlay: " + this.readyToPlay,
+          // "waitingConfirmation: " + this.waitingConfirmation
         ];
       } else {
         this.debugText.text = "";
@@ -408,41 +430,54 @@ export class FarmerFootballScene extends BaseScene {
         server.state.leftTeam.has(server.sessionId) ||
         server.state.leftQueue.has(server.sessionId)
       ) {
-        if (server.state.matchState != "playing") {
-          server.state.rightTeam.forEach((value, at) => {
+        if (server.state.rightTeam.has(server.sessionId)) {
+          index = 0;
+          if (server.state.matchState != "playing") {
+            server.state.rightTeam.forEach((value, at) => {
+              if (value == server.sessionId) {
+                position = index + 1;
+                color = "#FF0000";
+              }
+              index++;
+            });
+          }
+        } else {
+          index = 0;
+          server.state.rightQueue.forEach((value, at) => {
             if (value == server.sessionId) {
               position = index + 1;
               color = "#FF0000";
             }
             index++;
           });
-        }
-        index = 0;
-        server.state.rightQueue.forEach((value, at) => {
-          if (value == server.sessionId) {
-            position = index + 1 + server.state.rightTeam.size;
-            color = "#FF0000";
+          if (server.state.matchState != "playing") {
+            position = position + server.state.rightTeam.size;
           }
-          index++;
-        });
-        index = 0;
-        if (server.state.matchState != "playing") {
-          server.state.leftTeam.forEach((value, at) => {
+        }
+        if (server.state.leftTeam.has(server.sessionId)) {
+          index = 0;
+          if (server.state.matchState != "playing") {
+            server.state.leftTeam.forEach((value, at) => {
+              if (value == server.sessionId) {
+                position = index + 1;
+                color = "#0095E9";
+              }
+              index++;
+            });
+          }
+        } else {
+          index = 0;
+          server.state.leftQueue.forEach((value, at) => {
             if (value == server.sessionId) {
               position = index + 1;
               color = "#0095E9";
             }
             index++;
           });
-        }
-        index = 0;
-        server.state.leftQueue.forEach((value, at) => {
-          if (value == server.sessionId) {
-            position = index + 1 + server.state.leftTeam.size;
-            color = "#0095E9";
+          if (server.state.matchState != "playing") {
+            position = position + server.state.leftTeam.size;
           }
-          index++;
-        });
+        }
       }
       if (position > 0) {
         this.positionTag.text = `QUEUE POSITION: ${position}`;
@@ -1171,21 +1206,27 @@ export class FarmerFootballScene extends BaseScene {
   addLeftGoal() {
     this.ball.body.stop();
     this.ball.setPosition(16 * 11, 16 * 5);
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     if (server) {
-      //if (server.state.leftTeam.has(server.sessionId)) {
-      server.send(8);
-      //}
+      if (
+        server.state.leftTeam.has(server.sessionId) ||
+        server.state.rightTeam.has(server.sessionId)
+      ) {
+        server.send(8);
+      }
     }
   }
   addRightGoal() {
     this.ball.body.stop();
     this.ball.setPosition(16 * 11, 16 * 5);
-    const server = this.mmoServer;
+    const server = this.farmerFootballMmoServer;
     if (server) {
-      //if (server.state.rightTeam.has(server.sessionId)) {
-      server.send(9);
-      //}
+      if (
+        server.state.leftTeam.has(server.sessionId) ||
+        server.state.rightTeam.has(server.sessionId)
+      ) {
+        server.send(9);
+      }
     }
   }
 }

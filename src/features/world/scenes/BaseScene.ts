@@ -711,7 +711,7 @@ export abstract class BaseScene extends Phaser.Scene {
     }
   }
 
-  update(): void {
+  update(time: number, delta: number): void {
     this.currentTick++;
 
     this.switchScene();
