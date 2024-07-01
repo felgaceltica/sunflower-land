@@ -568,8 +568,8 @@ export class PlazaScene extends BaseScene {
     });
   }
 
-  public update() {
-    super.update();
+  public update(t: number, dt: number) {
+    super.update(t, dt);
     this.syncPlaceables();
 
     if (this.movementAngle && this.arrows) {
