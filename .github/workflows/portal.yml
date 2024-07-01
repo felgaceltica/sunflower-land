@@ -36,7 +36,7 @@ jobs:
           VITE_CLIENT_VERSION: ${{ steps.date.outputs.date }}
           VITE_PRIVATE_IMAGE_URL: "https://sunflower-land.com/testnet-assets"
           VITE_API_URL: "https://api-dev.sunflower-land.com"
-          VITE_ROOM_URL: "wss://nl-ams-4b5faef5.colyseus.cloud"
+          VITE_ROOM_URL: "wss://216-238-112-132.colyseus.dev/"
           VITE_PORTAL_APP: "farmer-soccer"
           VITE_PORTAL_GAME_URL: "https://sunflower-land.com/testnet/"
 
