@@ -18,15 +18,15 @@ const SFL_LIMIT = 100;
 export const MINIGAME_CURRENCY_LIMITS: Record<MinigameCurrency, number> = {
   ...getKeys(COMMODITIES).reduce(
     (acc, name) => ({ ...acc, [name]: 1000 }),
-    {} as Record<FruitName, number>
+    {} as Record<FruitName, number>,
   ),
   ...getKeys(FRUIT()).reduce(
     (acc, name) => ({ ...acc, [name]: 1000 }),
-    {} as Record<CommodityName, number>
+    {} as Record<CommodityName, number>,
   ),
-  ...getKeys(CROPS()).reduce(
+  ...getKeys(CROPS).reduce(
     (acc, name) => ({ ...acc, [name]: 1000 }),
-    {} as Record<CropName, number>
+    {} as Record<CropName, number>,
   ),
 };
 
@@ -58,6 +58,10 @@ export function purchaseMinigameItem({
     throw new Error("Insufficient SFL");
   }
 
+  if (action.sfl < 0) {
+    throw new Error("SFL must be positive");
+  }
+
   if (action.sfl > SFL_LIMIT) {
     throw new Error("SFL is greater than purchase limit");
   }
@@ -72,6 +76,10 @@ export function purchaseMinigameItem({
 
     if (count.lessThan(totalAmount)) {
       throw new Error(`Insufficient resource: ${name}`);
+    }
+
+    if (totalAmount < 0) {
+      throw new Error(`Cannot spend negative amount: ${name}`);
     }
 
     return {

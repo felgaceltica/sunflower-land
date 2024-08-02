@@ -4,6 +4,7 @@ import { useActor } from "@xstate/react";
 
 import { Context } from "features/game/GameProvider";
 import { ITEM_DETAILS } from "features/game/types/images";
+import token from "assets/icons/sfl.webp";
 
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { getKeys } from "features/game/types/craftables";
@@ -19,8 +20,6 @@ import { getRelativeTime } from "lib/utils/time";
 import useUiRefresher from "lib/utils/hooks/useUiRefresher";
 import { setPrecision } from "lib/utils/formatNumber";
 
-import sflIcon from "assets/icons/sfl.webp";
-import lock from "assets/skills/lock.png";
 import { Box } from "components/ui/Box";
 import { MAX_SESSION_SFL } from "features/game/lib/processEvent";
 
@@ -61,7 +60,7 @@ const LastUpdated: React.FC<{ cachedAt: number }> = ({ cachedAt }) => {
   useUiRefresher();
   return (
     <span className="text-xs">{`${t("last.updated")} ${getRelativeTime(
-      cachedAt
+      cachedAt,
     )}`}</span>
   );
 };
@@ -142,7 +141,7 @@ export const SalesPanel: React.FC<{
 
   const unitPrice = marketPrices?.prices?.currentPrices?.[selected] || "0.0000";
   const bundlePrice = (MARKET_BUNDLES[selected] * Number(unitPrice))?.toFixed(
-    4
+    4,
   );
   const canSell =
     state.inventory[selected]?.gte(MARKET_BUNDLES[selected]) &&
@@ -154,7 +153,7 @@ export const SalesPanel: React.FC<{
     return (
       <>
         <div className="p-1 flex flex-col items-center">
-          <img src={lock} className="w-1/5 mb-2" />
+          <img src={SUNNYSIDE.icons.lock} className="w-1/5 mb-2" />
           <p className="text-sm mb-1 text-center">
             {t("goblinTrade.hoarding")}
           </p>
@@ -210,7 +209,7 @@ export const SalesPanel: React.FC<{
               <Label type="default" icon={SUNNYSIDE.icons.basket}>
                 {t("goblinTrade.bulk")}
               </Label>
-              <Label type="default" icon={sflIcon}>
+              <Label type="default" icon={token}>
                 {t("goblinTrade.conversion")}
               </Label>
             </div>
@@ -268,7 +267,7 @@ export const SalesPanel: React.FC<{
                 <div
                   className={classNames(
                     "flex items-center justify-start sm:justify-end w-64",
-                    { "opacity-75": !hasVIP }
+                    { "opacity-75": !hasVIP },
                   )}
                 >
                   <LastUpdated cachedAt={marketPrices.cachedAt ?? 0} />
@@ -280,7 +279,7 @@ export const SalesPanel: React.FC<{
               {getKeys(MARKET_BUNDLES).map((name) => {
                 const priceMovement = getPriceMovement(
                   marketPrices?.prices?.currentPrices?.[name] ?? 0,
-                  marketPrices?.prices?.yesterdayPrices?.[name] ?? 0
+                  marketPrices?.prices?.yesterdayPrices?.[name] ?? 0,
                 );
 
                 return (

@@ -1,12 +1,5 @@
 import React, { Fragment, useContext, useState } from "react";
 
-import springRaft from "assets/land/prestige_raft.png";
-import desertRaft from "assets/land/desert_prestige_raft.png";
-import springPrestige from "assets/announcements/spring_prestige.png";
-import desertPrestige from "assets/announcements/desert_prestige.png";
-import lockIcon from "assets/skills/lock.png";
-import land from "assets/land/islands/island.webp";
-
 import { GRID_WIDTH_PX, PIXEL_SCALE } from "features/game/lib/constants";
 import { NPC } from "features/island/bumpkin/components/NPC";
 import { NPC_WEARABLES } from "lib/npcs";
@@ -34,7 +27,7 @@ import { translate } from "lib/i18n/translate";
 import { Loading } from "features/auth/components";
 
 const UPGRADE_DATES: (state: GameState) => Record<IslandType, number | null> = (
-  state
+  state,
 ) => ({
   basic: new Date(0).getTime(),
   spring: new Date("2024-05-15T00:00:00Z").getTime(),
@@ -42,14 +35,14 @@ const UPGRADE_DATES: (state: GameState) => Record<IslandType, number | null> = (
 });
 
 const UPGRADE_RAFTS: Record<IslandType, string | null> = {
-  basic: springRaft,
-  spring: desertRaft,
+  basic: SUNNYSIDE.land.springRaft,
+  spring: SUNNYSIDE.land.desertRaft,
   desert: null, // Next prestige after desert
 };
 
 const UPGRADE_PREVIEW: Record<IslandType, string | null> = {
-  basic: springPrestige,
-  spring: desertPrestige,
+  basic: SUNNYSIDE.announcement.springPrestige,
+  spring: SUNNYSIDE.announcement.desertPrestige,
   desert: null, // Next prestige after desert
 };
 
@@ -115,7 +108,7 @@ const IslandUpgraderModal: React.FC<{
   const isReady = hasUpgrade && upgradeDate < Date.now();
 
   const hasResources = getKeys(upgrade.items).every(
-    (name) => inventory[name]?.gte(upgrade.items[name] ?? 0) ?? false
+    (name) => inventory[name]?.gte(upgrade.items[name] ?? 0) ?? false,
   );
 
   return (
@@ -133,7 +126,11 @@ const IslandUpgraderModal: React.FC<{
         />
 
         {!hasUpgrade && (
-          <Label icon={lockIcon} type="danger" className="mr-3 my-2">
+          <Label
+            icon={SUNNYSIDE.icons.lock}
+            type="danger"
+            className="mr-3 my-2"
+          >
             {t("coming.soon")}
           </Label>
         )}
@@ -148,13 +145,13 @@ const IslandUpgraderModal: React.FC<{
                   className="mr-3 my-2 whitespace-nowrap"
                 >
                   {`${t("coming.soon")} - ${formatDateTime(
-                    new Date(upgradeDate).toISOString()
+                    new Date(upgradeDate).toISOString(),
                   )}`}
                 </Label>
               )}
               {remainingExpansions > 0 && (
                 <Label
-                  icon={land}
+                  icon={SUNNYSIDE.land.island}
                   type="danger"
                   className="mr-3 whitespace-nowrap"
                 >
@@ -274,7 +271,7 @@ export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
             <Loading text={t("islandupgrade.exploring")} />
           </div>
         </Transition>,
-        document.body
+        document.body,
       )}
 
       <Modal show={showModal} onHide={onClose}>

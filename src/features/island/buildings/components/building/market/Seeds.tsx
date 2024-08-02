@@ -1,8 +1,6 @@
 import React, { useContext, useState } from "react";
 import { useActor } from "@xstate/react";
-import lock from "assets/skills/lock.png";
 import orange from "assets/resources/orange.png";
-import greenhouse from "assets/icons/greenhouse.webp";
 import { Box } from "components/ui/Box";
 import { Button } from "components/ui/Button";
 import { Context } from "features/game/GameProvider";
@@ -21,7 +19,7 @@ import { INVENTORY_LIMIT } from "features/game/lib/constants";
 import { makeBulkBuySeeds } from "./lib/makeBulkBuyAmount";
 import { getBumpkinLevel } from "features/game/lib/level";
 import { SEEDS, SeedName } from "features/game/types/seeds";
-import { Bumpkin, IslandType } from "features/game/types/game";
+import { Bumpkin } from "features/game/types/game";
 import {
   FRUIT,
   FRUIT_SEEDS,
@@ -44,11 +42,10 @@ import {
   SEED_TO_PLANT,
   getGreenhouseCropTime,
 } from "features/game/events/landExpansion/plantGreenhouse";
-import { hasRequiredIslandExpansion } from "features/game/lib/hasRequiredIslandExpansion";
-import { capitalize } from "lib/utils/capitalize";
 import { NPC_WEARABLES } from "lib/npcs";
 import { ConfirmationModal } from "components/ui/ConfirmationModal";
 import { setPrecision } from "lib/utils/formatNumber";
+import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   onClose: () => void;
@@ -104,28 +101,24 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
   // Calculates the difference between amount in inventory and the inventory limit
   const bulkSeedBuyAmount = makeBulkBuySeeds(stock, bulkBuyLimit);
 
+  const plantingSpot = selected.plantingSpot;
+
   const isSeedLocked = (seedName: SeedName) => {
     const seed = SEEDS()[seedName];
     return getBumpkinLevel(state.bumpkin?.experience ?? 0) < seed.bumpkinLevel;
   };
 
   const Action = () => {
-    if (
-      !hasRequiredIslandExpansion(state.island.type, selected.requiredIsland)
-    ) {
+    if (!inventory[plantingSpot]) {
       return (
-        <Label type="danger">
-          {t("islandupgrade.requiredIsland", {
-            islandType:
-              selected.requiredIsland === "spring"
-                ? "Petal Paradise"
-                : t("islandupgrade.otherIsland", {
-                    island: capitalize(selected.requiredIsland as IslandType),
-                  }),
-          })}
-        </Label>
+        <div className="flex justify-center">
+          <Label className="mb-1" type="danger">
+            {t("seeds.plantingSpot.needed", { plantingSpot: plantingSpot })}
+          </Label>
+        </div>
       );
     }
+
     if (isSeedLocked(selectedName)) {
       // return nothing if requirement not met
       return <></>;
@@ -168,7 +161,7 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
           )}
         </div>
         <div>
-          {!!inventory.Warehouse && bulkSeedBuyAmount > 10 && (
+          {state.island.type !== "basic" && bulkSeedBuyAmount > 10 && (
             <Button
               className="mt-1"
               disabled={lessFunds(bulkSeedBuyAmount)}
@@ -195,7 +188,7 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
           messages={[
             t("confirmation.buyCrops", {
               coinAmount: setPrecision(
-                new Decimal(price).mul(bulkSeedBuyAmount)
+                new Decimal(price).mul(bulkSeedBuyAmount),
               ).toNumber(),
               seedNo: bulkSeedBuyAmount,
               seedName: selectedName,
@@ -225,11 +218,11 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
       return getFruitPatchTime(
         selectedName as FruitSeedName,
         state,
-        (state.bumpkin as Bumpkin)?.equipped ?? {}
+        (state.bumpkin as Bumpkin)?.equipped ?? {},
       );
 
     if (
-      selectedName in GREENHOUSE_SEEDS() ||
+      selectedName in GREENHOUSE_SEEDS ||
       selectedName in GREENHOUSE_FRUIT_SEEDS()
     ) {
       const plant = SEED_TO_PLANT[selectedName as GreenHouseCropSeedName];
@@ -297,7 +290,7 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
           </Label>
           <div className="flex flex-wrap mb-2">
             {seeds
-              .filter((name) => name in CROP_SEEDS())
+              .filter((name) => name in CROP_SEEDS)
               .map((name: SeedName) => (
                 <Box
                   isSelected={selectedName === name}
@@ -305,7 +298,9 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
                   onClick={() => onSeedClick(name)}
                   image={ITEM_DETAILS[name].image}
                   showOverlay={isSeedLocked(name)}
-                  secondaryImage={isSeedLocked(name) ? lock : undefined}
+                  secondaryImage={
+                    isSeedLocked(name) ? SUNNYSIDE.icons.lock : undefined
+                  }
                   count={inventory[name]}
                 />
               ))}
@@ -316,6 +311,14 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
           <div className="flex flex-wrap mb-2">
             {seeds
               .filter((name) => name in FRUIT_SEEDS())
+              .filter(
+                (name) =>
+                  (name !== "Tomato Seed" && name !== "Lemon Seed") ||
+                  hasFeatureAccess(
+                    gameService.state.context.state,
+                    "NEW_FRUITS",
+                  ),
+              )
               .map((name: SeedName) => (
                 <Box
                   isSelected={selectedName === name}
@@ -323,7 +326,9 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
                   onClick={() => onSeedClick(name)}
                   image={ITEM_DETAILS[name].image}
                   showOverlay={isSeedLocked(name)}
-                  secondaryImage={isSeedLocked(name) ? lock : undefined}
+                  secondaryImage={
+                    isSeedLocked(name) ? SUNNYSIDE.icons.lock : undefined
+                  }
                   count={inventory[name]}
                 />
               ))}
@@ -346,22 +351,28 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
                     onClick={() => onSeedClick(name)}
                     image={ITEM_DETAILS[name].image}
                     showOverlay={isSeedLocked(name)}
-                    secondaryImage={isSeedLocked(name) ? lock : undefined}
+                    secondaryImage={
+                      isSeedLocked(name) ? SUNNYSIDE.icons.lock : undefined
+                    }
                     count={inventory[name]}
                   />
                 ))}
             </div>
 
             <>
-              <Label icon={greenhouse} type="default" className="ml-2 mb-1">
+              <Label
+                icon={SUNNYSIDE.icons.greenhouseIcon}
+                type="default"
+                className="ml-2 mb-1"
+              >
                 {t("greenhouse")}
               </Label>
               <div className="flex flex-wrap mb-2">
                 {seeds
                   .filter(
                     (name) =>
-                      name in GREENHOUSE_SEEDS() ||
-                      name in GREENHOUSE_FRUIT_SEEDS()
+                      name in GREENHOUSE_SEEDS ||
+                      name in GREENHOUSE_FRUIT_SEEDS(),
                   )
                   .map((name: SeedName) => (
                     <Box
@@ -370,7 +381,9 @@ export const Seeds: React.FC<Props> = ({ onClose }) => {
                       onClick={() => onSeedClick(name)}
                       image={ITEM_DETAILS[name].image}
                       showOverlay={isSeedLocked(name)}
-                      secondaryImage={isSeedLocked(name) ? lock : undefined}
+                      secondaryImage={
+                        isSeedLocked(name) ? SUNNYSIDE.icons.lock : undefined
+                      }
                       count={inventory[name]}
                     />
                   ))}

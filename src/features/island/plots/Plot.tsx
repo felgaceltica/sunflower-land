@@ -40,15 +40,15 @@ import Decimal from "decimal.js-light";
 import { hasFeatureAccess } from "lib/flags";
 
 export function getYieldColour(yieldAmount: number) {
-  if (yieldAmount <= 1) {
+  if (yieldAmount < 2) {
     return "white";
   }
 
-  if (yieldAmount <= 1.5) {
-    return "#ffeb37";
+  if (yieldAmount < 10) {
+    return "#ffeb37"; // Yellow
   }
 
-  return "#71e358";
+  return "#71e358"; // Green
 }
 
 const selectCrops = (state: MachineState) => state.context.state.crops;
@@ -56,19 +56,20 @@ const selectBuildings = (state: MachineState) => state.context.state.buildings;
 const selectLevel = (state: MachineState) =>
   getBumpkinLevel(state.context.state.bumpkin?.experience ?? 0);
 
-const selectHarvests = (state: MachineState) =>
-  getKeys(CROPS()).reduce(
+const selectHarvests = (state: MachineState) => {
+  return getKeys(CROPS).reduce(
     (total, crop) =>
       total +
       (state.context.state.bumpkin?.activity?.[`${crop} Harvested`] ?? 0),
-    0
+    0,
   );
+};
 
 const selectPlants = (state: MachineState) =>
-  getKeys(CROPS()).reduce(
+  getKeys(CROPS).reduce(
     (total, crop) =>
       total + (state.context.state.bumpkin?.activity?.[`${crop} Planted`] ?? 0),
-    0
+    0,
   );
 
 const selectCropsSold = (state: MachineState) =>
@@ -76,7 +77,7 @@ const selectCropsSold = (state: MachineState) =>
 
 const compareBuildings = (
   prev: Partial<Record<BuildingName, PlacedItem[]>>,
-  next: Partial<Record<BuildingName, PlacedItem[]>>
+  next: Partial<Record<BuildingName, PlacedItem[]>>,
 ) => {
   return getCompletedWellCount(prev) === getCompletedWellCount(next);
 };
@@ -167,7 +168,7 @@ export const Plot: React.FC<Props> = ({ id, index }) => {
           fps={HARVEST_PROC_ANIMATION.fps}
           steps={HARVEST_PROC_ANIMATION.steps}
           onPause={() => setProcAnimation(<></>)}
-        />
+        />,
       );
     }
 
@@ -207,7 +208,7 @@ export const Plot: React.FC<Props> = ({ id, index }) => {
 
     // increase touch count if there is a reward
     const readyToHarvest =
-      !!crop && isReadyToHarvest(now, crop, CROPS()[crop.name]);
+      !!crop && isReadyToHarvest(now, crop, CROPS[crop.name]);
 
     if (crop?.reward && readyToHarvest) {
       if (touchCount < 1) {
@@ -242,7 +243,7 @@ export const Plot: React.FC<Props> = ({ id, index }) => {
     if (!crop) {
       if (
         hasFeatureAccess(state, "CROP_QUICK_SELECT") &&
-        (!seed || !(seed in CROP_SEEDS()) || !inventory[seed]?.gte(1))
+        (!seed || !(seed in CROP_SEEDS) || !inventory[seed]?.gte(1))
       ) {
         setShowQuickSelect(true);
         return;
@@ -309,9 +310,9 @@ export const Plot: React.FC<Props> = ({ id, index }) => {
       >
         <QuickSelect
           icon={SUNNYSIDE.icons.seeds}
-          options={getKeys(CROP_SEEDS()).map((seed) => ({
+          options={getKeys(CROP_SEEDS).map((seed) => ({
             name: seed as InventoryItemName,
-            icon: CROP_SEEDS()[seed].yield as InventoryItemName,
+            icon: CROP_SEEDS[seed].yield as InventoryItemName,
           }))}
           onClose={() => setShowQuickSelect(false)}
           onSelected={(seed) => {
@@ -398,7 +399,7 @@ export const Plot: React.FC<Props> = ({ id, index }) => {
             }}
           >{`+${setPrecision(
             new Decimal(harvested.current?.amount ?? 0),
-            2
+            2,
           )}`}</span>
         </Transition>
       )}

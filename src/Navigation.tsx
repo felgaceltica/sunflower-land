@@ -27,19 +27,18 @@ import { Modal } from "components/ui/Modal";
 import { PWAInstallProvider } from "features/pwa/PWAInstallProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
-import landing from "assets/brand/landing.webp";
-import greenBg from "assets/brand/green_bg.png";
+import { SUNNYSIDE } from "assets/sunnyside";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import classNames from "classnames";
 
 // Lazy load routes
 const World = lazy(() =>
-  import("features/world/World").then((m) => ({ default: m.World }))
+  import("features/world/World").then((m) => ({ default: m.World })),
 );
 const CommunityTools = lazy(() =>
   import("features/world/ui/CommunityTools").then((m) => ({
     default: m.CommunityTools,
-  }))
+  })),
 );
 
 const selectState = (state: AuthMachineState) => ({
@@ -123,7 +122,7 @@ export const Navigation: React.FC = () => {
             position: "relative",
             overflow: "hidden",
             backgroundColor: "#63c74d", // Optional: to visualize the container
-            backgroundImage: `url(${greenBg})`,
+            backgroundImage: `url(${SUNNYSIDE.brand.greenBg})`,
             backgroundRepeat: "repeat",
             backgroundSize: `${PIXEL_SCALE * 64}px`,
             imageRendering: "pixelated",
@@ -131,7 +130,7 @@ export const Navigation: React.FC = () => {
           }}
         >
           <img
-            src={landing}
+            src={SUNNYSIDE.brand.landing}
             alt="Landing image"
             className={classNames("transition-opacity", {
               "opacity-0": !landingImageLoaded,
@@ -180,7 +179,11 @@ export const Navigation: React.FC = () => {
                       path="/goblins"
                       element={
                         <Splash>
-                          <Forbidden />
+                          <Forbidden
+                            onClose={() => {
+                              authService.send("RETURN");
+                            }}
+                          />
                         </Splash>
                       }
                     />

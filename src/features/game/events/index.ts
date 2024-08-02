@@ -180,10 +180,6 @@ import {
   ClaimMilestoneAction,
 } from "./landExpansion/claimMilestone";
 import { missFish, MissFishAction } from "./landExpansion/missFish";
-import {
-  tradeTentacle,
-  TradeTentacleAction,
-} from "./landExpansion/tradeTentacle";
 import { revealLand, RevealLandAction } from "./landExpansion/revealLand";
 import {
   burnCollectible,
@@ -264,10 +260,6 @@ import {
   ExchangeSFLtoCoinsAction,
 } from "./landExpansion/exchangeSFLtoCoins";
 import {
-  pledgeFaction,
-  PledgeFactionAction,
-} from "./landExpansion/pledgeFaction";
-import {
   moveOilReserve,
   MoveOilReserveAction,
 } from "./landExpansion/moveOilReserve";
@@ -314,7 +306,6 @@ import {
   HarvestCropMachineAction,
 } from "./landExpansion/harvestCropMachine";
 import { joinFaction, JoinFactionAction } from "./landExpansion/joinFaction";
-import { claimEmblems, ClaimEmblemsAction } from "./landExpansion/claimEmblems";
 import {
   completeKingdomChore,
   CompleteKingdomChoreAction,
@@ -331,6 +322,20 @@ import {
   claimFactionPrize,
   ClaimFactionPrizeAction,
 } from "./landExpansion/claimFactionPrize";
+import {
+  FeedFactionPetAction,
+  feedFactionPet,
+} from "./landExpansion/feedFactionPet";
+import {
+  refreshKingdomChores,
+  RefreshKingdomChoresAction,
+} from "./landExpansion/refreshKingdomChores";
+import {
+  skipKingdomChore,
+  SkipKingdomChoreAction,
+} from "./landExpansion/skipKingdomChore";
+import { leaveFaction, LeaveFactionAction } from "./landExpansion/leaveFaction";
+import { BuyMoreDigsAction, buyMoreDigs } from "./landExpansion/buyMoreDigs";
 
 export type PlayingEvent =
   | OilGreenhouseAction
@@ -395,7 +400,6 @@ export type PlayingEvent =
   | ReelRodAction
   | ClaimMilestoneAction
   | MissFishAction
-  | TradeTentacleAction
   | RevealLandAction
   | BurnCollectibleAction
   | ClaimBonusAction
@@ -421,13 +425,16 @@ export type PlayingEvent =
   | SupplyCropMachineAction
   | HarvestCropMachineAction
   | SupplyCookingOilAction
-  | PledgeFactionAction
   | JoinFactionAction
-  | ClaimEmblemsAction
   | CompleteKingdomChoreAction
+  | SkipKingdomChoreAction
+  | RefreshKingdomChoresAction
   | DeliverFactionKitchenAction
   | BuyFactionShopItemAction
-  | ClaimFactionPrizeAction;
+  | ClaimFactionPrizeAction
+  | FeedFactionPetAction
+  | LeaveFactionAction
+  | BuyMoreDigsAction;
 
 export type PlacementEvent =
   | ConstructBuildingAction
@@ -474,7 +481,7 @@ export type GameEventName<T> = Extract<T, { type: string }>["type"];
 
 export function isEventType<T extends PlayingEvent>(
   action: PlayingEvent,
-  typeName: T["type"]
+  typeName: T["type"],
 ): action is T {
   return action.type === typeName;
 }
@@ -493,6 +500,7 @@ type Handlers<T> = {
 };
 
 export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
+  "faction.left": leaveFaction,
   "faction.prizeClaimed": claimFactionPrize,
   "greenhouse.oiled": oilGreenhouse,
   "greenhouse.harvested": harvestGreenHouse,
@@ -560,7 +568,6 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "rod.reeled": reelRod,
   "milestone.claimed": claimMilestone,
   "fish.missed": missFish,
-  "shelly.tradeTentacle": tradeTentacle,
   "land.revealed": revealLand,
   "collectible.burned": burnCollectible,
   "bonus.claimed": claimBonus,
@@ -579,17 +586,18 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "gift.claimed": claimGift,
   "raffle.entered": enterRaffle,
   "sfl.exchanged": exchangeSFLtoCoins,
-  "faction.pledged": pledgeFaction,
-  // To replace pledgeFaction
   "faction.joined": joinFaction,
   "oilReserve.drilled": drillOilReserve,
   "cropMachine.supplied": supplyCropMachine,
   "cropMachine.harvested": harvestCropMachine,
   "cookingOil.supplied": supplyCookingOil,
-  "emblems.claimed": claimEmblems,
   "kingdomChore.completed": completeKingdomChore,
+  "kingdomChore.skipped": skipKingdomChore,
+  "kingdomChores.refreshed": refreshKingdomChores,
   "factionKitchen.delivered": deliverFactionKitchen,
   "factionShopItem.bought": buyFactionShopItem,
+  "factionPet.fed": feedFactionPet,
+  "desert.digsBought": buyMoreDigs,
 };
 
 export const PLACEMENT_EVENTS: Handlers<PlacementEvent> = {

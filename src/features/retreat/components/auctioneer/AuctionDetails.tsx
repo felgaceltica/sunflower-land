@@ -2,7 +2,6 @@ import React from "react";
 
 import { Button } from "components/ui/Button";
 import token from "assets/icons/sfl.webp";
-import bg from "assets/ui/grey_background.png";
 
 import { Label } from "components/ui/Label";
 import { ITEM_DETAILS } from "features/game/types/images";
@@ -18,6 +17,7 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { GameState } from "features/game/types/game";
 import { getImageUrl } from "lib/utils/getImageURLS";
 import classNames from "classnames";
+import { translateTerms } from "lib/i18n/translate";
 
 type Props = {
   item: Auction;
@@ -73,7 +73,7 @@ export const AuctionDetails: React.FC<Props> = ({
 
   const hasIngredients =
     getKeys(item.ingredients).every((name) =>
-      (game.inventory[name] ?? new Decimal(0)).gte(item.ingredients[name] ?? 0)
+      (game.inventory[name] ?? new Decimal(0)).gte(item.ingredients[name] ?? 0),
     ) ?? false;
 
   const MintButton = () => {
@@ -134,7 +134,7 @@ export const AuctionDetails: React.FC<Props> = ({
 
         <p className="text-center text-xs mb-3">
           {item.type === "collectible"
-            ? ITEM_DETAILS[item.collectible].description
+            ? translateTerms(ITEM_DETAILS[item.collectible].description)
             : ""}
         </p>
 
@@ -146,7 +146,10 @@ export const AuctionDetails: React.FC<Props> = ({
 
         <div className="relative mb-2">
           {item.type === "collectible" && (
-            <img src={bg} className="absolute inset-0 w-48 h-48  rounded-md" />
+            <img
+              src={SUNNYSIDE.ui.grey_background}
+              className="absolute inset-0 w-48 h-48  rounded-md"
+            />
           )}
           <div className="w-48 h-48 relative">
             <img

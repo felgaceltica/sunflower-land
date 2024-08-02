@@ -60,7 +60,7 @@ const FertilePlotComponent: React.FC<Props> = ({
 
   const [_, setRender] = useState<number>(0);
 
-  let harvestSeconds = cropName ? CROPS()[cropName].harvestSeconds : 0;
+  let harvestSeconds = cropName ? CROPS[cropName].harvestSeconds : 0;
   const readyAt = plantedAt ? plantedAt + harvestSeconds * 1000 : 0;
 
   let startAt = plantedAt ?? 0;
@@ -86,12 +86,12 @@ const FertilePlotComponent: React.FC<Props> = ({
   const stage: GrowthStage | undefined = !cropName
     ? undefined
     : growPercentage >= 100
-    ? "ready"
-    : growPercentage >= 50
-    ? "almost"
-    : growPercentage >= 25
-    ? "halfway"
-    : "seedling";
+      ? "ready"
+      : growPercentage >= 50
+        ? "almost"
+        : growPercentage >= 25
+          ? "halfway"
+          : "seedling";
 
   const handleMouseEnter = () => {
     // show details if field is growing

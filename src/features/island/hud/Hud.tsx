@@ -22,7 +22,7 @@ import Decimal from "decimal.js-light";
 import { BuyCurrenciesModal } from "./components/BuyCurrenciesModal";
 import { MachineState } from "features/game/lib/gameMachine";
 import { useSound } from "lib/utils/hooks/useSound";
-import { EmblemAirdropCountdown } from "./EmblemAirdropCountdown";
+import { SpecialEventCountdown } from "./SpecialEventCountdown";
 
 const _farmAddress = (state: MachineState) => state.context.farmAddress;
 const _xp = (state: MachineState) =>
@@ -52,7 +52,7 @@ const HudComponent: React.FC<{
   const autosaving = gameState.matches("autosaving");
 
   const handleDeposit = (
-    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">
+    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">,
   ) => {
     gameService.send("DEPOSIT", args);
   };
@@ -80,7 +80,7 @@ const HudComponent: React.FC<{
                 "absolute flex z-50 cursor-pointer hover:img-highlight",
                 {
                   "opacity-50 cursor-not-allowed": !isFarming,
-                }
+                },
               )}
               style={{
                 marginLeft: `${PIXEL_SCALE * 2}px`,
@@ -164,7 +164,7 @@ const HudComponent: React.FC<{
           }}
         >
           <AuctionCountdown />
-          <EmblemAirdropCountdown />
+          <SpecialEventCountdown />
         </div>
 
         <div

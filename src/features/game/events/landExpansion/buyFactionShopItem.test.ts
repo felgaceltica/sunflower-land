@@ -14,13 +14,6 @@ const GAME_STATE: GameState = {
     name: "goblins",
     pledgedAt: 0,
     history: {},
-    donated: {
-      daily: {
-        resources: {},
-        sfl: {},
-      },
-      totalItems: {},
-    },
     points: 0,
   },
 };
@@ -37,7 +30,7 @@ describe("buyFactionShopItem", () => {
           type: "factionShopItem.bought",
           item: "Knight Gambit",
         },
-      })
+      }),
     ).toThrow("Bumpkin not found");
   });
 
@@ -49,7 +42,7 @@ describe("buyFactionShopItem", () => {
           faction: undefined,
         },
         action: { type: "factionShopItem.bought", item: "Knight Gambit" },
-      })
+      }),
     ).toThrow("Player does not belong to a faction");
   });
 
@@ -61,7 +54,7 @@ describe("buyFactionShopItem", () => {
           type: "factionShopItem.bought",
           item: "Test Item" as FactionShopItemName,
         },
-      })
+      }),
     ).toThrow("This item does not exist");
   });
 
@@ -75,7 +68,7 @@ describe("buyFactionShopItem", () => {
           type: "factionShopItem.bought",
           item: "Nightshade Armor",
         },
-      })
+      }),
     ).toThrow("Player is not in the required faction");
   });
 
@@ -89,7 +82,7 @@ describe("buyFactionShopItem", () => {
           type: "factionShopItem.bought",
           item: "Goblin Armor",
         },
-      })
+      }),
     ).toThrow("Player does not have enough marks");
   });
 

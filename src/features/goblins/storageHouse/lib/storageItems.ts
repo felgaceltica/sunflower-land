@@ -21,7 +21,7 @@ export function getDeliverableItems({ game }: { game: GameState }) {
   return (Object.keys(inventory) as InventoryItemName[]).reduce(
     (acc, itemName) => {
       const isDeliverable =
-        itemName in CROPS() ||
+        itemName in CROPS ||
         itemName in FRUIT() ||
         (itemName in COMMODITIES &&
           itemName !== "Chicken" &&
@@ -45,7 +45,7 @@ export function getDeliverableItems({ game }: { game: GameState }) {
 
       return acc;
     },
-    {} as Inventory
+    {} as Inventory,
   );
 }
 
@@ -57,7 +57,7 @@ export function getBankItems(game: GameState) {
   return (Object.keys(inventory) as InventoryItemName[]).reduce(
     (acc, itemName) => {
       if (
-        itemName in CROPS() ||
+        itemName in CROPS ||
         itemName in FRUIT() ||
         (itemName in COMMODITIES && itemName !== "Chicken")
       ) {
@@ -77,6 +77,6 @@ export function getBankItems(game: GameState) {
         [itemName]: amount,
       };
     },
-    {} as Inventory
+    {} as Inventory,
   );
 }

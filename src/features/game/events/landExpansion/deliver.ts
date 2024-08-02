@@ -24,6 +24,7 @@ export const TICKET_REWARDS: Record<QuestNPCName, number> = {
   cornwell: 4,
   tywin: 5,
   jester: 4,
+  pharaoh: 5,
 };
 
 export function generateDeliveryTickets({
@@ -117,7 +118,8 @@ export type QuestNPCName =
   | "finn"
   | "finley"
   | "miranda"
-  | "jester";
+  | "jester"
+  | "pharaoh";
 
 // All available quest npcs
 export const QUEST_NPC_NAMES: QuestNPCName[] = [
@@ -137,14 +139,14 @@ const DELIVERY_FRIENDSHIP_POINTS = 3;
 export function populateOrders(
   game: GameState,
   createdAt: number = Date.now(),
-  isSkipped = false
+  isSkipped = false,
 ) {
   const orders = game.delivery.orders;
   const slots = getTotalSlots(game);
 
   while (orders.length < slots) {
     const upcomingOrderTimes = game.delivery.orders.map(
-      (order) => order.readyAt
+      (order) => order.readyAt,
     );
     const baseTime = Math.max(...upcomingOrderTimes, createdAt);
 
@@ -280,7 +282,7 @@ export function deliverOrder({
     bumpkin.activity = trackActivity(
       "Coins Earned",
       bumpkin.activity,
-      new Decimal(coinsReward)
+      new Decimal(coinsReward),
     );
   }
 

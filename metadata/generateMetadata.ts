@@ -28,11 +28,11 @@ function generateCollectibles() {
 
     const jsonPath = path.join(
       __dirname,
-      `../public/erc1155/${KNOWN_IDS[name]}.json`
+      `../public/erc1155/${KNOWN_IDS[name]}.json`,
     );
     const hexJsonPath = path.join(
       __dirname,
-      `../public/erc1155/${zeroPadded}.json`
+      `../public/erc1155/${zeroPadded}.json`,
     );
 
     fs.writeFile(jsonPath, JSON.stringify(metadata), () => undefined);
@@ -56,9 +56,9 @@ function generateCollectibles() {
       .map(String)
       .concat(
         Object.values(KNOWN_IDS).map((id) =>
-          Number(id).toString(16).padStart(64, "0")
-        )
-      )
+          Number(id).toString(16).padStart(64, "0"),
+        ),
+      ),
   );
 
   fileItemIds.forEach((id) => {
@@ -84,16 +84,16 @@ function generateWearables() {
 
     metadata.name = name;
 
-    // convert KNOWN_IDS[name] to hex zero padded with 64 zeros
+    //convert ITEM_IDS[name] to hex zero padded with 64 zeros
     const zeroPadded = ITEM_IDS[name].toString(16).padStart(64, "0");
 
     const jsonPath = path.join(
       __dirname,
-      `../public/wearables/${ITEM_IDS[name]}.json`
+      `../public/wearables/${ITEM_IDS[name]}.json`,
     );
     const hexJsonPath = path.join(
       __dirname,
-      `../public/wearables/${zeroPadded}.json`
+      `../public/wearables/${zeroPadded}.json`,
     );
 
     fs.writeFile(jsonPath, JSON.stringify(metadata), () => undefined);
@@ -113,13 +113,13 @@ function generateWearables() {
   // Previously was using decimals https://URL/1.json
   // We need to support both for now
   const idLookup = new Set<string>(
-    Object.values(KNOWN_IDS)
+    Object.values(ITEM_IDS)
       .map(String)
       .concat(
-        Object.values(KNOWN_IDS).map((id) =>
-          Number(id).toString(16).padStart(64, "0")
-        )
-      )
+        Object.values(ITEM_IDS).map((id) =>
+          Number(id).toString(16).padStart(64, "0"),
+        ),
+      ),
   );
 
   fileItemIds.forEach((id) => {
@@ -130,4 +130,5 @@ function generateWearables() {
 }
 
 generateWearables();
-// generateCollectibles();
+
+generateCollectibles();

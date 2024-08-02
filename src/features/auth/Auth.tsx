@@ -2,10 +2,6 @@ import React, { useContext } from "react";
 import { useActor } from "@xstate/react";
 import { Modal } from "components/ui/Modal";
 
-import logo from "assets/brand/logo_v2.png";
-import easterlogo from "assets/brand/easterlogo.png";
-import sparkle from "assets/fx/sparkle2.gif";
-
 import * as AuthProvider from "features/auth/lib/Provider";
 
 import { ErrorMessage } from "./ErrorMessage";
@@ -44,12 +40,12 @@ export const Auth: React.FC<Props> = ({ showOfflineModal }) => {
       >
         <div
           className={classNames(
-            "relative flex items-center justify-center mb-4 w-full -mt-12 max-w-xl transition-opacity duration-500 opacity-100"
+            "relative flex items-center justify-center mb-4 w-full -mt-12 max-w-xl transition-opacity duration-500 opacity-100",
           )}
         >
           <div className="w-[90%] relative">
             <img
-              src={sparkle}
+              src={SUNNYSIDE.fx.sparkle}
               className="absolute animate-pulse"
               style={{
                 width: `${PIXEL_SCALE * 8}px`,
@@ -59,9 +55,13 @@ export const Auth: React.FC<Props> = ({ showOfflineModal }) => {
             />
             <>
               {hasFeatureAccess(TEST_FARM, "EASTER") ? (
-                <img id="logo" src={easterlogo} className="w-full" />
+                <img
+                  id="logo"
+                  src={SUNNYSIDE.brand.easterlogo}
+                  className="w-full"
+                />
               ) : (
-                <img id="logo" src={logo} className="w-full" />
+                <img id="logo" src={SUNNYSIDE.brand.logo} className="w-full" />
               )}
 
               <div className="flex justify-center">

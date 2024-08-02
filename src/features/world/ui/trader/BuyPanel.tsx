@@ -3,6 +3,7 @@ import { useActor } from "@xstate/react";
 
 import { Context } from "features/game/GameProvider";
 import { ITEM_DETAILS } from "features/game/types/images";
+import token from "assets/icons/sfl.webp";
 
 import { Button } from "components/ui/Button";
 
@@ -10,8 +11,6 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { OuterPanel } from "components/ui/Panel";
 import { Box } from "components/ui/Box";
 import Decimal from "decimal.js-light";
-import token from "assets/icons/sfl.webp";
-import lock from "assets/skills/lock.png";
 import { getKeys } from "features/game/types/craftables";
 import { InventoryItemName } from "features/game/types/game";
 import { SUNNYSIDE } from "assets/sunnyside";
@@ -32,6 +31,7 @@ import { VIPAccess } from "features/game/components/VipAccess";
 import { getDayOfYear } from "lib/utils/time";
 import { setPrecision } from "lib/utils/formatNumber";
 import { ListingCategoryCard } from "components/ui/ListingCategoryCard";
+import { hasFeatureAccess } from "lib/flags";
 
 export const TRADE_LIMITS: Partial<Record<InventoryItemName, number>> = {
   Sunflower: 2000,
@@ -48,6 +48,8 @@ export const TRADE_LIMITS: Partial<Record<InventoryItemName, number>> = {
   Radish: 500,
   Wheat: 500,
   Kale: 500,
+  Tomato: 300,
+  Lemon: 250,
   Blueberry: 200,
   Orange: 200,
   Apple: 200,
@@ -79,10 +81,12 @@ export const TRADE_MINIMUMS: Partial<Record<InventoryItemName, number>> = {
   Radish: 10,
   Wheat: 10,
   Kale: 10,
+  Tomato: 5,
   Blueberry: 5,
   Orange: 5,
   Apple: 5,
   Banana: 5,
+  Lemon: 5,
   Grape: 5,
   Rice: 5,
   Olive: 5,
@@ -149,18 +153,24 @@ export const BuyPanel: React.FC<{
     return (
       <div className="p-2">
         <div className="flex flex-wrap mt-2">
-          {getKeys(TRADE_LIMITS).map((name) => (
-            <div
-              key={name}
-              className="w-1/3 sm:w-1/4 md:w-1/5 lg:w-1/6 pr-1 pb-1"
-            >
-              <ListingCategoryCard
-                itemName={name}
-                pricePerUnit={floorPrices[name]}
-                onClick={() => onSearch(name)}
-              />
-            </div>
-          ))}
+          {getKeys(TRADE_LIMITS)
+            .filter(
+              (name) =>
+                (name !== "Tomato" && name !== "Lemon") ||
+                hasFeatureAccess(gameService.state.context.state, "NEW_FRUITS"),
+            )
+            .map((name) => (
+              <div
+                key={name}
+                className="w-1/3 sm:w-1/4 md:w-1/5 lg:w-1/6 pr-1 pb-1"
+              >
+                <ListingCategoryCard
+                  itemName={name}
+                  pricePerUnit={floorPrices[name]}
+                  onClick={() => onSearch(name)}
+                />
+              </div>
+            ))}
         </div>
       </div>
     );
@@ -206,10 +216,10 @@ export const BuyPanel: React.FC<{
         (acc, name) => ({
           ...acc,
           [name]: (inventory[name] ?? new Decimal(0)).add(
-            listing.items[name] ?? 0
+            listing.items[name] ?? 0,
           ),
         }),
-        inventory
+        inventory,
       );
 
       const hasMaxedOut = hasMaxItems({
@@ -279,7 +289,7 @@ export const BuyPanel: React.FC<{
     if (warning === "hoarding") {
       return (
         <div className="p-1 flex flex-col items-center">
-          <img src={lock} className="w-1/5 mb-2" />
+          <img src={SUNNYSIDE.icons.lock} className="w-1/5 mb-2" />
           <p className="text-sm mb-1 text-center">
             {t("playerTrade.max.item")}
           </p>
@@ -324,14 +334,25 @@ export const BuyPanel: React.FC<{
                 <div className="flex justify-between">
                   <div>
                     <div className="flex flex-wrap w-52 items-center">
-                      {getKeys(selectedListing.items).map((item, index) => (
-                        <Box
-                          image={ITEM_DETAILS[item].image}
-                          count={new Decimal(selectedListing.items[item] ?? 0)}
-                          disabled
-                          key={`items-${index}`}
-                        />
-                      ))}
+                      {getKeys(selectedListing.items)
+                        .filter(
+                          (name) =>
+                            (name !== "Tomato" && name !== "Lemon") ||
+                            hasFeatureAccess(
+                              gameService.state.context.state,
+                              "NEW_FRUITS",
+                            ),
+                        )
+                        .map((item, index) => (
+                          <Box
+                            image={ITEM_DETAILS[item].image}
+                            count={
+                              new Decimal(selectedListing.items[item] ?? 0)
+                            }
+                            disabled
+                            key={`items-${index}`}
+                          />
+                        ))}
                       <div className="ml-1">
                         <div className="flex items-center mb-1">
                           <img src={token} className="h-6 mr-1" />
@@ -340,7 +361,7 @@ export const BuyPanel: React.FC<{
                         <p className="text-xxs">
                           {t("bumpkinTrade.price/unit", {
                             price: setPrecision(new Decimal(unitPrice)).toFixed(
-                              4
+                              4,
                             ),
                           })}
                         </p>
@@ -392,6 +413,9 @@ export const BuyPanel: React.FC<{
           >
             {selected.current}
           </Label>
+          <Label type="warning" className="ml-auto">
+            {`${t("inventory")}: ${setPrecision(inventory[selected.current as InventoryItemName] || new Decimal(0))}`}
+          </Label>
         </div>
         <div className="flex-1 pr-2 overflow-y-auto scrollable mt-1">
           {listings.map((listing, index) => {
@@ -405,14 +429,23 @@ export const BuyPanel: React.FC<{
                 <div className="flex justify-between">
                   <div className="justify-start">
                     <div className="flex flex-wrap w-52 items-center">
-                      {getKeys(listing.items).map((item) => (
-                        <Box
-                          image={ITEM_DETAILS[item].image}
-                          count={new Decimal(listing.items[item] ?? 0)}
-                          disabled
-                          key={`items-${index}`}
-                        />
-                      ))}
+                      {getKeys(listing.items)
+                        .filter(
+                          (name) =>
+                            (name !== "Tomato Seed" && name !== "Lemon Seed") ||
+                            hasFeatureAccess(
+                              gameService.state.context.state,
+                              "NEW_FRUITS",
+                            ),
+                        )
+                        .map((item) => (
+                          <Box
+                            image={ITEM_DETAILS[item].image}
+                            count={new Decimal(listing.items[item] ?? 0)}
+                            disabled
+                            key={`items-${index}`}
+                          />
+                        ))}
                       <div className="ml-1">
                         <div className="flex items-center mb-1">
                           <img src={token} className="h-6 mr-1" />
@@ -421,7 +454,7 @@ export const BuyPanel: React.FC<{
                         <p className="text-xxs">
                           {t("bumpkinTrade.price/unit", {
                             price: setPrecision(new Decimal(unitPrice)).toFixed(
-                              4
+                              4,
                             ),
                           })}
                         </p>
@@ -445,7 +478,7 @@ export const BuyPanel: React.FC<{
     setIsSearching(true);
     const listings = await getTradeListings(
       resource.toLowerCase(),
-      authState.context.user.rawToken
+      authState.context.user.rawToken,
     );
 
     setListings(listings);
@@ -462,13 +495,14 @@ export const BuyPanel: React.FC<{
             onUpgrade={() => {
               openModal("BUY_BANNER");
             }}
+            text={t("bumpkinTrade.unlockMoreTrades")}
           />
           {!isVIP && (
             <Label
               type={hasPurchasesRemaining ? "success" : "danger"}
               className="-ml-2"
             >
-              {remainingFreePurchases == 0
+              {remainingFreePurchases === 1
                 ? `${t("remaining.free.purchase")}`
                 : `${t("remaining.free.purchases", {
                     purchasesRemaining: hasPurchasesRemaining

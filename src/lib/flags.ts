@@ -13,6 +13,11 @@ const clashOfFactionsFeatureFlag = () => {
 const timeBasedFeatureFlag = (date: Date) => () => {
   return testnetFeatureFlag() || Date.now() > date.getTime();
 };
+
+const betaTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
+  return defaultFeatureFlag(game) || Date.now() > date.getTime();
+};
+
 /*
  * How to Use:
  * Add the feature name to this list when working on a new feature.
@@ -26,13 +31,18 @@ export type FeatureName =
   | "EASTER"
   | "FACTIONS"
   | "BANNER_SALES"
-  | "CHICKEN_RESCUE"
+  | "CROPS_AND_CHICKENS"
   | "CROP_MACHINE"
   | "DESERT_RECIPES"
   | "FACTION_HOUSE"
   | "CROP_QUICK_SELECT"
-  | "MARKS_LEADERBOARD"
-  | "FESTIVAL_OF_COLORS";
+  | "FESTIVAL_OF_COLORS"
+  | "FACTION_KITCHEN"
+  | "FACTION_CHORES"
+  | "CHAMPIONS"
+  | "TEST_DIGGING"
+  | "NEW_FRUITS"
+  | "DESERT_PLAZA";
 
 // Used for testing production features
 export const ADMIN_IDS = [1, 2, 3, 39488];
@@ -45,12 +55,13 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
 
     return Date.now() > new Date("2024-06-25T00:00:00Z").getTime();
   },
+  CHAMPIONS: betaTimeBasedFeatureFlag(new Date("2024-07-15T00:00:00Z")),
   CROP_QUICK_SELECT: defaultFeatureFlag,
-  CHICKEN_RESCUE: defaultFeatureFlag,
+  CROPS_AND_CHICKENS: defaultFeatureFlag,
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   DESERT_RECIPES: defaultFeatureFlag,
-  FACTION_HOUSE: defaultFeatureFlag,
+  FACTION_HOUSE: betaTimeBasedFeatureFlag(new Date("2024-07-08T00:00:00Z")),
   EASTER: (game) => {
     return false;
   },
@@ -58,7 +69,11 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   BANNER_SALES: clashOfFactionsFeatureFlag,
   // Just in case we need to disable the crop machine, leave the flag in temporarily
   CROP_MACHINE: () => true,
-  MARKS_LEADERBOARD: defaultFeatureFlag,
+  FACTION_KITCHEN: betaTimeBasedFeatureFlag(new Date("2022-07-08T00:00:00Z")),
+  FACTION_CHORES: betaTimeBasedFeatureFlag(new Date("2022-07-08T00:00:00Z")),
+  TEST_DIGGING: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
+  NEW_FRUITS: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
+  DESERT_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
 };
 
 export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {

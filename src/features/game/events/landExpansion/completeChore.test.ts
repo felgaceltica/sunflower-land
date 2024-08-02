@@ -55,7 +55,7 @@ describe("chore.completed", () => {
             },
           },
         },
-      })
+      }),
     ).toThrow("Chore ID not supplied");
   });
 
@@ -103,7 +103,7 @@ describe("chore.completed", () => {
             },
           },
         },
-      })
+      }),
     ).toThrow("Chore is not completed");
   });
 
@@ -146,7 +146,7 @@ describe("chore.completed", () => {
             },
           },
         },
-      })
+      }),
     ).toThrow("No bumpkin found");
   });
 
@@ -299,7 +299,7 @@ describe("chore.completed", () => {
           id: 1,
         },
         state,
-      })
+      }),
     ).toThrow("Chore is already completed");
   });
 
@@ -348,7 +348,7 @@ describe("chore.completed", () => {
             },
           },
         },
-      })
+      }),
     ).toThrow("Not the same bumpkin");
   });
 
@@ -426,13 +426,6 @@ describe("chore.completed", () => {
           pledgedAt: 0,
           history: {},
           points: 0,
-          donated: {
-            daily: {
-              sfl: {},
-              resources: {},
-            },
-            totalItems: {},
-          },
         },
         bumpkin: {
           ...INITIAL_BUMPKIN,
@@ -483,13 +476,6 @@ describe("chore.completed", () => {
           pledgedAt: 0,
           history: {},
           points: 0,
-          donated: {
-            daily: {
-              sfl: {},
-              resources: {},
-            },
-            totalItems: {},
-          },
         },
         bumpkin: {
           ...INITIAL_BUMPKIN,
@@ -543,13 +529,6 @@ describe("chore.completed", () => {
           pledgedAt: 0,
           history: {},
           points: 0,
-          donated: {
-            daily: {
-              sfl: {},
-              resources: {},
-            },
-            totalItems: {},
-          },
         },
         bumpkin: {
           ...INITIAL_BUMPKIN,
@@ -602,13 +581,6 @@ describe("chore.completed", () => {
           pledgedAt: 0,
           history: {},
           points: 0,
-          donated: {
-            daily: {
-              sfl: {},
-              resources: {},
-            },
-            totalItems: {},
-          },
         },
         bumpkin: {
           ...INITIAL_BUMPKIN,

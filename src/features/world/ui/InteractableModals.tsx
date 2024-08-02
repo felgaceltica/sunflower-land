@@ -7,7 +7,6 @@ import {
   SpeakingText,
 } from "features/game/components/SpeakingModal";
 import { NPC_WEARABLES } from "lib/npcs";
-import { KrakenIntro } from "./npcs/Shelly";
 import { AuctionHouseModal } from "./AuctionHouseModal";
 import { BoatModal } from "./BoatModal";
 import { PlazaBanner } from "./PlazaBanner";
@@ -25,18 +24,25 @@ import { BankModal } from "features/game/components/bank/components/BankModal";
 import { GarbageCollectorModal } from "features/helios/components/garbageCollector/components/GarbageCollectorModal";
 import { WishingWellModal } from "features/game/components/bank/components/WishingWellModal";
 import { GoblinMarket } from "./market/GoblinMarket";
-import { FactionModalContent } from "./factions/FactionModalContent";
 import { VIPGift } from "./VIPGift";
 import { ChickenRescue } from "./portals/ChickenRescue";
 import { InlineDialogue } from "./TypingMessage";
 import { Label } from "components/ui/Label";
 import { FestivalOfColors } from "./portals/FestivalOfColors";
 import { FactionWeeklyPrize } from "./factions/weeklyPrize/FactionWeeklyPrize";
-
-export type FanArtNPC = "fan_npc_1" | "fan_npc_2" | "fan_npc_3" | "fan_npc_4";
+import { FactionWelcome, hasReadFactionIntro } from "./factions/FactionWelcome";
+import { Champions } from "./factions/Champions";
+import { KingdomNoticeboard } from "./kingdom/KingdomNoticeboard";
+import { FactionNoticeboard } from "./factions/FactionNoticeboard";
+import { CropsAndChickens } from "./portals/CropsAndChickens";
+import { DesertNoticeboard } from "./beach/DesertNoticeboard";
 
 type InteractableName =
-  | FanArtNPC
+  | "desert_noticeboard"
+  | "faction_noticeboard"
+  | "kingdom_noticeboard"
+  | "champions"
+  | "faction_intro"
   | "vip_chest"
   | "weekly_faction_prize"
   | "faction_launch"
@@ -97,6 +103,7 @@ type InteractableName =
   | "nightshades_faction"
   | "sunflorians_faction"
   | "chicken_rescue"
+  | "crops_and_chickens"
   | "festival_of_colors"
   // to replace pledge factions
   | "join_goblins"
@@ -108,7 +115,12 @@ type InteractableName =
   | "kingdom_book_3"
   | "kingdom_book_4"
   | "kingdom_book_5"
-  | "kingdom_knight";
+  | "kingdom_knight"
+  | "fan_art"
+  | "desert_book_1"
+  | "desert_book_2"
+  | "desert_book_3"
+  | "desert_book_4";
 
 class InteractableModalManager {
   private listener?: (name: InteractableName, isOpen: boolean) => void;
@@ -126,13 +138,28 @@ class InteractableModalManager {
 
 export const interactableModalManager = new InteractableModalManager();
 
+function getInitialModal(scene: SceneId): InteractableName | undefined {
+  if (
+    !hasReadFactionIntro() &&
+    (scene === "goblin_house" ||
+      scene === "bumpkin_house" ||
+      scene === "nightshade_house" ||
+      scene === "sunflorian_house")
+  )
+    return "faction_intro";
+
+  return undefined;
+}
+
 interface Props {
   id: number;
   scene: SceneId;
 }
 
 export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
-  const [interactable, setInteractable] = useState<InteractableName>();
+  const [interactable, setInteractable] = useState<
+    InteractableName | undefined
+  >(getInitialModal(scene));
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -164,6 +191,21 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
           isOpen={interactable === "auction_item"}
         />
       )}
+      <Modal show={interactable === "faction_intro"} onHide={closeModal}>
+        <FactionWelcome onClose={closeModal} />
+      </Modal>
+      <Modal show={interactable === "desert_noticeboard"} onHide={closeModal}>
+        <DesertNoticeboard onClose={closeModal} />
+      </Modal>
+      <Modal show={interactable === "kingdom_noticeboard"} onHide={closeModal}>
+        <KingdomNoticeboard onClose={closeModal} />
+      </Modal>
+      <Modal show={interactable === "faction_noticeboard"} onHide={closeModal}>
+        <FactionNoticeboard onClose={closeModal} />
+      </Modal>
+      <Modal show={interactable === "champions"} onHide={closeModal}>
+        <Champions onClose={closeModal} />
+      </Modal>
       <Modal show={interactable === "donations"} onHide={closeModal}>
         <CloseButtonPanel title={t("enjoying.event")} onClose={closeModal}>
           <CommunityDonations />
@@ -186,9 +228,6 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
             },
           ]}
         />
-      </Modal>
-      <Modal show={interactable === "kraken"} onHide={closeModal}>
-        <KrakenIntro onClose={closeModal} />
       </Modal>
       <Modal show={interactable === "lazy_bud"} onHide={closeModal}>
         <SpeakingModal
@@ -406,6 +445,15 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
         </CloseButtonPanel>
       </Modal>
 
+      <Modal show={interactable === "crops_and_chickens"} onHide={closeModal}>
+        <CloseButtonPanel
+          onClose={closeModal}
+          bumpkinParts={NPC_WEARABLES["cluck e cheese"]}
+        >
+          <CropsAndChickens onClose={closeModal} />
+        </CloseButtonPanel>
+      </Modal>
+
       <Modal show={interactable === "festival_of_colors"} onHide={closeModal}>
         <CloseButtonPanel
           onClose={closeModal}
@@ -521,7 +569,7 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
                   cb: () => {
                     window.open(
                       "https://docs.sunflower-land.com/player-guides/bud-nfts",
-                      "_blank"
+                      "_blank",
                     );
                   },
                 },
@@ -530,7 +578,7 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
                   cb: () => {
                     window.open(
                       "https://opensea.io/collection/sunflower-land-buds",
-                      "_blank"
+                      "_blank",
                     );
                   },
                 },
@@ -625,16 +673,8 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
         </Panel>
       </Modal>
 
-      <Modal
-        show={
-          interactable === "fan_npc_1" ||
-          interactable === "fan_npc_2" ||
-          interactable === "fan_npc_3" ||
-          interactable === "fan_npc_4"
-        }
-        onHide={closeModal}
-      >
-        <FanArt name={interactable as FanArtNPC} onClose={closeModal} />
+      <Modal show={interactable === "fan_art"} onHide={closeModal}>
+        <FanArt onClose={closeModal} />
       </Modal>
 
       <Modal show={interactable === "kingdom_knight"} onHide={closeModal}>
@@ -703,6 +743,50 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
         </CloseButtonPanel>
       </Modal>
 
+      <Modal show={interactable === "desert_book_1"} onHide={closeModal}>
+        <CloseButtonPanel onClose={closeModal}>
+          <div className="p-2">
+            <Label type="default" className="mb-2">
+              {t("easterEgg.digbysDiary")}
+            </Label>
+            <InlineDialogue message={t("easterEgg.desertBook1")} />
+          </div>
+        </CloseButtonPanel>
+      </Modal>
+
+      <Modal show={interactable === "desert_book_2"} onHide={closeModal}>
+        <CloseButtonPanel onClose={closeModal}>
+          <div className="p-2">
+            <Label type="default" className="mb-2">
+              {t("easterEgg.digbysDiary")}
+            </Label>
+            <InlineDialogue message={t("easterEgg.desertBook2")} />
+          </div>
+        </CloseButtonPanel>
+      </Modal>
+
+      <Modal show={interactable === "desert_book_3"} onHide={closeModal}>
+        <CloseButtonPanel onClose={closeModal}>
+          <div className="p-2">
+            <Label type="default" className="mb-2">
+              {t("easterEgg.pharaohsDiary")}
+            </Label>
+            <InlineDialogue message={t("easterEgg.desertBook3")} />
+          </div>
+        </CloseButtonPanel>
+      </Modal>
+
+      <Modal show={interactable === "desert_book_4"} onHide={closeModal}>
+        <CloseButtonPanel onClose={closeModal}>
+          <div className="p-2">
+            <Label type="default" className="mb-2">
+              {t("easterEgg.goldtoothsDiary")}
+            </Label>
+            <InlineDialogue message={t("easterEgg.desertBook4")} />
+          </div>
+        </CloseButtonPanel>
+      </Modal>
+
       <Modal
         show={interactable === "trading_board"}
         dialogClassName="md:max-w-3xl"
@@ -716,45 +800,6 @@ export const InteractableModals: React.FC<Props> = ({ id, scene }) => {
         onHide={closeModal}
       >
         <GoblinMarket onClose={closeModal} />
-      </Modal>
-      <Modal show={interactable === "pledge_sunflorian"} onHide={closeModal}>
-        <FactionModalContent
-          representativeFaction="sunflorians"
-          onClose={closeModal}
-        />
-      </Modal>
-      <Modal show={interactable === "pledge_bumpkin"} onHide={closeModal}>
-        <FactionModalContent
-          representativeFaction="bumpkins"
-          onClose={closeModal}
-        />
-      </Modal>
-      <Modal show={interactable === "pledge_goblin"} onHide={closeModal}>
-        <FactionModalContent
-          representativeFaction="goblins"
-          onClose={closeModal}
-        />
-      </Modal>
-      <Modal show={interactable === "pledge_nightshade"} onHide={closeModal}>
-        <FactionModalContent
-          representativeFaction="nightshades"
-          onClose={closeModal}
-        />
-      </Modal>
-      <Modal show={interactable === "sunflorians_faction"} onHide={closeModal}>
-        <FactionModalContent
-          representativeFaction="sunflorians"
-          onClose={closeModal}
-        />
-      </Modal>
-      <Modal show={interactable === "bumpkins_faction"} onHide={closeModal}>
-        <FactionModalContent onClose={closeModal} />
-      </Modal>
-      <Modal show={interactable === "nightshades_faction"} onHide={closeModal}>
-        <FactionModalContent onClose={closeModal} />
-      </Modal>
-      <Modal show={interactable === "goblins_faction"} onHide={closeModal}>
-        <FactionModalContent onClose={closeModal} />
       </Modal>
     </>
   );

@@ -5,7 +5,7 @@ import { ChoreV2, ChoreV2Name, GameState, Inventory } from "../types/game";
 
 import { BumpkinLevel } from "features/game/lib/level";
 import { getEnabledNodeCount } from "../expansion/lib/expansionNodes";
-import { INITIAL_BUMPKIN, INITIAL_BUMPKIN_LEVEL } from "./bumpkinData";
+import { TEST_BUMPKIN, INITIAL_BUMPKIN_LEVEL } from "./bumpkinData";
 import { EMPTY, makeMegaStoreAvailableDates } from "./constants";
 export const INITIAL_RESOURCES: Pick<
   GameState,
@@ -180,36 +180,36 @@ const INITIAL_STOCK: Inventory = {
 
 const OFFLINE_FARM_CROPS = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Crop Plot"
+  "Crop Plot",
 );
 const OFFLINE_FARM_TREES = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Tree"
+  "Tree",
 );
 const OFFLINE_FARM_STONES = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Stone Rock"
+  "Stone Rock",
 );
 const OFFLINE_FARM_IRON = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Iron Rock"
+  "Iron Rock",
 );
 const OFFLINE_FARM_GOLD = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Gold Rock"
+  "Gold Rock",
 );
 const OFFLINE_FARM_CRIMSTONE = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Crimstone Rock"
+  "Crimstone Rock",
 );
 
 const OFFLINE_FARM_SUNSTONE = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Sunstone Rock"
+  "Sunstone Rock",
 );
 const OFFLINE_FARM_FRUIT = getEnabledNodeCount(
   INITIAL_BUMPKIN_LEVEL as BumpkinLevel,
-  "Fruit Patch"
+  "Fruit Patch",
 );
 
 export const STATIC_OFFLINE_FARM: GameState = {
@@ -245,7 +245,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     },
   },
   island: {
-    type: "desert",
+    type: "basic",
   },
   mysteryPrizes: {},
   minigames: {
@@ -307,7 +307,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     spawnedAt: 0,
   },
   farmHands: { bumpkins: {} },
-  bumpkin: { ...INITIAL_BUMPKIN, experience: 100000000 },
+  bumpkin: { ...TEST_BUMPKIN },
   buds: {
     1: {
       aura: "Basic",
@@ -350,7 +350,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     chores: {
       2: {
         activity: "Sunflower Planted",
-        bumpkinId: INITIAL_BUMPKIN.id,
+        bumpkinId: TEST_BUMPKIN.id,
         createdAt: Date.now(),
         description: "Plant a sunflower",
         requirement: 1,
@@ -358,7 +358,35 @@ export const STATIC_OFFLINE_FARM: GameState = {
       },
     } as Record<ChoreV2Name, ChoreV2>,
   },
+  desert: {
+    digging: {
+      grid: [
+        {
+          x: 5,
+          y: 5,
+          dugAt: Date.now(),
+          items: {
+            Starfish: 1,
+          },
+          tool: "Sand Shovel",
+        },
+      ],
+      patterns: [
+        "MONDAY_ARTEFACT_FORMATION",
+        "SEAWEED",
+        "MONDAY_ARTEFACT_FORMATION",
+        "SEA_CUCUMBERS",
+        "MONDAY_ARTEFACT_FORMATION",
+        "COCKLE",
+        "CORAL",
+        "CORAL",
+        "CORAL",
+      ],
+    },
+  },
   inventory: {
+    "Lemon Shark": new Decimal(1),
+    "Beta Pass": new Decimal(1),
     "Paint Can": new Decimal(1),
     "Jelly Lamp": new Decimal(1),
     "Splendor Flag": new Decimal(5),
@@ -413,6 +441,8 @@ export const STATIC_OFFLINE_FARM: GameState = {
     Warehouse: new Decimal(1),
     Wheat: new Decimal(100),
     Oil: new Decimal(100),
+    "Sand Shovel": new Decimal(1),
+    "Sand Drill": new Decimal(1),
     Manor: new Decimal(1),
     House: new Decimal(1),
     "Sunflower Seed": new Decimal(100),
@@ -451,7 +481,6 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Mashed Potato": new Decimal(1),
     "Treasure Key": new Decimal(1),
     "Hungry Hare": new Decimal(1),
-    "Farmhand Coupon": new Decimal(1),
     "White Festive Fox": new Decimal(3),
     "Red Pansy": new Decimal(3),
     "White Pansy": new Decimal(3),
@@ -641,6 +670,12 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Sunflorian Faction Banner": new Decimal(1),
     "Nightshade Faction Banner": new Decimal(1),
     "Earn Alliance Banner": new Decimal(1),
+    "Goblin Gold Champion": new Decimal(1),
+    "Goblin Silver Champion": new Decimal(1),
+    "Pharaoh's Treasure Banner": new Decimal(1),
+
+    "Pirate Bounty": new Decimal(1),
+    Scarab: new Decimal(1),
   },
   wardrobe: {
     "Tofu Mask": 1,
@@ -663,6 +698,9 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Beekeeper Hat": 1,
     "Honeycomb Shield": 1,
     "Bee Suit": 1,
+    "Coin Aura": 1,
+    "Gift Giver": 1,
+    "Desert Merchant Turban": 1,
   },
   previousWardrobe: {
     "Elf Suit": 1,
@@ -764,10 +802,10 @@ export const STATIC_OFFLINE_FARM: GameState = {
     },
   },
   buildings: {
-    "Town Center": [
+    Manor: [
       {
         coordinates: {
-          x: -2,
+          x: 2,
           y: -2,
         },
         createdAt: 0,
@@ -827,58 +865,18 @@ export const STATIC_OFFLINE_FARM: GameState = {
       {
         createdAt: Date.now(),
         readyAt: Date.now(),
-        from: "pumpkin' pete",
+        from: "betty",
         reward: {
           items: {},
+          coins: 100,
         },
-        id: "1",
+        id: `betty-delivery`,
         items: {
           Sunflower: 20,
-          Potato: 20,
-          Pumpkin: 20,
-        },
-      },
-      {
-        createdAt: Date.now(),
-        readyAt: Date.now(),
-        from: "victoria",
-        reward: {
-          coins: 10000,
-        },
-        id: "12",
-        items: {
-          Sunflower: 20,
-          Potato: 20,
-          Pumpkin: 20,
-        },
-      },
-      // {
-      //   createdAt: Date.now(),
-      //   readyAt: Date.now(),
-      //   from: "grimbly",
-      //   reward: {
-      //     items: {},
-      //     sfl: 0.15,
-      //   },
-      //   id: "3",
-      //   items: {
-      //     Potato: 2,
-      //   },
-      // },
-      {
-        createdAt: Date.now(),
-        readyAt: Date.now(),
-        from: "grubnuk",
-        reward: {
-          items: {},
-          sfl: 0.2,
-        },
-        id: "2",
-        items: {
-          "Pumpkin Soup": 1,
         },
       },
     ],
+
     milestone: {
       goal: 10,
       total: 10,
@@ -904,10 +902,6 @@ export const STATIC_OFFLINE_FARM: GameState = {
   },
   milestones: {
     "Advanced Angler": 1,
-  },
-  catchTheKraken: {
-    hunger: "Iron",
-    weeklyCatches: {},
   },
   megastore: {
     available: makeMegaStoreAvailableDates(),
@@ -1334,41 +1328,5 @@ export const STATIC_OFFLINE_FARM: GameState = {
   dailyFactionDonationRequest: {
     resource: "Sunflower",
     amount: new Decimal(1000),
-  },
-  faction: {
-    name: "nightshades",
-    pledgedAt: 0,
-    points: 100,
-    donated: {
-      daily: {
-        sfl: {},
-        resources: {},
-      },
-      totalItems: {},
-    },
-    history: {
-      "2024-06-24": {
-        score: 200,
-        results: {
-          rank: 10,
-          reward: {
-            sfl: 100,
-            coins: 200,
-            items: {
-              Mark: 100,
-            },
-          },
-        },
-      },
-    },
-    kitchen: {
-      week: 1,
-      requests: [
-        { item: "Sunflower", amount: 1, deliveryCount: 0 },
-        { item: "Honey", amount: 1, deliveryCount: 0 },
-        { item: "Tuna", amount: 1, deliveryCount: 0 },
-      ],
-      points: 0,
-    },
   },
 };

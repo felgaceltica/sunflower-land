@@ -1,9 +1,5 @@
 import React, { useContext, useLayoutEffect, useMemo, useState } from "react";
 
-import tent from "assets/land/tent_inside.png";
-import house from "assets/land/house_inside.png";
-import manor from "assets/land/manor_inside.png";
-
 import { GRID_WIDTH_PX, PIXEL_SCALE } from "features/game/lib/constants";
 import { Hud } from "features/island/hud/Hud";
 import { Context } from "features/game/GameProvider";
@@ -37,9 +33,9 @@ const selectGameState = (state: MachineState) => state.context.state;
 const isLandscaping = (state: MachineState) => state.matches("landscaping");
 
 const BACKGROUND_IMAGE: Record<IslandType, string> = {
-  basic: tent,
-  spring: house,
-  desert: manor,
+  basic: SUNNYSIDE.land.tent_inside,
+  spring: SUNNYSIDE.land.house_inside,
+  desert: SUNNYSIDE.land.manor_inside,
 };
 
 function hasReadIntro() {
@@ -126,13 +122,13 @@ export const Home: React.FC = () => {
             </MapPlacement>
           );
         });
-      })
+      }),
   );
 
   mapPlacements.push(
     ...getKeys(buds)
       .filter(
-        (budId) => !!buds[budId].coordinates && buds[budId].location === "home"
+        (budId) => !!buds[budId].coordinates && buds[budId].location === "home",
       )
       .flatMap((id) => {
         const { x, y } = buds[id]!.coordinates!;
@@ -142,7 +138,7 @@ export const Home: React.FC = () => {
             <Bud id={String(id)} x={x} y={y} />
           </MapPlacement>
         );
-      })
+      }),
   );
 
   const bounds = HOME_BOUNDS[state.island.type];
@@ -187,7 +183,7 @@ export const Home: React.FC = () => {
                   {
                     "opacity-0": !landscaping,
                     "opacity-100": landscaping,
-                  }
+                  },
                 )}
                 style={{
                   // Offset the walls

@@ -1,6 +1,9 @@
 import Decimal from "decimal.js-light";
 import { isCollectibleBuilt } from "features/game/lib/collectibleBuilt";
-import { getBudYieldBoosts } from "features/game/lib/getBudYieldBoosts";
+import {
+  getBudYieldBoosts,
+  Resource,
+} from "features/game/lib/getBudYieldBoosts";
 import {
   BumpkinActivityName,
   trackActivity,
@@ -19,6 +22,7 @@ import { FruitPatch } from "features/game/types/game";
 import { FruitCompostName } from "features/game/types/composters";
 import { getPlantedAt } from "./fruitPlanted";
 import { isWearableActive } from "features/game/lib/wearables";
+import { isGreenhouseFruit } from "./plantGreenhouse";
 
 export type HarvestFruitAction = {
   type: "fruit.harvested";
@@ -34,7 +38,7 @@ type Options = {
 export const isFruitReadyToHarvest = (
   createdAt: number,
   plantedFruit: PlantedFruit,
-  fruitDetails: Fruit
+  fruitDetails: Fruit,
 ) => {
   const { seed } = FRUIT()[fruitDetails.name];
   const { plantSeconds } = FRUIT_SEEDS()[seed];
@@ -73,6 +77,10 @@ export function isFruitGrowing(patch: FruitPatch) {
   return growingTimeLeft > 0;
 }
 
+const isFruit = (resource: Resource): resource is FruitName => {
+  return resource in FRUIT();
+};
+
 export function getFruitYield({ name, game, fertiliser }: FruitYield) {
   let amount = 1;
 
@@ -85,6 +93,10 @@ export function getFruitYield({ name, game, fertiliser }: FruitYield) {
     isCollectibleBuilt({ name: "Black Bearry", game })
   ) {
     amount += 1;
+  }
+
+  if (isFruit(name) && isWearableActive({ name: "Camel Onesie", game })) {
+    amount += 0.1;
   }
 
   if (
@@ -112,14 +124,49 @@ export function getFruitYield({ name, game, fertiliser }: FruitYield) {
     amount += 0.1;
   }
 
-  // Grape
+  // Lemon
+  if (name === "Lemon" && isCollectibleBuilt({ name: "Lemon Shark", game })) {
+    amount += 0.2;
+  }
+
+  if (name === "Lemon" && isWearableActive({ name: "Lemon Shield", game })) {
+    amount += 1;
+  }
+
+  if (
+    name === "Lemon" &&
+    isCollectibleBuilt({ name: "Reveling Lemon", game })
+  ) {
+    amount += 0.25;
+  }
+
+  if (
+    name === "Tomato" &&
+    isCollectibleBuilt({ name: "Tomato Bombard", game })
+  ) {
+    amount += 1;
+  }
+
   if (name === "Grape" && isCollectibleBuilt({ name: "Vinny", game })) {
+    // Grape
     amount += 0.25;
   }
 
   if (name === "Grape" && isCollectibleBuilt({ name: "Grape Granny", game })) {
     amount += 1;
   }
+
+  if (name === "Grape" && isWearableActive({ name: "Grape Pants", game })) {
+    amount += 0.2;
+  }
+
+  if (
+    isGreenhouseFruit(name) &&
+    isCollectibleBuilt({ name: "Pharaoh Gnome", game })
+  ) {
+    amount += 2;
+  }
+
   amount += getBudYieldBoosts(game.buds ?? {}, name);
 
   return amount;
@@ -172,7 +219,7 @@ export function harvestFruit({
     seed,
     (stateCopy.bumpkin as Bumpkin).equipped,
     stateCopy,
-    createdAt
+    createdAt,
   );
 
   patch.fruit.amount = getFruitYield({

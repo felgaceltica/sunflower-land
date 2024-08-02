@@ -10,6 +10,7 @@ import {
 import { getKeys } from "../types/craftables";
 import { BumpkinParts, tokenUriBuilder } from "lib/utils/tokenUriBuilder";
 import { Equipped } from "../types/bumpkin";
+import { SeedName } from "../types/seeds";
 
 // Our "zoom" factor
 export const PIXEL_SCALE = 2.625;
@@ -65,12 +66,12 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
   if (state?.buildings.Toolshed && isBuildingReady(state.buildings.Toolshed)) {
     for (const tool in tools) {
       tools[tool as keyof typeof tools] = new Decimal(
-        Math.ceil(tools[tool as keyof typeof tools].toNumber() * 1.5)
+        Math.ceil(tools[tool as keyof typeof tools].toNumber() * 1.5),
       );
     }
   }
 
-  const seeds = {
+  const seeds: Record<SeedName, Decimal> = {
     "Sunflower Seed": new Decimal(400),
     "Potato Seed": new Decimal(200),
     "Pumpkin Seed": new Decimal(150),
@@ -90,10 +91,12 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
     "Olive Seed": new Decimal(10),
     "Rice Seed": new Decimal(10),
 
+    "Tomato Seed": new Decimal(10),
     "Blueberry Seed": new Decimal(10),
     "Orange Seed": new Decimal(10),
     "Apple Seed": new Decimal(10),
     "Banana Plant": new Decimal(10),
+    "Lemon Seed": new Decimal(10),
 
     "Sunpetal Seed": new Decimal(16),
     "Bloom Seed": new Decimal(8),
@@ -107,7 +110,7 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
     // Multiply each seed quantity by 1.2 and round up
     for (const seed in seeds) {
       seeds[seed as keyof typeof seeds] = new Decimal(
-        Math.ceil(seeds[seed as keyof typeof seeds].toNumber() * 1.2)
+        Math.ceil(seeds[seed as keyof typeof seeds].toNumber() * 1.2),
       );
     }
   }
@@ -120,8 +123,8 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
 
     Shovel: new Decimal(1),
     "Rusty Shovel": new Decimal(100),
-    "Sand Shovel": new Decimal(25),
-    "Sand Drill": new Decimal(5),
+    "Sand Shovel": new Decimal(50),
+    "Sand Drill": new Decimal(10),
     Chicken: new Decimal(5),
 
     "Magic Bean": new Decimal(5),
@@ -130,7 +133,7 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
 };
 
 export const INVENTORY_LIMIT = (state?: GameState): Inventory => {
-  const seeds: Record<string, Decimal> = {
+  const seeds: Record<SeedName, Decimal> = {
     "Sunflower Seed": new Decimal(1000),
     "Potato Seed": new Decimal(500),
     "Pumpkin Seed": new Decimal(400),
@@ -146,6 +149,8 @@ export const INVENTORY_LIMIT = (state?: GameState): Inventory => {
     "Wheat Seed": new Decimal(100),
     "Kale Seed": new Decimal(80),
 
+    "Tomato Seed": new Decimal(50),
+    "Lemon Seed": new Decimal(45),
     "Blueberry Seed": new Decimal(40),
     "Orange Seed": new Decimal(33),
     "Apple Seed": new Decimal(25),
@@ -167,7 +172,7 @@ export const INVENTORY_LIMIT = (state?: GameState): Inventory => {
     // Multiply each seed quantity by 1.2
     for (const seed in seeds) {
       seeds[seed as keyof typeof seeds] = new Decimal(
-        Math.ceil(seeds[seed as keyof typeof seeds].toNumber() * 1.2)
+        Math.ceil(seeds[seed as keyof typeof seeds].toNumber() * 1.2),
       );
     }
   }
@@ -517,16 +522,23 @@ export const INITIAL_FARM: GameState = {
   },
   farmActivity: {},
   milestones: {},
-  catchTheKraken: {
-    hunger: "Sunflower",
-    weeklyCatches: {},
-  },
   specialEvents: {
     history: {},
     current: {},
   },
   goblinMarket: {
     resources: {},
+  },
+  kingdomChores: {
+    chores: [],
+    choresCompleted: 0,
+    choresSkipped: 0,
+  },
+  desert: {
+    digging: {
+      grid: [],
+      patterns: [],
+    },
   },
 };
 
@@ -559,6 +571,11 @@ export const TEST_FARM: GameState = {
     games: {},
     prizes: {},
   },
+  kingdomChores: {
+    chores: [],
+    choresCompleted: 0,
+    choresSkipped: 0,
+  },
   stock: INITIAL_STOCK(),
   chickens: {},
   farmActivity: {},
@@ -571,10 +588,6 @@ export const TEST_FARM: GameState = {
     wharf: {},
     beach: {},
     dailyAttempts: {},
-  },
-  catchTheKraken: {
-    hunger: "Sunflower",
-    weeklyCatches: {},
   },
   greenhouse: {
     pots: {},
@@ -814,6 +827,13 @@ export const TEST_FARM: GameState = {
   goblinMarket: {
     resources: {},
   },
+  desert: {
+    digging: {
+      patterns: [],
+
+      grid: [],
+    },
+  },
 };
 
 export const EMPTY: GameState = {
@@ -840,6 +860,11 @@ export const EMPTY: GameState = {
   conversations: [],
   farmHands: {
     bumpkins: {},
+  },
+  kingdomChores: {
+    chores: [],
+    choresCompleted: 0,
+    choresSkipped: 0,
   },
   greenhouse: {
     pots: {},
@@ -892,10 +917,6 @@ export const EMPTY: GameState = {
     spawnedAt: 0,
     mushrooms: {},
   },
-  catchTheKraken: {
-    hunger: "Sunflower",
-    weeklyCatches: {},
-  },
   megastore: {
     available: makeMegaStoreAvailableDates(),
     collectibles: [],
@@ -907,5 +928,11 @@ export const EMPTY: GameState = {
   },
   goblinMarket: {
     resources: {},
+  },
+  desert: {
+    digging: {
+      patterns: [],
+      grid: [],
+    },
   },
 };

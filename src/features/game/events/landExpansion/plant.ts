@@ -39,6 +39,7 @@ import {
 import { getBumpkinLevel } from "features/game/lib/level";
 import { isBuildingEnabled } from "features/game/expansion/lib/buildingRequirements";
 import { isWearableActive } from "features/game/lib/wearables";
+import { isGreenhouseCrop } from "./plantGreenhouse";
 
 export type LandExpansionPlantAction = {
   type: "seed.planted";
@@ -66,7 +67,7 @@ const INITIAL_SUPPORTED_PLOTS = 17;
 const WELL_PLOT_SUPPORT = 8;
 
 export const getCompletedWellCount = (
-  buildings: Partial<Record<BuildingName, PlacedItem[]>>
+  buildings: Partial<Record<BuildingName, PlacedItem[]>>,
 ) => {
   return (
     buildings["Water Well"]?.filter((well) => well.readyAt < Date.now())
@@ -76,7 +77,7 @@ export const getCompletedWellCount = (
 
 export const getEnabledWellCount = (
   buildings: Partial<Record<BuildingName, PlacedItem[]>>,
-  bumpkin?: Bumpkin
+  bumpkin?: Bumpkin,
 ) => {
   let enabledWells =
     buildings["Water Well"]?.filter((well) => well.readyAt < Date.now())
@@ -180,7 +181,7 @@ export const getCropPlotTime = ({
   plot?: CropPlot;
   fertiliser?: CropCompostName;
 }) => {
-  let seconds = CROPS()[crop]?.harvestSeconds ?? 0;
+  let seconds = CROPS[crop]?.harvestSeconds ?? 0;
 
   if (game.bumpkin === undefined) return seconds;
 
@@ -286,7 +287,7 @@ export function getPlantedAt({
 }: GetPlantedAtArgs): number {
   if (!crop) return 0;
 
-  const cropTime = CROPS()[crop].harvestSeconds;
+  const cropTime = CROPS[crop].harvestSeconds;
   const boostedTime = getCropPlotTime({
     crop,
     inventory,
@@ -302,7 +303,7 @@ export function getPlantedAt({
 }
 
 function isPlotCrop(plant: GreenHouseCropName | CropName): plant is CropName {
-  return (plant as CropName) in CROPS();
+  return (plant as CropName) in CROPS;
 }
 
 /**
@@ -586,6 +587,12 @@ export function getCropYieldAmount({
     amount += 0.25;
   }
 
+  if (
+    isGreenhouseCrop(crop) &&
+    isCollectibleBuilt({ name: "Pharaoh Gnome", game })
+  ) {
+    amount += 2;
+  }
   return Number(setPrecision(new Decimal(amount)));
 }
 

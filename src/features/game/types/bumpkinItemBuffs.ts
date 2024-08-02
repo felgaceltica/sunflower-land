@@ -128,7 +128,7 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<Record<BumpkinItem, BuffLabel>> =
     },
     "Luminous Anglerfish Topper": {
       shortDescription: translate(
-        "bumpkinItemBuff.luminous.anglerfish.topper.boost"
+        "bumpkinItemBuff.luminous.anglerfish.topper.boost",
       ),
       labelType: "success",
       boostTypeIcon: powerup,
@@ -359,5 +359,58 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<Record<BumpkinItem, BuffLabel>> =
       labelType: "success",
       boostTypeIcon: powerup,
       boostedItemIcon: ITEM_DETAILS.Mark.image,
+    },
+    "Camel Onesie": {
+      shortDescription: "+0.1 Fruit Patch Yield",
+      labelType: "success",
+      boostedItemIcon: powerup,
+    },
+    "Crab Trap": {
+      shortDescription: translate("bumpkinItemBuff.crab.trap"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Crab.image,
+    },
+    "Lemon Shield": {
+      shortDescription: translate("bumpkinItemBuff.lemon.shield.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Lemon.image,
+    },
+    "Infernal Drill": {
+      shortDescription: translate("bumpkinItemBuff.infernal.drill.boost"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+      boostedItemIcon: ITEM_DETAILS.Oil.image,
+    },
+    "Ancient Shovel": {
+      shortDescription: translate("bumpkinItemBuff.ancient.shovel.boost"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+      boostedItemIcon: ITEM_DETAILS.Oil.image,
+    },
+    "Oil Overalls": {
+      shortDescription: translate("bumpkinItemBuff.oil.overalls.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Oil.image,
+    },
+    "Dev Wrench": {
+      shortDescription: translate("bumpkinItemBuff.dev.wrench.boost"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: ITEM_DETAILS.Oil.image,
+    },
+    "Bionic Drill": {
+      shortDescription: translate("bumpkinItemBuff.bionic.drill"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SUNNYSIDE.tools.sand_shovel,
+    },
+    "Grape Pants": {
+      shortDescription: translate("bumpkinItemBuff.grape.pants"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Grape.image,
     },
   };

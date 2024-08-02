@@ -2,6 +2,7 @@ import { GameAnalytics } from "gameanalytics";
 import { CONFIG } from "./config";
 import { Currency, InventoryItemName } from "features/game/types/game";
 import { BumpkinItem } from "features/game/types/bumpkin";
+import { DigAnalytics } from "features/world/scenes/BeachScene";
 
 // Their type definition has some issues, extract to here
 enum EGAResourceFlowType {
@@ -54,7 +55,7 @@ class GameAnalyticTracker {
 
       GameAnalytics.initialize(
         CONFIG.GAME_ANALYTICS_APP_ID,
-        CONFIG.GAME_ANALYTICS_PUB_KEY
+        CONFIG.GAME_ANALYTICS_PUB_KEY,
       );
 
       GameAnalytics.startSession();
@@ -95,7 +96,7 @@ class GameAnalyticTracker {
       item.replace(/\s/g, ""), // Camel Case naming
       amount,
       type.replace(/\s/g, ""), // Camel Case naming,
-      from.replace(/\s/g, "") // Camel Case naming
+      from.replace(/\s/g, ""), // Camel Case naming
     );
   }
 
@@ -109,7 +110,7 @@ class GameAnalyticTracker {
     currency: Currency;
     amount: number;
     type: "Consumable" | "Fee" | "Wearable" | "Collectible" | "Web3";
-    item: InventoryItemName | BumpkinItem | "Stock" | "Trade";
+    item: InventoryItemName | BumpkinItem | "Stock" | "Trade" | "DesertDigs";
   }) {
     const { currency, amount, type, item } = event;
 
@@ -118,7 +119,7 @@ class GameAnalyticTracker {
       currency.replace(/\s/g, ""), // Camel Case naming
       amount,
       type.replace(/\s/g, ""), // Camel Case naming,
-      item.replace(/\s/g, "") // Camel Case naming
+      item.replace(/\s/g, ""), // Camel Case naming
     );
   }
 
@@ -139,10 +140,21 @@ class GameAnalyticTracker {
     const { event } = milestone;
 
     GameAnalytics.addDesignEvent(
-      event.replace(/\s/g, "") // Camel Case naming
+      event.replace(/\s/g, ""), // Camel Case naming
     );
 
     this.executed[key] = true;
+  }
+
+  public trackBeachDiggingAttempt(analytics: DigAnalytics) {
+    const { outputCoins, percentageFound } = analytics;
+
+    GameAnalytics.addDesignEvent(
+      "Beach:Digging:PercentageFound",
+      percentageFound,
+    );
+
+    GameAnalytics.addDesignEvent("Beach:Digging:OutputCoins", outputCoins);
   }
 }
 

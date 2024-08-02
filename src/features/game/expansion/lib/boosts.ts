@@ -17,8 +17,9 @@ import { getBudExperienceBoosts } from "features/game/lib/getBudExperienceBoosts
 import { getBumpkinLevel } from "features/game/lib/level";
 import { isWearableActive } from "features/game/lib/wearables";
 import { SellableItem } from "features/game/events/landExpansion/sellCrop";
+import { getFactionPetBoostMultiplier } from "features/game/lib/factions";
 
-const crops = CROPS();
+const crops = CROPS;
 
 export function isCropShortage({ game }: { game: GameState }) {
   const bumpkinLevel = getBumpkinLevel(game.bumpkin?.experience ?? 0);
@@ -68,8 +69,21 @@ export const getSellPrice = ({
   const isCropShortage =
     game.createdAt + CROP_SHORTAGE_HOURS * 60 * 60 * 1000 > now.getTime();
 
-  if (item.name in CROPS() && isCropShortage) {
+  if (item.name in CROPS && isCropShortage) {
     price = price * 2;
+  }
+
+  // Special Events
+  const specialEventMultiplier = Object.values(game.specialEvents.current)
+    .filter((event) => !!event?.isEligible)
+    .filter((event) => (event?.endAt ?? Infinity) > now.getTime())
+    .filter((event) => (event?.startAt ?? 0) <= now.getTime())
+    .find((event) => event?.bonus?.[item.name]?.saleMultiplier)?.bonus?.[
+    item.name
+  ]?.saleMultiplier;
+
+  if (specialEventMultiplier) {
+    price = price * specialEventMultiplier;
   }
 
   return price;
@@ -96,7 +110,7 @@ export const hasSellBoost = (inventory: Inventory) => {
 export const getCookingTime = (
   seconds: number,
   bumpkin: Bumpkin | undefined,
-  game: GameState
+  game: GameState,
 ): number => {
   let reducedSecs = new Decimal(seconds);
 
@@ -138,7 +152,7 @@ export const getFoodExpBoost = (
   bumpkin: Bumpkin,
   game: GameState,
   buds: NonNullable<GameState["buds"]>,
-  createdAt: number = Date.now()
+  createdAt: number = Date.now(),
 ): number => {
   let boostedExp = new Decimal(food.experience);
   const { skills } = bumpkin;
@@ -209,6 +223,7 @@ export const getFoodExpBoost = (
   }
 
   boostedExp = boostedExp.mul(getBudExperienceBoosts(buds, food));
+  boostedExp = boostedExp.mul(getFactionPetBoostMultiplier(game));
 
   return boostedExp.toDecimalPlaces(4).toNumber();
 };

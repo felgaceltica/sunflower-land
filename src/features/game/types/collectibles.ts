@@ -1,6 +1,7 @@
 import Decimal from "decimal.js-light";
 import { GameState, Inventory } from "./game";
 import { translate } from "lib/i18n/translate";
+import { SEASONS } from "./seasons";
 
 export type CollectibleLocation = "farm" | "home";
 
@@ -18,11 +19,11 @@ export type PurchasableItems =
   | "Catch the Kraken Banner"
   | "Spring Blossom Banner"
   | "Clash of Factions Banner"
-  | "Lifetime Farmer Banner";
+  | "Lifetime Farmer Banner"
+  | "Pharaoh's Treasure Banner";
 
 export type HeliosBlacksmithItem =
   | "Immortal Pear"
-  | "Treasure Map"
   | "Basic Scarecrow"
   | "Bale"
   | "Scary Mike"
@@ -33,6 +34,14 @@ export type HeliosBlacksmithItem =
   | "Skill Shrimpy"
   | "Soil Krabby"
   | "Nana";
+
+export type TreasureCollectibleItem =
+  | "Treasure Map"
+  | "Adrift Ark"
+  | "Castellan"
+  | "Sunlit Citadel"
+  | "Baobab Tree"
+  | "Camel";
 
 export type SoldOutCollectibleName =
   | "Sir Goldensnout"
@@ -75,7 +84,12 @@ export type SoldOutCollectibleName =
   | "Grape Granny"
   | "Royal Throne"
   | "Lily Egg"
-  | "Goblet";
+  | "Goblet"
+  | "Pharaoh Gnome"
+  | "Lemon Tea Bath"
+  | "Tomato Clown"
+  | "Pyramid"
+  | "Oasis";
 
 export type MegaStoreCollectibleName =
   | "Flower Cart"
@@ -101,7 +115,24 @@ export type MegaStoreCollectibleName =
   | "Silver Squire"
   | "Cluckapult"
   | "Bullseye Board"
-  | "Twister Rug";
+  | "Twister Rug"
+  // Pharaoh's Treasure
+  | "Hapy Jar"
+  | "Imsety Jar"
+  | "Cannonball"
+  | "Sarcophagus"
+  | "Duamutef Jar"
+  | "Qebehsenuef Jar"
+  | "Clay Tablet"
+  | "Snake in Jar"
+  | "Reveling Lemon"
+  | "Anubis Jackal"
+  | "Sundial"
+  | "Sand Golem"
+  | "Cactus King"
+  | "Lemon Frog"
+  | "Scarab Beetle"
+  | "Tomato Bombard";
 
 export type GoblinBlacksmithItemName =
   | "Purple Trail"
@@ -134,10 +165,10 @@ export type CraftableCollectible = {
 
 export const HELIOS_BLACKSMITH_ITEMS: (
   game?: GameState,
-  date?: Date
+  date?: Date,
 ) => Partial<Record<HeliosBlacksmithItem, CraftableCollectible>> = (
   state,
-  date = new Date()
+  date = new Date(),
 ) => ({
   "Basic Scarecrow": {
     description: translate("description.basic.scarecrow"),
@@ -190,15 +221,60 @@ export const HELIOS_BLACKSMITH_ITEMS: (
       Orange: new Decimal(10),
     },
   },
+});
+
+export const TREASURE_COLLECTIBLE_ITEM: Record<
+  TreasureCollectibleItem,
+  CraftableCollectible
+> = {
   "Treasure Map": {
     description: translate("description.treasure.map"),
     boost: translate("description.treasure.map.boost"),
     ingredients: {
-      Gold: new Decimal(5),
-      "Wooden Compass": new Decimal(2),
+      Sand: new Decimal(50),
+      Hieroglyph: new Decimal(20),
     },
   },
-});
+  "Adrift Ark": {
+    ingredients: {
+      Sand: new Decimal(125),
+    },
+    description:
+      "A sandcastle on the shore intricately crafted to resemble a capsized boat, complete with shell portholes and seaweed flags fluttering atop its sculpted hull.",
+  },
+  Castellan: {
+    ingredients: {
+      Sand: new Decimal(750),
+    },
+    description:
+      "Castellan is a charming sandcastle figure adorned with colorful accessories, symbolizing playful spirit and creativity.",
+  },
+  "Sunlit Citadel": {
+    ingredients: {
+      Sand: new Decimal(1500),
+      Scarab: new Decimal(40),
+    },
+    description: "A Castle to show your pride",
+    from: SEASONS["Pharaoh's Treasure"].startDate,
+    to: SEASONS["Pharaoh's Treasure"].endDate,
+  },
+  "Baobab Tree": {
+    ingredients: {
+      Scarab: new Decimal(35),
+    },
+    description: "A nice looking tree!",
+    from: SEASONS["Pharaoh's Treasure"].startDate,
+    to: SEASONS["Pharaoh's Treasure"].endDate,
+  },
+  Camel: {
+    ingredients: {
+      Scarab: new Decimal(200),
+    },
+    description: "A mean looking camel!",
+    from: SEASONS["Pharaoh's Treasure"].startDate,
+    to: SEASONS["Pharaoh's Treasure"].endDate,
+  },
+};
 
 export type PotionHouseItem = CraftableCollectible & {
   name: PotionHouseItemName;

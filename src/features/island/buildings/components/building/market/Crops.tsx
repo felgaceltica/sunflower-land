@@ -12,9 +12,7 @@ import { Fruit, FRUIT, GREENHOUSE_FRUIT } from "features/game/types/fruits";
 import { SplitScreenView } from "components/ui/SplitScreenView";
 import { ShopSellDetails } from "components/ui/layouts/ShopSellDetails";
 import { getBumpkinLevel } from "features/game/lib/level";
-import lock from "assets/skills/lock.png";
 import lightning from "assets/icons/lightning.png";
-import greenhouse from "assets/icons/greenhouse.webp";
 import orange from "assets/resources/orange.png";
 import {
   EXOTIC_CROPS,
@@ -28,17 +26,24 @@ import { CROP_LIFECYCLE } from "features/island/plots/lib/plant";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { ConfirmationModal } from "components/ui/ConfirmationModal";
 import { NPC_WEARABLES } from "lib/npcs";
+import { BulkSellModal } from "components/ui/BulkSellModal";
+import { SUNNYSIDE } from "assets/sunnyside";
 
 export const isExoticCrop = (
-  item: Crop | Fruit | ExoticCrop
+  item: Crop | Fruit | ExoticCrop,
 ): item is ExoticCrop => {
   return item.name in EXOTIC_CROPS;
 };
+
 export const Crops: React.FC = () => {
   const [selected, setSelected] = useState<Crop | Fruit | ExoticCrop>(
-    CROPS().Sunflower
+    CROPS.Sunflower,
   );
-  const [isSellAllModalOpen, showSellAllModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+
+  const [customAmount, setCustomAmount] = useState(new Decimal(0));
+  const [isCustomSellModalOpen, showCustomSellModal] = useState(false);
+
   const { gameService } = useContext(Context);
   const { t } = useAppTranslation();
   const [
@@ -71,47 +76,41 @@ export const Crops: React.FC = () => {
     }
   };
 
-  const bumpkinLevel = getBumpkinLevel(state.bumpkin?.experience ?? 0);
-  const cropAmount = setPrecision(new Decimal(inventory[selected.name] || 0));
-  const noCrop = cropAmount.lessThanOrEqualTo(0);
   const displaySellPrice = (crop: Crop | Fruit | ExoticCrop) =>
     isExoticCrop(crop)
       ? crop.sellPrice
       : getSellPrice({ item: crop, game: state });
 
-  const handleSellOneOrLess = () => {
-    const sellAmount = cropAmount.gte(1) ? new Decimal(1) : cropAmount;
-    sell(sellAmount);
+  const bumpkinLevel = getBumpkinLevel(state.bumpkin?.experience ?? 0);
+  const cropAmount = setPrecision(new Decimal(inventory[selected.name] || 0));
+  const coinAmount = setPrecision(
+    new Decimal(displaySellPrice(selected)).mul(
+      state.island.type !== "basic" ? new Decimal(customAmount) : cropAmount,
+    ),
+    2,
+  );
+
+  const handleSell = (amount: Decimal) => {
+    sell(amount);
+    setShowConfirmationModal(false);
+    setCustomAmount(new Decimal(0));
   };
 
-  const handleSellTen = () => {
-    sell(new Decimal(10));
-  };
-
-  const handleSellAll = () => {
-    sell(cropAmount);
-    showSellAllModal(false);
-  };
-
-  // ask confirmation if crop supply is greater than 1
   const openConfirmationModal = () => {
-    if (cropAmount.lessThanOrEqualTo(1)) {
-      handleSellOneOrLess();
-    } else {
-      showSellAllModal(true);
-    }
+    setShowConfirmationModal(true);
+    showCustomSellModal(false);
   };
-
   const closeConfirmationModal = () => {
-    showSellAllModal(false);
+    setShowConfirmationModal(false);
+    setCustomAmount(new Decimal(0));
   };
 
-  const sellOneButtonText = () => {
-    // In the case of 0 the button will be disabled
-    if (cropAmount.greaterThanOrEqualTo(1) || cropAmount.eq(0))
-      return t("sell.one");
-
-    return `Sell ${cropAmount}`;
+  const openBulkSellModal = () => {
+    showCustomSellModal(true);
+  };
+  const closeBulkSellModal = () => {
+    showCustomSellModal(false);
+    setCustomAmount(new Decimal(0));
   };
 
   const exotics = getKeys(EXOTIC_CROPS)
@@ -125,15 +124,15 @@ export const Crops: React.FC = () => {
       {} as Record<
         ExoticCropName,
         ExoticCrop & { disabled: false; bumpkinLevel: 0 }
-      >
+      >,
     );
 
   const cropsAndFruits = Object.values({
-    ...CROPS(),
+    ...CROPS,
     ...FRUIT(),
     ...exotics,
     ...GREENHOUSE_FRUIT(),
-    ...GREENHOUSE_CROPS(),
+    ...GREENHOUSE_CROPS,
   }) as Crop[];
 
   return (
@@ -151,23 +150,55 @@ export const Crops: React.FC = () => {
               }}
               actionView={
                 <>
-                  <div className="flex space-x-1 mb-1 sm:space-x-0 sm:space-y-1 sm:flex-col w-full">
-                    <Button
-                      disabled={cropAmount.lessThanOrEqualTo(0)}
-                      onClick={handleSellOneOrLess}
-                    >
-                      {sellOneButtonText()}
-                    </Button>
-                    <Button
-                      disabled={cropAmount.lessThan(10)}
-                      onClick={handleSellTen}
-                    >
-                      {t("sell.ten")}
-                    </Button>
+                  <div className="flex flex-col h-full justify-between">
+                    <div className="flex space-x-1 mb-1 sm:space-x-0 sm:space-y-1 sm:flex-col w-full">
+                      {cropAmount.greaterThan(1) && (
+                        <Button onClick={() => handleSell(new Decimal(1))}>
+                          {t("sell.one")}
+                        </Button>
+                      )}
+                      {cropAmount.greaterThan(0) && (
+                        <Button
+                          onClick={() =>
+                            handleSell(
+                              cropAmount.greaterThan(10)
+                                ? new Decimal(10)
+                                : cropAmount,
+                            )
+                          }
+                        >
+                          {t(
+                            cropAmount.greaterThan(10)
+                              ? "sell.ten"
+                              : "sell.amount",
+                            { amount: cropAmount },
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                    <div>
+                      {cropAmount.greaterThan(10) && (
+                        <Button
+                          onClick={
+                            state.island.type !== "basic"
+                              ? openBulkSellModal
+                              : openConfirmationModal
+                          }
+                        >
+                          {t(
+                            state.island.type !== "basic"
+                              ? "sell.inBulk"
+                              : "sell.all",
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                    {cropAmount.lessThanOrEqualTo(0) && (
+                      <p className="text-xxs text-center mb-1">
+                        {t("crops.noCropsToSell", { cropName: selected.name })}
+                      </p>
+                    )}
                   </div>
-                  <Button disabled={noCrop} onClick={openConfirmationModal}>
-                    {t("sell.all")}
-                  </Button>
                 </>
               }
             />
@@ -186,7 +217,7 @@ export const Crops: React.FC = () => {
             </div>
             <div className="flex flex-wrap mb-2">
               {cropsAndFruits
-                .filter((crop) => !!crop.sellPrice && crop.name in CROPS())
+                .filter((crop) => !!crop.sellPrice && crop.name in CROPS)
                 .map((item) => (
                   <Box
                     isSelected={selected.name === item.name}
@@ -196,7 +227,9 @@ export const Crops: React.FC = () => {
                     count={inventory[item.name]}
                     parentDivRef={divRef}
                     secondaryImage={
-                      bumpkinLevel < item.bumpkinLevel ? lock : undefined
+                      bumpkinLevel < item.bumpkinLevel
+                        ? SUNNYSIDE.icons.lock
+                        : undefined
                     }
                     showOverlay={bumpkinLevel < item.bumpkinLevel}
                   />
@@ -219,7 +252,9 @@ export const Crops: React.FC = () => {
                     count={inventory[item.name]}
                     parentDivRef={divRef}
                     secondaryImage={
-                      bumpkinLevel < item.bumpkinLevel ? lock : undefined
+                      bumpkinLevel < item.bumpkinLevel
+                        ? SUNNYSIDE.icons.lock
+                        : undefined
                     }
                     showOverlay={bumpkinLevel < item.bumpkinLevel}
                   />
@@ -242,7 +277,9 @@ export const Crops: React.FC = () => {
                     count={inventory[item.name]}
                     parentDivRef={divRef}
                     secondaryImage={
-                      bumpkinLevel < item.bumpkinLevel ? lock : undefined
+                      bumpkinLevel < item.bumpkinLevel
+                        ? SUNNYSIDE.icons.lock
+                        : undefined
                     }
                     showOverlay={bumpkinLevel < item.bumpkinLevel}
                   />
@@ -253,7 +290,7 @@ export const Crops: React.FC = () => {
               <div className="flex">
                 <Label
                   className="mr-3 ml-2 mb-1"
-                  icon={greenhouse}
+                  icon={SUNNYSIDE.icons.greenhouseIcon}
                   type="default"
                 >
                   {t("greenhouse")}
@@ -264,8 +301,8 @@ export const Crops: React.FC = () => {
                   .filter(
                     (crop) =>
                       !!crop.sellPrice &&
-                      (crop.name in GREENHOUSE_CROPS() ||
-                        crop.name in GREENHOUSE_FRUIT())
+                      (crop.name in GREENHOUSE_CROPS ||
+                        crop.name in GREENHOUSE_FRUIT()),
                   )
                   .map((item) => (
                     <Box
@@ -276,7 +313,9 @@ export const Crops: React.FC = () => {
                       count={inventory[item.name]}
                       parentDivRef={divRef}
                       secondaryImage={
-                        bumpkinLevel < item.bumpkinLevel ? lock : undefined
+                        bumpkinLevel < item.bumpkinLevel
+                          ? SUNNYSIDE.icons.lock
+                          : undefined
                       }
                       showOverlay={bumpkinLevel < item.bumpkinLevel}
                     />
@@ -287,22 +326,40 @@ export const Crops: React.FC = () => {
         }
       />
       <ConfirmationModal
-        show={isSellAllModalOpen}
+        show={showConfirmationModal}
         onHide={closeConfirmationModal}
         messages={[
           t("confirmation.sellCrops", {
-            cropAmount: cropAmount,
+            cropAmount:
+              state.island.type !== "basic" ? customAmount : cropAmount,
             cropName: selected.name,
-            coinAmount: setPrecision(
-              new Decimal(displaySellPrice(selected)).mul(cropAmount)
-            ),
+            coinAmount: coinAmount,
           }),
         ]}
         onCancel={closeConfirmationModal}
-        onConfirm={handleSellAll}
-        confirmButtonLabel={t("sell.all")}
-        disabled={noCrop}
+        onConfirm={() =>
+          handleSell(
+            state.island.type !== "basic"
+              ? new Decimal(customAmount)
+              : cropAmount,
+          )
+        }
+        confirmButtonLabel={
+          state.island.type !== "basic"
+            ? t("sell.amount", { amount: customAmount })
+            : t("sell.all")
+        }
         bumpkinParts={NPC_WEARABLES.betty}
+      />
+      <BulkSellModal
+        show={isCustomSellModalOpen}
+        onHide={closeBulkSellModal}
+        customAmount={customAmount}
+        setCustomAmount={setCustomAmount}
+        cropAmount={cropAmount}
+        onCancel={closeBulkSellModal}
+        onSell={openConfirmationModal}
+        coinAmount={coinAmount}
       />
     </>
   );

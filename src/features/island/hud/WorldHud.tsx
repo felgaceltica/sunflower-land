@@ -19,8 +19,9 @@ import { CodexButton } from "./components/codex/CodexButton";
 import { HudContainer } from "components/ui/HudContainer";
 import { ModalContext } from "features/game/components/modal/ModalProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { EmblemAirdropCountdown } from "./EmblemAirdropCountdown";
 import { useLocation } from "react-router-dom";
+import { SpecialEventCountdown } from "./SpecialEventCountdown";
+import { DesertDiggingDisplay } from "./components/DesertDiggingDisplay";
 
 /**
  * Heads up display - a concept used in games for the small overlaid display of information.
@@ -36,8 +37,6 @@ const HudComponent: React.FC = () => {
   const [depositDataLoaded, setDepositDataLoaded] = useState(false);
 
   const { pathname } = useLocation();
-  const farmId = Number(gameState.context.farmId);
-  const username = gameState.context.state.username;
 
   const autosaving = gameState.matches("autosaving");
 
@@ -50,7 +49,7 @@ const HudComponent: React.FC = () => {
   };
 
   const handleDeposit = (
-    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">
+    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">,
   ) => {
     gameService.send("DEPOSIT", args);
   };
@@ -81,7 +80,7 @@ const HudComponent: React.FC = () => {
           pathname.includes("dawn-breaker")
         }
       />
-
+      {pathname.includes("beach") && <DesertDiggingDisplay />}
       <Balances
         onClick={farmAddress ? handleBuyCurrenciesModal : undefined}
         sfl={gameState.context.state.balance}
@@ -110,7 +109,7 @@ const HudComponent: React.FC = () => {
         }}
       >
         <AuctionCountdown />
-        <EmblemAirdropCountdown />
+        <SpecialEventCountdown />
       </div>
 
       <BumpkinProfile isFullUser={isFullUser} />

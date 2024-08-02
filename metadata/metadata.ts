@@ -1,6 +1,12 @@
 import { BumpkinItem } from "features/game/types/bumpkin";
 import { InventoryItemName } from "../src/features/game/types/game";
 import { Attribute } from "./models";
+import { getKeys } from "features/game/types/craftables";
+import {
+  DECORATION_TEMPLATES,
+  TemplateDecorationName,
+} from "features/game/types/decorations";
+import { KNOWN_IDS } from "features/game/types";
 
 type Metadata = {
   description: string;
@@ -8,7 +14,7 @@ type Metadata = {
   attributes: Attribute[];
   external_url: string;
   image: string;
-  name?: string;
+  name?: InventoryItemName | BumpkinItem;
 };
 
 export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
@@ -145,7 +151,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     ],
   },
   "Corn Seed": {
-    name: "Cord Seed",
+    name: "Corn Seed",
     description:
       "A seed used to grow corn.\n\nYou can buy corn seeds in game at the market.",
     decimals: 18,
@@ -234,6 +240,28 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     decimals: 18,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/120.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Tomato Seed": {
+    name: "Tomato Seed",
+    description: "Rich in Lycopene",
+    decimals: 18,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/128.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Lemon Seed": {
+    name: "Lemon Seed",
+    description: "Because sometimes, you just can't squeeze an orange!",
+    decimals: 18,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/129.png",
     attributes: [
       { trait_type: "Purpose", value: "Seed" },
       { trait_type: "Tradable", value: "No" },
@@ -427,7 +455,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/214.png",
     attributes: [
-      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Purpose", value: "Fruit" },
       { trait_type: "Tradable", value: "Yes" },
     ],
   },
@@ -438,7 +466,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/213.png",
     attributes: [
-      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Purpose", value: "Fruit" },
       { trait_type: "Tradable", value: "Yes" },
     ],
   },
@@ -450,7 +478,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/212.png",
     attributes: [
-      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Purpose", value: "Fruit" },
       { trait_type: "Tradable", value: "Yes" },
     ],
   },
@@ -461,8 +489,30 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/217.png",
     attributes: [
-      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Purpose", value: "Fruit" },
       { trait_type: "Tradable", value: "Yes" },
+    ],
+  },
+  Tomato: {
+    name: "Tomato",
+    description: "Rich in Lycopene",
+    decimals: 18,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/255.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fruit" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Lemon: {
+    name: "Lemon",
+    description: "Because sometimes, you just can't squeeze an orange!",
+    decimals: 18,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/256.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fruit" },
+      { trait_type: "Tradable", value: "No" },
     ],
   },
   Pickaxe: {
@@ -4289,6 +4339,16 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Tradable", value: "No" },
     ],
   },
+  "Amber Fossil": {
+    description: "A ticket used during the Pharaoh's Treasure Season",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/747.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Coupon" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
 
   "Sunflower Supporter": {
     description: "A true supporter of the project",
@@ -4653,6 +4713,21 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       {
         display_type: "boost_percentage",
         trait_type: "XP increase during Clash of Factions Season",
+        value: 10,
+      },
+    ],
+  },
+  "Pharaoh's Treasure Banner": {
+    description: "The mark of a participant in the Pharaoh's Treasure Season.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/746.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Banner" },
+      { trait_type: "Tradable", value: "No" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "XP increase during Pharaoh's Treasure Season",
         value: 10,
       },
     ],
@@ -6088,6 +6163,23 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       },
     ],
   },
+  "Lemon Shark": {
+    description:
+      "A zesty, zippy swimmer of the Summer seas. Only available during Pharaoh's Treasure season.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1539.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Lemon Yield",
+        value: 0.2,
+      },
+    ],
+  },
   Chowder: {
     description:
       "Sailor's delight in a bowl! Dive in, there's treasure inside!",
@@ -6333,6 +6425,21 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
         display_type: "boost_number",
         trait_type: "Increase Oil yield",
         value: 0.1,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+  },
+  "Pharaoh Chicken": {
+    description: "A ruling chicken, +1 Dig.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2116.gif",
+    attributes: [
+      { trait_type: "Boost", value: "Other" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase daily digs",
+        value: 1,
       },
       { trait_type: "Tradable", value: "Yes" },
     ],
@@ -7286,7 +7393,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     ],
   },
   Baozi: {
-    name: "Bazoi",
+    name: "Baozi",
     description:
       "A delicious steamed bun. A special event item from Lunar New Year 2024.",
     decimals: 0,
@@ -7349,7 +7456,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     ],
   },
   "Nightshade Faction Banner": {
-    name: "Nightshades Faction Banner",
+    name: "Nightshade Faction Banner",
     description:
       "A banner that shows your allegiance to the Nightshade Faction.",
     decimals: 0,
@@ -7711,7 +7818,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     decimals: 18,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: `../public/erc1155/images/252.png`,
-    attributes: [{ trait_type: "Purpose", value: "Crop" }],
+    attributes: [{ trait_type: "Purpose", value: "Fruit" }],
   },
   Olive: {
     name: "Olive",
@@ -8325,11 +8432,479 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       "A magnificent rug made by the talented Bumpkin faction artisans.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
-    image: "../public/erc1155/images/2081png",
+    image: "../public/erc1155/images/2081.png",
     attributes: [{ trait_type: "Purpose", value: "Decoration" }],
   },
-};
 
+  ...getKeys(DECORATION_TEMPLATES).reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: {
+        description: "A beautiful collection for your Sunflower Land farm.",
+        decimals: 0,
+        attributes: [{ trait_type: "Purpose", value: "Decoration" }],
+        external_url: "https://docs.sunflower-land.com/getting-started/about",
+        image: `../public/erc1155/images/${KNOWN_IDS[key]}.png`,
+        name: key,
+      },
+    }),
+    {} as Record<TemplateDecorationName, Metadata>,
+  ),
+
+  Caponata: {
+    name: "Caponata",
+    description: "A flavorful eggplant dish, perfect for sharing.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/575.png",
+    attributes: [{ trait_type: "Purpose", value: "Consumable" }],
+  },
+  "Glazed Carrots": {
+    name: "Glazed Carrots",
+    description: "Sweet and savory carrots, a delightful side dish.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/576.png",
+    attributes: [{ trait_type: "Purpose", value: "Consumable" }],
+  },
+  Paella: {
+    name: "Paella",
+    description: "A classic Spanish dish, brimming with flavor.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/577.png",
+    attributes: [{ trait_type: "Purpose", value: "Consumable" }],
+  },
+  "Desert Rose": {
+    name: "Desert Rose",
+    description:
+      "A mutant flower that can be found during the Pharaoh's Treasure season.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2100.png",
+    attributes: [
+      {
+        display_type: "boost_percentage",
+        trait_type: "Flower Critical Hit Chance",
+        value: 10,
+      },
+      {
+        display_type: "boost_number",
+        trait_type: "Critical Flower Amount",
+        value: 1,
+      },
+    ],
+  },
+
+  "Camel Bone": {
+    description: "Bones of an ancient camel, rumoured to transport artefacts",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1408.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Bounty" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Cockle Shell": {
+    description: "Bones of an ancient camel, rumoured to transport artefacts",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1409.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Bounty" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Hieroglyph: {
+    description: "Unlock the secrets of the hieroglyphs.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1410.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Bounty" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Sand: {
+    description: "It get's everywhere!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1411.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Bounty" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Scarab: {
+    description: "Pharaoh's lost artefact.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1412.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Bounty" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Vase: {
+    description: "A fragile item from ancient times",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1413.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Bounty" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Hapy Jar": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2101.png",
+    name: "Hapy Jar",
+  },
+  "Imsety Jar": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2104.png",
+    name: "Imsety Jar",
+  },
+  Cannonball: {
+    description:
+      "Cannonball is ferocious being. Residing in Tomato Bombard, it's ready to strike anyone who gets in its way",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Tomato Growth Time",
+        value: -25,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Cannonball",
+  },
+  Sarcophagus: {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2106.png",
+    name: "Sarcophagus",
+  },
+  "Duamutef Jar": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2102.png",
+    name: "Duamutef Jar",
+  },
+  "Qebehsenuef Jar": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2103.png",
+    name: "Qebehsenuef Jar",
+  },
+  "Clay Tablet": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Clay Tablet",
+  },
+  "Snake in Jar": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Snake in Jar",
+  },
+  "Reveling Lemon": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_number",
+        trait_type: "Lemon Yield",
+        value: 0.25,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Reveling Lemon",
+  },
+  "Anubis Jackal": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Anubis Jackal",
+  },
+  Sundial: {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Sundial",
+  },
+  "Sand Golem": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Sand Golem",
+  },
+  "Cactus King": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Cactus King",
+  },
+  "Lemon Frog": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Lemon Growth Time",
+        value: -25,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Lemon Frog",
+  },
+  "Scarab Beetle": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Scarab Beetle",
+  },
+  "Adrift Ark": {
+    description:
+      "A sandcastle on the shore intricately crafted to resemble a capsized boat, complete with shell portholes and seaweed flags fluttering atop its sculpted hull.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Adrift Ark",
+  },
+  Castellan: {
+    description:
+      "Castellan is a charming sandcastle figure adorned with colorful accessories, symbolizing playful spirit and creativity.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Castellan",
+  },
+  "Sunlit Citadel": {
+    description: "A Castle to show your pride",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Sunlit Citadel",
+  },
+  "Pharaoh Gnome": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Greenhouse Crop Yield",
+        value: 2,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Pharaoh Gnome",
+  },
+  "Lemon Tea Bath": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Lemon Growth Time",
+        value: -50,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Lemon Tea Bath",
+  },
+  "Tomato Clown": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Tomato Growth Time",
+        value: -50,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Tomato Clown",
+  },
+  Pyramid: {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Pyramid",
+  },
+  Oasis: {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Oasis",
+  },
+  "Paper Reed": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Paper Reed",
+  },
+  Camel: {
+    description: "A mean looking camel!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Boost" },
+      { trait_type: "Tradable", value: "Yes" },
+      { trait_type: "Boost", value: "Crop" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Sand Yield",
+        value: 1,
+      },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Artefact Shop Bounty Price",
+        value: 30,
+      },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2127.png",
+    name: "Camel",
+  },
+  "Baobab Tree": {
+    description:
+      "Guardian of the desert, the Baobab Tree stands tall and proud.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2126.png",
+    name: "Baobab Tree",
+  },
+  "Tomato Bombard": {
+    description:
+      "Home to Cannonball, and is ready to strike anyone who gets in its way",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Tomato Yield",
+        value: 1,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    name: "Tomato Bombard",
+  },
+};
 export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   "Beige Farmer Potion": {
     description:
@@ -11070,6 +11645,12 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     attributes: [
       { trait_type: "Part", value: "SecondaryTool" },
       { trait_type: "Tradable", value: "No" },
+      { trait_type: "Boost", value: "Crab" },
+      {
+        display_type: "boost_number",
+        value: 1,
+        trait_type: "+1 Crab when digging or drilling",
+      },
     ],
     external_url: "https://bumpkins.io",
     image: "../public/wearables/images/230.png",
@@ -12541,5 +13122,358 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     external_url: "https://bumpkins.io",
     image: "../public/wearables/images/348.png",
     name: "Festival of Colors Background",
+  },
+  "Explorer Shirt": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Shirt" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/353.png",
+    name: "Explorer Shirt",
+  },
+  "Explorer Shorts": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Pants" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/359.png",
+    name: "Explorer Shorts",
+  },
+  "Oil Overalls": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Pants" },
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Oil Yield",
+        value: 10,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/360.png",
+    name: "Oil Overalls",
+  },
+  "Dev Wrench": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Oil Cooldown Reduction Time",
+        value: -50,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/354.png",
+    name: "Dev Wrench",
+  },
+  "Rock Hammer": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/355.png",
+    name: "Rock Hammer",
+  },
+  "Pharaoh Headdress": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/349.png",
+    name: "Pharaoh Headdress",
+  },
+  "Explorer Hat": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/357.png",
+    name: "Explorer Hat",
+  },
+  "Oil Protection Hat": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/358.png",
+    name: "Oil Protection Hat",
+  },
+  "Amber Amulet": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Necklace" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/351.png",
+    name: "Amber Amulet",
+  },
+  "Sun Scarab Amulet": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Necklace" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/356.png",
+    name: "Sun Scarab Amulet",
+  },
+  "Desert Background": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Background" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/352.png",
+    name: "Desert Background",
+  },
+  "Camel Onesie": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Onesie" },
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Fruit Patch Yield",
+        value: 0.1,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/350.png",
+    name: "Camel Onesie",
+  },
+  "Desert Merchant Turban": {
+    description: "A turban to stay safe from the fierce desert and sand.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/361.png",
+    name: "Desert Merchant Turban",
+  },
+  "Desert Merchant Shoes": {
+    description: "Protect your feet from the scorching heat of the desert.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Shoes" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/362.png",
+    name: "Desert Merchant Shoes",
+  },
+  "Desert Merchant Suit": {
+    description: "A light-weight attire worned by desert merchants.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Dress" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/363.png",
+    name: "Desert Merchant Suit",
+  },
+  "Desert Camel Background": {
+    description:
+      "The Desert Camel accompanies you in the sand full of discovery.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Background" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/364.png",
+    name: "Desert Camel Background",
+  },
+  "Water Gourd": {
+    description: "Quench your thirst while exploring the desert.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/365.png",
+    name: "Water Gourd",
+  },
+  "Rocket Onesie": {
+    description:
+      "Ready to blast off into imagination, it's a miniature marvel of cosmic adventure!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Onesie" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/366.png",
+    name: "Rocket Onesie",
+  },
+  "Coin Aura": {
+    description:
+      "Its elegant dance captivates the eye, embodying the essence of prosperity and luxury before gracefully vanishing. ",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Aura" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/367.png",
+    name: "Coin Aura",
+  },
+  "Ankh Shirt": {
+    description: "",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Shirt" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/368.png",
+    name: "Ankh Shirt",
+  },
+  "Ancient Shovel": {
+    description:
+      "Ancient Shovel is a mystical tool that allows holders of this shovel to dig for treasure without needing a traditional sand shovel.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "Yes" },
+      { trait_type: "Boost", value: "Other" },
+      {
+        display_type: "boost_number",
+        trait_type: "Dig treasure without Sand Shovel",
+        value: 1,
+      },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/369.png",
+    name: "Ancient Shovel",
+  },
+  "Infernal Drill": {
+    description:
+      "Infernal Drill is a potent device that enables holders of drill to extract oil directly without the need for a traditional oil drill.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "SecondaryTool" },
+      { trait_type: "Tradable", value: "Yes" },
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Drill Oil without Oil Drill",
+        value: 1,
+      },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/370.png",
+    name: "Infernal Drill",
+  },
+  "Lemon Shield": {
+    description:
+      "Lemon Shield is a boost that enhances lemon production by increasing the yield of each harvest by 1.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "SecondaryTool" },
+      { trait_type: "Tradable", value: "Yes" },
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Lemon Yield",
+        value: 1,
+      },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/371.png",
+    name: "Lemon Shield",
+  },
+  "Scarab Wings": {
+    description:
+      "Scarab Wings is a vibrant and decorative accessory featuring intricate, winged designs that evoke ancient mysticism and elegance.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Wings" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/372.png",
+    name: "Scarab Wings",
+  },
+  "Grape Pants": {
+    description: "Stylist pants for the grape farmer.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Pants" },
+      { trait_type: "Boost", value: "Fruit" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Grape Yield",
+        value: 0.2,
+      },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/373.png",
+    name: "Grape Pants",
+  },
+  "Bionic Drill": {
+    description:
+      "The Bionic Drill is a state-of-the-art wearable designed for the modern desert explorer. Enjoy +5 desert digs per day.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Wings" },
+      { trait_type: "Tradable", value: "Yes" },
+      { trait_type: "Boost", value: "Other" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase daily digs",
+        value: 5,
+      },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/374.png",
+    name: "Bionic Drill",
+  },
+  "Fossil Head": {
+    description:
+      "The Fossil Head is an artefact that was discovered by an ancient digger, it's said to be a rare find!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://bumpkins.io",
+    image: "../public/wearables/images/375.png",
+    name: "Fossil Head",
   },
 };

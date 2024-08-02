@@ -1,6 +1,8 @@
 import { Equipped } from "features/game/types/bumpkin";
 
 export type NPCName =
+  | "cluck e cheese"
+  | "digby"
   | "portaller"
   | "gambit"
   | "victoria"
@@ -51,12 +53,11 @@ export type NPCName =
   | "eins"
   | "garth"
   | "reelin roy"
-  | "shelly"
   | "finn"
   | "finley"
   | "tango"
   | "corale"
-  | "goldtooth"
+  | "goldtooth" // To remove on release
   | "daphne"
   | "miranda"
   | "damien"
@@ -95,9 +96,65 @@ export type NPCName =
   | "buttercup"
   | "shadow"
   | "flora"
-  | "eldric";
+  | "eldric"
+  | "jafar" // desert merchant
+  | "pet" // faction pet
+  | "peggy"
+  | "petro"
+  | "pharaoh";
 
 export const NPC_WEARABLES: Record<NPCName, Equipped> = {
+  "cluck e cheese": {
+    background: "Farm Background",
+    body: "Beige Farmer Potion",
+    hair: "Basic Hair",
+    shoes: "Black Farmer Boots",
+    tool: "Merch Coffee Mug",
+    secondaryTool: "Wise Book",
+    pants: "Farmer Overalls",
+    shirt: "Chic Gala Blouse",
+    hat: "Chicken Hat",
+  },
+  pharaoh: {
+    body: "Light Brown Farmer Potion",
+    hair: "Sun Spots",
+    hat: "Pharaoh Headdress",
+    dress: "Desert Merchant Suit",
+    shoes: "Desert Merchant Shoes",
+    tool: "Royal Scepter",
+    background: "Farm Background",
+  },
+  petro: {
+    body: "Beige Farmer Potion",
+    hair: "Basic Hair",
+    hat: "Oil Protection Hat",
+    shirt: "SFL T-Shirt",
+    pants: "Oil Overalls",
+    tool: "Dev Wrench",
+    background: "Farm Background",
+    shoes: "Black Farmer Boots",
+  },
+  digby: {
+    body: "Light Brown Farmer Potion",
+    hair: "Wise Hair",
+    hat: "Explorer Hat",
+    shirt: "Explorer Shirt",
+    pants: "Explorer Shorts",
+    tool: "Rock Hammer",
+    background: "Farm Background",
+    shoes: "Black Farmer Boots",
+  },
+  peggy: {
+    body: "Beige Farmer Potion",
+    shirt: "Red Farmer Shirt",
+    pants: "Farmer Pants",
+    coat: "Chef Apron",
+    hair: "Royal Braids",
+    hat: "Chef Hat",
+    background: "Farm Background",
+    shoes: "Black Farmer Boots",
+    tool: "Parsnip",
+  },
   "chef tuck": {
     body: "Goblin Potion",
     hair: "Wise Hair",
@@ -627,7 +684,7 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     shoes: "Brown Boots",
   },
   "old salty": {
-    body: "Beige Farmer Potion",
+    body: "Pirate Potion",
     hair: "Buzz Cut",
     pants: "Pirate Pants",
     hat: "Pirate Hat",
@@ -635,7 +692,7 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     coat: "Pirate General Coat",
     tool: "Pirate Scimitar",
     background: "Farm Background",
-    shoes: "Brown Boots",
+    shoes: "Peg Leg",
   },
   miranda: {
     body: "Beige Farmer Potion",
@@ -725,16 +782,6 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     background: "Farm Background",
     shoes: "Black Farmer Boots",
   },
-  shelly: {
-    body: "Beige Farmer Potion",
-    hair: "White Long Hair",
-    hat: "Lifeguard Hat",
-    shirt: "Lifeguard Shirt",
-    pants: "Lifeguard Pants",
-    tool: "Water Gun",
-    background: "Seashore Background",
-    shoes: "Black Farmer Boots",
-  },
   // Placeholder fisherman
   finn: {
     body: "Light Brown Farmer Potion",
@@ -770,6 +817,7 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     shoes: "Black Farmer Boots",
     tool: "Trident",
   },
+  // To remove on digging release
   goldtooth: {
     body: "Goblin Potion",
     hair: "Sun Spots",
@@ -1046,6 +1094,25 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     tool: "Goblin Axe",
     coat: "Royal Robe",
   },
+  jafar: {
+    background: "Desert Camel Background",
+    body: "Light Brown Farmer Potion",
+    hair: "Buzz Cut",
+    dress: "Desert Merchant Suit",
+    hat: "Desert Merchant Turban",
+    shoes: "Desert Merchant Shoes",
+    tool: "Water Gourd",
+  },
+  // Placeholder values. Pets are an image.
+  pet: {
+    body: "Sunburst Potion",
+    hair: "Blondie",
+    shirt: "Fancy Top",
+    pants: "Sunflorian Pants",
+    tool: "Sunflorian Sword",
+    background: "Farm Background",
+    shoes: "Sunflorian Sabatons",
+  },
 };
 
 type AcknowledgedNPCs = Partial<Record<NPCName, number>>;
@@ -1067,7 +1134,7 @@ export function acknowledgeNPC(npcName: NPCName) {
     JSON.stringify({
       ...previous,
       [npcName]: Date.now().toString(),
-    })
+    }),
   );
 }
 

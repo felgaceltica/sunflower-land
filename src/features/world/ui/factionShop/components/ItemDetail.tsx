@@ -4,8 +4,6 @@ import { Label } from "components/ui/Label";
 import Decimal from "decimal.js-light";
 import { FactionName, InventoryItemName } from "features/game/types/game";
 
-import bg from "assets/ui/grey_background.png";
-
 import { Context } from "features/game/GameProvider";
 import { useSelector } from "@xstate/react";
 import { PIXEL_SCALE } from "features/game/lib/constants";
@@ -24,10 +22,11 @@ import { capitalize } from "lib/utils/capitalize";
 import {
   FactionShopWearable,
   FactionShopCollectible,
+  FactionShopFood,
 } from "features/game/types/factionShop";
 
 interface ItemOverlayProps {
-  item: FactionShopWearable | FactionShopCollectible | null;
+  item: FactionShopWearable | FactionShopCollectible | FactionShopFood | null;
   image: string;
   isWearable: boolean;
   buff?: BuffLabel;
@@ -78,7 +77,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   }, []);
 
   const getBalanceOfItem = (
-    item: FactionShopWearable | FactionShopCollectible | null
+    item: FactionShopWearable | FactionShopCollectible | FactionShopFood | null,
   ): number => {
     if (!item) return 0;
 
@@ -177,7 +176,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
     }
 
     <span className="absolute bottom-1 right-2 text-xxs">{`${t(
-      "limit"
+      "limit",
     )}: ${balanceOfItem}/${item.limit}`}</span>; //t
   };
 
@@ -187,7 +186,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
 
     return (
       <Label type="danger" icon={ITEM_DETAILS[name].image}>{`${capitalize(
-        faction
+        faction,
       )} Only!`}</Label>
     );
   };
@@ -225,7 +224,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                     style={
                       item?.type === "collectible"
                         ? {
-                            backgroundImage: `url(${bg})`,
+                            backgroundImage: `url(${SUNNYSIDE.ui.grey_background})`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
                           }

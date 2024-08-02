@@ -24,7 +24,7 @@ describe("sell", () => {
           crop: "Axe" as CropName,
           amount: 1,
         },
-      })
+      }),
     ).toThrow("Not for sale");
   });
 
@@ -42,7 +42,7 @@ describe("sell", () => {
           crop: "Sunflower",
           amount: 0,
         },
-      })
+      }),
     ).toThrow("Invalid amount");
   });
 
@@ -55,7 +55,7 @@ describe("sell", () => {
           crop: "Sunflower",
           amount: 1,
         },
-      })
+      }),
     ).toThrow("Insufficient quantity to sell");
   });
 
@@ -76,7 +76,7 @@ describe("sell", () => {
     });
 
     expect(state.inventory.Sunflower).toEqual(new Decimal(4));
-    expect(state.coins).toEqual(GAME_STATE.coins + CROPS().Sunflower.sellPrice);
+    expect(state.coins).toEqual(GAME_STATE.coins + CROPS.Sunflower.sellPrice);
   });
 
   it("sell an item in bulk given sufficient quantity", () => {
@@ -97,7 +97,7 @@ describe("sell", () => {
 
     expect(state.inventory.Sunflower).toEqual(new Decimal(1));
     expect(state.coins).toEqual(
-      GAME_STATE.coins + CROPS().Sunflower.sellPrice * 10
+      GAME_STATE.coins + CROPS.Sunflower.sellPrice * 10,
     );
   });
 
@@ -115,7 +115,7 @@ describe("sell", () => {
           crop: "Sunflower",
           amount: 10,
         },
-      })
+      }),
     ).toThrow("Insufficient quantity to sell");
   });
 
@@ -135,7 +135,7 @@ describe("sell", () => {
       },
     });
 
-    expect(state.coins).toEqual(CROPS().Cauliflower.sellPrice);
+    expect(state.coins).toEqual(CROPS.Cauliflower.sellPrice);
   });
 
   it("increments coins earned when cauliflower is sold", () => {
@@ -154,7 +154,7 @@ describe("sell", () => {
     });
 
     expect(state.bumpkin?.activity?.["Coins Earned"]).toEqual(
-      CROPS().Cauliflower.sellPrice
+      CROPS.Cauliflower.sellPrice,
     );
   });
 
@@ -192,5 +192,46 @@ describe("sell", () => {
       },
     });
     expect(state.bumpkin?.activity?.["Apple Sold"]).toEqual(amount);
+  });
+
+  it("sells tomato for two times the normal price during La Tomatina", () => {
+    const now = new Date().getTime();
+
+    const coins = 1;
+    const state = sellCrop({
+      state: {
+        ...GAME_STATE,
+        coins,
+        inventory: {
+          Tomato: new Decimal(1),
+        },
+        specialEvents: {
+          current: {
+            "La Tomatina": {
+              text: "La Tomatina",
+              endAt: now + 1000,
+              startAt: now,
+              isEligible: true,
+              requiresWallet: false,
+              tasks: [],
+              bonus: {
+                Tomato: {
+                  saleMultiplier: 2,
+                },
+              },
+            },
+          },
+          history: {},
+        },
+        createdAt: now,
+      },
+      action: {
+        type: "crop.sold",
+        crop: "Tomato",
+        amount: 1,
+      },
+    });
+
+    expect(state.coins).toEqual(coins + FRUIT().Tomato.sellPrice * 2);
   });
 });

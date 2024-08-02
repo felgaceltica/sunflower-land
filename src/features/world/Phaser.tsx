@@ -52,6 +52,10 @@ import { SunflorianHouseScene } from "./scenes/SunflorianHouseScene";
 import { Loading } from "features/auth/components";
 import { NightshadeHouseScene } from "./scenes/NightshadeHouseScene";
 import { BumpkinHouseScene } from "./scenes/BumpkinHouseScene";
+import { ExampleAnimationScene } from "./scenes/examples/AnimationScene";
+import { ExampleRPGScene } from "./scenes/examples/RPGScene";
+import { EventObject } from "xstate";
+import { ToastContext } from "features/game/toast/ToastProvider";
 
 const _roomState = (state: MachineState) => state.value;
 const _scene = (state: MachineState) => state.context.sceneId;
@@ -91,8 +95,10 @@ export const PhaserComponent: React.FC<Props> = ({
   const { t } = useAppTranslation();
 
   const { authService } = useContext(AuthProvider.Context);
-  const { gameService } = useContext(Context);
+  const { gameService, selectedItem, shortcutItem } = useContext(Context);
   const [authState] = useActor(authService);
+
+  const { toastsList } = useContext(ToastContext);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -123,22 +129,16 @@ export const PhaserComponent: React.FC<Props> = ({
     new PlazaScene({ gameState: gameService.state.context.state }),
     RetreatScene,
     KingdomScene,
-    ...(hasHouseAccess(gameService.state.context.state, "goblins") &&
-    hasFeatureAccess(gameService.state.context.state, "FACTION_HOUSE")
-      ? [GoblinHouseScene]
+    ...(hasFeatureAccess(gameService.state.context.state, "FACTION_HOUSE")
+      ? [
+          GoblinHouseScene,
+          SunflorianHouseScene,
+          NightshadeHouseScene,
+          BumpkinHouseScene,
+        ]
       : []),
-    ...(hasHouseAccess(gameService.state.context.state, "sunflorians") &&
-    hasFeatureAccess(gameService.state.context.state, "FACTION_HOUSE")
-      ? [SunflorianHouseScene]
-      : []),
-    ...(hasHouseAccess(gameService.state.context.state, "nightshades") &&
-    hasFeatureAccess(gameService.state.context.state, "FACTION_HOUSE")
-      ? [NightshadeHouseScene]
-      : []),
-    ...(hasHouseAccess(gameService.state.context.state, "bumpkins") &&
-    hasFeatureAccess(gameService.state.context.state, "FACTION_HOUSE")
-      ? [BumpkinHouseScene]
-      : []),
+    ExampleAnimationScene,
+    ExampleRPGScene,
   ];
 
   useEffect(() => {
@@ -162,7 +162,7 @@ export const PhaserComponent: React.FC<Props> = ({
 
     if (userModLogs.muted.length > 0) {
       const latestMute = userModLogs.muted.sort(
-        (a, b) => b.mutedUntil - a.mutedUntil
+        (a, b) => b.mutedUntil - a.mutedUntil,
       )[0];
 
       if (latestMute.mutedUntil > new Date().getTime()) {
@@ -228,8 +228,11 @@ export const PhaserComponent: React.FC<Props> = ({
     game.current.registry.set("gameService", gameService);
     game.current.registry.set("id", gameService.state.context.farmId);
     game.current.registry.set("initialScene", scene);
+    game.current.registry.set("navigate", navigate);
+    game.current.registry.set("selectedItem", selectedItem);
+    game.current.registry.set("shortcutItem", shortcutItem);
 
-    gameService.onEvent((e) => {
+    const listener = (e: EventObject) => {
       if (e.type === "bumpkin.equipped") {
         mmoService.state.context.server?.send(0, {
           clothing: (e as EquipBumpkinAction).equipment,
@@ -240,14 +243,22 @@ export const PhaserComponent: React.FC<Props> = ({
           username: (e as UpdateUsernameEvent).username,
         });
       }
-    });
+    };
+
+    gameService.onEvent(listener);
 
     setLoaded(true);
 
     return () => {
       game.current?.destroy(true);
+      gameService.off(listener);
     };
   }, []);
+
+  // When selected item changes in context, update game registry
+  useEffect(() => {
+    game.current?.registry.set("selectedItem", selectedItem);
+  }, [selectedItem]);
 
   // When route changes, switch scene
   useEffect(() => {
@@ -283,7 +294,7 @@ export const PhaserComponent: React.FC<Props> = ({
           default:
             break;
         }
-      }
+      },
     );
 
     // Update Messages on change
@@ -293,7 +304,7 @@ export const PhaserComponent: React.FC<Props> = ({
 
       const sceneMessages =
         mmoService.state.context.server?.state.messages.filter(
-          (m) => m.sceneId === currentScene
+          (m) => m.sceneId === currentScene,
         ) as Message[];
 
       setMessages(
@@ -304,7 +315,7 @@ export const PhaserComponent: React.FC<Props> = ({
           sessionId: m.sessionId,
           sceneId: m.sceneId,
           sentAt: m.sentAt,
-        })) ?? []
+        })) ?? [],
       );
       updateMessages();
     });
@@ -319,7 +330,7 @@ export const PhaserComponent: React.FC<Props> = ({
 
           playersMap.forEach((player, playerId) => {
             const existingPlayer = currentPlayers.find(
-              (p) => p.playerId === playerId
+              (p) => p.playerId === playerId,
             );
 
             // do we really need to update the player when they move?
@@ -351,7 +362,7 @@ export const PhaserComponent: React.FC<Props> = ({
 
           // Remove players who left the server
           return updatedPlayers.filter((updatedPlayer) =>
-            playersMap.has(updatedPlayer.playerId)
+            playersMap.has(updatedPlayer.playerId),
           );
         });
       }
@@ -374,6 +385,16 @@ export const PhaserComponent: React.FC<Props> = ({
     }
   }, [isMuted]);
 
+  useEffect(() => {
+    const item = toastsList.filter((toast) => !toast.hidden)[0];
+
+    if (item && item.difference.gt(0)) {
+      mmoService.state.context.server?.send(0, {
+        reaction: { reaction: item.item, quantity: item.difference.toNumber() },
+      });
+    }
+  }, [toastsList]);
+
   // Listen to state change from trading -> playing
   const updateMessages = () => {
     // Load active scene in Phaser, otherwise fallback to route
@@ -382,14 +403,14 @@ export const PhaserComponent: React.FC<Props> = ({
 
     const sceneMessages =
       mmoService.state.context.server?.state.messages.filter(
-        (m) => m.sceneId === currentScene
+        (m) => m.sceneId === currentScene,
       ) as Message[];
 
     const filteredMessages = sceneMessages.filter(
       (m) =>
         !JSON.parse(
-          localStorage.getItem("plaza-settings.mutedFarmIds") ?? "[]"
-        ).includes(m.farmId)
+          localStorage.getItem("plaza-settings.mutedFarmIds") ?? "[]",
+        ).includes(m.farmId),
     );
 
     setMessages(
@@ -400,7 +421,7 @@ export const PhaserComponent: React.FC<Props> = ({
         sessionId: m.sessionId,
         sceneId: m.sceneId,
         sentAt: m.sentAt,
-      })) ?? []
+      })) ?? [],
     );
   };
 
@@ -443,7 +464,7 @@ export const PhaserComponent: React.FC<Props> = ({
           isMuted={isMuted ? true : false}
           onReact={(reaction) => {
             mmoService.state.context.server?.send(0, {
-              reaction,
+              reaction: { reaction },
             });
           }}
           onBudPlace={(tokenId) => {
@@ -506,6 +527,7 @@ export const PhaserComponent: React.FC<Props> = ({
       <InteractableModals
         id={gameService.state.context.farmId as number}
         scene={scene}
+        key={scene}
       />
       <Modal
         show={mmoState === "loading" || mmoState === "initialising"}

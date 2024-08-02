@@ -5,8 +5,6 @@ import { getKeys } from "features/game/types/craftables";
 import { TradeListing } from "features/game/types/game";
 import { ITEM_DETAILS } from "features/game/types/images";
 import React, { useContext, useEffect, useState } from "react";
-import token from "assets/icons/sfl.webp";
-import lock from "assets/skills/lock.png";
 import { Context } from "features/game/GameProvider";
 import { Button } from "components/ui/Button";
 import { useActor } from "@xstate/react";
@@ -19,6 +17,7 @@ import { getBumpkinLevel } from "features/game/lib/level";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { makeListingType } from "lib/utils/makeTradeListingType";
 import { Loading } from "features/auth/components";
+import token from "assets/icons/sfl.webp";
 
 interface Props {
   farmId: number;
@@ -43,7 +42,7 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
     const load = async () => {
       const farm = await loadGameStateForVisit(
         farmId,
-        authState.context.user.rawToken
+        authState.context.user.rawToken,
       );
 
       const listings = farm.state.trades?.listings;
@@ -56,7 +55,7 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
   }, []);
 
   const level = getBumpkinLevel(
-    gameState.context.state.bumpkin?.experience ?? 0
+    gameState.context.state.bumpkin?.experience ?? 0,
   );
 
   if (level < 10) {
@@ -66,7 +65,10 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
           {t("beta")}
         </Label>
         <div className="p-1 flex flex-col items-center">
-          <img src={lock} className="w-1/5 mx-auto my-2 img-highlight-heavy" />
+          <img
+            src={SUNNYSIDE.icons.lock}
+            className="w-1/5 mx-auto my-2 img-highlight-heavy"
+          />
           <p className="text-sm">{t("bumpkinTrade.minLevel")}</p>
           <p className="text-xs mb-2">{t("statements.lvlUp")}</p>
         </div>
@@ -89,7 +91,7 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
   if (warning === "hoarding") {
     return (
       <div className="p-1 flex flex-col items-center">
-        <img src={lock} className="w-1/5 mb-2" />
+        <img src={SUNNYSIDE.icons.lock} className="w-1/5 mb-2" />
         <p className="text-sm mb-1 text-center">{t("playerTrade.max.item")}</p>
         <p className="text-xs mb-1 text-center">{t("playerTrade.Progress")}</p>
       </div>
@@ -115,10 +117,10 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
       (acc, name) => ({
         ...acc,
         [name]: (inventory[name] ?? new Decimal(0)).add(
-          listings[listingId].items[name] ?? 0
+          listings[listingId].items[name] ?? 0,
         ),
       }),
-      inventory
+      inventory,
     );
 
     const hasMaxedOut = hasMaxItems({
@@ -205,7 +207,7 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
                 "Goblin Emblem",
                 "Nightshade Emblem",
                 "Sunflorian Emblem",
-              ].includes(name)
+              ].includes(name),
           );
         })
         .map((listingId, index) => {

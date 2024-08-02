@@ -28,9 +28,11 @@ export const maxItems: Inventory = {
   Wheat: new Decimal("4000"),
   Kale: new Decimal("4000"),
 
-  Apple: new Decimal("700"),
-  Orange: new Decimal("900"),
+  Tomato: new Decimal(1200),
+  Lemon: new Decimal(1000),
   Blueberry: new Decimal("900"),
+  Orange: new Decimal("900"),
+  Apple: new Decimal("700"),
   Banana: new Decimal("600"),
 
   Olive: new Decimal("250"),
@@ -46,6 +48,8 @@ export const maxItems: Inventory = {
   "Banana Chicken": new Decimal("5"),
   "Crim Peckster": new Decimal("5"),
   "Knight Chicken": new Decimal("5"),
+  "Desert Rose": new Decimal("5"),
+  "Pharaoh Chicken": new Decimal("5"),
 
   // Seed limits + buffer
   "Sunflower Seed": new Decimal(1250),
@@ -62,13 +66,18 @@ export const maxItems: Inventory = {
   "Radish Seed": new Decimal(170),
   "Wheat Seed": new Decimal(170),
   "Kale Seed": new Decimal(150),
+
+  "Tomato Seed": new Decimal(100),
   "Apple Seed": new Decimal(100),
   "Orange Seed": new Decimal(100),
   "Blueberry Seed": new Decimal(100),
   "Banana Plant": new Decimal(100),
+  "Lemon Seed": new Decimal(100),
+
   "Sunpetal Seed": new Decimal(100),
   "Bloom Seed": new Decimal(100),
   "Lily Seed": new Decimal(100),
+
   "Olive Seed": new Decimal(100),
   "Grape Seed": new Decimal(100),
   "Rice Seed": new Decimal(100),
@@ -130,7 +139,6 @@ export const maxItems: Inventory = {
   "Bumpkin Emblem": new Decimal(90_000),
   "Sunflorian Emblem": new Decimal(90_000),
   "Nightshade Emblem": new Decimal(90_000),
-  Mark: new Decimal(500),
 
   // Stock limits
   Axe: new Decimal("900"),
@@ -170,6 +178,7 @@ export const maxItems: Inventory = {
   "Mermaid Scale": new Decimal(1500),
   "Tulip Bulb": new Decimal(1500),
   Scroll: new Decimal(1500),
+  "Amber Fossil": new Decimal(1500),
   "Bud Ticket": new Decimal(1),
 
   // Potion House
@@ -202,7 +211,7 @@ export const maxItems: Inventory = {
   Starfish: new Decimal(50),
   Seaweed: new Decimal(50),
   "Sea Cucumber": new Decimal(50),
-  Crab: new Decimal(100),
+  Crab: new Decimal(1000),
 
   // Seasonal decorations - Dawnbreaker
   Clementine: new Decimal(1),
@@ -230,12 +239,20 @@ export const maxItems: Inventory = {
   "Tiki Torch": new Decimal(100),
   "Beach Umbrella": new Decimal(100),
 
+  // Sand Castles
+  "Adrift Ark": new Decimal(50),
+  Castellan: new Decimal(50),
+  "Sunlit Citadel": new Decimal(50),
+
+  "Tomato Bombard": new Decimal(1),
+  Cannonball: new Decimal(1),
+
   ...(Object.keys(EXOTIC_CROPS) as InventoryItemName[]).reduce(
     (acc, name) => ({
       ...acc,
       [name]: new Decimal(50),
     }),
-    {}
+    {},
   ),
 
   // Max of 1000 food item
@@ -244,7 +261,7 @@ export const maxItems: Inventory = {
       ...acc,
       [name]: new Decimal(1000),
     }),
-    {}
+    {},
   ),
 
   // Max of 1 skill badge
@@ -253,7 +270,7 @@ export const maxItems: Inventory = {
       ...acc,
       [name]: new Decimal(1),
     }),
-    {}
+    {},
   ),
 
   ...(Object.keys(EXOTIC_CROPS) as InventoryItemName[]).reduce(
@@ -261,7 +278,7 @@ export const maxItems: Inventory = {
       ...acc,
       [name]: new Decimal(50),
     }),
-    {}
+    {},
   ),
 
   // Max of 100 basic decoration
@@ -270,7 +287,7 @@ export const maxItems: Inventory = {
       ...acc,
       [name]: new Decimal(100),
     }),
-    {}
+    {},
   ),
 
   // Max of 100 fish
@@ -279,7 +296,7 @@ export const maxItems: Inventory = {
       ...acc,
       [name]: new Decimal(100),
     }),
-    {}
+    {},
   ),
 
   Anchovy: new Decimal(300),
@@ -289,25 +306,25 @@ export const maxItems: Inventory = {
   // Max of 1000 landscaping decoration, but only 100 for mushrooms
   ...(Object.keys(LANDSCAPING_DECORATIONS()) as LandscapingDecorationName[])
     .filter(
-      (name) => !LANDSCAPING_DECORATIONS()[name].ingredients["Wild Mushroom"]
+      (name) => !LANDSCAPING_DECORATIONS()[name].ingredients["Wild Mushroom"],
     )
     .reduce(
       (acc, name) => ({
         ...acc,
         [name]: new Decimal(1000),
       }),
-      {}
+      {},
     ),
   ...(Object.keys(LANDSCAPING_DECORATIONS()) as LandscapingDecorationName[])
     .filter(
-      (name) => LANDSCAPING_DECORATIONS()[name].ingredients["Wild Mushroom"]
+      (name) => LANDSCAPING_DECORATIONS()[name].ingredients["Wild Mushroom"],
     )
     .reduce(
       (acc, name) => ({
         ...acc,
         [name]: new Decimal(100),
       }),
-      {}
+      {},
     ),
 };
 

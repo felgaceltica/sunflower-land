@@ -49,6 +49,8 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Grape Seed": 125,
   "Rice Seed": 126,
   "Olive Seed": 127,
+  "Tomato Seed": 128,
+  "Lemon Seed": 129,
 
   Sunflower: 201,
   Potato: 202,
@@ -104,6 +106,8 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Grape: 252,
   Rice: 253,
   Olive: 254,
+  Tomato: 255,
+  Lemon: 256,
 
   Axe: 301,
   Pickaxe: 302,
@@ -294,6 +298,9 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "The Lot": 572,
   "Tofu Scramble": 573,
   Antipasto: 574,
+  Caponata: 575,
+  "Glazed Carrots": 576,
+  Paella: 577,
 
   Wood: 601,
   Stone: 602,
@@ -381,6 +388,8 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Sunflorian Emblem": 743,
   "Nightshade Emblem": 744,
   Mark: 745,
+  "Pharaoh's Treasure Banner": 746,
+  "Amber Fossil": 747,
 
   "Australian Flag": 801,
   "Belgian Flag": 802,
@@ -629,6 +638,14 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Warty Goblin Pumpkin": 1406,
   "White Carrot": 1407,
 
+  // Digging Site
+  "Camel Bone": 1408,
+  "Cockle Shell": 1409,
+  Hieroglyph: 1410,
+  Sand: 1411,
+  Scarab: 1412,
+  Vase: 1413,
+
   // Fish
   Anchovy: 1501,
   Butterflyfish: 1502,
@@ -669,6 +686,7 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Parrotfish: 1536,
   "Crimson Carp": 1537,
   "Battle Fish": 1538,
+  "Lemon Shark": 1539,
 
   "White Festive Fox": 2001,
   Rug: 2002,
@@ -753,12 +771,56 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Nightshade Faction Rug": 2079,
   "Goblin Faction Rug": 2080,
   "Bumpkin Faction Rug": 2081,
+  "Goblin Gold Champion": 2082,
+  "Goblin Silver Champion": 2083,
+  "Goblin Bronze Champion": 2084,
+  "Bumpkin Bronze Champion": 2085,
+  "Bumpkin Gold Champion": 2086,
+  "Bumpkin Silver Champion": 2087,
+  "Nightshade Bronze Champion": 2088,
+  "Nightshade Gold Champion": 2089,
+  "Nightshade Silver Champion": 2090,
+  "Sunflorian Bronze Champion": 2091,
+  "Sunflorian Gold Champion": 2092,
+  "Sunflorian Silver Champion": 2093,
+
+  // Mutant Flowers
+  "Desert Rose": 2100,
+  // Pharaoh's Treasure
+  "Hapy Jar": 2101,
+  "Duamutef Jar": 2102,
+  "Qebehsenuef Jar": 2103,
+  "Imsety Jar": 2104,
+  Cannonball: 2105,
+  Sarcophagus: 2106,
+  "Clay Tablet": 2107,
+  "Snake in Jar": 2108,
+  "Reveling Lemon": 2109,
+  "Anubis Jackal": 2110,
+  Sundial: 2111,
+  "Sand Golem": 2112,
+  "Cactus King": 2113,
+  "Lemon Frog": 2114,
+  "Scarab Beetle": 2115,
+  "Pharaoh Chicken": 2116,
+  "Adrift Ark": 2117,
+  Castellan: 2118,
+  "Sunlit Citadel": 2119,
+  "Pharaoh Gnome": 2120,
+  "Lemon Tea Bath": 2121,
+  "Tomato Clown": 2122,
+  Pyramid: 2123,
+  Oasis: 2124,
+  "Paper Reed": 2125,
+  "Baobab Tree": 2126,
+  Camel: 2127,
+  "Tomato Bombard": 2128,
 };
 
 // The reverse of above
 export const KNOWN_ITEMS: Record<string, InventoryItemName> = Object.assign(
   {},
-  ...Object.entries(KNOWN_IDS).map(([a, b]) => ({ [b]: a }))
+  ...Object.entries(KNOWN_IDS).map(([a, b]) => ({ [b]: a })),
 );
 
 export const IDS = Object.values(KNOWN_IDS);

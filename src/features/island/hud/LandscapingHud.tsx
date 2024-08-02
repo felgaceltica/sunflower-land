@@ -6,7 +6,6 @@ import Decimal from "decimal.js-light";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 
 import { SUNNYSIDE } from "assets/sunnyside";
-import bush from "assets/icons/decoration.png";
 import chest from "assets/icons/chest.png";
 
 import { isMobile } from "mobile-device-detect";
@@ -67,19 +66,19 @@ const LandscapingHudComponent: React.FC<{
   const balance = useSelector(
     gameService,
     (state) => state.context.state.balance,
-    compareBalance
+    compareBalance,
   );
 
   const coins = useSelector(
     gameService,
     (state) => state.context.state.coins,
-    compareCoins
+    compareCoins,
   );
 
   const blockBucks = useSelector(
     gameService,
     (state) => state.context.state.inventory["Block Buck"] ?? new Decimal(0),
-    compareBlockBucks
+    compareBlockBucks,
   );
 
   const selectedItem = useSelector(child, selectMovingItem);
@@ -91,7 +90,7 @@ const LandscapingHudComponent: React.FC<{
     ? hasRemoveRestriction(
         selectedItem.name,
         selectedItem.id,
-        gameService.state.context.state
+        gameService.state.context.state,
       )
     : [false, "No restriction"];
 
@@ -188,7 +187,7 @@ const LandscapingHudComponent: React.FC<{
                     }}
                   />
                   <img
-                    src={bush}
+                    src={SUNNYSIDE.icons.decorationbush}
                     className="absolute"
                     style={{
                       top: `${PIXEL_SCALE * 5}px`,
@@ -355,7 +354,7 @@ const Chest: React.FC<{
         >
           {getKeys(chestItems).reduce(
             (acc, key) => acc + (chestItems[key]?.toNumber() ?? 0),
-            0
+            0,
           )}
         </Label>
       </div>

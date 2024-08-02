@@ -1,4 +1,5 @@
-import mapJson from "assets/map/plaza.json";
+import faction_plaza from "assets/map/plaza.json";
+import desert_plaza from "assets/map/desert_plaza.json";
 
 import { SceneId } from "../mmoMachine";
 import { BaseScene, NPCBumpkin } from "./BaseScene";
@@ -11,10 +12,10 @@ import {
 import { PlaceableContainer } from "../containers/PlaceableContainer";
 import { budImageDomain } from "features/island/collectibles/components/Bud";
 import { SOUNDS } from "assets/sound-effects/soundEffects";
-import { hasFeatureAccess } from "lib/flags";
 import { NPCName } from "lib/npcs";
 import { FactionName, GameState } from "features/game/types/game";
 import { translate } from "lib/i18n/translate";
+import { hasFeatureAccess } from "lib/flags";
 
 export type FactionNPC = {
   npc: NPCName;
@@ -25,6 +26,11 @@ export type FactionNPC = {
 };
 
 export const PLAZA_BUMPKINS: NPCBumpkin[] = [
+  {
+    x: 207,
+    y: 379,
+    npc: "peggy",
+  },
   {
     x: 600,
     y: 197,
@@ -126,10 +132,11 @@ export class PlazaScene extends BaseScene {
   public arrows: Phaser.GameObjects.Sprite | undefined;
 
   constructor({ gameState }: { gameState: GameState }) {
+    const showDesertMap = hasFeatureAccess(gameState, "DESERT_PLAZA");
     super({
       name: "plaza",
       map: {
-        json: mapJson,
+        json: showDesertMap ? desert_plaza : faction_plaza,
         imageKey: "tileset",
       },
       audio: { fx: { walk_key: "dirt_footstep" } },
@@ -153,11 +160,6 @@ export class PlazaScene extends BaseScene {
     this.load.image("shop_icon", "world/shop_disc.png");
     this.load.image("timer_icon", "world/timer_icon.png");
     this.load.image("trade_icon", "world/trade_icon.png");
-
-    this.load.spritesheet("color_portal", "world/color_portal.webp", {
-      frameWidth: 47,
-      frameHeight: 47,
-    });
 
     this.load.spritesheet("plaza_bud", "world/plaza_bud.png", {
       frameWidth: 15,
@@ -204,10 +206,13 @@ export class PlazaScene extends BaseScene {
     this.load.image("luxury_key_disc", "world/luxury_key_disc.png");
 
     // Stella Megastore items
-    this.load.image("vinny", "world/vinny.webp");
+    this.load.image("tomato_bombard", "world/tomato_bombard.gif");
+    this.load.image("rice_panda", "world/rice_panda.webp");
+
     this.load.image("non_la", "world/non_la.webp");
 
-    this.load.image("banner", "world/clash_of_factions_banner.webp");
+    this.load.image("faction_banner", "world/clash_of_factions_banner.webp");
+    this.load.image("pharaoh_banner", "world/pharaohs_treasure_banner.webp");
 
     this.load.spritesheet("glint", "world/glint.png", {
       frameWidth: 7,
@@ -218,7 +223,7 @@ export class PlazaScene extends BaseScene {
 
     const audioMuted = getCachedAudioSetting<boolean>(
       AudioLocalStorageKeys.audioMuted,
-      false
+      false,
     );
 
     if (!audioMuted) {
@@ -274,7 +279,7 @@ export class PlazaScene extends BaseScene {
         .sprite(
           (this.currentPlayer?.x ?? 0) + 2,
           (this.currentPlayer?.y ?? 0) - 4,
-          "arrows_to_move"
+          "arrows_to_move",
         )
         .setDepth(1000000000000);
     }
@@ -285,13 +290,13 @@ export class PlazaScene extends BaseScene {
     });
 
     if (this.gameState.inventory["Treasure Key"]) {
-      this.add.sprite(112, 140, "key_disc").setDepth(1000000000);
+      this.add.sprite(106, 140, "key_disc").setDepth(1000000000);
     } else {
-      this.add.sprite(112, 140, "locked_disc").setDepth(1000000000);
+      this.add.sprite(106, 140, "locked_disc").setDepth(1000000000);
     }
 
     // Sprites
-    const basicChest = this.add.sprite(112, 160, "basic_chest");
+    const basicChest = this.add.sprite(106, 160, "basic_chest");
     basicChest.setInteractive({ cursor: "pointer" }).on("pointerdown", () => {
       if (this.checkDistanceToSprite(basicChest, 75)) {
         interactableModalManager.open("basic_chest");
@@ -324,35 +329,6 @@ export class PlazaScene extends BaseScene {
     clubHouseLabel.setPosition(152, 262);
     clubHouseLabel.setDepth(10000000);
     this.add.existing(clubHouseLabel);
-
-    // Color Portal
-    // Plaza Bud
-    const colorPortal = this.add.sprite(150, 150, "color_portal");
-    this.anims.create({
-      key: "color_portal_anim",
-      frames: this.anims.generateFrameNumbers("color_portal", {
-        start: 0,
-        end: 11,
-      }),
-      repeat: -1,
-      frameRate: 10,
-    });
-
-    colorPortal.play("color_portal_anim", true);
-    colorPortal.setInteractive({ cursor: "pointer" }).on("pointerdown", () => {
-      if (this.checkDistanceToSprite(colorPortal, 75)) {
-        interactableModalManager.open("festival_of_colors");
-      } else {
-        this.currentPlayer?.speak(translate("base.iam.far.away"));
-      }
-    });
-
-    if (
-      !hasFeatureAccess(this.gameState, "FESTIVAL_OF_COLORS") &&
-      Date.now() < new Date("2024-06-30T00:00:00Z").getTime()
-    ) {
-      this.add.sprite(150, 150, "locked_disc").setDepth(1000000000);
-    }
 
     // Plaza Bud
     const fatChicken = this.add.sprite(106, 352, "fat_chicken");
@@ -397,16 +373,19 @@ export class PlazaScene extends BaseScene {
       });
 
     // Banner
-    this.add.image(400, 225, "banner").setDepth(100000000000);
+    const banner = hasFeatureAccess(this.gameState, "DESERT_PLAZA")
+      ? "pharaoh_banner"
+      : "faction_banner";
+    this.add.image(400, 225, banner).setDepth(100000000000);
     // .setInteractive({ cursor: "pointer" })
     // .on("pointerdown", () => {
-    //   interactableModalManager.open("banner");
+    //   interactableModalManager.open(banner);
     // });
-    this.add.image(464, 225, "banner").setDepth(100000000000);
+    this.add.image(464, 225, banner).setDepth(100000000000);
 
-    this.add.image(480, 386, "banner").setDepth(100000000000);
+    this.add.image(480, 386, banner).setDepth(100000000000);
 
-    this.add.sprite(385, 386, "banner").setDepth(100000000000);
+    this.add.sprite(385, 386, banner).setDepth(100000000000);
 
     const bud3 = this.add.sprite(176, 290, "plaza_bud_3");
     this.anims.create({
@@ -477,7 +456,12 @@ export class PlazaScene extends BaseScene {
       });
 
     // Stella Collectible of the Month
-    this.add.image(248, 244, "vinny");
+    if (hasFeatureAccess(this.gameState, "DESERT_PLAZA")) {
+      this.add.image(248, 244, "tomato_bombard");
+    } else {
+      this.add.image(248, 244, "rice_panda");
+    }
+
     this.add.image(288.5, 248, "non_la");
 
     const door = this.colliders

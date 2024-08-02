@@ -8,8 +8,6 @@ import {
   WearablesItem,
 } from "features/game/types/game";
 
-import bg from "assets/ui/grey_background.png";
-
 import { Context } from "features/game/GameProvider";
 import { useSelector } from "@xstate/react";
 import { PIXEL_SCALE } from "features/game/lib/constants";
@@ -73,7 +71,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   }, []);
 
   const getBalanceOfItem = (
-    item: WearablesItem | CollectiblesItem | null
+    item: WearablesItem | CollectiblesItem | null,
   ): number => {
     if (!item) return 0;
 
@@ -174,7 +172,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
     }
 
     <span className="absolute bottom-1 right-2 text-xxs">{`${t(
-      "limit"
+      "limit",
     )}: ${balanceOfItem}/${item.limit}`}</span>; //t
   };
 
@@ -214,7 +212,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                     style={
                       item?.type === "collectible"
                         ? {
-                            backgroundImage: `url(${bg})`,
+                            backgroundImage: `url(${SUNNYSIDE.ui.grey_background})`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
                           }

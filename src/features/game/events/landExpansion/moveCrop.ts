@@ -33,7 +33,7 @@ type Options = {
 export function isLocked(
   plot: CropPlot,
   collectibles: Collectibles,
-  createdAt: number
+  createdAt: number,
 ): boolean {
   const crop = plot.crop;
 
@@ -43,7 +43,7 @@ export function isLocked(
   if (!crop || !plantedAt) return false;
 
   const cropName = crop.name;
-  const cropDetails = CROPS()[cropName];
+  const cropDetails = CROPS[cropName];
 
   if (isReadyToHarvest(createdAt, crop, cropDetails)) return false;
 

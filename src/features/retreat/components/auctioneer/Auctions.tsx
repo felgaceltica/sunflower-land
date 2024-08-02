@@ -4,9 +4,8 @@ import { useActor } from "@xstate/react";
 import { ButtonPanel } from "components/ui/Panel";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { ITEM_IDS } from "features/game/types/bumpkin";
+import token from "assets/icons/sfl.webp";
 
-import bg from "assets/ui/grey_background.png";
-import sflIcon from "assets/icons/sfl.webp";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Label } from "components/ui/Label";
 import { getKeys } from "features/game/types/craftables";
@@ -26,7 +25,7 @@ export const Auctions: React.FC<Props> = ({ auctionService, onSelect }) => {
   const { auctions } = auctioneerState.context;
 
   const currentAuctions = auctions.filter(
-    (auction) => auction.endAt > Date.now()
+    (auction) => auction.endAt > Date.now(),
   );
   if (currentAuctions.length === 0) {
     return <AuctionsComingSoon />;
@@ -51,7 +50,7 @@ export const Auctions: React.FC<Props> = ({ auctionService, onSelect }) => {
           >
             <div className="relative w-20 h-20 flex items-center justify-center mr-2">
               <img
-                src={bg}
+                src={SUNNYSIDE.ui.grey_background}
                 className="w-full h-full absolute inset-0 rounded-md"
               />
               <img
@@ -75,7 +74,7 @@ export const Auctions: React.FC<Props> = ({ auctionService, onSelect }) => {
               </p>
               <div className="ml-1 hidden sm:flex my-1">
                 {auction.sfl > 0 && (
-                  <img src={sflIcon} className="h-4 img-highlight -ml-1" />
+                  <img src={token} className="h-4 img-highlight -ml-1" />
                 )}
                 {getKeys(auction.ingredients).map((name) => (
                   <img

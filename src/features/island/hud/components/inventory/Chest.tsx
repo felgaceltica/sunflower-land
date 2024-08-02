@@ -10,24 +10,12 @@ import { CollectibleName, getKeys } from "features/game/types/craftables";
 import { getChestBuds, getChestItems } from "./utils/inventory";
 import Decimal from "decimal.js-light";
 import { Button } from "components/ui/Button";
-import chest from "assets/npcs/synced.gif";
+
 import lightning from "assets/icons/lightning.png";
 
 import { SplitScreenView } from "components/ui/SplitScreenView";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { InventoryItemDetails } from "components/ui/layouts/InventoryItemDetails";
-
-import marketIcon from "assets/buildings/market_icon.png";
-import firePitIcon from "assets/buildings/fire_pit_icon.png";
-import workbenchIcon from "assets/buildings/workbench_icon.png";
-import kitchenIcon from "assets/buildings/kitchen_icon.png";
-import henHouseIcon from "assets/buildings/hen_house_icon.png";
-import bakeryIcon from "assets/buildings/bakery_icon.png";
-import deliIcon from "assets/buildings/deli_icon.png";
-import smoothieIcon from "assets/buildings/smoothie_shack_icon.png";
-import toolshedIcon from "assets/buildings/toolshed_icon.png";
-import warehouseIcon from "assets/buildings/warehouse_icon.png";
-import greenhouseIcon from "assets/icons/greenhouse.webp";
 
 import { BudName, isBudName } from "features/game/types/buds";
 import { CONFIG } from "lib/config";
@@ -47,21 +35,21 @@ import { InnerPanel } from "components/ui/Panel";
 const imageDomain = CONFIG.NETWORK === "mainnet" ? "buds" : "testnet-buds";
 
 export const ITEM_ICONS: (
-  island: IslandType
+  island: IslandType,
 ) => Partial<Record<InventoryItemName, string>> = (island) => ({
-  Market: marketIcon,
-  "Fire Pit": firePitIcon,
-  Workbench: workbenchIcon,
-  Kitchen: kitchenIcon,
-  "Hen House": henHouseIcon,
-  Bakery: bakeryIcon,
-  Deli: deliIcon,
-  "Smoothie Shack": smoothieIcon,
-  Toolshed: toolshedIcon,
-  Warehouse: warehouseIcon,
+  Market: SUNNYSIDE.icons.marketIcon,
+  "Fire Pit": SUNNYSIDE.icons.firePitIcon,
+  Workbench: SUNNYSIDE.icons.workbenchIcon,
+  Kitchen: SUNNYSIDE.icons.kitchenIcon,
+  "Hen House": SUNNYSIDE.icons.henHouseIcon,
+  Bakery: SUNNYSIDE.icons.bakeryIcon,
+  Deli: SUNNYSIDE.icons.deliIcon,
+  "Smoothie Shack": SUNNYSIDE.icons.smoothieIcon,
+  Toolshed: SUNNYSIDE.icons.toolshedIcon,
+  Warehouse: SUNNYSIDE.icons.warehouseIcon,
   Tree: TREE_VARIANTS[island],
   "Dirt Path": DIRT_PATH_VARIANTS[island],
-  Greenhouse: greenhouseIcon,
+  Greenhouse: SUNNYSIDE.icons.greenhouseIcon,
 });
 
 interface Props {
@@ -92,9 +80,12 @@ export const Chest: React.FC<Props> = ({
   const { t } = useAppTranslation();
   const collectibles = getKeys(chestMap)
     .sort((a, b) => a.localeCompare(b))
-    .reduce((acc, item) => {
-      return { ...acc, [item]: chestMap[item] };
-    }, {} as Record<CollectibleName, Decimal>);
+    .reduce(
+      (acc, item) => {
+        return { ...acc, [item]: chestMap[item] };
+      },
+      {} as Record<CollectibleName, Decimal>,
+    );
 
   const getSelectedChestItems = (): InventoryItemName | BudName => {
     if (isBudName(selected)) {
@@ -134,7 +125,7 @@ export const Chest: React.FC<Props> = ({
     return (
       <InnerPanel className="flex flex-col justify-evenly items-center px-2 !py-[50px]">
         <img
-          src={chest}
+          src={SUNNYSIDE.npcs.synced}
           alt="Empty Chest"
           style={{
             width: `${PIXEL_SCALE * 17}px`,
@@ -211,7 +202,7 @@ export const Chest: React.FC<Props> = ({
       !resources.includes(name) &&
       !buildings.includes(name) &&
       !boosts.includes(name) &&
-      !banners.includes(name)
+      !banners.includes(name),
   );
 
   return (
@@ -248,7 +239,7 @@ export const Chest: React.FC<Props> = ({
                           "top-1": type === "Retreat",
 
                           "left-1": type === "Plaza",
-                        }
+                        },
                       )}
                     />
                   );

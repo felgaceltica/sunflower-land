@@ -9,7 +9,7 @@ import {
 import { INITIAL_BUMPKIN, TEST_FARM } from "features/game/lib/constants";
 import { getSeasonalTicket } from "features/game/types/seasons";
 
-const LAST_DAY_OF_SEASON = new Date("2023-10-31T16:00:00Z").getTime();
+const FIRST_DAY_OF_SEASON = new Date("2023-11-01T16:00:00Z").getTime();
 const MID_SEASON = new Date("2023-08-15T15:00:00Z").getTime();
 
 describe("deliver", () => {
@@ -27,7 +27,7 @@ describe("deliver", () => {
           id: "123",
           type: "order.delivered",
         },
-      })
+      }),
     ).toThrow("Order does not exist");
   });
 
@@ -57,7 +57,7 @@ describe("deliver", () => {
           type: "order.delivered",
         },
         createdAt: MID_SEASON,
-      })
+      }),
     ).toThrow("Order has not started");
   });
 
@@ -87,7 +87,7 @@ describe("deliver", () => {
           type: "order.delivered",
         },
         createdAt: MID_SEASON,
-      })
+      }),
     ).toThrow("Insufficient ingredient: Sunflower");
   });
 
@@ -121,7 +121,7 @@ describe("deliver", () => {
           id: "123",
           type: "order.delivered",
         },
-      })
+      }),
     ).toThrow("Insufficient ingredient: sfl");
   });
 
@@ -152,7 +152,7 @@ describe("deliver", () => {
           type: "order.delivered",
         },
         createdAt: MID_SEASON,
-      })
+      }),
     ).toThrow("Insufficient ingredient: coins");
   });
 
@@ -547,7 +547,7 @@ describe("deliver", () => {
               {
                 id: "123",
                 createdAt: 0,
-                readyAt: LAST_DAY_OF_SEASON,
+                readyAt: FIRST_DAY_OF_SEASON,
                 from: "pumpkin' pete",
                 items: {
                   Sunflower: 50,
@@ -562,8 +562,8 @@ describe("deliver", () => {
           id: "123",
           type: "order.delivered",
         },
-        createdAt: LAST_DAY_OF_SEASON,
-      })
+        createdAt: FIRST_DAY_OF_SEASON,
+      }),
     ).toThrow("Ticket tasks are frozen");
   });
 
@@ -581,7 +581,7 @@ describe("deliver", () => {
             {
               id: "123",
               createdAt: 0,
-              readyAt: LAST_DAY_OF_SEASON,
+              readyAt: FIRST_DAY_OF_SEASON,
               from: "betty",
               items: {
                 Sunflower: 50,
@@ -596,7 +596,7 @@ describe("deliver", () => {
         id: "123",
         type: "order.delivered",
       },
-      createdAt: LAST_DAY_OF_SEASON,
+      createdAt: FIRST_DAY_OF_SEASON,
     });
 
     expect(state.balance).toEqual(new Decimal(10));
@@ -638,8 +638,8 @@ describe("deliver", () => {
         createdAt: new Date("2024-05-10T16:00:00Z").getTime(),
       });
 
-      expect(state.inventory["Scroll"]).toEqual(
-        new Decimal(TICKET_REWARDS[name as QuestNPCName])
+      expect(state.inventory[getSeasonalTicket()]).toEqual(
+        new Decimal(TICKET_REWARDS[name as QuestNPCName]),
       );
     });
   });
@@ -676,7 +676,7 @@ describe("deliver", () => {
       createdAt: new Date("2024-05-10T16:00:00Z").getTime(),
     });
 
-    expect(state.inventory["Scroll"]).toEqual(new Decimal(1));
+    expect(state.inventory[getSeasonalTicket()]).toEqual(new Decimal(1));
   });
 
   it("provides +2 tickets for banner holder", () => {
@@ -712,7 +712,7 @@ describe("deliver", () => {
       createdAt: new Date("2024-05-10T16:00:00Z").getTime(),
     });
 
-    expect(state.inventory["Scroll"]).toEqual(new Decimal(3));
+    expect(state.inventory[getSeasonalTicket()]).toEqual(new Decimal(3));
   });
 
   it("provides +2 tickets for Lifetime Farmer banner holder", () => {
@@ -748,6 +748,6 @@ describe("deliver", () => {
       createdAt: new Date("2024-05-10T16:00:00Z").getTime(),
     });
 
-    expect(state.inventory["Scroll"]).toEqual(new Decimal(3));
+    expect(state.inventory[getSeasonalTicket()]).toEqual(new Decimal(3));
   });
 });

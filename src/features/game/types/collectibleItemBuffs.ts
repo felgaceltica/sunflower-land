@@ -425,6 +425,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     boostTypeIcon: powerup,
     // boostedItemIcon: ITEM_DETAILS.Oil.image,
   },
+  "Lemon Shark": {
+    labelType: "success",
+    shortDescription: translate("description.lemon.shark.boost"),
+    boostTypeIcon: powerup,
+    boostedItemIcon: ITEM_DETAILS.Lemon.image,
+  },
   "Crim Peckster": {
     shortDescription: translate("description.crim.peckster.boost"),
     labelType: "success",
@@ -459,6 +465,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     shortDescription: translate("description.beehive.boost"),
     labelType: "vibrant",
     boostTypeIcon: lightning,
+  },
+  "Pharaoh Chicken": {
+    shortDescription: translate("description.pharaoh.chicken.boost"),
+    labelType: "success",
+    boostTypeIcon: powerup,
+    boostedItemIcon: ITEM_DETAILS["Sand Shovel"].image,
   },
 
   // Fish
@@ -627,5 +639,58 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     shortDescription: translate("description.blossom.hourglass.boost"),
     labelType: "info",
     boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+  },
+  "Desert Rose": {
+    shortDescription: translate("description.desert.rose.boost"),
+    labelType: "vibrant",
+    boostTypeIcon: lightning,
+    boostedItemIcon: SUNNYSIDE.icons.plant,
+  },
+  "Pharaoh Gnome": {
+    shortDescription: translate("description.pharaoh.gnome.boost"),
+    labelType: "success",
+    boostedItemIcon: powerup,
+  },
+  "Lemon Tea Bath": {
+    shortDescription: translate("description.lemon.tea.bath.boost"),
+    labelType: "info",
+    boostedItemIcon: SUNNYSIDE.icons.stopwatch,
+    boostTypeIcon: ITEM_DETAILS.Lemon.image,
+  },
+  "Tomato Clown": {
+    shortDescription: translate("description.tomato.clown.boost"),
+    labelType: "info",
+    boostedItemIcon: SUNNYSIDE.icons.stopwatch,
+    boostTypeIcon: ITEM_DETAILS.Tomato.image,
+  },
+  Cannonball: {
+    shortDescription: translate("description.cannonball.boost"),
+    labelType: "info",
+    boostedItemIcon: SUNNYSIDE.icons.stopwatch,
+    boostTypeIcon: ITEM_DETAILS.Tomato.image,
+  },
+  "Tomato Bombard": {
+    shortDescription: translate("description.tomato.bombard.boost"),
+    labelType: "success",
+    boostedItemIcon: powerup,
+    boostTypeIcon: ITEM_DETAILS.Tomato.image,
+  },
+  Camel: {
+    shortDescription: translate("description.camel.boost"),
+    labelType: "success",
+    boostTypeIcon: powerup,
+    boostedItemIcon: SUNNYSIDE.tools.sand_shovel,
+  },
+  "Reveling Lemon": {
+    shortDescription: translate("description.reveling.lemon.boost"),
+    labelType: "success",
+    boostedItemIcon: powerup,
+    boostTypeIcon: ITEM_DETAILS.Lemon.image,
+  },
+  "Lemon Frog": {
+    shortDescription: translate("description.lemon.frog.boost"),
+    labelType: "info",
+    boostedItemIcon: SUNNYSIDE.icons.stopwatch,
+    boostTypeIcon: ITEM_DETAILS.Lemon.image,
   },
 };
