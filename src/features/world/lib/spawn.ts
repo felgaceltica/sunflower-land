@@ -171,4 +171,10 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 16 * 11 + randomYOffset,
     },
   },
+  goblin_invasion: {
+    default: {
+      x: 16 * 11 + randomXOffset,
+      y: 16 * 11 + randomYOffset,
+    },
+  },
 });
