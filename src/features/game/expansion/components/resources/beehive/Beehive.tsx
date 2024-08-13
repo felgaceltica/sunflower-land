@@ -13,7 +13,7 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import classNames from "classnames";
 import { Context } from "features/game/GameProvider";
 import { MachineState } from "features/game/lib/gameMachine";
-import { useActor, useInterpret, useSelector } from "@xstate/react";
+import { useInterpret, useSelector } from "@xstate/react";
 import { Bar } from "components/ui/ProgressBar";
 import { Beehive as IBeehive } from "features/game/types/game";
 import {
@@ -41,7 +41,7 @@ import { DEFAULT_HONEY_PRODUCTION_TIME } from "features/game/lib/updateBeehives"
 import { translate } from "lib/i18n/translate";
 import Decimal from "decimal.js-light";
 import { secondsToString } from "lib/utils/time";
-import { setPrecision } from "lib/utils/formatNumber";
+import { formatNumber } from "lib/utils/formatNumber";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { getHoneyMultiplier } from "features/game/events/landExpansion/harvestBeehive";
 
@@ -68,11 +68,11 @@ const _currentFlowerId = (state: BeehiveMachineState) =>
   state.context.attachedFlower?.id;
 const _showBeeAnimation = (state: BeehiveMachineState) =>
   state.matches("showBeeAnimation");
+const _state = (state: MachineState) => state.context.state;
 
 export const Beehive: React.FC<Props> = ({ id }) => {
   const { t } = useAppTranslation();
   const { showTimers, gameService } = useContext(Context);
-  const [gameState] = useActor(gameService);
   const isInitialMount = useRef(true);
   const [showProducingBee, setShowProducingBee] = useState<boolean>();
   const [showHoneyLevelModal, setShowHoneyLevelModal] = useState(false);
@@ -83,9 +83,10 @@ export const Beehive: React.FC<Props> = ({ id }) => {
 
   const landscaping = useSelector(gameService, _landscaping);
   const hive = useSelector(gameService, getBeehiveById(id), compareHive);
+  const gameState = useSelector(gameService, _state);
 
   const beehiveContext: BeehiveContext = {
-    gameState: gameState.context.state,
+    gameState,
     hive,
     honeyProduced: getCurrentHoneyProduced(hive),
     currentSpeed: getCurrentSpeed(hive),
@@ -102,7 +103,7 @@ export const Beehive: React.FC<Props> = ({ id }) => {
   const currentFlowerId = useSelector(beehiveService, _currentFlowerId);
   const showBeeAnimation = useSelector(beehiveService, _showBeeAnimation);
 
-  const honeyMultiplier = getHoneyMultiplier(gameState.context.state);
+  const honeyMultiplier = getHoneyMultiplier(gameState);
 
   const handleBeeAnimationEnd = useCallback(() => {
     beehiveService.send("BEE_ANIMATION_DONE");
@@ -185,10 +186,10 @@ export const Beehive: React.FC<Props> = ({ id }) => {
     .todp(4, Decimal.ROUND_DOWN)
     .toNumber();
 
-  const honeyPercentage = setPrecision(
-    new Decimal(honeyAmount * 100),
-    2,
-  ).toFixed(2);
+  const honeyPercentageDisplay = `${formatNumber(honeyAmount * 100, {
+    decimalPlaces: 2,
+    showTrailingZeros: true,
+  })}%`;
 
   const percentage = (honeyProduced / DEFAULT_HONEY_PRODUCTION_TIME) * 100;
   const showQuantityBar =
@@ -268,6 +269,7 @@ export const Beehive: React.FC<Props> = ({ id }) => {
           <Bee
             hiveX={hive.x}
             hiveY={hive.y}
+            gameService={gameService}
             flowerId={currentFlowerId as string}
             onAnimationEnd={handleBeeAnimationEnd}
           />
@@ -301,7 +303,7 @@ export const Beehive: React.FC<Props> = ({ id }) => {
                 {t("honey")}
                 {":"}{" "}
                 {Number(honeyAmount) < 1
-                  ? `${honeyPercentage}% ${t("full")}`
+                  ? `${honeyPercentageDisplay} ${t("full")}`
                   : t("full")}
               </span>
             </div>
@@ -361,7 +363,7 @@ export const Beehive: React.FC<Props> = ({ id }) => {
                     )}
                   >
                     {Number(honeyAmount) < 1
-                      ? `${honeyPercentage}%`
+                      ? honeyPercentageDisplay
                       : t("full")}
                   </p>
                 </div>
@@ -375,7 +377,7 @@ export const Beehive: React.FC<Props> = ({ id }) => {
                   </Label>
                   <div className="text-xs mb-0.5">
                     {t("beehive.honeyPerFullHive", {
-                      multiplier: setPrecision(new Decimal(honeyMultiplier)),
+                      multiplier: formatNumber(honeyMultiplier),
                     })}
                   </div>
                 </div>
@@ -385,7 +387,7 @@ export const Beehive: React.FC<Props> = ({ id }) => {
                   </Label>
                   <div className="text-xs mb-0.5">
                     {t("beehive.fullHivePerDay", {
-                      speed: setPrecision(new Decimal(currentSpeed)),
+                      speed: formatNumber(currentSpeed),
                       hive:
                         new Decimal(currentSpeed).toNumber() > 1
                           ? t("beehive.hives.plural")

@@ -12,7 +12,7 @@ import {
   LandscapingDecorationName,
 } from "../types/decorations";
 
-export const maxItems: Inventory = {
+export const MAX_ITEMS: Inventory = {
   Sunflower: new Decimal("30000"),
   Potato: new Decimal("20000"),
   Pumpkin: new Decimal("16000"),
@@ -33,14 +33,14 @@ export const maxItems: Inventory = {
   Blueberry: new Decimal("900"),
   Orange: new Decimal("900"),
   Apple: new Decimal("700"),
-  Banana: new Decimal("600"),
+  Banana: new Decimal("700"),
 
-  Olive: new Decimal("250"),
-  Grape: new Decimal("250"),
-  Rice: new Decimal("250"),
+  Olive: new Decimal("400"),
+  Grape: new Decimal("400"),
+  Rice: new Decimal("400"),
 
   Chicken: new Decimal("20"),
-  Egg: new Decimal("800"),
+  Egg: new Decimal("1700"),
 
   "Speed Chicken": new Decimal("5"),
   "Rich Chicken": new Decimal("5"),
@@ -123,7 +123,7 @@ export const maxItems: Inventory = {
   Stone: new Decimal("1600"),
   Wood: new Decimal("8000"),
   "Wild Mushroom": new Decimal("100"),
-  Honey: new Decimal("220"),
+  Honey: new Decimal("350"),
   Oil: new Decimal("300"),
 
   "War Bond": new Decimal(500),
@@ -201,17 +201,6 @@ export const maxItems: Inventory = {
   Grub: new Decimal(150),
   "Red Wiggler": new Decimal(100),
   "Fishing Lure": new Decimal(100),
-
-  //Treasure Island Beach Bounty
-  "Pirate Bounty": new Decimal(50),
-  Pearl: new Decimal(50),
-  Coral: new Decimal(50),
-  "Clam Shell": new Decimal(50),
-  Pipi: new Decimal(50),
-  Starfish: new Decimal(50),
-  Seaweed: new Decimal(50),
-  "Sea Cucumber": new Decimal(50),
-  Crab: new Decimal(1000),
 
   // Seasonal decorations - Dawnbreaker
   Clementine: new Decimal(1),
@@ -371,7 +360,7 @@ export function checkProgress({ state, action, farmId }: ProcessEventArgs): {
 
     Object.entries(items).forEach(([itemName, amount]) => {
       listedItems[itemName as InventoryItemName] =
-        (listedItems[itemName as InventoryItemName] ?? 0) + amount;
+        (listedItems[itemName as InventoryItemName] ?? 0) + Number(amount);
     });
   });
 
@@ -392,7 +381,7 @@ export function checkProgress({ state, action, farmId }: ProcessEventArgs): {
         .add(listingAmount)
         .minus(previousInventoryAmount);
 
-      const max = maxItems[name] || new Decimal(0);
+      const max = MAX_ITEMS[name] || new Decimal(0);
 
       if (max.eq(0)) return true;
 
@@ -423,7 +412,7 @@ export function hasMaxItems({
 
     const diff = current[name]?.minus(oldAmount) || new Decimal(0);
 
-    const max = maxItems[name] || new Decimal(0);
+    const max = MAX_ITEMS[name] || new Decimal(0);
 
     if (max.eq(0)) return true;
 

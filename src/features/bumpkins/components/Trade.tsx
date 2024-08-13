@@ -23,12 +23,8 @@ import { getBumpkinLevel } from "features/game/lib/level";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { makeListingType } from "lib/utils/makeTradeListingType";
 import { Label } from "components/ui/Label";
-import {
-  TRADE_LIMITS,
-  TRADE_MINIMUMS,
-} from "features/world/ui/trader/BuyPanel";
 import { FloorPrices } from "features/game/actions/getListingsFloorPrices";
-import { setPrecision } from "lib/utils/formatNumber";
+import { formatNumber, setPrecision } from "lib/utils/formatNumber";
 import { hasVipAccess } from "features/game/lib/vipAccess";
 import { ModalContext } from "features/game/components/modal/ModalProvider";
 import { VIPAccess } from "features/game/components/VipAccess";
@@ -37,6 +33,10 @@ import { ListingCategoryCard } from "components/ui/ListingCategoryCard";
 import { FACTION_EMBLEMS } from "features/game/events/landExpansion/joinFaction";
 import { NumberInput } from "components/ui/NumberInput";
 import { hasFeatureAccess } from "lib/flags";
+import {
+  TRADE_LIMITS,
+  TRADE_MINIMUMS,
+} from "features/game/actions/tradeLimits";
 
 const MAX_NON_VIP_LISTINGS = 1;
 const MAX_SFL = 150;
@@ -158,13 +158,19 @@ const ListTrade: React.FC<{
         </div>
         <div className="flex flex-col items-end pr-1">
           <Label
-            type={inventory[selected]?.lt(quantity) ? "danger" : "info"}
+            type={
+              (inventory?.[selected] ?? new Decimal(0)).lt(quantity)
+                ? "danger"
+                : "info"
+            }
             className="my-1"
           >
             {t("bumpkinTrade.available")}
           </Label>
           <span className="text-sm mr-1 font-secondary">
-            {`${setPrecision(new Decimal(inventory?.[selected] ?? 0), 0)}`}
+            {formatNumber(inventory?.[selected] ?? new Decimal(0), {
+              decimalPlaces: 0,
+            })}
           </span>
         </div>
       </div>
@@ -182,25 +188,33 @@ const ListTrade: React.FC<{
         >
           {t("bumpkinTrade.floorPrice", {
             price: floorPrices[selected]
-              ? setPrecision(new Decimal(floorPrices[selected] ?? 0))
+              ? formatNumber(floorPrices[selected] ?? 0, {
+                  decimalPlaces: 4,
+                })
               : "?",
           })}
         </Label>
         {isTooLow && (
           <Label type="danger" className="my-1 ml-2 mr-1">
             {t("bumpkinTrade.minimumFloor", {
-              min: setPrecision(new Decimal(floorPrices[selected] ?? 0))
-                .mul(0.8)
-                .toNumber(),
+              min: formatNumber(
+                new Decimal(floorPrices[selected] ?? 0).mul(0.8),
+                {
+                  decimalPlaces: 4,
+                },
+              ),
             })}
           </Label>
         )}
         {isTooHigh && (
           <Label type="danger" className="my-1 ml-2 mr-1">
             {t("bumpkinTrade.maximumFloor", {
-              max: setPrecision(new Decimal(floorPrices[selected] ?? 0))
-                .mul(1.2)
-                .toNumber(),
+              max: formatNumber(
+                new Decimal(floorPrices[selected] ?? 0).mul(1.2),
+                {
+                  decimalPlaces: 4,
+                },
+              ),
             })}
           </Label>
         )}
@@ -280,9 +294,10 @@ const ListTrade: React.FC<{
         }}
       >
         <span className="text-xs"> {t("bumpkinTrade.listingPrice")}</span>
-        <p className="text-xs font-secondary">{`${setPrecision(
-          new Decimal(sfl),
-        ).toFixed(4)} SFL`}</p>
+        <p className="text-xs font-secondary">{`${formatNumber(sfl, {
+          decimalPlaces: 4,
+          showTrailingZeros: true,
+        })} SFL`}</p>
       </div>
       <div
         className="flex justify-between"
@@ -297,7 +312,10 @@ const ListTrade: React.FC<{
         <p className="text-xs font-secondary">
           {quantity.equals(0)
             ? "0.0000 SFL"
-            : `${setPrecision(unitPrice).toFixed(4)} SFL`}
+            : `${formatNumber(sfl.dividedBy(quantity), {
+                decimalPlaces: 4,
+                showTrailingZeros: true,
+              })} SFL`}
         </p>
       </div>
       <div
@@ -308,9 +326,10 @@ const ListTrade: React.FC<{
         }}
       >
         <span className="text-xs"> {t("bumpkinTrade.tradingFee")}</span>
-        <p className="text-xs font-secondary">{`${setPrecision(
-          sfl.mul(0.1),
-        ).toFixed(4)} SFL`}</p>
+        <p className="text-xs font-secondary">{`${formatNumber(sfl.mul(0.1), {
+          decimalPlaces: 4,
+          showTrailingZeros: true,
+        })} SFL`}</p>
       </div>
       <div
         className="flex justify-between"
@@ -319,9 +338,10 @@ const ListTrade: React.FC<{
         }}
       >
         <span className="text-xs"> {t("bumpkinTrade.youWillReceive")}</span>
-        <p className="text-xs font-secondary">{`${setPrecision(
-          sfl.mul(0.9),
-        ).toFixed(4)} SFL`}</p>
+        <p className="text-xs font-secondary">{`${formatNumber(sfl.mul(0.9), {
+          decimalPlaces: 4,
+          showTrailingZeros: true,
+        })} SFL`}</p>
       </div>
       <div className="flex mt-2">
         <Button onClick={onCancel} className="mr-1">
@@ -333,7 +353,8 @@ const ListTrade: React.FC<{
             isTooHigh ||
             isTooLow ||
             maxSFL ||
-            (inventory[selected]?.lt(quantity) ?? false) ||
+            quantity.gt(inventory?.[selected] ?? new Decimal(0)) ||
+            quantity.gt(TRADE_LIMITS[selected] ?? new Decimal(0)) ||
             quantity.equals(0) || // Disable when quantity is 0
             sfl.equals(0) || // Disable when sfl is 0
             isSaving

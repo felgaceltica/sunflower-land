@@ -30,11 +30,8 @@ import { Coordinates } from "features/game/expansion/components/MapPlacement";
 import Decimal from "decimal.js-light";
 import { isTouchDevice } from "../lib/device";
 import { getRemainingDigs } from "features/island/hud/components/DesertDiggingDisplay";
-import {
-  AudioLocalStorageKeys,
-  getCachedAudioSetting,
-} from "features/game/lib/audio";
 import { hasReadDigbyIntro } from "../ui/beach/Digby";
+import { isWearableActive } from "features/game/lib/wearables";
 
 const convertToSnakeCase = (str: string) => {
   return str.replace(" ", "_").toLowerCase();
@@ -329,7 +326,7 @@ export class BeachScene extends BaseScene {
       key: "blinking_anim",
       frames: this.anims.generateFrameNumbers("blinking", {
         start: 0,
-        end: 12,
+        end: 11,
       }),
       repeat: -1,
       frameRate: 5,
@@ -342,7 +339,7 @@ export class BeachScene extends BaseScene {
       key: "bird_anim",
       frames: this.anims.generateFrameNumbers("bird", {
         start: 0,
-        end: 4,
+        end: 3,
       }),
       repeat: -1,
       frameRate: 5,
@@ -368,20 +365,7 @@ export class BeachScene extends BaseScene {
     this.sound.add("dig");
     this.sound.add("reveal");
 
-    if (
-      hasFeatureAccess(this.gameService.state.context.state, "TEST_DIGGING")
-    ) {
-      this.setUpDigSite();
-    } else {
-      const blockingTree = this.add.sprite(384, 322, "palm_tree");
-      this.physics.world.enable(blockingTree);
-      this.colliders?.add(blockingTree);
-      (blockingTree.body as Phaser.Physics.Arcade.Body)
-        .setSize(32, 16)
-        .setOffset(0, 16)
-        .setImmovable(true)
-        .setCollideWorldBounds(true);
-    }
+    this.setUpDigSite();
 
     if (!hasReadDesertNotice()) {
       this.add.image(424, 267, "question_disc").setDepth(1000000);
@@ -604,12 +588,14 @@ export class BeachScene extends BaseScene {
       const existing = this.dugItems.find(
         (item) => item.x === offsetX && item.y === offsetY,
       );
+
       if (existing) {
-        existing.setTexture(key);
-      } else {
-        const image = this.add.image(offsetX, offsetY, key).setScale(0.8);
-        this.dugItems.push(image);
+        existing.destroy();
+        this.dugItems = this.dugItems.filter((item) => item !== existing);
       }
+
+      const image = this.add.image(offsetX, offsetY, key).setScale(0.8);
+      this.dugItems.push(image);
     });
 
     // Clean up any sprites that are no longer in game state
@@ -634,18 +620,7 @@ export class BeachScene extends BaseScene {
   public walkToLocation = (x: number, y: number, onComplete: () => void) => {
     if (!this.currentPlayer) return;
 
-    const xDiff = this.currentPlayer.x - x;
-    const yDiff = this.currentPlayer.y - y;
-    const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
     const speed = 75;
-
-    const duration = (distance / speed) * 1000;
-
-    if (xDiff > 0) {
-      this.currentPlayer.faceLeft();
-    } else {
-      this.currentPlayer.faceRight();
-    }
 
     let offsetX = this.digOffsetX;
     let offsetY = this.digOffsetY;
@@ -661,20 +636,99 @@ export class BeachScene extends BaseScene {
         : x + this.cellSize + offsetX;
     const yPosition = y + offsetY;
 
-    this.tweens.add({
-      targets: this.currentPlayer,
-      x: xPosition,
-      y: yPosition,
-      duration,
-      ease: "Linear",
-      onStart: () => {
-        this.isPlayerTweening = true;
-      },
-      onComplete: () => {
-        this.isPlayerTweening = false;
-        onComplete();
-      },
-    });
+    const path = this.navMesh?.findPath(
+      { x: this.currentPlayer.x, y: this.currentPlayer.y },
+      { x: xPosition, y: yPosition },
+    );
+
+    const tweens: any[] = [];
+
+    if (path?.length) {
+      path.forEach((point, i) => {
+        const nextPoint = path[i + 1];
+
+        if (nextPoint) {
+          const currentX = point.x as number;
+          const currentY = point.y as number;
+          const nextX = nextPoint.x as number;
+          const nextY = nextPoint.y as number;
+
+          const distance = Phaser.Math.Distance.Between(
+            currentX,
+            currentY,
+            nextX,
+            nextY,
+          );
+
+          const duration = (distance / speed) * 1000;
+
+          tweens.push({
+            x: nextX,
+            y: nextY,
+            duration, // Duration for each segment
+            ease: "Linear",
+            onStart: () => {
+              this.isPlayerTweening = true;
+            },
+            onActive: () => {
+              if (nextX > currentX) {
+                this.currentPlayer?.faceRight();
+              } else {
+                this.currentPlayer?.faceLeft();
+              }
+            },
+            onComplete: () => {
+              if (i === path.length - 2) {
+                // Only call onComplete for the last segment
+                this.isPlayerTweening = false;
+
+                // Face the correct direction for the dig site
+                if (currentX > x) {
+                  this.currentPlayer?.faceLeft();
+                } else {
+                  this.currentPlayer?.faceRight();
+                }
+
+                onComplete();
+              }
+            },
+          });
+        }
+      });
+
+      this.tweens.chain({
+        targets: this.currentPlayer,
+        tweens,
+      });
+    } else {
+      // Fallback for is no path is found. Just plow through.
+      const xDiff = this.currentPlayer.x - x;
+      const yDiff = this.currentPlayer.y - y;
+      const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+      const duration = (distance / speed) * 1000;
+
+      if (xDiff > 0) {
+        this.currentPlayer.faceLeft();
+      } else {
+        this.currentPlayer.faceRight();
+      }
+
+      this.tweens.add({
+        targets: this.currentPlayer,
+        x: xPosition,
+        y: yPosition,
+        duration,
+        ease: "Linear",
+        onStart: () => {
+          this.isPlayerTweening = true;
+        },
+        onComplete: () => {
+          this.isPlayerTweening = false;
+          onComplete();
+        },
+      });
+    }
   };
 
   public disableControls() {
@@ -727,21 +781,32 @@ export class BeachScene extends BaseScene {
       });
     }
 
-    if (
-      (this.selectedItem === "Sand Drill" && sandDrillsCount === 0) ||
-      (this.selectedItem === "Sand Shovel" && sandShovelsCount === 0) ||
-      !this.hasDigsLeft
-    ) {
-      if (
-        !hasDugHere &&
-        this.selectedItem === "Sand Shovel" &&
-        sandShovelsCount === 0
-      ) {
-        // Drills are handled in their own hover handlers
-        this.noToolHoverBox
-          ?.setPosition(rectX + 4, rectY + 4)
-          .setOrigin(0)
-          .setVisible(true);
+    const hasTool =
+      (this.selectedItem === "Sand Drill" && sandDrillsCount > 0) ||
+      (this.selectedItem === "Sand Shovel" && sandShovelsCount > 0) ||
+      this.isAncientShovelActive;
+
+    if (!hasTool || !this.hasDigsLeft) {
+      if (!hasDugHere) {
+        // If the player has the drill selected then return as the no dig icon is handled in the drill hover
+        // due to the different size of the hover box
+        if (this.selectedItem === "Sand Drill") return;
+
+        const sandShovels =
+          this.gameService.state.context.state.inventory["Sand Shovel"] ??
+          new Decimal(0);
+
+        if (this.selectedItem !== "Sand Shovel") {
+          // Select the shovel so the player knows they need a shovel to dig
+          this.shortcutItem("Sand Shovel");
+        }
+
+        if (sandShovels.lt(1)) {
+          this.noToolHoverBox
+            ?.setPosition(rectX + 4, rectY + 4)
+            .setOrigin(0)
+            .setVisible(true);
+        }
       }
 
       this.handleDigbyWarnings();
@@ -888,6 +953,8 @@ export class BeachScene extends BaseScene {
 
     if (sandDrills.lt(1)) {
       this.noToolHoverBox?.setPosition(noToolX, noToolY).setVisible(true);
+      this.drillHoverBox?.setVisible(false);
+      this.handleDigbyWarnings();
 
       return;
     }
@@ -1051,6 +1118,13 @@ export class BeachScene extends BaseScene {
     );
   }
 
+  get isAncientShovelActive() {
+    return isWearableActive({
+      name: "Ancient Shovel",
+      game: this.gameService.state.context.state,
+    });
+  }
+
   get holesDugCount() {
     return this.gameService.state.context.state.desert.digging.grid.length ?? 0;
   }
@@ -1137,8 +1211,9 @@ export class BeachScene extends BaseScene {
 
   public handleNameTagVisibility = () => {
     const currentPlayerBounds = this.currentPlayer?.getBounds();
-    const nameTag = this.currentPlayer?.getByName("nameTag");
-    const factionTag = this.currentPlayer?.getByName("factionTag");
+    const nameTag = this.currentPlayer?.getByName(
+      "nameTag",
+    ) as Phaser.GameObjects.Text;
     // Create a grid for the dig site with a buffer of 1 tile
     const gridRect = new Phaser.Geom.Rectangle(
       this.gridX,
@@ -1149,23 +1224,11 @@ export class BeachScene extends BaseScene {
 
     if (!currentPlayerBounds || !gridRect) return;
 
-    if (Phaser.Geom.Rectangle.Overlaps(currentPlayerBounds, gridRect)) {
-      if (nameTag) {
-        (nameTag as Phaser.GameObjects.Text).setVisible(false);
-      }
-
-      if (factionTag) {
-        (factionTag as Phaser.GameObjects.Text).setVisible(false);
-      }
-    } else {
-      if (nameTag) {
-        (nameTag as Phaser.GameObjects.Text).setVisible(true);
-      }
-
-      if (factionTag) {
-        (factionTag as Phaser.GameObjects.Text).setVisible(true);
-      }
-    }
+    const isOverlapping = Phaser.Geom.Rectangle.Overlaps(
+      currentPlayerBounds,
+      gridRect,
+    );
+    nameTag?.setVisible(!isOverlapping);
   };
 
   private pickRandomDiggerPosition = () => {
@@ -1303,7 +1366,11 @@ export class BeachScene extends BaseScene {
       this.gameService.state.context.state.inventory["Sand Drill"] ??
       new Decimal(0);
 
-    if (sandShovels.lt(1) && this.selectedItem !== "Sand Drill") {
+    if (
+      sandShovels.lt(1) &&
+      this.selectedItem !== "Sand Drill" &&
+      !this.isAncientShovelActive
+    ) {
       this.npcs.digby?.speak(translate("digby.noShovels"));
 
       return;
@@ -1319,13 +1386,6 @@ export class BeachScene extends BaseScene {
   public handleActionSFX = () => {
     const sfx = this.selectedItem === "Sand Drill" ? "drill" : "dig";
 
-    const audioMuted = getCachedAudioSetting<boolean>(
-      AudioLocalStorageKeys.audioMuted,
-      false,
-    );
-
-    if (audioMuted) return;
-
     if (!this.digSoundsCooldown) {
       this.sound.play(sfx, { volume: 0.1 });
       this.digSoundsCooldown = true;
@@ -1339,13 +1399,6 @@ export class BeachScene extends BaseScene {
   };
 
   public handleRevealSFX() {
-    const audioMuted = getCachedAudioSetting<boolean>(
-      AudioLocalStorageKeys.audioMuted,
-      false,
-    );
-
-    if (audioMuted) return;
-
     if (!this.digSoundsCooldown) {
       this.sound.play("reveal", { volume: 0.1 });
       this.digSoundsCooldown = true;
@@ -1520,8 +1573,6 @@ export class BeachScene extends BaseScene {
   public handleUpdateSelectedItem = () => {
     if (this.currentSelectedItem === this.selectedItem) return;
 
-    this.currentSelectedItem = this.selectedItem;
-
     if (this.selectedItem === "Sand Drill") {
       this.hoverBox?.setVisible(false);
       this.confirmBox?.setVisible(false);
@@ -1544,15 +1595,11 @@ export class BeachScene extends BaseScene {
       this.confirmBox?.setVisible(false);
     }
 
-    const sandDrills = this.gameState.inventory["Sand Drill"] ?? new Decimal(0);
-
-    if (
-      this.selectedItem === "Sand Drill" &&
-      sandDrills.gt(0) &&
-      this.npcs.digby?.isSpeaking
-    ) {
+    if (this.npcs.digby?.isSpeaking) {
       this.npcs.digby?.stopSpeaking();
     }
+
+    this.currentSelectedItem = this.selectedItem;
   };
 
   public update() {
@@ -1561,12 +1608,21 @@ export class BeachScene extends BaseScene {
     this.handleUpdateSelectedItem();
     this.handleNameTagVisibility();
 
+    // Get Digby to hold his tongue if the player doesn't have the drill selected and is rocking the ancient shovel
+    if (
+      this.isAncientShovelActive &&
+      this.currentSelectedItem !== "Sand Drill" &&
+      this.npcs.digby?.isSpeaking
+    ) {
+      this.npcs.digby?.stopSpeaking();
+    }
+
     if (this.isPlayerInDigArea(this.currentPlayer.x, this.currentPlayer.y)) {
       this.updatePlayer();
       this.updateOtherPlayers();
       this.handleDigbyWarnings();
     } else {
-      this.noToolHoverBox?.setVisible(false);
+      // this.noToolHoverBox?.setVisible(false);
       this.alreadyWarnedOfNoDigs = false;
       this.alreadyNotifiedOfClaim = false;
       super.update();

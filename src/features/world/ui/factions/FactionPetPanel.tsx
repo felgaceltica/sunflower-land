@@ -42,7 +42,7 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { secondsToString } from "lib/utils/time";
 import { getFactionPetUpdate } from "./actions/getFactionPetUpdate";
 
-import { setPrecision } from "lib/utils/formatNumber";
+import { formatNumber } from "lib/utils/formatNumber";
 import { BoostInfoPanel } from "./BoostInfoPanel";
 import { getKeys } from "features/game/types/decorations";
 
@@ -50,6 +50,7 @@ import goblinEmblem from "assets/icons/goblin_emblem.webp";
 import bumpkinEmblem from "assets/icons/bumpkin_emblem.webp";
 import sunflorianEmblem from "assets/icons/sunflorian_emblem.webp";
 import nightshadeEmblem from "assets/icons/nightshade_emblem.webp";
+import xpIcon from "assets/icons/xp.png";
 
 const FACTION_EMBLEM_ICONS: Record<FactionName, string> = {
   goblins: goblinEmblem,
@@ -240,10 +241,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
     selectedRequestReward,
   )[0];
 
-  const boostedMarks = setPrecision(
-    new Decimal(selectedRequestReward + boost),
-    2,
-  ).toNumber();
+  const boostedMarks = selectedRequestReward + boost;
 
   const isContributingMemberForThisWeek = pet.requests.every(
     (request) => getKeys(request.dailyFulfilled).length > 0,
@@ -346,10 +344,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                             points,
                           )[0];
 
-                          const boostedMarks = setPrecision(
-                            new Decimal(points + boost),
-                            2,
-                          ).toNumber();
+                          const boostedMarks = points + boost;
 
                           return (
                             <OuterPanel
@@ -388,7 +383,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                                   }}
                                 >
                                   <span className={boost ? "pl-1.5" : ""}>
-                                    {boostedMarks}
+                                    {formatNumber(boostedMarks)}
                                   </span>
                                 </Label>
                               </div>
@@ -453,7 +448,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                             className="m-1 cursor-pointer"
                           >
                             <span className={boost ? "pl-1.5" : ""}>
-                              {`${boostedMarks} ${t("marks")}`}
+                              {`${formatNumber(boostedMarks)} ${t("marks")}`}
                             </span>
                           </Label>
                         </div>
@@ -499,8 +494,8 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                 <div className="space-y-3">
                   <span className="text-xs sm:text-sm">
                     {t("faction.donation.confirm", {
-                      factionPoints: boostedMarks,
-                      reward: boostedMarks > 1 ? "marks" : "mark",
+                      factionPoints: formatNumber(boostedMarks),
+                      reward: t("marks"),
                     })}
                   </span>
                   <div className="flex flex-col space-y-1">
@@ -543,10 +538,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
               </div>
               <div className="flex mb-2">
                 <div className="w-12 flex justify-center">
-                  <img
-                    src={SUNNYSIDE.icons.xpIcon}
-                    className="h-6 mr-2 object-contain"
-                  />
+                  <img src={xpIcon} className="h-6 mr-2 object-contain" />
                 </div>
                 <p className="text-xs flex-1">{t("guide.factionPet.two")}</p>
               </div>
@@ -602,10 +594,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
             <div className="p-2">
               <div className="flex items-center mb-2">
                 <div className="w-12 flex justify-center">
-                  <img
-                    src={SUNNYSIDE.icons.xpIcon}
-                    className="h-4 mr-2 object-contain"
-                  />
+                  <img src={xpIcon} className="h-4 mr-2 object-contain" />
                 </div>
                 <p className="text-sm flex-1">{`Streaks Explained`}</p>
               </div>

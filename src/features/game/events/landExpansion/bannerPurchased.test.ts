@@ -11,21 +11,6 @@ import {
 } from "features/game/types/seasons";
 
 describe("purchaseBanner", () => {
-  it("throws an error if no bumpkin exists", () => {
-    expect(() =>
-      purchaseBanner({
-        state: {
-          ...TEST_FARM,
-          bumpkin: undefined,
-        },
-        action: {
-          type: "banner.purchased",
-          name: "Spring Blossom Banner",
-        },
-      }),
-    ).toThrow("You do not have a Bumpkin");
-  });
-
   it("throws an error if invalid banner", () => {
     expect(() =>
       purchaseBanner({
@@ -78,8 +63,8 @@ describe("purchaseBanner", () => {
     ).toThrow("You already have this banner");
   });
 
-  it("purchases banner on first 2 weeks without previous banner", () => {
-    const WEEK = 1000 * 60 * 60 * 24 * 7;
+  it("purchases banner on first week without previous banner", () => {
+    const SIX_DAYS = 1000 * 60 * 60 * 24 * 6;
     const season = getCurrentSeason();
     const seasonStart = SEASONS[season].startDate;
     const banner = getSeasonalBanner();
@@ -95,7 +80,7 @@ describe("purchaseBanner", () => {
         type: "banner.purchased",
         name: banner,
       },
-      createdAt: seasonStart.getTime() + WEEK,
+      createdAt: seasonStart.getTime() + SIX_DAYS,
     });
 
     expect(result).toEqual({
@@ -107,8 +92,8 @@ describe("purchaseBanner", () => {
     });
   });
 
-  it("purchases banner on first 2 weeks with previous banner", () => {
-    const WEEK = 1000 * 60 * 60 * 24 * 7;
+  it("purchases banner on first week with previous banner", () => {
+    const SIX_DAYS = 1000 * 60 * 60 * 24 * 6;
     const season = getCurrentSeason();
     const seasonStart = SEASONS[season].startDate;
     const banner = getSeasonalBanner();
@@ -126,7 +111,7 @@ describe("purchaseBanner", () => {
         type: "banner.purchased",
         name: banner,
       },
-      createdAt: seasonStart.getTime() + WEEK,
+      createdAt: seasonStart.getTime() + SIX_DAYS,
     });
 
     expect(result).toEqual({
@@ -286,8 +271,8 @@ describe("purchaseBanner", () => {
     ).toThrow("Attempt to purchase Dawn Breaker Banner");
   });
 
-  it("purchases banner on first 2 weeks of Pharaohs Treasure without previous banner", () => {
-    const WEEK = 1000 * 60 * 60 * 24 * 7;
+  it("purchases banner on first week of Pharaohs Treasure without previous banner", () => {
+    const SIX_DAYS = 1000 * 60 * 60 * 24 * 6;
     const seasonStart = SEASONS["Pharaoh's Treasure"].startDate;
     const banner = getSeasonalBanner(seasonStart);
 
@@ -302,7 +287,7 @@ describe("purchaseBanner", () => {
         type: "banner.purchased",
         name: banner,
       },
-      createdAt: seasonStart.getTime() + WEEK,
+      createdAt: seasonStart.getTime() + SIX_DAYS,
     });
 
     expect(result).toEqual({

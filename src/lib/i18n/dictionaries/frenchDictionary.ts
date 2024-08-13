@@ -76,16 +76,12 @@ import {
   Helper,
   HeliosSunflower,
   HenHouseTerms,
-  HowToFarm,
-  HowToSync,
-  HowToUpgrade,
   Islandupgrade,
   InteractableModals,
   IntroPage,
   IslandName,
   IslandNotFound,
   LandscapeTerms,
-  LetsGo,
   LevelUpMessages,
   Loser,
   LostSunflorian,
@@ -648,6 +644,7 @@ const basicTreasure: Record<BasicTreasure, string> = {
   "budBox.title": "Bud Box",
   "budBox.description":
     "Chaque jour, un type de tête peut débloquer des récompenses agricoles.",
+  "budBox.today": ENGLISH_TERMS["budBox.today"],
   "raffle.title": "Tombola Gobelin",
   "raffle.description":
     "Chaque mois, vous avez une chance de gagner des récompenses. Les gagnants seront annoncés sur Discord.",
@@ -2058,8 +2055,8 @@ const deliveryHelp: Record<DeliveryHelp, string> = {
 };
 
 const deliveryitem: Record<DeliveryItem, string> = {
-  "deliveryitem.inventory": "Inventaire:",
-  "deliveryitem.itemsToDeliver": "Articles à livrer: ",
+  "deliveryitem.inventory": "Inventaire",
+  "deliveryitem.itemsToDeliver": "Articles à livrer",
   "deliveryitem.deliverToWallet": "Livrer à votre portefeuille",
   "deliveryitem.viewOnOpenSea":
     "Une fois livré, vous pourrez voir vos articles sur OpenSea.",
@@ -2140,16 +2137,18 @@ const errorAndAccess: Record<ErrorAndAccess, string> = {
 };
 
 const errorTerms: Record<ErrorTerms, string> = {
+  "error.askOnDiscord": ENGLISH_TERMS["error.askOnDiscord"],
+  "error.contactSupport": ENGLISH_TERMS["error.contactSupport"],
+  "error.file": ENGLISH_TERMS["error.file"],
+  "error.getHelp": ENGLISH_TERMS["error.getHelp"],
   "error.betaTestersOnly": "Réservé aux bêta-testeurs uniquement!",
   "error.congestion.one":
     "Nous faisons de notre mieux, mais il semble que Polygon soit très fréquenté ou que vous ayez perdu votre connexion.",
   "error.congestion.two":
     "Si cette erreur persiste, veuillez essayer de changer votre RPC Metamask.",
-  "error.connection.one":
-    "Il semble que nous n'ayons pas pu compléter cette demande.",
-  "error.connection.two": "Cela peut être un simple problème de connexion.",
-  "error.connection.three":
-    "Vous pouvez cliquer sur Actualiser pour réessayer.",
+  "error.connection.one": ENGLISH_TERMS["error.connection.one"],
+  "error.connection.two": ENGLISH_TERMS["error.connection.two"],
+  "error.connection.three": ENGLISH_TERMS["error.connection.three"],
   "error.connection.four":
     "Si le problème persiste, vous pouvez demander de l'aide en contactant notre équipe de support ou en rejoignant notre Discord et en demandant à notre communauté.",
   "error.diagnostic.info": "Informations de diagnostic",
@@ -2166,8 +2165,9 @@ const errorTerms: Record<ErrorTerms, string> = {
   "error.toManyRequest.one": "Trop de demandes!",
   "error.toManyRequest.two":
     "On dirait que vous avez été occupé ! Veuillez réessayer plus tard.",
+  "error.tooManyFarms": ENGLISH_TERMS["error.tooManyFarms"],
   "error.Web3NotFound": "Web3 non trouvé",
-  "error.wentWrong": "Quelque chose s'est mal passé!",
+  "error.wentWrong": ENGLISH_TERMS["error.wentWrong"],
   "error.clock.not.synced": "Horloge non synchronisée",
   "error.polygon.cant.connect": "Impossible de se connecter à Polygon",
   "error.composterNotExist": "Le composteur n'existe pas",
@@ -3271,33 +3271,6 @@ const henHouseTerms: Record<HenHouseTerms, string> = {
     "Construisez une autre Maison de Poules pour élever plus de poules",
 };
 
-const howToFarm: Record<HowToFarm, string> = {
-  "howToFarm.title": "Comment cultiver?",
-  "howToFarm.stepOne": "1. Récoltez les cultures lorsqu'elles sont prêtes",
-  "howToFarm.stepTwo": "2. Rendez-vous en ville et cliquez sur la boutique",
-  "howToFarm.stepThree":
-    "3. Vendez les cultures à la boutique contre des Coins",
-  "howToFarm.stepFour": "4. Achetez des graines avec vos Coins",
-  "howToFarm.stepFive": "5. Plantez les graines et attendez",
-};
-
-const howToSync: Record<HowToSync, string> = {
-  "howToSync.title": "Comment synchroniser?",
-  "howToSync.description":
-    "Tout votre progrès est enregistré sur notre serveur de jeu. Vous devrez synchroniser sur la chaîne lorsque vous souhaiterez déplacer vos jetons, NFT et ressources sur Polygon.",
-  "howToSync.stepOne": "1. Ouvrez le menu",
-  "howToSync.stepTwo": "2. Cliquez sur 'Synchroniser sur la chaîne'",
-};
-
-const howToUpgrade: Record<HowToUpgrade, string> = {
-  "howToUpgrade.title": "Comment améliorer?",
-  "howToUpgrade.stepOne": "1. Parlez à un lutin bloquant les champs",
-  "howToUpgrade.stepTwo": "2. Visitez la ville et cliquez sur la cuisine",
-  "howToUpgrade.stepThree": "3. Fabriquez la nourriture que le lutin souhaite",
-  "howToUpgrade.stepFour":
-    "4. Voilà ! Profitez de vos nouveaux champs et cultures",
-};
-
 const interactableModals: Record<InteractableModals, string> = {
   "interactableModals.returnhome.message": "Souhaitez-vous rentrer chez vous?",
   "interactableModals.fatChicken.message":
@@ -3467,14 +3440,6 @@ const landscapeTerms: Record<LandscapeTerms, string> = {
   "landscape.expansion.date":
     "Plus d'extensions seront disponibles le 7 février.",
   "landscape.great.work": "Excellent travail, Bumpkin!",
-};
-
-const letsGo: Record<LetsGo, string> = {
-  "letsGo.title": "C'est le moment de jouer!",
-  "letsGo.description":
-    "Merci d'avoir participé à la version bêta ! Nous travaillons toujours sur le jeu et nous vous sommes reconnaissants de votre soutien pendant les premières étapes!",
-  "letsGo.readMore": "Vous pouvez en savoir plus sur le jeu dans la ",
-  "letsGo.officialDocs": "documentation officielle",
 };
 
 const levelUpMessages: Record<LevelUpMessages, string> = {
@@ -5001,6 +4966,8 @@ const seasonTerms: Record<SeasonTerms, string> = {
   "season.lifetime.farmer": ENGLISH_TERMS["season.lifetime.farmer"],
   "season.free.with.lifetime": ENGLISH_TERMS["season.free.with.lifetime"],
   "season.vip.claim": ENGLISH_TERMS["season.vip.claim"],
+  "season.pharaohs.gift": ENGLISH_TERMS["season.pharaohs.gift"],
+  "season.ticket.bonus": ENGLISH_TERMS["season.ticket.bonus"],
 };
 
 const share: Record<Share, string> = {
@@ -5480,13 +5447,12 @@ const withdraw: Record<Withdraw, string> = {
   "withdraw.sfl.available": "SFL est disponible sur la chaîne",
   "withdraw.send.wallet": "Envoyé à votre portefeuille",
   "withdraw.choose": "Choisissez le montant à retirer",
-  "withdraw.receive": "Vous recevrez: {{sflReceived}}",
+  "withdraw.receive": "Vous recevrez: {{sflReceived}} SFL",
   "withdraw.select.item": "Sélectionnez les objets à retirer",
   "withdraw.opensea":
     "Une fois retirés, vous pourrez voir vos objets sur OpenSea.",
   "withdraw.budRestricted": "Utilisé dans la boîte à bud d'aujourd'hui.",
-  "withdraw.restricted":
-    "Certains objets ne peuvent pas être retirés. D'autres objets peuvent être restreints lorsque",
+  "withdraw.restricted": ENGLISH_TERMS["withdraw.restricted"],
   "withdraw.bumpkin.wearing":
     "Votre Bumpkin porte actuellement les objets suivants qui ne peuvent pas être retirés. Vous devrez les déséquiper avant de pouvoir les retirer.",
   "withdraw.bumpkin.sure.withdraw":
@@ -5635,7 +5601,6 @@ export const leaderboardTerms: Record<Leaderboard, string> = {
 
 const gameOptions: Record<GameOptions, string> = {
   "gameOptions.title": ENGLISH_TERMS["gameOptions.title"],
-  "gameOptions.howToPlay": "Comment jouer? (En reconstruction)",
   "gameOptions.farmId": ENGLISH_TERMS["gameOptions.farmId"],
   "gameOptions.logout": "Déconnexion",
   "gameOptions.confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter?",
@@ -5848,9 +5813,6 @@ export const FRENCH_TERMS: Record<TranslationKeys, string> = {
   ...heliosSunflower,
   ...helper,
   ...henHouseTerms,
-  ...howToFarm,
-  ...howToSync,
-  ...howToUpgrade,
   ...interactableModals,
   ...introPage,
   ...islandName,
@@ -5858,7 +5820,6 @@ export const FRENCH_TERMS: Record<TranslationKeys, string> = {
   ...islandupgrade,
   ...landscapeTerms,
   ...leaderboardTerms,
-  ...letsGo,
   ...levelUpMessages,
   ...loser,
   ...lostSunflorian,

@@ -19,7 +19,6 @@ import { Success } from "../components/Success";
 import { Syncing } from "../components/Syncing";
 
 import { Hoarding } from "../components/Hoarding";
-import { NoBumpkin } from "features/island/bumpkin/NoBumpkin";
 import { Swarming } from "../components/Swarming";
 import { Cooldown } from "../components/Cooldown";
 import { Route, Routes } from "react-router-dom";
@@ -47,7 +46,6 @@ import classNames from "classnames";
 import { Label } from "components/ui/Label";
 import { CONFIG } from "lib/config";
 import { Home } from "features/home/Home";
-import { Wallet } from "features/wallet/Wallet";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Listed } from "../components/Listed";
 import { ListingDeleted } from "../components/listingDeleted";
@@ -64,6 +62,8 @@ import { VIPOffer } from "../components/modal/components/VIPItems";
 import { GreenhouseInside } from "features/greenhouse/GreenhouseInside";
 import { useSound } from "lib/utils/hooks/useSound";
 import { SomethingArrived } from "./components/SomethingArrived";
+import { TradeAlreadyFulfilled } from "../components/TradeAlreadyFulfilled";
+import { NPC_WEARABLES } from "lib/npcs";
 
 const land = SUNNYSIDE.land.island;
 
@@ -80,7 +80,6 @@ const SHOW_MODAL: Record<StateValues, boolean> = {
   refreshing: true,
   hoarding: true,
   landscaping: false,
-  noBumpkinFound: true,
   swarming: true,
   coolingDown: true,
   gameRules: true,
@@ -109,6 +108,7 @@ const SHOW_MODAL: Record<StateValues, boolean> = {
   fulfillTradeListing: false,
   listed: true,
   sniped: true,
+  tradeAlreadyFulfilled: true,
   priceChanged: true,
   buds: false,
   mailbox: false,
@@ -137,6 +137,8 @@ const isListingDeleted = (state: MachineState) =>
 const isFulfillingTradeListing = (state: MachineState) =>
   state.matches("fulfillTradeListing");
 const isSniped = (state: MachineState) => state.matches("sniped");
+const isTradeAlreadyFulfilled = (state: MachineState) =>
+  state.matches("tradeAlreadyFulfilled");
 const hasMarketPriceChanged = (state: MachineState) =>
   state.matches("priceChanged");
 const isRefreshing = (state: MachineState) => state.matches("refreshing");
@@ -149,8 +151,7 @@ const isVisiting = (state: MachineState) => state.matches("visiting");
 const isSwarming = (state: MachineState) => state.matches("swarming");
 const isPurchasing = (state: MachineState) =>
   state.matches("purchasing") || state.matches("buyingBlockBucks");
-const isNoBumpkinFound = (state: MachineState) =>
-  state.matches("noBumpkinFound");
+
 const isCoolingDown = (state: MachineState) => state.matches("coolingDown");
 const isGameRules = (state: MachineState) => state.matches("gameRules");
 const isDepositing = (state: MachineState) => state.matches("depositing");
@@ -279,6 +280,10 @@ export const GameWrapper: React.FC = ({ children }) => {
   const deletingListing = useSelector(gameService, isDeletingListing);
   const listingDeleted = useSelector(gameService, isListingDeleted);
   const sniped = useSelector(gameService, isSniped);
+  const tradeAlreadyFulfilled = useSelector(
+    gameService,
+    isTradeAlreadyFulfilled,
+  );
   const marketPriceChanged = useSelector(gameService, hasMarketPriceChanged);
   const refreshing = useSelector(gameService, isRefreshing);
   const buyingSFL = useSelector(gameService, isBuyingSFL);
@@ -288,7 +293,6 @@ export const GameWrapper: React.FC = ({ children }) => {
   const purchasing = useSelector(gameService, isPurchasing);
   const hoarding = useSelector(gameService, isHoarding);
   const swarming = useSelector(gameService, isSwarming);
-  const noBumpkinFound = useSelector(gameService, isNoBumpkinFound);
   const coolingDown = useSelector(gameService, isCoolingDown);
   const gameRules = useSelector(gameService, isGameRules);
   const depositing = useSelector(gameService, isDepositing);
@@ -452,7 +456,9 @@ export const GameWrapper: React.FC = ({ children }) => {
         <ToastPanel />
 
         <Modal show={SHOW_MODAL[stateValue as StateValues]} onHide={onHide}>
-          <Panel>
+          <Panel
+            bumpkinParts={error ? NPC_WEARABLES["worried pete"] : undefined}
+          >
             {loading && <Loading />}
             {refreshing && <Refreshing />}
             {buyingSFL && <AddingSFL />}
@@ -462,11 +468,7 @@ export const GameWrapper: React.FC = ({ children }) => {
             {purchasing && <Purchasing />}
             {hoarding && <Hoarding />}
             {swarming && <Swarming />}
-            {noBumpkinFound && (
-              <Wallet action="deposit">
-                <NoBumpkin />
-              </Wallet>
-            )}
+
             {coolingDown && <Cooldown />}
             {gameRules && <Rules />}
             {transacting && <Transacting />}
@@ -478,6 +480,7 @@ export const GameWrapper: React.FC = ({ children }) => {
             {deletingListing && <Loading text="Deleting listing" />}
             {listingDeleted && <ListingDeleted />}
             {sniped && <Sniped />}
+            {tradeAlreadyFulfilled && <TradeAlreadyFulfilled />}
             {marketPriceChanged && <PriceChange />}
             {minting && <Minting />}
             {promo && <Promo />}

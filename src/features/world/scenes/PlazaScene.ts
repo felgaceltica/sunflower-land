@@ -5,10 +5,7 @@ import { SceneId } from "../mmoMachine";
 import { BaseScene, NPCBumpkin } from "./BaseScene";
 import { Label } from "../containers/Label";
 import { interactableModalManager } from "../ui/InteractableModals";
-import {
-  AudioLocalStorageKeys,
-  getCachedAudioSetting,
-} from "../../game/lib/audio";
+
 import { PlaceableContainer } from "../containers/PlaceableContainer";
 import { budImageDomain } from "features/island/collectibles/components/Bud";
 import { SOUNDS } from "assets/sound-effects/soundEffects";
@@ -209,7 +206,7 @@ export class PlazaScene extends BaseScene {
     this.load.image("tomato_bombard", "world/tomato_bombard.gif");
     this.load.image("rice_panda", "world/rice_panda.webp");
 
-    this.load.image("non_la", "world/non_la.webp");
+    this.load.image("explorer_hat", "world/explorer_hat.png");
 
     this.load.image("faction_banner", "world/clash_of_factions_banner.webp");
     this.load.image("pharaoh_banner", "world/pharaohs_treasure_banner.webp");
@@ -221,17 +218,10 @@ export class PlazaScene extends BaseScene {
 
     super.preload();
 
-    const audioMuted = getCachedAudioSetting<boolean>(
-      AudioLocalStorageKeys.audioMuted,
-      false,
-    );
-
-    if (!audioMuted) {
-      // Ambience SFX
-      if (!this.sound.get("nature_1")) {
-        const nature1 = this.sound.add("nature_1");
-        nature1.play({ loop: true, volume: 0.01 });
-      }
+    // Ambience SFX
+    if (!this.sound.get("nature_1")) {
+      const nature1 = this.sound.add("nature_1");
+      nature1.play({ loop: true, volume: 0.01 });
     }
 
     // Shut down the sound when the scene changes
@@ -462,7 +452,7 @@ export class PlazaScene extends BaseScene {
       this.add.image(248, 244, "rice_panda");
     }
 
-    this.add.image(288.5, 248, "non_la");
+    this.add.image(288.5, 248, "explorer_hat");
 
     const door = this.colliders
       ?.getChildren()

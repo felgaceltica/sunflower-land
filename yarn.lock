@@ -5611,6 +5611,11 @@ core-js-compat@^3.25.1:
   dependencies:
     browserslist "^4.21.4"
 
+core-js@3:
+  version "3.37.1"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.37.1.tgz#d21751ddb756518ac5a00e4d66499df981a62db9"
+  integrity sha512-Xn6qmxrQZyB0FFY8E3bgRXei3lWDJHhvI+u0q9TKIYM49G8pAr0FgnnrFRAmsbptZL1yxRADVXn+x5AGsbBfyw==
+
 core-util-is@1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
@@ -6592,7 +6597,7 @@ eventemitter3@^3.1.2:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
 
-eventemitter3@^5.0.0:
+eventemitter3@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
   integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
@@ -7838,6 +7843,10 @@ jake@^10.6.1:
     filelist "^1.0.1"
     minimatch "^3.0.4"
 
+"javascript-astar@github:mikewesthad/javascript-astar":
+  version "0.4.2"
+  resolved "https://codeload.github.com/mikewesthad/javascript-astar/tar.gz/c0304b12861eda334e27f2f15d701c10b296593f"
+
 jest-changed-files@^27.4.2:
   version "27.4.2"
   resolved "https://registry.npmjs.org/jest-changed-files/-/jest-changed-files-27.4.2.tgz"
@@ -8992,6 +9001,14 @@ natural-compare@^1.4.0:
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
+navmesh@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/navmesh/-/navmesh-2.3.1.tgz#056ad258b3070878248f49ddcaadad0f77799ae4"
+  integrity sha512-psNjH0lNJbprtlTNo4gmhqIgNhZxQgxiGtnGAOmtL7I/tByoGfAfDX+/LD/5b26XuLZw3XXTr0+tHScnm5MBWw==
+  dependencies:
+    core-js "3"
+    javascript-astar "github:mikewesthad/javascript-astar"
+
 negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.npmjs.org/negotiator/-/negotiator-0.6.2.tgz"
@@ -9382,6 +9399,14 @@ performance-now@^2.1.0:
   resolved "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
+phaser-navmesh@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/phaser-navmesh/-/phaser-navmesh-2.3.1.tgz#ccf271ed6649c0d1ba74cfe01170efd8d9160530"
+  integrity sha512-804eKhaa0cyVBFBQ1TA1M6QclclbFiPoBYyLInw7GKO8EITQbNWrBHkmS3jlbVOor89oTUALbwZDd74pVdMP3w==
+  dependencies:
+    core-js "3"
+    navmesh "^2.3.1"
+
 phaser3-rex-plugins@^1.60.1:
   version "1.60.1"
   resolved "https://registry.yarnpkg.com/phaser3-rex-plugins/-/phaser3-rex-plugins-1.60.1.tgz#045c0c6b5a77595b5c937a57415bbd9491af4996"
@@ -9394,12 +9419,12 @@ phaser3-rex-plugins@^1.60.1:
     papaparse "^5.4.1"
     webfontloader "^1.6.28"
 
-phaser@^3.60.0:
-  version "3.60.0"
-  resolved "https://registry.yarnpkg.com/phaser/-/phaser-3.60.0.tgz#8a555623e64c707482e6321485b4bda84604590d"
-  integrity sha512-IKUy35EnoEVcl2EmJ8WOyK4X8OoxHYdlhZLgRGpNrvD1fEagYffhVmwHcapE/tGiLgyrnezmXIo5RrH2NcrTHw==
+phaser@^3.80.1:
+  version "3.80.1"
+  resolved "https://registry.yarnpkg.com/phaser/-/phaser-3.80.1.tgz#d387d7e04042218f74b9d22e261f437e54464440"
+  integrity sha512-VQGAWoDOkEpAWYkI+PUADv5Ql+SM0xpLuAMBJHz9tBcOLqjJ2wd8bUhxJgOqclQlLTg97NmMd9MhS75w16x1Cw==
   dependencies:
-    eventemitter3 "^5.0.0"
+    eventemitter3 "^5.0.1"
 
 picocolors@^1.0.0:
   version "1.0.0"
