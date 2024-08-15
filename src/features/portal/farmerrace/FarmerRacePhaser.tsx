@@ -7,8 +7,6 @@ import { Preloader } from "features/world/scenes/Preloader";
 import { PortalContext } from "./lib/PortalProvider";
 import { useActor } from "@xstate/react";
 import { FarmerRaceScene } from "./FarmerRaceScene";
-import { NPCModals } from "features/world/ui/NPCModals";
-import { InteractableModals } from "features/world/ui/InteractableModals";
 
 export const FarmerRacePhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
@@ -55,7 +53,7 @@ export const FarmerRacePhaser: React.FC = () => {
         default: "arcade",
         arcade: {
           debug: true,
-          gravity: { y: 0 },
+          gravity: { x: 0, y: 0 },
         },
       },
       scene: scenes,
@@ -86,16 +84,16 @@ export const FarmerRacePhaser: React.FC = () => {
       <div id="game-content" ref={ref} />
 
       {/* Comment out if you don't want to use our standard Bumpkin NPCs + click interactions */}
-      <NPCModals
+      {/* <NPCModals
         id={portalState.context.id as number}
         scene={"portal_example"}
-      />
+      /> */}
 
       {/* Comment out if you don't want to use pop up modals from in game interactables */}
-      <InteractableModals
+      {/* <InteractableModals
         id={portalState.context.id as number}
         scene="portal_example"
-      />
+      /> */}
     </div>
   );
 };

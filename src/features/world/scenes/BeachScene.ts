@@ -211,13 +211,13 @@ export class BeachScene extends BaseScene {
       if (bumpkin.npc === "jafar") {
         return hasFeatureAccess(
           this.gameService.state.context.state,
-          "TEST_DIGGING"
+          "TEST_DIGGING",
         );
       }
       if (bumpkin.npc === "goldtooth") {
         return !hasFeatureAccess(
           this.gameService.state.context.state,
-          "TEST_DIGGING"
+          "TEST_DIGGING",
         );
       }
       return true;
@@ -434,7 +434,7 @@ export class BeachScene extends BaseScene {
         SITE_COLS * this.cellSize,
         SITE_ROWS * this.cellSize,
         this.cellSize,
-        this.cellSize
+        this.cellSize,
       )
       .setOrigin(0);
 
@@ -506,7 +506,7 @@ export class BeachScene extends BaseScene {
       .image(
         this.gridX + this.cellSize * 8,
         this.gridY + this.cellSize * 6,
-        "shovel_select"
+        "shovel_select",
       )
       .setOrigin(0)
       .setDisplaySize(16, 16)
@@ -522,7 +522,7 @@ export class BeachScene extends BaseScene {
       .image(
         this.gridX + this.cellSize * 7,
         this.gridY + this.cellSize * 5,
-        "drill_select"
+        "drill_select",
       )
       .setOrigin(0)
       .setDisplaySize(32, 32)
@@ -603,7 +603,7 @@ export class BeachScene extends BaseScene {
       const key = convertToSnakeCase(foundItem);
 
       const existing = this.dugItems.find(
-        (item) => item.x === offsetX && item.y === offsetY
+        (item) => item.x === offsetX && item.y === offsetY,
       );
 
       if (existing) {
@@ -655,7 +655,7 @@ export class BeachScene extends BaseScene {
 
     const path = this.navMesh?.findPath(
       { x: this.currentPlayer.x, y: this.currentPlayer.y },
-      { x: xPosition, y: yPosition }
+      { x: xPosition, y: yPosition },
     );
 
     const tweens: any[] = [];
@@ -674,7 +674,7 @@ export class BeachScene extends BaseScene {
             currentX,
             currentY,
             nextX,
-            nextY
+            nextY,
           );
 
           const duration = (distance / speed) * 1000;
@@ -930,7 +930,7 @@ export class BeachScene extends BaseScene {
 
       if (
         drillCoords.every(({ x, y }) =>
-          this.cannotDig({ rectX, rectY, col: x, row: y })
+          this.cannotDig({ rectX, rectY, col: x, row: y }),
         )
       ) {
         return;
@@ -979,11 +979,11 @@ export class BeachScene extends BaseScene {
     // Calculate the starting cell (top-left corner)
     let startCol = Math.max(
       Math.floor((hoverX - this.gridX) / this.cellSize),
-      0
+      0,
     );
     let startRow = Math.max(
       Math.floor((hoverY - this.gridY) / this.cellSize),
-      0
+      0,
     );
 
     startCol = Math.min(startCol, 8);
@@ -1068,7 +1068,7 @@ export class BeachScene extends BaseScene {
     ];
 
     const noAvailableSpots = drillCoords.every(({ x, y }) =>
-      this.cannotDig({ rectX, rectY, col: x, row: y })
+      this.cannotDig({ rectX, rectY, col: x, row: y }),
     );
 
     if (noAvailableSpots) return;
@@ -1131,7 +1131,7 @@ export class BeachScene extends BaseScene {
 
   get percentageTreasuresFound() {
     return Math.round(
-      (this.treasuresFound.length / this.totalBuriedTreasure) * 100
+      (this.treasuresFound.length / this.totalBuriedTreasure) * 100,
     );
   }
 
@@ -1193,12 +1193,12 @@ export class BeachScene extends BaseScene {
 
       localStorage.setItem(
         "beachDigAttempts",
-        JSON.stringify({ ...JSON.parse(stored), [day]: attemptsToday + 1 })
+        JSON.stringify({ ...JSON.parse(stored), [day]: attemptsToday + 1 }),
       );
     } else {
       localStorage.setItem(
         "beachDigAttempts",
-        JSON.stringify({ [day]: attemptsToday + 1 })
+        JSON.stringify({ [day]: attemptsToday + 1 }),
       );
     }
 
@@ -1216,7 +1216,7 @@ export class BeachScene extends BaseScene {
       }, 0);
 
       const percentageFound = Math.floor(
-        (this.totalBuriedTreasure / this.treasuresFound.length) * 100
+        (this.totalBuriedTreasure / this.treasuresFound.length) * 100,
       );
 
       gameAnalytics.trackBeachDiggingAttempt({
@@ -1229,21 +1229,21 @@ export class BeachScene extends BaseScene {
   public handleNameTagVisibility = () => {
     const currentPlayerBounds = this.currentPlayer?.getBounds();
     const nameTag = this.currentPlayer?.getByName(
-      "nameTag"
+      "nameTag",
     ) as Phaser.GameObjects.Text;
     // Create a grid for the dig site with a buffer of 1 tile
     const gridRect = new Phaser.Geom.Rectangle(
       this.gridX,
       this.gridY,
       this.cellSize * SITE_COLS,
-      this.cellSize * SITE_ROWS - (this.currentPlayer?.height ?? 0)
+      this.cellSize * SITE_ROWS - (this.currentPlayer?.height ?? 0),
     );
 
     if (!currentPlayerBounds || !gridRect) return;
 
     const isOverlapping = Phaser.Geom.Rectangle.Overlaps(
       currentPlayerBounds,
-      gridRect
+      gridRect,
     );
     nameTag?.setVisible(!isOverlapping);
   };
@@ -1296,7 +1296,7 @@ export class BeachScene extends BaseScene {
       this.gridX + this.cellSize * 0.5,
       this.gridY,
       this.cellSize * SITE_COLS + 0.25,
-      this.cellSize * (SITE_ROWS + 0.5)
+      this.cellSize * (SITE_ROWS + 0.5),
     );
 
     // If any other players are inside of the dig area, move them to the perimeter
@@ -1305,7 +1305,7 @@ export class BeachScene extends BaseScene {
         player.x,
         player.y,
         16,
-        16
+        16,
       );
       const currentPlayerBounds = this.currentPlayer?.getBounds();
 
@@ -1322,7 +1322,7 @@ export class BeachScene extends BaseScene {
 
         this.playerEntities[sessionId]?.setPosition(
           this.otherDiggers.get(sessionId)!.x,
-          this.otherDiggers.get(sessionId)!.y
+          this.otherDiggers.get(sessionId)!.y,
         );
         this.playerEntities[sessionId]?.idle();
       } else {
@@ -1333,7 +1333,7 @@ export class BeachScene extends BaseScene {
           this.otherDiggers.delete(sessionId);
           this.playerEntities[sessionId]?.setPosition(
             this.mmoServer?.state?.players.get(sessionId)?.x,
-            this.mmoServer?.state?.players.get(sessionId)?.y
+            this.mmoServer?.state?.players.get(sessionId)?.y,
           );
         }
       }
@@ -1345,7 +1345,7 @@ export class BeachScene extends BaseScene {
       this.gridX,
       this.gridY,
       this.cellSize * SITE_COLS - 1,
-      this.cellSize * SITE_ROWS - 1
+      this.cellSize * SITE_ROWS - 1,
     );
 
     return (
@@ -1478,7 +1478,7 @@ export class BeachScene extends BaseScene {
     if (this.movementAngle !== undefined) {
       currentPlayerBody.setVelocity(
         this.walkingSpeed * Math.cos((this.movementAngle * Math.PI) / 180),
-        this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180)
+        this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180),
       );
     } else {
       currentPlayerBody.setVelocity(0, 0);
@@ -1493,8 +1493,8 @@ export class BeachScene extends BaseScene {
       this.soundEffects.forEach((audio) =>
         audio.setVolumeAndPan(
           this.currentPlayer?.x ?? 0,
-          this.currentPlayer?.y ?? 0
-        )
+          this.currentPlayer?.y ?? 0,
+        ),
       );
     } else {
       // eslint-disable-next-line no-console
@@ -1503,7 +1503,7 @@ export class BeachScene extends BaseScene {
 
     if (this.walkAudioController) {
       this.walkAudioController.handleWalkSound(
-        isMoving || this.isPlayerTweening
+        isMoving || this.isPlayerTweening,
       );
     } else {
       // eslint-disable-next-line no-console
@@ -1597,7 +1597,7 @@ export class BeachScene extends BaseScene {
       this.drillHoverBox
         ?.setPosition(
           this.gridX + this.cellSize * 7,
-          this.gridY + this.cellSize * 5
+          this.gridY + this.cellSize * 5,
         )
         .setVisible(true);
     } else {
@@ -1606,7 +1606,7 @@ export class BeachScene extends BaseScene {
       this.hoverBox
         ?.setPosition(
           this.gridX + this.cellSize * 8,
-          this.gridY + this.cellSize * 6
+          this.gridY + this.cellSize * 6,
         )
         .setVisible(true);
       this.confirmBox?.setVisible(false);
@@ -1619,7 +1619,7 @@ export class BeachScene extends BaseScene {
     this.currentSelectedItem = this.selectedItem;
   };
 
-  public update() {
+  public update(time: number, delta: number) {
     if (!this.currentPlayer) return;
 
     this.handleUpdateSelectedItem();
@@ -1642,7 +1642,7 @@ export class BeachScene extends BaseScene {
       // this.noToolHoverBox?.setVisible(false);
       this.alreadyWarnedOfNoDigs = false;
       this.alreadyNotifiedOfClaim = false;
-      super.update();
+      super.update(time, delta);
     }
 
     this.handleOtherDiggersPositions();

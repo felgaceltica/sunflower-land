@@ -1115,6 +1115,12 @@ export type CropMachine =
   | "cropMachine.idle"
   | "cropMachine.name";
 
+export type CropsAndChickensMessages =
+  | "crops-and-chickens.portal.title"
+  | "crops-and-chickens.portal.description"
+  | "crops-and-chickens.portal.missionObjectives"
+  | "crops-and-chickens.portal.rewardMessage";
+
 export type FarmerRaceMessages =
   | "farmer-race.portal.title"
   | "farmer-race.portal.description"
@@ -3916,6 +3922,7 @@ export type TranslationKeys =
   | CropBoomMessages
   | CropFruitDescriptions
   | CropMachine
+  | CropsAndChickensMessages
   | FarmerRaceMessages
   | DeliveryItem
   | DefaultDialogue

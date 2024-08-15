@@ -175,6 +175,7 @@ import {
   FactionShopDescription,
   GuideFactionPet,
   DesertKeys,
+  FarmerRaceMessages,
 } from "./types";
 
 const generalTerms: Record<GeneralTerms, string> = {
@@ -1593,6 +1594,61 @@ const cropsAndChickens: Record<CropsAndChickensMessages, string> = {
     ENGLISH_TERMS["crops-and-chickens.portal.missionObjectives"],
   "crops-and-chickens.portal.rewardMessage":
     ENGLISH_TERMS["crops-and-chickens.portal.rewardMessage"],
+};
+
+const farmerRace: Record<FarmerRaceMessages, string> = {
+  "farmer-race.portal.title": ENGLISH_TERMS["farmer-race.portal.title"],
+  "farmer-race.portal.description":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.portal.missionObjectives":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.portal.rewardMessage":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.missionComplete":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.missionFailed": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.noPrizesAvailable":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.completed": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.unlimitedAttempts":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.attemptsRemainingPlural":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.attemptsRemainingSingular":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.noAttemptsRemaining":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.achievementUnlockedAt":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.guide": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.instructions": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.instructions1": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.instructions2": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.instructions3": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.instructions4": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.obstacles": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.cropDescription":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.score": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.bestToday": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.bestAllTime": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.donationDescription":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.mission": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.achievementUnlocked":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.sflRequired": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.youHaveRunOutOfAttempts":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.wouldYouLikeToUnlock":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.buyAttempts": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.unlockAttempts": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.endGameConfirmation":
+    ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.endGame": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.targetScore": ENGLISH_TERMS["farmer-race.portal.description"],
+  "farmer-race.inventory": ENGLISH_TERMS["farmer-race.portal.description"],
 };
 
 const decorationDescriptions: Record<DecorationDescriptions, string> = {
@@ -5798,4 +5854,5 @@ export const TURKISH_TERMS: Record<TranslationKeys, string> = {
   ...removeCropMachine,
   ...easterEggTerms,
   ...guideFactionPet,
+  ...farmerRace,
 };

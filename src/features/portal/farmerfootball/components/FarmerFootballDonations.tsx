@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { donationMachine } from "features/community/merchant/lib/donationMachine";
 import { useMachine } from "@xstate/react";
-import { Loading, roundToOneDecimal } from "features/auth/components";
+import { Loading } from "features/auth/components";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
@@ -27,10 +27,10 @@ export const FarmerFootballDonations: React.FC = () => {
   const onDonationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // If keyboard input "" convert to 0
     // Typed input validation will happen in onBlur
-    setDonation(roundToOneDecimal(Number(e.target.value)));
+    setDonation(Number(e.target.value));
   };
   const incrementDonation = () => {
-    setDonation((prevState) => roundToOneDecimal(prevState + 0.1));
+    setDonation((prevState) => prevState + 0.1);
   };
 
   const decrementDonation = () => {
@@ -38,7 +38,7 @@ export const FarmerFootballDonations: React.FC = () => {
       setDonation(0.2);
     } else if (donation < 0.2) {
       setDonation(0.1);
-    } else setDonation((prevState) => roundToOneDecimal(prevState - 0.1));
+    } else setDonation((prevState) => prevState - 0.1);
   };
 
   const donate = () => {
