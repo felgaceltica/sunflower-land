@@ -596,7 +596,7 @@ const addSFL: Record<AddSFL, string> = {
   "addSFL.referralFee":
     "Sunflower Land prend une commission de parrainage de 5% pour compléter cette transaction.",
   "addSFL.swapTitle": "Détails de l'échange",
-  "addSFL.minimumReceived": "Minimum reçu: ",
+  "addSFL.minimumReceived": "Minimum reçu: {{sflReceived}} SFL",
 };
 
 const auction: Record<Auction, string> = {

@@ -608,7 +608,7 @@ const addSFL: Record<AddSFL, string> = {
   "addSFL.referralFee":
     "Sunflower Land берет комиссию в размере 5% за совершение сделки.",
   "addSFL.swapTitle": "Детали Обмена",
-  "addSFL.minimumReceived": "Минимум: ",
+  "addSFL.minimumReceived": "Минимум: {{sflReceived}} SFL",
 };
 
 const availableSeeds: Record<AvailableSeeds, string> = {
