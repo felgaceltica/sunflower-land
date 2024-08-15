@@ -37,7 +37,8 @@ jobs:
           VITE_PRIVATE_IMAGE_URL: "https://sunflower-land.com/testnet-assets"
           VITE_API_URL: "https://api-dev.sunflower-land.com"
           VITE_ROOM_URL: "wss://216-238-112-132.colyseus.dev/"
-          VITE_PORTAL_APP: "farmer-soccer"
+          VITE_ANIMATION_URL: "https://animations-dev.sunflower-land.com"
+          VITE_PORTAL_APP: "farmer-race"
           VITE_PORTAL_GAME_URL: "https://sunflower-land.com/testnet/"
 
       - name: Configure AWS Credentials
