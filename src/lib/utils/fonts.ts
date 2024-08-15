@@ -78,11 +78,11 @@ export const CYRILLIC_FONT_CONFIG: Record<Font, FontSettings> = {
   },
   Bold: {
     fontFamily: "Born2bSporty",
-    xxs: [18, 12],
-    xs: [24, 14],
-    sm: [30, 20],
-    base: [36, 26],
-    lg: [42, 32],
+    xxs: [16, 12],
+    xs: [20, 14],
+    sm: [26, 20],
+    base: [30, 26],
+    lg: [36, 32],
   },
   "Chunky (Old)": {
     fontFamily: "Russo One",
@@ -123,47 +123,47 @@ export function initialiseFont() {
 function setFontProperties(config: FontSettings) {
   document.documentElement.style.setProperty(
     "--font-family",
-    config.fontFamily,
+    config.fontFamily
   );
   document.documentElement.style.setProperty(
     "--text-xxs-size",
-    `${config.xxs[0]}px`,
+    `${config.xxs[0]}px`
   );
   document.documentElement.style.setProperty(
     "--text-xxs-line-height",
-    `${config.xxs[1]}px`,
+    `${config.xxs[1]}px`
   );
   document.documentElement.style.setProperty(
     "--text-xs-size",
-    `${config.xs[0]}px`,
+    `${config.xs[0]}px`
   );
   document.documentElement.style.setProperty(
     "--text-xs-line-height",
-    `${config.xs[1]}px`,
+    `${config.xs[1]}px`
   );
   document.documentElement.style.setProperty(
     "--text-sm-size",
-    `${config.sm[0]}px`,
+    `${config.sm[0]}px`
   );
   document.documentElement.style.setProperty(
     "--text-sm-line-height",
-    `${config.sm[1]}px`,
+    `${config.sm[1]}px`
   );
   document.documentElement.style.setProperty(
     "--text-base-size",
-    `${config.base[0]}px`,
+    `${config.base[0]}px`
   );
   document.documentElement.style.setProperty(
     "--text-base-line-height",
-    `${config.base[1]}px`,
+    `${config.base[1]}px`
   );
   document.documentElement.style.setProperty(
     "--text-lg-size",
-    `${config.lg[0]}px`,
+    `${config.lg[0]}px`
   );
   document.documentElement.style.setProperty(
     "--text-lg-line-height",
-    `${config.lg[1]}px`,
+    `${config.lg[1]}px`
   );
 }
 
@@ -172,8 +172,8 @@ export function changeFont(font: Font) {
   const config = ["ru"].includes(lang)
     ? CYRILLIC_FONT_CONFIG[font]
     : ["zh-CN"].includes(lang)
-      ? CHINESE_FONT_CONFIG[font]
-      : FONT_CONFIG[font];
+    ? CHINESE_FONT_CONFIG[font]
+    : FONT_CONFIG[font];
 
   if (config) {
     setFontProperties(config);
