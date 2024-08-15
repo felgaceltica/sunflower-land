@@ -21,7 +21,7 @@ export const PLAYER_MAX_X =
 export const PLAYER_Y =
   window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 5);
 export const TOTAL_COLUMNS = Math.ceil(
-  window.innerWidth / SQUARE_WIDTH_TEXTURE / ZOOM
+  window.innerWidth / SQUARE_WIDTH_TEXTURE / ZOOM,
 );
 export const GRASS_COLUMNS =
   Math.ceil((TOTAL_COLUMNS - STREET_COLUMNS) / 2) + 1;
@@ -56,12 +56,13 @@ export const MINIGAME_NAME = "farmer_race";
 export const NAME_TAG_OFFSET_PX = 12;
 export const MAX_OBSTACLES_LINES = 5;
 export const MAX_DECORATIONS_LINES = 20;
-export const INITIAL_SPEED = 1.8;
+export const INITIAL_SPEED = 1.4;
 export const MAX_SPEED = 5;
-export const SPEED_INCREMENT = 0.1;
+export const SPEED_INCREMENT = 0.06;
 export const INITIAL_WALK_SPEED = 70;
 export const MAX_WALK_SPEED = 150;
 export const WALK_SPEED_INCREMENT = 5;
+export const BACKGROUND_SPEED_RATIO = 2;
 export type FarmerRaceNPCName = "Felga";
 export const FARMER_RACE_NPC_WEREABLES: Record<FarmerRaceNPCName, Equipped> = {
   Felga: {

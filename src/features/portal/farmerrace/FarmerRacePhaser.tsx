@@ -24,6 +24,8 @@ export const FarmerRacePhaser: React.FC = () => {
     const config: Phaser.Types.Core.GameConfig = {
       type: AUTO,
       fps: {
+        //min: 40,
+        //limit: 60,
         target: 30,
         smoothStep: true,
       },

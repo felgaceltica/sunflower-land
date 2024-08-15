@@ -20,9 +20,11 @@ export class FarmerRaceObstacleFactory {
     this._scene = scene;
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
     this.obstacles["rock"] = new RockObstacle(60, 5, false);
+    this.obstacles["gravestone"] = new GraveStoneObstacle(20, 10, false);
     this.obstacles["oilpit"] = new OilPitObstacle(10, 10, false);
-    this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
     this.obstacles["largerock"] = new StoneRockObstacle(10, 10, false);
+    // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
+    //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
     //Points
     this.obstacles["fruit"] = new FruitObstacle(5, 25, true);
     //this.obstacles["coin"] = new CoinObstacle(5,10,true);
@@ -37,7 +39,7 @@ export class FarmerRaceObstacleFactory {
     for (let index = 0; index < keys.length; index++) {
       const element = keys[index];
       weights.push(
-        (this.obstacles[keys[index]] as FarmerRaceObstacle).getWeight()
+        (this.obstacles[keys[index]] as FarmerRaceObstacle).getWeight(),
       );
     }
 
@@ -51,7 +53,7 @@ export class FarmerRaceObstacleFactory {
       if (
         Phaser.Geom.Intersects.RectangleToRectangle(
           this.obstaclesLines[index].getBounds(),
-          obstacleToInsert.getBounds()
+          obstacleToInsert.getBounds(),
         )
       ) {
         intersects = true;
@@ -90,7 +92,7 @@ export class FarmerRaceObstacleFactory {
             ).width,
             (
               this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body
-            ).height
+            ).height,
           );
 
           const obstacle = this.obstaclesLines[
@@ -103,7 +105,7 @@ export class FarmerRaceObstacleFactory {
               obstacle.getType() == "Rectangle" &&
               Phaser.Geom.Intersects.RectangleToRectangle(
                 obstacle.getCollisionRect(),
-                playerrect
+                playerrect,
               )
             ) {
               if (this._scene.physics.world.drawDebug) {
@@ -123,7 +125,7 @@ export class FarmerRaceObstacleFactory {
               obstacle.getType() == "Circle" &&
               Phaser.Geom.Intersects.CircleToRectangle(
                 obstacle.getCollisionCircle(),
-                playerrect
+                playerrect,
               )
             ) {
               if (this._scene.physics.world.drawDebug) {
@@ -182,7 +184,7 @@ export class FarmerRaceObstacleFactory {
       }
 
       this.obstaclesLines = this.obstaclesLines.filter(
-        (item) => item.active == true
+        (item) => item.active == true,
       );
     }
   }
@@ -203,7 +205,7 @@ export class FarmerRaceObstacleFactory {
     const playerDeath = this._scene.add.sprite(
       this._scene.currentPlayer.x,
       this._scene.currentPlayer.y - 1,
-      spriteName
+      spriteName,
     );
     playerDeath.setDepth(this._scene.currentPlayer.body.position.y);
     playerDeath.play({ key: spriteKey });
@@ -231,7 +233,7 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
     y: number,
     weight: number,
     points: number,
-    isBounty: boolean
+    isBounty: boolean,
   ) {
     super(scene, x, y);
     scene.add.existing(this);
@@ -271,7 +273,7 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
         this.x + this._collisionShape.x,
         this.y + this._collisionShape.y,
         (this._collisionShape as Phaser.Geom.Rectangle).width,
-        (this._collisionShape as Phaser.Geom.Rectangle).height
+        (this._collisionShape as Phaser.Geom.Rectangle).height,
       );
     } else {
       return this.getBounds();
@@ -282,7 +284,7 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
       return new Phaser.Geom.Circle(
         this.x + this._collisionShape.x,
         this.y + this._collisionShape.y,
-        (this._collisionShape as Phaser.Geom.Circle).radius
+        (this._collisionShape as Phaser.Geom.Circle).radius,
       );
     } else {
       return new Phaser.Geom.Circle(this.x, this.y, this.width / 2);
@@ -312,7 +314,7 @@ class TurtleObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3714);
     image.setOrigin(0, 0);
@@ -327,7 +329,7 @@ class TurtleObstacle extends FarmerRaceObstacle {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE,
       "SunnySideSprites",
-      3779
+      3779,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -358,7 +360,7 @@ class OilBarrelObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3317);
     image.setOrigin(0, 0);
@@ -371,9 +373,74 @@ class OilBarrelObstacle extends FarmerRaceObstacle {
       0.5,
       -2,
       bounds.width,
-      bounds.height
+      bounds.height,
     );
     Phaser.Geom.Rectangle.Inflate(rect, -3, -7);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeRectShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionRect(rect);
+    return container;
+  }
+}
+
+class GraveStoneObstacle extends FarmerRaceObstacle {
+  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+    const baseX = getBaseX(1);
+    const container = new FarmerRaceObstacleContainer(
+      scene,
+      baseX,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._isBounty,
+    );
+    const image = scene.add.image(0, 0, "SunnySideSprites", 1004);
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Rectangle(0, -1, bounds.width, bounds.height);
+    Phaser.Geom.Rectangle.Inflate(rect, -3, -3);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeRectShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionRect(rect);
+    return container;
+  }
+}
+
+class StoneWallObstacle extends FarmerRaceObstacle {
+  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+    const baseX = getBaseX(1);
+    const container = new FarmerRaceObstacleContainer(
+      scene,
+      baseX,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._isBounty,
+    );
+    const image = scene.add.image(0, 0, "SunnySideSprites", 109);
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Rectangle(0, 0, bounds.width, bounds.height);
     if (scene.physics.world.drawDebug) {
       const graphics = new Phaser.GameObjects.Graphics(scene, {
         lineStyle: { width: 1, color: 0xffff00 },
@@ -399,7 +466,7 @@ class StoneRockObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 1907);
     image.setOrigin(0, 0);
@@ -414,7 +481,7 @@ class StoneRockObstacle extends FarmerRaceObstacle {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE,
       "SunnySideSprites",
-      1972
+      1972,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -422,7 +489,7 @@ class StoneRockObstacle extends FarmerRaceObstacle {
     const shape = new Phaser.Geom.Circle(
       bounds.width / 2,
       bounds.height / 2,
-      bounds.width / 2
+      bounds.width / 2,
     );
     shape.radius = shape.radius * 0.7;
     //Phaser.Geom.Rectangle.Inflate(rect, -7, -2);
@@ -449,7 +516,7 @@ class OilPitObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3443);
     image.setOrigin(0, 0);
@@ -464,7 +531,7 @@ class OilPitObstacle extends FarmerRaceObstacle {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE,
       "SunnySideSprites",
-      3508
+      3508,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -472,7 +539,7 @@ class OilPitObstacle extends FarmerRaceObstacle {
     const shape = new Phaser.Geom.Circle(
       bounds.width / 2,
       bounds.height / 2,
-      bounds.width / 2
+      bounds.width / 2,
     );
     shape.radius = shape.radius * 0.7;
     //Phaser.Geom.Rectangle.Inflate(rect, -7, -2);
@@ -499,7 +566,7 @@ class RockObstacle extends FarmerRaceObstacle {
       START_HEIGHT,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 288);
     image.setOrigin(0, 0);
@@ -529,7 +596,7 @@ class ChestObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 1895);
     image.setOrigin(0, 0);
@@ -570,7 +637,7 @@ class CoinObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3736);
     image.setOrigin(0, 0);
@@ -606,7 +673,7 @@ class FruitObstacle extends FarmerRaceObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty
+      this._isBounty,
     );
     const image = scene.add.image(0, 0, fruits[randomInt(0, fruits.length)]);
     image.setOrigin(0, 0.2);
@@ -615,7 +682,7 @@ class FruitObstacle extends FarmerRaceObstacle {
     const shape = new Phaser.Geom.Circle(
       bounds.width / 2,
       bounds.height / 2,
-      bounds.width / 2
+      bounds.width / 2,
     );
     shape.radius = shape.radius * 0.8;
     if (scene.physics.world.drawDebug) {

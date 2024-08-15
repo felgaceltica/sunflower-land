@@ -63,7 +63,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     this.load.image("blueberry", ITEM_DETAILS["Blueberry"].image);
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,
-      "death"
+      "death",
     );
     this.load.spritesheet("player_death", url, {
       frameWidth: 96,
@@ -71,7 +71,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     });
   }
   async create() {
-    this.physics.world.drawDebug = false;
+    this.physics.world.drawDebug = true;
     this.initialiseCamera();
     this.initialiseSounds();
     this.initialiseControls();
@@ -133,7 +133,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     const audioMuted = getAudioMutedSetting();
     if (!audioMuted) {
       this.walkAudioController = new WalkAudioController(
-        this.sound.add("dirt_footstep")
+        this.sound.add("dirt_footstep"),
       );
     }
   }
@@ -174,7 +174,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     if (this.movementAngle !== undefined) {
       currentPlayerBody.setVelocity(
         this.walkingSpeed * Math.cos((this.movementAngle * Math.PI) / 180),
-        this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180)
+        this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180),
       );
     } else {
       currentPlayerBody.setVelocity(0, 0);
@@ -187,8 +187,8 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       this.soundEffects.forEach((audio) =>
         audio.setVolumeAndPan(
           this.currentPlayer?.x ?? 0,
-          this.currentPlayer?.y ?? 0
-        )
+          this.currentPlayer?.y ?? 0,
+        ),
       );
     } else {
       // eslint-disable-next-line no-console
@@ -225,7 +225,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     left: boolean,
     right: boolean,
     up: boolean,
-    down: boolean
+    down: boolean,
   ): number | undefined {
     // calculate the x and y components based on key states
     const x = (right ? 1 : 0) - (left ? 1 : 0);
@@ -267,14 +267,14 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     this.cursorKeys = this.input.keyboard?.createCursorKeys();
     if (this.cursorKeys) {
       const mmoLocalSettings = JSON.parse(
-        localStorage.getItem("mmo_settings") ?? "{}"
+        localStorage.getItem("mmo_settings") ?? "{}",
       );
       const layout = mmoLocalSettings.layout ?? "QWERTY";
 
       // add WASD keys
       this.cursorKeys.a = this.input.keyboard?.addKey(
         layout === "QWERTY" ? "A" : "Q",
-        false
+        false,
       );
       this.cursorKeys.d = this.input.keyboard?.addKey("D", false);
 
@@ -310,7 +310,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     const defaultClick = () => {
       const distance = Phaser.Math.Distance.BetweenPoints(
         entity,
-        this.currentPlayer as BumpkinContainer
+        this.currentPlayer as BumpkinContainer,
       );
 
       if (distance > 50) {
@@ -351,7 +351,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
         .setCollideWorldBounds(true);
 
       (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setAllowRotation(
-        false
+        false,
       );
     } else {
       (entity.body as Phaser.Physics.Arcade.Body)

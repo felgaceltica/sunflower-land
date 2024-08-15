@@ -9,6 +9,7 @@ import {
   GROUND_DEPTH,
   MAX_DECORATIONS_LINES,
   MAX_OBSTACLES_LINES,
+  BACKGROUND_SPEED_RATIO,
 } from "../util/FarmerRaceConstants";
 import { FarmerRaceBaseScene } from "./FarmerRaceBaseScene";
 import { FarmerRaceDecorationFactory } from "./Decorations";
@@ -22,6 +23,7 @@ export class FarmerRaceGroundFactory {
   public grassTiles = [66, 129, 130, 131, 194, 199, 257, 258];
   public grassWeights = [90, 1, 1, 1, 1, 1, 1, 1];
   private streetLines: Phaser.GameObjects.Container[] = [];
+  private backgroundLines: Phaser.GameObjects.Container[] = [];
   nextDecoration: number = randomInt(0, MAX_DECORATIONS_LINES);
   private _decorationsFactory: FarmerRaceDecorationFactory;
   nextObstacle: number = randomInt(0, MAX_OBSTACLES_LINES);
@@ -45,6 +47,10 @@ export class FarmerRaceGroundFactory {
   public createBaseRoad() {
     for (let index = 0; index < TOTAL_LINES; index++) {
       this.addRoadLine(START_HEIGHT + SQUARE_WIDTH_TEXTURE * index, false);
+      this.addBackgroundLine(
+        START_HEIGHT + SQUARE_WIDTH_TEXTURE * index,
+        false,
+      );
     }
   }
   private addRoadLine(startY: number, start: boolean) {
@@ -57,34 +63,7 @@ export class FarmerRaceGroundFactory {
         x,
         y,
         "SunnySideSprites",
-        weightedRandom(this.dirtyTiles, this.dirtyWeights)?.item
-      );
-      image.setOrigin(0, 0);
-      container.add(image);
-      x = x + SQUARE_WIDTH_TEXTURE;
-    }
-    x =
-      window.innerWidth / 2 -
-      SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
-      SQUARE_WIDTH_TEXTURE;
-    for (let index = 0; index < GRASS_COLUMNS; index++) {
-      const image = this._scene.add.image(
-        x,
-        y,
-        "SunnySideSprites",
-        weightedRandom(this.grassTiles, this.grassWeights)?.item
-      );
-      image.setOrigin(0, 0);
-      container.add(image);
-      x = x - SQUARE_WIDTH_TEXTURE;
-    }
-    x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
-    for (let index = 0; index < GRASS_COLUMNS; index++) {
-      const image = this._scene.add.image(
-        x,
-        y,
-        "SunnySideSprites",
-        weightedRandom(this.grassTiles, this.grassWeights)?.item
+        weightedRandom(this.dirtyTiles, this.dirtyWeights)?.item,
       );
       image.setOrigin(0, 0);
       container.add(image);
@@ -104,6 +83,41 @@ export class FarmerRaceGroundFactory {
     if (start) this.streetLines.unshift(container);
     else this.streetLines.push(container);
   }
+  private addBackgroundLine(startY: number, start: boolean) {
+    const container = this._scene.add.container();
+    container.y = startY;
+    let x = window.innerWidth / 2 - SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
+    const y = 0;
+    x =
+      window.innerWidth / 2 -
+      SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
+      SQUARE_WIDTH_TEXTURE;
+    for (let index = 0; index < GRASS_COLUMNS; index++) {
+      const image = this._scene.add.image(
+        x,
+        y,
+        "SunnySideSprites",
+        weightedRandom(this.grassTiles, this.grassWeights)?.item,
+      );
+      image.setOrigin(0, 0);
+      container.add(image);
+      x = x - SQUARE_WIDTH_TEXTURE;
+    }
+    x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
+    for (let index = 0; index < GRASS_COLUMNS; index++) {
+      const image = this._scene.add.image(
+        x,
+        y,
+        "SunnySideSprites",
+        weightedRandom(this.grassTiles, this.grassWeights)?.item,
+      );
+      image.setOrigin(0, 0);
+      container.add(image);
+      x = x + SQUARE_WIDTH_TEXTURE;
+    }
+    if (start) this.backgroundLines.unshift(container);
+    else this.backgroundLines.push(container);
+  }
   public update() {
     for (let index = 0; index < this.streetLines.length; index++) {
       this.streetLines[index].setDepth(GROUND_DEPTH);
@@ -115,14 +129,8 @@ export class FarmerRaceGroundFactory {
       this.streetLines.splice(-1);
       lastLine.destroy();
       this.addRoadLine(this.streetLines[0].y - SQUARE_WIDTH_TEXTURE, true);
-      this.nextDecoration--;
       this.nextObstacle--;
     }
-    if (this.nextDecoration < 0) {
-      this.nextDecoration = randomInt(0, MAX_DECORATIONS_LINES);
-      this._decorationsFactory.addRandomDecoration();
-    }
-    this._decorationsFactory.update();
     if (this._scene.isGamePlaying) {
       if (this.nextObstacle < 0) {
         this.nextObstacle = randomInt(0, MAX_OBSTACLES_LINES);
@@ -130,5 +138,27 @@ export class FarmerRaceGroundFactory {
       }
     }
     this._obstaclesFactory.update();
+
+    for (let index = 0; index < this.backgroundLines.length; index++) {
+      this.backgroundLines[index].setDepth(GROUND_DEPTH - 1);
+      this.backgroundLines[index].y +=
+        this._scene.speed / BACKGROUND_SPEED_RATIO;
+    }
+
+    const lastLineBG = this.backgroundLines[this.streetLines.length - 1];
+    if (lastLineBG.y > FINAL_HEIGHT) {
+      this.backgroundLines.splice(-1);
+      lastLineBG.destroy();
+      this.addBackgroundLine(
+        this.backgroundLines[0].y - SQUARE_WIDTH_TEXTURE,
+        true,
+      );
+      this.nextDecoration--;
+    }
+    if (this.nextDecoration < 0) {
+      this.nextDecoration = randomInt(0, MAX_DECORATIONS_LINES);
+      this._decorationsFactory.addRandomDecoration();
+    }
+    this._decorationsFactory.update();
   }
 }

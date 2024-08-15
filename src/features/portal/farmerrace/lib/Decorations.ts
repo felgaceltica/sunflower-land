@@ -8,6 +8,7 @@ import {
   GRASS_RIGHT_MAX,
   FINAL_HEIGHT,
   DECORATION_DEPTH,
+  BACKGROUND_SPEED_RATIO,
 } from "../util/FarmerRaceConstants";
 import weightedRandom from "../util/Utils";
 import { FarmerRaceBaseScene } from "./FarmerRaceBaseScene";
@@ -36,7 +37,7 @@ export class FarmerRaceDecorationFactory {
     for (let index = 0; index < keys.length; index++) {
       const element = keys[index];
       weights.push(
-        (this.decorations[keys[index]] as FarmerRaceDecoration).getWeight()
+        (this.decorations[keys[index]] as FarmerRaceDecoration).getWeight(),
       );
     }
 
@@ -50,7 +51,7 @@ export class FarmerRaceDecorationFactory {
       if (
         Phaser.Geom.Intersects.RectangleToRectangle(
           this.decorationsLines[index].getBounds(),
-          decorationToInsert.getBounds()
+          decorationToInsert.getBounds(),
         )
       ) {
         intersects = true;
@@ -66,14 +67,15 @@ export class FarmerRaceDecorationFactory {
   public update() {
     for (let index = 0; index < this.decorationsLines.length; index++) {
       this.decorationsLines[index].setDepth(DECORATION_DEPTH);
-      this.decorationsLines[index].y += this._scene.speed;
+      this.decorationsLines[index].y +=
+        this._scene.speed / BACKGROUND_SPEED_RATIO;
       if (this.decorationsLines[index].y > FINAL_HEIGHT) {
         this.decorationsLines[index].visible = false;
         this.decorationsLines[index].destroy();
       }
     }
     this.decorationsLines = this.decorationsLines.filter(
-      (item) => item.active == true
+      (item) => item.active == true,
     );
   }
 }
@@ -92,7 +94,7 @@ class TreeDecoration extends FarmerRaceDecoration {
     const baseX = getBaseX(2);
     const container = scene.add.container(
       baseX,
-      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 119);
     image.setOrigin(0, 0);
@@ -107,7 +109,7 @@ class TreeDecoration extends FarmerRaceDecoration {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE,
       "SunnySideSprites",
-      444
+      444,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -115,7 +117,7 @@ class TreeDecoration extends FarmerRaceDecoration {
       0,
       SQUARE_WIDTH_TEXTURE * 2,
       "SunnySideSprites",
-      507
+      507,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -123,7 +125,7 @@ class TreeDecoration extends FarmerRaceDecoration {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE * 2,
       "SunnySideSprites",
-      508
+      508,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -146,7 +148,7 @@ class GoldRockDecoration extends FarmerRaceDecoration {
     const baseX = getBaseX(2);
     const container = scene.add.container(
       baseX,
-      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 1
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 1,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 1779);
     image.setOrigin(0, 0);
@@ -161,7 +163,7 @@ class GoldRockDecoration extends FarmerRaceDecoration {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE,
       "SunnySideSprites",
-      1844
+      1844,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -174,7 +176,7 @@ class BushDecoration extends FarmerRaceDecoration {
     const baseX = getBaseX(2);
     const container = scene.add.container(
       baseX,
-      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 1
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 1,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 241);
     image.setOrigin(0, 0);
@@ -189,7 +191,7 @@ class BushDecoration extends FarmerRaceDecoration {
       SQUARE_WIDTH_TEXTURE,
       SQUARE_WIDTH_TEXTURE,
       "SunnySideSprites",
-      306
+      306,
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -206,7 +208,7 @@ class FlowerDecoration extends FarmerRaceDecoration {
       0,
       0,
       "SunnySideSprites",
-      flowers[randomInt(0, flowers.length)]
+      flowers[randomInt(0, flowers.length)],
     );
     image.setOrigin(0, 0);
     container.add(image);
@@ -228,12 +230,12 @@ function getBaseX(squares: number): number {
   if (randomBoolean()) {
     return randomInt(
       GRASS_LEFT_MIN,
-      GRASS_LEFT_MAX - squares * SQUARE_WIDTH_TEXTURE
+      GRASS_LEFT_MAX - squares * SQUARE_WIDTH_TEXTURE,
     );
   } else {
     return randomInt(
       GRASS_RIGHT_MIN,
-      GRASS_RIGHT_MAX - squares * SQUARE_WIDTH_TEXTURE
+      GRASS_RIGHT_MAX - squares * SQUARE_WIDTH_TEXTURE,
     );
   }
 }
