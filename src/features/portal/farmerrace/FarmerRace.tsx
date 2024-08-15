@@ -103,7 +103,7 @@ import { Panel } from "components/ui/Panel";
 import { Button } from "components/ui/Button";
 
 import { PortalContext } from "./lib/PortalProvider";
-import { FarmerRaceHUD } from "./components/FarmerRaceHUD";
+import { FarmerRaceHud } from "./components/hud/FarmerRaceHud";
 import { FarmerRacePhaser } from "./FarmerRacePhaser";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
@@ -111,8 +111,8 @@ import { PortalMachineState } from "./lib/FarmerRaceMachine";
 import { Loading } from "features/auth/components";
 import { CONFIG } from "lib/config";
 import { authorisePortal, claimPrize } from "../lib/portalUtil";
-import { CropsAndChickensRulesPanel } from "./components/panel/CropsAndChickensRulesPanel";
-import { CropsAndChickensNoAttemptsPanel } from "./components/panel/CropsAndChickensNoAttemptsPanel";
+import { FarmerRaceRulesPanel } from "./components/panels/FarmerRaceRulesPanel";
+import { FarmerRaceNoAttemptsPanel } from "./components/panels/FarmerRaceNoAttemptsPanel";
 import AchievementToastProvider from "./providers/AchievementToastProvider";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
@@ -128,7 +128,7 @@ const _isLoser = (state: PortalMachineState) => state.matches("loser");
 const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
 
-export const CropsAndChickens: React.FC = () => {
+export const FarmerRace: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
 
@@ -203,13 +203,13 @@ export const CropsAndChickens: React.FC = () => {
     <div>
       {isNoAttempts && (
         <Modal show>
-          <CropsAndChickensNoAttemptsPanel />
+          <FarmerRaceNoAttemptsPanel />
         </Modal>
       )}
 
       {isIntroduction && (
         <Modal show>
-          <CropsAndChickensRulesPanel
+          <FarmerRaceRulesPanel
             mode={"introduction"}
             showScore={false}
             showExitButton={true}
@@ -221,7 +221,7 @@ export const CropsAndChickens: React.FC = () => {
 
       {isLoser && (
         <Modal show>
-          <CropsAndChickensRulesPanel
+          <FarmerRaceRulesPanel
             mode={"failed"}
             showScore={true}
             showExitButton={true}
@@ -233,7 +233,7 @@ export const CropsAndChickens: React.FC = () => {
 
       {isWinner && (
         <Modal show>
-          <CropsAndChickensRulesPanel
+          <FarmerRaceRulesPanel
             mode={"success"}
             showScore={true}
             showExitButton={false}
@@ -245,7 +245,7 @@ export const CropsAndChickens: React.FC = () => {
 
       {isComplete && (
         <Modal show>
-          <CropsAndChickensRulesPanel
+          <FarmerRaceRulesPanel
             mode={"introduction"}
             showScore={true}
             showExitButton={true}
@@ -257,7 +257,7 @@ export const CropsAndChickens: React.FC = () => {
 
       {sflBalance && (
         <AchievementToastProvider>
-          <FarmerRaceHUD />
+          <FarmerRaceHud />
           <FarmerRacePhaser />
         </AchievementToastProvider>
       )}

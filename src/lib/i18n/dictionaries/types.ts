@@ -1110,11 +1110,44 @@ export type CropMachine =
   | "cropMachine.idle"
   | "cropMachine.name";
 
-export type CropsAndChickensMessages =
-  | "crops-and-chickens.portal.title"
-  | "crops-and-chickens.portal.description"
-  | "crops-and-chickens.portal.missionObjectives"
-  | "crops-and-chickens.portal.rewardMessage";
+export type FarmerRaceMessages =
+  | "farmer-race.portal.title"
+  | "farmer-race.portal.description"
+  | "farmer-race.portal.missionObjectives"
+  | "farmer-race.portal.rewardMessage"
+  | "farmer-race.missionComplete"
+  | "farmer-race.missionFailed"
+  | "farmer-race.noPrizesAvailable"
+  | "farmer-race.completed"
+  | "farmer-race.unlimitedAttempts"
+  | "farmer-race.attemptsRemainingPlural"
+  | "farmer-race.attemptsRemainingSingular"
+  | "farmer-race.noAttemptsRemaining"
+  | "farmer-race.achievementUnlockedAt"
+  | "farmer-race.guide"
+  | "farmer-race.instructions"
+  | "farmer-race.instructions1"
+  | "farmer-race.instructions2"
+  | "farmer-race.instructions3"
+  | "farmer-race.instructions4"
+  | "farmer-race.obstacles"
+  | "farmer-race.cropDescription"
+  | "farmer-race.score"
+  | "farmer-race.bestToday"
+  | "farmer-race.bestAllTime"
+  | "farmer-race.donationDescription"
+  | "farmer-race.mission"
+  | "farmer-race.achievementUnlocked"
+  | "farmer-race.noAttemptsRemaining"
+  | "farmer-race.sflRequired"
+  | "farmer-race.youHaveRunOutOfAttempts"
+  | "farmer-race.wouldYouLikeToUnlock"
+  | "farmer-race.buyAttempts"
+  | "farmer-race.unlockAttempts"
+  | "farmer-race.endGameConfirmation"
+  | "farmer-race.endGame"
+  | "farmer-race.targetScore"
+  | "farmer-race.inventory";
 
 export type DeliveryItem =
   | "deliveryitem.inventory"
@@ -3851,7 +3884,7 @@ export type TranslationKeys =
   | CropBoomMessages
   | CropFruitDescriptions
   | CropMachine
-  | CropsAndChickensMessages
+  | FarmerRaceMessages
   | DeliveryItem
   | DefaultDialogue
   | DecorationDescriptions

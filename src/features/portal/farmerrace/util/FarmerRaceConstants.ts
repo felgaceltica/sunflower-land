@@ -1,7 +1,9 @@
+import { Equipped } from "features/game/types/bumpkin";
+import { ITEM_DETAILS } from "features/game/types/images";
+
 export const ZOOM = window.innerWidth < 500 ? 3 : 4;
 export const SQUARE_WIDTH_TEXTURE = 18;
 export const STREET_COLUMNS = 6;
-export const INITIAL_SPEED = 0.5;
 export const TOTAL_LINES =
   Math.ceil(window.innerHeight / SQUARE_WIDTH_TEXTURE / ZOOM) + 2;
 export const START_HEIGHT =
@@ -17,7 +19,7 @@ export const PLAYER_MAX_X =
   SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
   SQUARE_WIDTH_TEXTURE / 2;
 export const PLAYER_Y =
-  window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3);
+  window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 5);
 export const TOTAL_COLUMNS = Math.ceil(
   window.innerWidth / SQUARE_WIDTH_TEXTURE / ZOOM
 );
@@ -40,3 +42,37 @@ export const DECORATION_DEPTH = 200;
 export const UNLIMITED_ATTEMPTS_SFL = 3;
 export const RESTOCK_ATTEMPTS_SFL = 1;
 export const DAILY_ATTEMPTS = 5;
+export const OBSTACLES_SCORE_TABLE: {
+  [key: number]: {
+    item: string;
+    points: number;
+    type: string;
+  };
+} = {
+  0: { item: ITEM_DETAILS["Oil Reserve"].image, points: 10, type: "Obstacle" },
+  1: { item: "Chest", points: 100, type: "Obstacle" },
+};
+export const MINIGAME_NAME = "farmer_race";
+export const NAME_TAG_OFFSET_PX = 12;
+export const MAX_OBSTACLES_LINES = 5;
+export const MAX_DECORATIONS_LINES = 20;
+export const INITIAL_SPEED = 1.8;
+export const MAX_SPEED = 5;
+export const SPEED_INCREMENT = 0.1;
+export const INITIAL_WALK_SPEED = 70;
+export const MAX_WALK_SPEED = 150;
+export const WALK_SPEED_INCREMENT = 5;
+export type FarmerRaceNPCName = "Felga";
+export const FARMER_RACE_NPC_WEREABLES: Record<FarmerRaceNPCName, Equipped> = {
+  Felga: {
+    hair: "Basic Hair",
+    shirt: "Skull Shirt",
+    pants: "Farmer Pants",
+    background: "Seashore Background",
+    necklace: "Green Amulet",
+    hat: "Feather Hat",
+    body: "Beige Farmer Potion",
+    shoes: "Yellow Boots",
+    tool: "Sunflower Rod",
+  },
+};

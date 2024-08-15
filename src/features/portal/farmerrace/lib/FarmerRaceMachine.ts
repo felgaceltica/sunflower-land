@@ -3,7 +3,6 @@ import { assign, createMachine, Interpreter, State } from "xstate";
 import { CONFIG } from "lib/config";
 import { decodeToken } from "features/auth/actions/login";
 import {
-  //GAME_SECONDS,
   RESTOCK_ATTEMPTS_SFL,
   UNLIMITED_ATTEMPTS_SFL,
   DAILY_ATTEMPTS,
@@ -15,7 +14,7 @@ import { achievementsUnlocked, played } from "features/portal/lib/portalUtil";
 import { getUrl, loadPortal } from "features/portal/actions/loadPortal";
 import { getAttemptsLeft } from "../util/Utils";
 import { unlockMinigameAchievements } from "features/game/events/minigames/unlockMinigameAchievements";
-import { CropsAndChickensAchievementName } from "../CropsAndChickensAchievements";
+import { FarmerRaceAchievementsName } from "../FarmerRaceAchievements";
 
 const getJWT = () => {
   const code = new URLSearchParams(window.location.search).get("jwt");
@@ -28,19 +27,18 @@ export interface Context {
   isJoystickActive: boolean;
   state: GameState | undefined;
   score: number;
-  inventory: number;
-  endAt: number;
+  startedAt: number;
   attemptsLeft: number;
 }
 
-type CropHarvestedEvent = {
-  type: "CROP_HARVESTED";
+type GainPointsEvent = {
+  type: "GAIN_POINTS";
   points: number;
 };
 
 type UnlockAchievementsEvent = {
   type: "UNLOCKED_ACHIEVEMENTS";
-  achievementNames: CropsAndChickensAchievementName[];
+  achievementNames: FarmerRaceAchievementsName[];
 };
 
 type SetJoystickActiveEvent = {
@@ -59,9 +57,9 @@ export type PortalEvent =
   | { type: "CONTINUE" }
   | { type: "END_GAME_EARLY" }
   | { type: "GAME_OVER" }
-  | CropHarvestedEvent
-  | { type: "CROP_DEPOSITED" }
-  | { type: "KILL_PLAYER" }
+  | GainPointsEvent
+  // | { type: "CROP_DEPOSITED" }
+  // | { type: "KILL_PLAYER" }
   | UnlockAchievementsEvent;
 
 export type PortalState = {
@@ -103,9 +101,8 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 
     score: 0,
-    inventory: 0,
     attemptsLeft: 0,
-    endAt: 0,
+    startedAt: 0,
   },
   on: {
     SET_JOYSTICK_ACTIVE: {
@@ -226,7 +223,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           cond: (context) => {
             const minigame = context.state?.minigames.games["farmer-race"];
             const attemptsLeft = getAttemptsLeft(minigame);
-
             return attemptsLeft <= 0;
           },
         },
@@ -249,7 +245,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         START: {
           target: "playing",
           actions: assign<Context>({
-            endAt: () => Date.now() + GAME_SECONDS * 1000,
+            startedAt: () => Date.now(),
             attemptsLeft: (context: Context) => context.attemptsLeft - 1,
           }) as any,
         },
@@ -258,30 +254,41 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
 
     playing: {
       on: {
-        CROP_HARVESTED: {
+        GAIN_POINTS: {
           actions: assign<Context, any>({
-            inventory: (context: Context, event: CropHarvestedEvent) => {
-              return context.inventory + event.points;
+            score: (context: Context, event: GainPointsEvent) => {
+              return context.score + event.points;
             },
           }),
         },
-        CROP_DEPOSITED: {
-          actions: assign<Context, any>({
-            score: (context: Context) => {
-              return context.score + context.inventory;
-            },
-            inventory: () => 0,
-          }),
-        },
-        KILL_PLAYER: {
-          actions: assign<Context, any>({
-            inventory: () => 0,
-          }),
-        },
+        // CROP_DEPOSITED: {
+        //   actions: assign<Context, any>({
+        //     score: (context: Context) => {
+        //       return context.score + context.inventory;
+        //     },
+        //   }),
+        // },
+        // KILL_PLAYER: {
+        //   actions: assign<Context, any>({
+
+        //   }),
+        // },
         END_GAME_EARLY: {
           actions: assign<Context, any>({
-            endAt: () => Date.now(),
+            startedAt: (context: any) => 0,
+            state: (context: any) => {
+              played({ score: context.score });
+              return playMinigame({
+                state: context.state,
+                action: {
+                  type: "minigame.played",
+                  score: context.score,
+                  id: "farmer-race",
+                },
+              });
+            },
           }),
+          target: "introduction",
         },
         GAME_OVER: {
           target: "gameOver",
@@ -321,7 +328,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "winner",
           cond: (context) => {
             const prize = context.state?.minigames.prizes["farmer-race"];
-
             if (!prize) {
               return false;
             }
@@ -331,6 +337,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         },
         {
           target: "loser",
+          actions: assign({
+            score: () => 0,
+            inventory: () => 0,
+            startedAt: () => 0,
+          }) as any,
         },
       ],
     },
@@ -342,7 +353,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign({
             score: () => 0,
             inventory: () => 0,
-            endAt: () => 0,
+            startedAt: () => 0,
           }) as any,
         },
       },
@@ -355,7 +366,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign({
             score: () => 0,
             inventory: () => 0,
-            endAt: () => 0,
+            startedAt: () => 0,
           }) as any,
         },
       },
@@ -368,7 +379,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign({
             score: () => 0,
             inventory: () => 0,
-            endAt: () => 0,
+            startedAt: () => 0,
           }) as any,
         },
       },

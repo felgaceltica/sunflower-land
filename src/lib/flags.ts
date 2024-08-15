@@ -32,6 +32,7 @@ export type FeatureName =
   | "FACTIONS"
   | "BANNER_SALES"
   | "CROPS_AND_CHICKENS"
+  | "FARMER_RACE"
   | "CROP_MACHINE"
   | "DESERT_RECIPES"
   | "FACTION_HOUSE"
@@ -42,7 +43,8 @@ export type FeatureName =
   | "CHAMPIONS"
   | "TEST_DIGGING"
   | "NEW_FRUITS"
-  | "DESERT_PLAZA";
+  | "DESERT_PLAZA"
+  | "FARMER_RACE_BETA_TESTING";
 
 // Used for testing production features
 export const ADMIN_IDS = [1, 2, 3, 39488];
@@ -58,8 +60,9 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   CHAMPIONS: betaTimeBasedFeatureFlag(new Date("2024-07-15T00:00:00Z")),
   CROP_QUICK_SELECT: defaultFeatureFlag,
   CROPS_AND_CHICKENS: betaTimeBasedFeatureFlag(
-    new Date("2024-08-07T00:00:00Z"),
+    new Date("2024-08-07T00:00:00Z")
   ),
+  FARMER_RACE: betaTimeBasedFeatureFlag(new Date("2025-08-07T00:00:00Z")),
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   DESERT_RECIPES: defaultFeatureFlag,
@@ -76,6 +79,7 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   TEST_DIGGING: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
   NEW_FRUITS: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
   DESERT_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
+  FARMER_RACE_BETA_TESTING: defaultFeatureFlag,
 };
 
 export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {

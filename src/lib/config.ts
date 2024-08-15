@@ -2,6 +2,8 @@ const NETWORK = import.meta.env.VITE_NETWORK as "mainnet" | "amoy";
 const DONATION_ADDRESS = import.meta.env.VITE_DONATION_ADDRESS;
 const TREASURY_ADDRESS = import.meta.env.VITE_TREASURY_ADDRESS as string;
 
+const PORTAL_DONATION_ADDRESS = import.meta.env.VITE_PORTAL_DONATION_ADDRESS;
+
 const POLYGON_CHAIN_ID = NETWORK === "mainnet" ? 137 : 80002;
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -86,6 +88,9 @@ export const CONFIG = {
   NETWORK,
   POLYGON_CHAIN_ID,
   DONATION_ADDRESS,
+
+  PORTAL_DONATION_ADDRESS,
+
   TREASURY_ADDRESS,
   API_URL,
   DISCORD_REDIRECT,
@@ -128,6 +133,7 @@ export const CONFIG = {
 
   GREEDY_GOBLIN_DONATION,
   CHICKEN_FIGHT_DONATION,
+
   PROTECTED_IMAGE_URL,
   ROOM_URL,
   POKO_API_KEY,

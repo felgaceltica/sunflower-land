@@ -10,21 +10,22 @@ import {
   DECORATION_DEPTH,
 } from "../util/FarmerRaceConstants";
 import weightedRandom from "../util/Utils";
+import { FarmerRaceBaseScene } from "./FarmerRaceBaseScene";
 
 export class FarmerRaceDecorationFactory {
-  private _scene: Phaser.Scene;
+  private _scene: FarmerRaceBaseScene;
   //private decorationsMethods = [];
   private decorations: any = {};
   private decorationsLines: Phaser.GameObjects.Container[] = [];
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: FarmerRaceBaseScene) {
     this._scene = scene;
-    this.decorations["tree"] = new TreeDecoration(50);
-    this.decorations["choppedtree"] = new ChoppedTreeDecoration(15);
-    this.decorations["bush"] = new BushDecoration(15);
-    this.decorations["mushroom"] = new MushroomDecoration(10);
-    this.decorations["flower"] = new FlowerDecoration(10);
-    this.decorations["goldrock"] = new GoldRockDecoration(5);
+    // this.decorations["tree"] = new TreeDecoration(60);
+    this.decorations["flower"] = new FlowerDecoration(20);
+    // this.decorations["bush"] = new BushDecoration(15);
+    // this.decorations["mushroom"] = new MushroomDecoration(15);
+    // this.decorations["choppedtree"] = new ChoppedTreeDecoration(10);
+    // this.decorations["goldrock"] = new GoldRockDecoration(5);
   }
 
   public addRandomDecoration(): void {
@@ -62,10 +63,10 @@ export class FarmerRaceDecorationFactory {
     }
   }
 
-  public update(speed: number) {
+  public update() {
     for (let index = 0; index < this.decorationsLines.length; index++) {
       this.decorationsLines[index].setDepth(DECORATION_DEPTH);
-      this.decorationsLines[index].y += speed;
+      this.decorationsLines[index].y += this._scene.speed;
       if (this.decorationsLines[index].y > FINAL_HEIGHT) {
         this.decorationsLines[index].visible = false;
         this.decorationsLines[index].destroy();
@@ -198,9 +199,15 @@ class BushDecoration extends FarmerRaceDecoration {
 
 class FlowerDecoration extends FarmerRaceDecoration {
   add(scene: Phaser.Scene): Phaser.GameObjects.Container {
+    const flowers = [223, 225, 159, 161, 95, 97, 92, 156, 220, 284];
     const baseX = getBaseX(1);
     const container = scene.add.container(baseX, START_HEIGHT);
-    const image = scene.add.image(0, 0, "SunnySideSprites", 1918);
+    const image = scene.add.image(
+      0,
+      0,
+      "SunnySideSprites",
+      flowers[randomInt(0, flowers.length)]
+    );
     image.setOrigin(0, 0);
     container.add(image);
     return container;
