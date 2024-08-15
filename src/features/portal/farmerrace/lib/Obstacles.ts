@@ -19,15 +19,16 @@ export class FarmerRaceObstacleFactory {
   constructor(scene: FarmerRaceBaseScene) {
     this._scene = scene;
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
+    // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
+    //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
+    //this.obstacles["coin"] = new CoinObstacle(5,10,true);
+
     this.obstacles["rock"] = new RockObstacle(60, 5, false);
     this.obstacles["gravestone"] = new GraveStoneObstacle(20, 10, false);
     this.obstacles["oilpit"] = new OilPitObstacle(10, 10, false);
     this.obstacles["largerock"] = new StoneRockObstacle(10, 10, false);
-    // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
-    //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
     //Points
     this.obstacles["fruit"] = new FruitObstacle(5, 25, true);
-    //this.obstacles["coin"] = new CoinObstacle(5,10,true);
     this.obstacles["chest"] = new ChestObstacle(1, 100, true);
   }
 
@@ -260,11 +261,16 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
     return this._type;
   }
   setCollisionRect(collisionRect: Phaser.Geom.Rectangle) {
+    this.x = getBaseX(collisionRect.x, collisionRect.width);
     this._collisionShape = collisionRect;
     this._type = "Rectangle";
   }
-  setCollisionCircle(collisionRect: Phaser.Geom.Circle) {
-    this._collisionShape = collisionRect;
+  setCollisionCircle(collisionCircle: Phaser.Geom.Circle) {
+    this.x = getBaseX(
+      collisionCircle.x - collisionCircle.radius,
+      collisionCircle.radius * 2,
+    );
+    this._collisionShape = collisionCircle;
     this._type = "Circle";
   }
   getCollisionRect(): Phaser.Geom.Rectangle {
@@ -307,10 +313,9 @@ abstract class FarmerRaceObstacle {
 }
 class TurtleObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(2);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -353,10 +358,9 @@ class TurtleObstacle extends FarmerRaceObstacle {
 }
 class OilBarrelObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -394,10 +398,9 @@ class OilBarrelObstacle extends FarmerRaceObstacle {
 
 class GraveStoneObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -427,10 +430,9 @@ class GraveStoneObstacle extends FarmerRaceObstacle {
 
 class StoneWallObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -459,10 +461,9 @@ class StoneWallObstacle extends FarmerRaceObstacle {
 
 class StoneRockObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(2);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -499,9 +500,11 @@ class StoneRockObstacle extends FarmerRaceObstacle {
         fillStyle: { color: 0xff0000 },
       });
       graphics.strokeCircleShape(shape);
+      graphics.strokeRectShape(bounds);
       graphics.setDepth(1000);
       container.add(graphics);
     }
+    const baseX = getBaseX(shape.x, shape.radius);
     container.setCollisionCircle(shape);
     return container;
   }
@@ -509,10 +512,9 @@ class StoneRockObstacle extends FarmerRaceObstacle {
 
 class OilPitObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(2);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      PLAYER_MIN_X,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -559,10 +561,9 @@ class OilPitObstacle extends FarmerRaceObstacle {
 
 class RockObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT,
       this._weight,
       this._points,
@@ -579,6 +580,7 @@ class RockObstacle extends FarmerRaceObstacle {
         lineStyle: { width: 1, color: 0xffff00 },
         fillStyle: { color: 0xff0000 },
       });
+      graphics.strokeRectShape(bounds);
       graphics.strokeRectShape(rect);
       graphics.setDepth(1000);
       container.add(graphics);
@@ -589,10 +591,9 @@ class RockObstacle extends FarmerRaceObstacle {
 }
 class ChestObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -630,10 +631,9 @@ class ChestObstacle extends FarmerRaceObstacle {
 }
 class CoinObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -666,10 +666,9 @@ class CoinObstacle extends FarmerRaceObstacle {
 class FruitObstacle extends FarmerRaceObstacle {
   add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
     const fruits = ["apple", "banana", "orange", "blueberry"];
-    const baseX = getBaseX(1);
     const container = new FarmerRaceObstacleContainer(
       scene,
-      baseX,
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
@@ -698,7 +697,9 @@ class FruitObstacle extends FarmerRaceObstacle {
     return container;
   }
 }
-function getBaseX(squares: number): number {
-  //Left or right
-  return randomInt(PLAYER_MIN_X, PLAYER_MAX_X - squares * SQUARE_WIDTH_TEXTURE);
+function getBaseX(x: number, width: number): number {
+  return randomInt(
+    PLAYER_MIN_X - x - 5,
+    PLAYER_MAX_X - x - width + SQUARE_WIDTH_TEXTURE / 2 - 4,
+  );
 }
