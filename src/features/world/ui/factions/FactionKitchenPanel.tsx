@@ -38,7 +38,7 @@ interface Props {
 }
 
 export const FACTION_KITCHEN_START_TIME = new Date(
-  "2024-07-08T00:00:00Z",
+  "2024-07-08T00:00:00Z"
 ).getTime();
 
 const _faction = (state: MachineState) =>
@@ -118,10 +118,10 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
         })}
       </Label>
       <CloseButtonPanel bumpkinParts={bumpkinParts}>
-        <div className="p-1">
+        <>
           {!showConfirm && (
             <>
-              <p className="block sm:hidden text-xs pb-1">
+              <p className="block sm:hidden text-xs p-2 mb-1">
                 {t("faction.kitchen.gatherResources")}
               </p>
               <SplitScreenView
@@ -138,7 +138,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
 
                         const boost = getKingdomKitchenBoost(
                           gameService.state.context.state,
-                          points,
+                          points
                         )[0];
 
                         const boostedMarks = points + boost;
@@ -150,7 +150,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
                               "flex relative flex-col flex-1 items-center p-2 cursor-pointer hover:bg-brown-300",
                               {
                                 "img-highlight": selectedRequestIdx === idx,
-                              },
+                              }
                             )}
                             onClick={() => setSelectedRequestIdx(idx)}
                           >
@@ -238,7 +238,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
                           "flex justify-between items-center sm:justify-center",
                           {
                             "-mt-1": isMobile,
-                          },
+                          }
                         )}
                         showLabel={isMobile}
                         hideIcon={!isMobile}
@@ -261,11 +261,10 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
           )}
           {showConfirm && (
             <>
-              <div className="space-y-3">
+              <div className="space-y-3 p-1">
                 <span className="text-xs sm:text-sm">
                   {t("faction.donation.confirm", {
                     factionPoints: formatNumber(boostedMarks),
-                    reward: `${formatNumber(boostedMarks)} ${t("marks")}`,
                   })}
                 </span>
                 <div className="flex flex-col space-y-1">
@@ -291,7 +290,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
               </div>
             </>
           )}
-        </div>
+        </>
       </CloseButtonPanel>
     </>
   );
