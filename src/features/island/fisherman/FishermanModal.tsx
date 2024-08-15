@@ -169,7 +169,7 @@ const BaitSelection: React.FC<{
     const hasRequirements =
       lastSelectedChum &&
       items[lastSelectedChum as InventoryItemName]?.gte(
-        CHUM_AMOUNTS[lastSelectedChum as Chum] ?? 0,
+        CHUM_AMOUNTS[lastSelectedChum as Chum] ?? 0
       );
 
     if (hasRequirements) {
@@ -209,7 +209,7 @@ const BaitSelection: React.FC<{
     (!state.inventory["Rod"] || state.inventory.Rod.lt(1));
 
   const catches = getKeys(FISH).filter((name) =>
-    FISH[name].baits.includes(bait),
+    FISH[name].baits.includes(bait)
   );
 
   const tide = getTide();
@@ -219,8 +219,8 @@ const BaitSelection: React.FC<{
     <>
       <InnerPanel>
         <div className="p-2">
-          <div className="flex items-center justify-between flex-wrap">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between flex-wrap gap-1">
+            <div className="flex items-center gap-1">
               {tide === "Dusktide" ? (
                 <Label
                   icon={SUNNYSIDE.icons.stopwatch}
@@ -285,7 +285,7 @@ const BaitSelection: React.FC<{
                 {translateTerms(ITEM_DETAILS[bait].description)}
               </p>
               {!items[bait] && bait !== "Fishing Lure" && (
-                <Label className="mt-1" type="default">
+                <Label className="mt-2" type="default">
                   {t("statements.craft.composter")}
                 </Label>
               )}
@@ -401,11 +401,11 @@ export const FishermanModal: React.FC<Props> = ({
   const dailyFishingCount = getDailyFishingCount(state);
 
   const [showFishFrenzy, setShowFishFrenzy] = React.useState(
-    weather === "Fish Frenzy" && dailyFishingCount === 0,
+    weather === "Fish Frenzy" && dailyFishingCount === 0
   );
 
   const [showFullMoon, setShowFullMoon] = React.useState(
-    weather === "Full Moon" && dailyFishingCount === 0,
+    weather === "Full Moon" && dailyFishingCount === 0
   );
 
   const [tab, setTab] = useState(0);

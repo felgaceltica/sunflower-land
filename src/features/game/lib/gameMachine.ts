@@ -52,7 +52,7 @@ import { loadGameStateForVisit } from "../actions/loadGameStateForVisit";
 import { randomID } from "lib/utils/random";
 
 import { buySFL } from "../actions/buySFL";
-import { CollectibleLocation, PurchasableItems } from "../types/collectibles";
+import { CollectibleLocation } from "../types/collectibles";
 import {
   getGameRulesLastRead,
   getIntroductionRead,
@@ -62,7 +62,6 @@ import { depositToFarm } from "lib/blockchain/Deposit";
 import Decimal from "decimal.js-light";
 import { setOnboardingComplete } from "features/auth/actions/onboardingComplete";
 import { Announcements } from "../types/announcements";
-import { purchaseItem, purchaseItemOnChain } from "../actions/purchaseItem";
 import {
   Currency,
   buyBlockBucks,
@@ -192,12 +191,6 @@ type WalletUpdatedEvent = {
   nftId: number;
 };
 
-type PurchaseEvent = {
-  type: "PURCHASE_ITEM";
-  name: PurchasableItems;
-  amount: number;
-};
-
 type BuyBlockBucksEvent = {
   type: "BUY_BLOCK_BUCKS";
   currency: Currency;
@@ -286,7 +279,6 @@ export type BlockchainEvent =
     }
   | WalletUpdatedEvent
   | SyncEvent
-  | PurchaseEvent
   | CommunityEvent
   | ListingEvent
   | DeleteTradeListingEvent
@@ -397,7 +389,7 @@ const GAME_EVENT_HANDLERS: TransitionsConfig<Context, BlockchainEvent> =
         },
       ],
     }),
-    {},
+    {}
   );
 
 const PLACEMENT_EVENT_HANDLERS: TransitionsConfig<Context, BlockchainEvent> =
@@ -421,7 +413,7 @@ const PLACEMENT_EVENT_HANDLERS: TransitionsConfig<Context, BlockchainEvent> =
         })),
       },
     }),
-    {},
+    {}
   );
 
 export type BlockchainState = {
@@ -438,7 +430,6 @@ export type BlockchainState = {
     | "syncing"
     | "synced"
     | "minting"
-    | "purchasing"
     | "buyingSFL"
     | "revealing"
     | "revealed"
@@ -496,7 +487,7 @@ export const saveGame = async (
   context: Context,
   event: any,
   farmId: number,
-  rawToken: string,
+  rawToken: string
 ) => {
   const saveAt = new Date();
 
@@ -535,7 +526,7 @@ export const saveGame = async (
 const handleSuccessfulSave = (context: Context, event: any) => {
   // Actions that occured since the server request
   const recentActions = context.actions.filter(
-    (action) => action.createdAt.getTime() > event.data.saveAt.getTime(),
+    (action) => action.createdAt.getTime() > event.data.saveAt.getTime()
   );
 
   const updatedState = recentActions.reduce((state, action) => {
@@ -810,7 +801,7 @@ export function startGame(authContext: AuthContext) {
               target: "airdrop",
               cond: (context) => {
                 const airdrop = context.state.airdrops?.find(
-                  (airdrop) => !airdrop.coordinates,
+                  (airdrop) => !airdrop.coordinates
                 );
 
                 return !!airdrop;
@@ -957,21 +948,18 @@ export function startGame(authContext: AuthContext) {
              * It is a rare event but it saves a user from making too much progress that would not be synced
              */
             src: (context) => (cb) => {
-              const interval = setInterval(
-                async () => {
-                  if (!context.farmAddress) return;
+              const interval = setInterval(async () => {
+                if (!context.farmAddress) return;
 
-                  const sessionID = await getSessionId(
-                    wallet.web3Provider,
-                    context.farmId as number,
-                  );
+                const sessionID = await getSessionId(
+                  wallet.web3Provider,
+                  context.farmId as number
+                );
 
-                  if (sessionID !== context.sessionId) {
-                    cb("EXPIRED");
-                  }
-                },
-                1000 * 60 * 2,
-              );
+                if (sessionID !== context.sessionId) {
+                  cb("EXPIRED");
+                }
+              }, 1000 * 60 * 2);
 
               return () => {
                 clearInterval(interval);
@@ -1015,9 +1003,6 @@ export function startGame(authContext: AuthContext) {
             },
             BUY_BLOCK_BUCKS: {
               target: "buyingBlockBucks",
-            },
-            PURCHASE_ITEM: {
-              target: "purchasing",
             },
             REVEAL: {
               target: "revealing",
@@ -1120,7 +1105,7 @@ export function startGame(authContext: AuthContext) {
                 context,
                 event,
                 context.farmId as number,
-                authContext.user.rawToken as string,
+                authContext.user.rawToken as string
               );
 
               return data;
@@ -1131,13 +1116,13 @@ export function startGame(authContext: AuthContext) {
                 // If a SAVE was queued up, go back into saving
                 cond: (c) => c.saveQueued,
                 actions: assign((context: Context, event) =>
-                  handleSuccessfulSave(context, event),
+                  handleSuccessfulSave(context, event)
                 ),
               },
               {
                 target: "playing",
                 actions: assign((context: Context, event) =>
-                  handleSuccessfulSave(context, event),
+                  handleSuccessfulSave(context, event)
                 ),
               },
             ],
@@ -1298,49 +1283,7 @@ export function startGame(authContext: AuthContext) {
             ],
           },
         },
-        purchasing: {
-          entry: "setTransactionId",
-          invoke: {
-            src: async (context, event) => {
-              const response = await purchaseItem({
-                farmId: Number(context.farmId),
-                token: authContext.user.rawToken as string,
-                transactionId: context.transactionId as string,
-                item: (event as PurchaseEvent).name,
-                amount: (event as PurchaseEvent).amount,
-              });
 
-              const sessionId = await purchaseItemOnChain({
-                transaction: response.transaction,
-                item: response.item,
-                amount: response.amount,
-              });
-
-              return { sessionId };
-            },
-            onDone: {
-              target: "synced",
-              actions: assign((_, event) => ({
-                sessionId: event.data.sessionId,
-                actions: [],
-              })),
-            },
-            onError: [
-              {
-                target: "#playing",
-                cond: (_, event: any) =>
-                  event.data.message === ERRORS.REJECTED_TRANSACTION,
-                actions: assign((_) => ({
-                  actions: [],
-                })),
-              },
-              {
-                target: "#error",
-                actions: "assignErrorMessage",
-              },
-            ],
-          },
-        },
         // Similar to autosaving, but for events that are only processed server side
         revealing: {
           entry: "setTransactionId",
@@ -1412,7 +1355,7 @@ export function startGame(authContext: AuthContext) {
                       }
 
                       return lamp;
-                    },
+                    }
                   );
 
                   return {
@@ -1469,7 +1412,7 @@ export function startGame(authContext: AuthContext) {
                 // Delete the Lamp from the collectibles after it's been rubbed 3 times
                 const lamps = context.state.collectibles["Genie Lamp"];
                 const newLamps = lamps?.filter(
-                  (lamp) => !shouldRemoveLamp(lamp),
+                  (lamp) => !shouldRemoveLamp(lamp)
                 );
 
                 return {
@@ -1494,7 +1437,7 @@ export function startGame(authContext: AuthContext) {
                 // Delete the Bean from the collectibles
                 const beans = context.state.collectibles["Magic Bean"];
                 const newBeans = beans?.filter(
-                  (bean) => !(bean.id === event.id),
+                  (bean) => !(bean.id === event.id)
                 );
 
                 return {
@@ -1902,13 +1845,13 @@ export function startGame(authContext: AuthContext) {
                     gameMachineContext: context,
                     rawToken: authContext.user.rawToken as string,
                     farmId: context.farmId,
-                  }) as SaveEvent,
-                { to: "landscaping" },
+                  } as SaveEvent),
+                { to: "landscaping" }
               ),
             },
             SAVE_SUCCESS: {
               actions: assign((context: Context, event: any) =>
-                handleSuccessfulSave(context, event),
+                handleSuccessfulSave(context, event)
               ),
             },
           },
@@ -2137,6 +2080,6 @@ export function startGame(authContext: AuthContext) {
           transactionId: () => undefined,
         }),
       },
-    },
+    }
   );
 }

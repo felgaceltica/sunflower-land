@@ -75,7 +75,6 @@ const SHOW_MODAL: Record<StateValues, boolean> = {
   syncing: true,
   synced: true,
   error: true,
-  purchasing: true,
   buyingBlockBucks: true,
   refreshing: true,
   hoarding: true,
@@ -282,7 +281,7 @@ export const GameWrapper: React.FC = ({ children }) => {
   const sniped = useSelector(gameService, isSniped);
   const tradeAlreadyFulfilled = useSelector(
     gameService,
-    isTradeAlreadyFulfilled,
+    isTradeAlreadyFulfilled
   );
   const marketPriceChanged = useSelector(gameService, hasMarketPriceChanged);
   const refreshing = useSelector(gameService, isRefreshing);
@@ -377,7 +376,7 @@ export const GameWrapper: React.FC = ({ children }) => {
           <Modal show backdrop={false}>
             <div
               className={classNames(
-                "relative flex items-center justify-center mb-4 w-full -mt-12 max-w-xl transition-opacity duration-500 opacity-100",
+                "relative flex items-center justify-center mb-4 w-full -mt-12 max-w-xl transition-opacity duration-500 opacity-100"
               )}
             >
               <div className="w-[90%] relative">

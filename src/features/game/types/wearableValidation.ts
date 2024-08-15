@@ -15,6 +15,7 @@ import {
   hasFishedToday,
   areBonusTreasureHolesDug,
   areAnyCropsOrGreenhouseCropsGrowing,
+  hasOpenedPirateChest,
 } from "./removeables";
 import { GameState } from "./game";
 
@@ -75,11 +76,12 @@ const withdrawConditions: Partial<Record<BumpkinItem, isWithdrawable>> = {
   "Oil Overalls": (state) => !areAnyOilReservesDrilled(state)[0],
   "Hornet Mask": (state) => isBeehivesFull(state)[0],
   "Ancient Shovel": (state) => areBonusTreasureHolesDug(state)[0],
+  "Pirate Potion": (state) => !hasOpenedPirateChest(state)[0],
 };
 
 export const canWithdrawBoostedWearable = (
   name: BumpkinItem,
-  state?: GameState,
+  state?: GameState
 ): boolean => {
   if (!state) return false;
 

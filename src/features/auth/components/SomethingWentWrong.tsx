@@ -83,7 +83,7 @@ export const BoundaryError: React.FC<BoundaryErrorProps> = ({
     window.open(
       "https://sunflowerland.freshdesk.com",
       "_blank",
-      "noopener,noreferrer",
+      "noopener,noreferrer"
     );
   };
 
@@ -91,7 +91,7 @@ export const BoundaryError: React.FC<BoundaryErrorProps> = ({
     window.open(
       "https://discord.gg/sunflowerland",
       "_blank",
-      "noopener,noreferrer",
+      "noopener,noreferrer"
     );
   };
 
@@ -113,6 +113,13 @@ export const BoundaryError: React.FC<BoundaryErrorProps> = ({
               {t("farm")}
               {": "}
               {farmId}
+            </p>
+          )}
+          {error && (
+            <p>
+              {t("error")}
+              {": "}
+              {error}
             </p>
           )}
           <p>

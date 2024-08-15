@@ -128,7 +128,7 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<Record<BumpkinItem, BuffLabel>> =
     },
     "Luminous Anglerfish Topper": {
       shortDescription: translate(
-        "bumpkinItemBuff.luminous.anglerfish.topper.boost",
+        "bumpkinItemBuff.luminous.anglerfish.topper.boost"
       ),
       labelType: "success",
       boostTypeIcon: powerup,
@@ -412,5 +412,11 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<Record<BumpkinItem, BuffLabel>> =
       labelType: "success",
       boostTypeIcon: powerup,
       boostedItemIcon: ITEM_DETAILS.Grape.image,
+    },
+    "Pirate Potion": {
+      shortDescription: translate("bumpkinItemBuff.pirate.potion"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+      boostedItemIcon: ITEM_DETAILS["Pirate Bounty"].image,
     },
   };
