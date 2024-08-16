@@ -301,11 +301,11 @@ export const Gifts: React.FC<{
 
   const [selected, setSelected] = useState<FlowerName>();
   const [message, setMessage] = useState<NpcDialogues>(
-    GIFT_RESPONSES[name]?.flowerIntro ?? DEFAULT_DIALOGUE.flowerIntro
+    GIFT_RESPONSES[name]?.flowerIntro ?? DEFAULT_DIALOGUE.flowerIntro,
   );
 
   const flowers = getKeys(game.inventory).filter(
-    (item) => item in FLOWERS && game.inventory[item]?.gte(1)
+    (item) => item in FLOWERS && game.inventory[item]?.gte(1),
   );
 
   const onGift = async () => {
@@ -323,15 +323,15 @@ export const Gifts: React.FC<{
       !!BUMPKIN_FLOWER_BONUSES[name]?.[selected as FlowerName]
     ) {
       setMessage(
-        GIFT_RESPONSES[name]?.flowerPositive ?? DEFAULT_DIALOGUE.flowerPositive
+        GIFT_RESPONSES[name]?.flowerPositive ?? DEFAULT_DIALOGUE.flowerPositive,
       );
     } else if (difference >= 3) {
       setMessage(
-        GIFT_RESPONSES[name]?.flowerAverage ?? DEFAULT_DIALOGUE.flowerAverage
+        GIFT_RESPONSES[name]?.flowerAverage ?? DEFAULT_DIALOGUE.flowerAverage,
       );
     } else {
       setMessage(
-        GIFT_RESPONSES[name]?.flowerNegative ?? DEFAULT_DIALOGUE.flowerNegative
+        GIFT_RESPONSES[name]?.flowerNegative ?? DEFAULT_DIALOGUE.flowerNegative,
       );
     }
   };
@@ -523,7 +523,7 @@ const BumpkinGiftBar: React.FC<{
             "absolute left-10 -top-4 flex opacity-0 transition-opacity w-full",
             {
               "opacity-100": showBonus,
-            }
+            },
           )}
         >
           <img src={SUNNYSIDE.icons.happy} className="w-4 h-auto mr-1" />
@@ -696,38 +696,38 @@ export const BumpkinDelivery: React.FC<Props> = ({ onClose, npc }) => {
 
           <InnerPanel>
             <div className="px-2 ">
-              <div className="flex flex-col sm:flex sm:justify-between sm:items-center mb-2 gap-1">
-                <Label type="default" icon={SUNNYSIDE.icons.expression_chat}>
-                  {t("delivery")}
-                </Label>
-
-                {delivery?.completedAt && (
-                  <Label
-                    style={{ whiteSpace: "nowrap" }}
-                    type="success"
-                    secondaryIcon={SUNNYSIDE.icons.confirm}
-                  >
-                    {t("completed")}
+              <div className="flex flex-col justify-between items-stretch mb-2 gap-1">
+                <div className="flex flex-row justify-between w-full">
+                  <Label type="default" icon={SUNNYSIDE.icons.expression_chat}>
+                    {t("delivery")}
                   </Label>
-                )}
-                {isLocked && (
-                  <Label type="danger" icon={SUNNYSIDE.icons.lock}>
-                    {`Lvl ${
-                      NPC_DELIVERY_LEVELS[npc as DeliveryNpcName]
-                    } required`}
-                  </Label>
-                )}
-                {!delivery?.completedAt && requiresSeasonPass && (
-                  <VIPAccess
-                    isVIP={hasVIP}
-                    onUpgrade={() => {
-                      onClose && onClose();
-                      openModal("BUY_BANNER");
-                    }}
-                  />
-                )}
+                  {delivery?.completedAt && (
+                    <Label
+                      style={{ whiteSpace: "nowrap" }}
+                      type="success"
+                      secondaryIcon={SUNNYSIDE.icons.confirm}
+                    >
+                      {t("completed")}
+                    </Label>
+                  )}
+                </div>
+                <div className="flex flex-row justify-between w-full">
+                  {!delivery?.completedAt && requiresSeasonPass && (
+                    <VIPAccess
+                      isVIP={hasVIP}
+                      onUpgrade={() => {
+                        onClose && onClose();
+                        openModal("BUY_BANNER");
+                      }}
+                    />
+                  )}
+                  {isLocked && (
+                    <Label type="danger" secondaryIcon={SUNNYSIDE.icons.lock}>
+                      {`Lvl ${NPC_DELIVERY_LEVELS[npc as DeliveryNpcName]} required`}
+                    </Label>
+                  )}
+                </div>
               </div>
-
               {!delivery && !isLocked && (
                 <p className="text-xs mb-1">{t("no.delivery.avl")}</p>
               )}
