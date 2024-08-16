@@ -68,6 +68,11 @@ export class FarmerRaceObstacleFactory {
   }
 
   public update() {
+    if (!this._scene.isGamePlaying) {
+      this.obstaclesLines = this.obstaclesLines.filter(
+        (item) => item.active == true,
+      );
+    }
     for (let index = 0; index < this.obstaclesLines.length; index++) {
       if (!this._scene.isGamePlaying) {
         this.obstaclesLines[index].visible = false;
@@ -75,8 +80,6 @@ export class FarmerRaceObstacleFactory {
       } else {
         this.obstaclesLines[index].setDepth(OBSTACLES_DEPTH);
         this.obstaclesLines[index].y += this._scene.speed;
-
-        //      this.obstaclesLines[index].visible = true;
 
         if (this._scene.currentPlayer) {
           const playerrect = new Phaser.Geom.Rectangle(
@@ -184,9 +187,9 @@ export class FarmerRaceObstacleFactory {
         }
       }
 
-      this.obstaclesLines = this.obstaclesLines.filter(
-        (item) => item.active == true,
-      );
+      // this.obstaclesLines = this.obstaclesLines.filter(
+      //   (item) => item.active == true,
+      // );
     }
   }
   /**
