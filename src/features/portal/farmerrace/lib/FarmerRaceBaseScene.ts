@@ -160,6 +160,8 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
         false,
         false,
       );
+    } else {
+      this.movementAngle = undefined;
     }
 
     // use keyboard control if joystick is not active
