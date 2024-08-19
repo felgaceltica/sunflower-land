@@ -60,11 +60,11 @@ export const OBSTACLES_SCORE_TABLE: {
   3: { item: ITEM_DETAILS["Orange"].image, points: 10, type: "Bonus" },
   4: { item: ITEM_DETAILS["Blueberry"].image, points: 10, type: "Bonus" },
   5: { item: ITEM_DETAILS["Oil Reserve"].image, points: 20, type: "Obstacle" },
-  6: { item: SUNNYSIDE.resource.stone_rock, points: 20, type: "Obstacle" },
-  7: { item: SUNNYSIDE.resource.stone_small, points: 20, type: "Obstacle" },
+  6: { item: SUNNYSIDE.resource.stone_rock, points: 10, type: "Obstacle" },
+  7: { item: SUNNYSIDE.resource.stone_small, points: 5, type: "Obstacle" },
   8: {
     item: SUNNYSIDE.decorations.bonniesTombstone,
-    points: 20,
+    points: 5,
     type: "Obstacle",
   },
 };
@@ -74,7 +74,7 @@ export const MAX_OBSTACLES_LINES = 5;
 export const MAX_DECORATIONS_LINES = 20;
 export const INITIAL_SPEED = 1;
 export const MAX_SPEED = 5;
-export const SPEED_INCREMENT = 0.06;
+export const SPEED_INCREMENT = 0.1;
 export const INITIAL_WALK_SPEED = 70;
 export const MAX_WALK_SPEED = 150;
 export const WALK_SPEED_INCREMENT = 5;

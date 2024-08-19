@@ -28,7 +28,7 @@ export class FarmerRaceObstacleFactory {
     this.obstacles["oilpit"] = new OilPitObstacle(20, 20, false);
     this.obstacles["largerock"] = new StoneRockObstacle(20, 20, false);
     //Points
-    this.obstacles["fruit"] = new FruitObstacle(25, 10, true);
+    this.obstacles["fruit"] = new FruitObstacle(40, 10, true);
     this.obstacles["chest"] = new ChestObstacle(0.1, 250, true);
   }
 
@@ -161,7 +161,7 @@ export class FarmerRaceObstacleFactory {
                   },
                 });
                 this._scene.portalService?.send("GAIN_POINTS", {
-                  points: obstacle.getPoints(),
+                  points: obstacle.getPoints() * this._scene.speed,
                 });
               } else {
                 obstacle.markProcessed();
