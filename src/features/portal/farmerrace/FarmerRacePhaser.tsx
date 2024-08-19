@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { Game, AUTO } from "phaser";
 import NinePatchPlugin from "phaser3-rex-plugins/plugins/ninepatch-plugin.js";
-import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
 import { Preloader } from "features/world/scenes/Preloader";
 import { PortalContext } from "./lib/PortalProvider";
@@ -26,7 +25,7 @@ export const FarmerRacePhaser: React.FC = () => {
     const config: Phaser.Types.Core.GameConfig = {
       type: AUTO,
       fps: {
-        min: 30,
+        //min: 30,
         //limit: 30,
         target: 30,
         smoothStep: true,
@@ -43,11 +42,11 @@ export const FarmerRacePhaser: React.FC = () => {
             plugin: NinePatchPlugin,
             start: true,
           },
-          {
-            key: "rexVirtualJoystick",
-            plugin: VirtualJoystickPlugin,
-            start: true,
-          },
+          // {
+          //   key: "rexVirtualJoystick",
+          //   plugin: VirtualJoystickPlugin,
+          //   start: true,
+          // },
         ],
       },
       width: window.innerWidth,

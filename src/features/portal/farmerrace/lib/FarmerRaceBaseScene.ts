@@ -7,7 +7,6 @@ import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { translate } from "lib/i18n/translate";
 import { isTouchDevice } from "features/world/lib/device";
 import { BumpkinParts } from "lib/utils/tokenUriBuilder";
-import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
 import {
   AudioController,
   WalkAudioController,
@@ -25,6 +24,8 @@ import {
   INITIAL_WALK_SPEED,
   MAX_SPEED,
   MAX_WALK_SPEED,
+  SQUARE_WIDTH_TEXTURE,
+  TOTAL_LINES,
 } from "../util/FarmerRaceConstants";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import { MINIGAME_NAME } from "../util/FarmerRaceConstants";
@@ -33,7 +34,7 @@ import { getAnimationUrl } from "features/world/lib/animations";
 import { ITEM_DETAILS } from "features/game/types/images";
 
 export abstract class FarmerRaceBaseScene extends Phaser.Scene {
-  joystick?: VirtualJoystick;
+  //joystick?: VirtualJoystick;
   sceneId: SceneId = "farmer_race";
   speed = INITIAL_SPEED;
   currentPlayer: BumpkinContainer | undefined;
@@ -44,6 +45,10 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
   soundEffects: AudioController[] = [];
   groundFactory = new FarmerRaceGroundFactory(this);
   speedInterval: any;
+  mobileKeys!: {
+    left: boolean;
+    right: boolean;
+  };
   cursorKeys:
     | {
         left: Phaser.Input.Keyboard.Key;
@@ -89,7 +94,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       }
     }, 5000);
     this.createPlayer({
-      x: PLAYER_MAX_X,
+      x: window.innerWidth / 2,
       y: PLAYER_Y,
       // gameService
       farmId: Number(this.id),
@@ -142,9 +147,20 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       return;
     }
     // joystick is active if force is greater than zero
-    this.movementAngle = this.joystick?.force
-      ? this.joystick?.angle
-      : undefined;
+    // this.movementAngle = this.joystick?.force
+    //   ? this.joystick?.angle
+    //   : undefined;
+    // console.log(this.cursorKeys?.left.isDown);
+    // console.log(this.cursorKeys?.left.isUp);
+    // console.log("---");
+    if (isTouchDevice()) {
+      this.movementAngle = this.keysToAngle(
+        this.mobileKeys.left,
+        this.mobileKeys.right,
+        false,
+        false,
+      );
+    }
 
     // use keyboard control if joystick is not active
     if (this.movementAngle === undefined) {
@@ -252,16 +268,57 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
 
   public initialiseControls() {
     if (isTouchDevice()) {
-      // Initialise joystick
+      this.mobileKeys = { left: false, right: false };
       const { x, y, centerX, centerY, width, height } = this.cameras.main;
-      this.joystick = new VirtualJoystick(this, {
-        x: centerX,
-        y: centerY - 35 + height / ZOOM / 2,
-        radius: 15,
-        base: this.add.circle(0, 0, 15, 0x000000, 0.2).setDepth(1000000000),
-        thumb: this.add.circle(0, 0, 7, 0xffffff, 0.2).setDepth(1000000000),
-        forceMin: 2,
-      });
+      // Initialise buttons
+      const realWidth = width / ZOOM;
+      const rightbutton = this.add
+        .circle(
+          centerX + realWidth / 4,
+          window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
+          SQUARE_WIDTH_TEXTURE,
+        )
+        .setStrokeStyle(2, 0xff0000)
+        .setInteractive()
+        .setDepth(1000)
+        .on("pointerdown", () => {
+          if (this.mobileKeys) {
+            this.mobileKeys.right = true;
+          }
+        })
+        .on("pointerup", () => {
+          if (this.mobileKeys) {
+            this.mobileKeys.right = false;
+          }
+        });
+
+      const leftbutton = this.add
+        .circle(
+          centerX - realWidth / 4,
+          window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
+          SQUARE_WIDTH_TEXTURE,
+        )
+        .setStrokeStyle(2, 0xff0000)
+        .setInteractive()
+        .setDepth(1000)
+        .on("pointerdown", () => {
+          if (this.mobileKeys) {
+            this.mobileKeys.left = true;
+          }
+        })
+        .on("pointerup", () => {
+          if (this.mobileKeys) {
+            this.mobileKeys.left = false;
+          }
+        });
+      // this.joystick = new VirtualJoystick(this, {
+      //   x: centerX,
+      //   y: centerY - 35 + height / ZOOM / 2,
+      //   radius: 15,
+      //   base: this.add.circle(0, 0, 15, 0x000000, 0.2).setDepth(1000000000),
+      //   thumb: this.add.circle(0, 0, 7, 0xffffff, 0.2).setDepth(1000000000),
+      //   forceMin: 2,
+      // });
     }
     // Initialise Keyboard
     this.cursorKeys = this.input.keyboard?.createCursorKeys();
