@@ -23,13 +23,13 @@ export class FarmerRaceObstacleFactory {
     //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
     //this.obstacles["coin"] = new CoinObstacle(5,10,true);
 
-    this.obstacles["rock"] = new RockObstacle(60, 5, false);
-    this.obstacles["gravestone"] = new GraveStoneObstacle(20, 10, false);
-    this.obstacles["oilpit"] = new OilPitObstacle(10, 10, false);
-    this.obstacles["largerock"] = new StoneRockObstacle(10, 10, false);
+    this.obstacles["rock"] = new RockObstacle(100, 5, false);
+    this.obstacles["gravestone"] = new GraveStoneObstacle(100, 5, false);
+    this.obstacles["oilpit"] = new OilPitObstacle(20, 20, false);
+    this.obstacles["largerock"] = new StoneRockObstacle(20, 20, false);
     //Points
-    this.obstacles["fruit"] = new FruitObstacle(5, 25, true);
-    this.obstacles["chest"] = new ChestObstacle(1, 100, true);
+    this.obstacles["fruit"] = new FruitObstacle(25, 10, true);
+    this.obstacles["chest"] = new ChestObstacle(0.1, 250, true);
   }
 
   public addRandomObstacle(): void {

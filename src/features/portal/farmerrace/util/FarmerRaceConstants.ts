@@ -1,3 +1,4 @@
+import { SUNNYSIDE } from "assets/sunnyside";
 import { Equipped } from "features/game/types/bumpkin";
 import { ITEM_DETAILS } from "features/game/types/images";
 
@@ -49,8 +50,23 @@ export const OBSTACLES_SCORE_TABLE: {
     type: string;
   };
 } = {
-  0: { item: ITEM_DETAILS["Oil Reserve"].image, points: 10, type: "Obstacle" },
-  1: { item: "Chest", points: 100, type: "Obstacle" },
+  0: {
+    item: SUNNYSIDE.decorations.treasure_chest_opened,
+    points: 250,
+    type: "Bonus",
+  },
+  1: { item: ITEM_DETAILS["Apple"].image, points: 10, type: "Bonus" },
+  2: { item: ITEM_DETAILS["Banana"].image, points: 10, type: "Bonus" },
+  3: { item: ITEM_DETAILS["Orange"].image, points: 10, type: "Bonus" },
+  4: { item: ITEM_DETAILS["Blueberry"].image, points: 10, type: "Bonus" },
+  5: { item: ITEM_DETAILS["Oil Reserve"].image, points: 20, type: "Obstacle" },
+  6: { item: SUNNYSIDE.resource.stone_rock, points: 20, type: "Obstacle" },
+  7: { item: SUNNYSIDE.resource.stone_small, points: 20, type: "Obstacle" },
+  8: {
+    item: SUNNYSIDE.decorations.bonniesTombstone,
+    points: 20,
+    type: "Obstacle",
+  },
 };
 export const MINIGAME_NAME = "farmer_race";
 export const NAME_TAG_OFFSET_PX = 12;
