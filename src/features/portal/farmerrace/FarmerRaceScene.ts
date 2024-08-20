@@ -12,8 +12,8 @@ export class FarmerRaceScene extends FarmerRaceBaseScene {
   async create() {
     super.create();
   }
-  async update() {
-    super.update();
+  async update(time: number, delta: number) {
+    super.update(time, delta);
     if (this.currentPlayer) {
       if (!this.isGamePlaying) {
         this.currentPlayer.visible = false;

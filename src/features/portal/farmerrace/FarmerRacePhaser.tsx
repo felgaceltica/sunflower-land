@@ -27,7 +27,7 @@ export const FarmerRacePhaser: React.FC = () => {
       fps: {
         //min: 30,
         //limit: 30,
-        target: 30,
+        target: 60,
         smoothStep: true,
       },
       backgroundColor: "#000000",

@@ -64,11 +64,11 @@ export class FarmerRaceDecorationFactory {
     }
   }
 
-  public update() {
+  public update(f: number) {
     for (let index = 0; index < this.decorationsLines.length; index++) {
       this.decorationsLines[index].setDepth(DECORATION_DEPTH);
       this.decorationsLines[index].y +=
-        this._scene.speed / BACKGROUND_SPEED_RATIO;
+        (this._scene.speed / BACKGROUND_SPEED_RATIO) * f;
       if (this.decorationsLines[index].y > FINAL_HEIGHT) {
         this.decorationsLines[index].visible = false;
         this.decorationsLines[index].destroy();

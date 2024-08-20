@@ -67,7 +67,7 @@ export class FarmerRaceObstacleFactory {
     }
   }
 
-  public update() {
+  public update(f: number) {
     if (!this._scene.isGamePlaying) {
       this.obstaclesLines = this.obstaclesLines.filter(
         (item) => item.active == true,
@@ -79,7 +79,7 @@ export class FarmerRaceObstacleFactory {
         this.obstaclesLines[index].destroy();
       } else {
         this.obstaclesLines[index].setDepth(OBSTACLES_DEPTH);
-        this.obstaclesLines[index].y += this._scene.speed;
+        this.obstaclesLines[index].y += this._scene.speed * f;
 
         if (this._scene.currentPlayer) {
           const playerrect = new Phaser.Geom.Rectangle(
@@ -153,11 +153,12 @@ export class FarmerRaceObstacleFactory {
                   targets: obstacle,
                   alpha: 0,
                   ease: "Cubic.easeOut",
-                  duration: 200,
-                  repeat: 2,
-                  yoyo: true,
+                  duration: 100,
+                  repeat: 1,
+                  yoyo: false,
                   onComplete: (item) => {
-                    item.destroy();
+                    (item.targets[0] as FarmerRaceObstacleContainer).destroy();
+                    //item.destroy();
                   },
                 });
                 this._scene.portalService?.send("GAIN_POINTS", {

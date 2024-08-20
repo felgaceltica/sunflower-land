@@ -76,7 +76,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     });
   }
   async create() {
-    this.physics.world.setFPS(60);
+    //this.physics.world.setFPS(60);
     this.physics.world.drawDebug = false;
     this.initialiseCamera();
     this.initialiseSounds();
@@ -116,9 +116,9 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       repeat: 0,
     });
   }
-  async update() {
+  async update(time: number, delta: number) {
     this.updatePlayer();
-    this.groundFactory.update();
+    this.groundFactory.update(time, delta);
   }
   public get isGamePlaying() {
     return this.portalService?.state.matches("playing") === true;
