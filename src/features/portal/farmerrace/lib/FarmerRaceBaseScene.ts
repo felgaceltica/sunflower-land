@@ -151,14 +151,14 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     if (!this.currentPlayer?.body) {
       return;
     }
-    if (this.isGamePlaying) {
-      this.leftButton.visible = true;
-      this.rightButton.visible = true;
-    } else {
-      this.leftButton.visible = false;
-      this.rightButton.visible = false;
-    }
     if (isTouchDevice()) {
+      if (this.isGamePlaying) {
+        this.leftButton.visible = true;
+        this.rightButton.visible = true;
+      } else {
+        this.leftButton.visible = false;
+        this.rightButton.visible = false;
+      }
       this.movementAngle = this.keysToAngle(
         this.mobileKeys.left,
         this.mobileKeys.right,
