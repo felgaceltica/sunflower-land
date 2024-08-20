@@ -66,6 +66,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     this.load.image("banana", ITEM_DETAILS["Banana"].image);
     this.load.image("orange", ITEM_DETAILS["Orange"].image);
     this.load.image("blueberry", ITEM_DETAILS["Blueberry"].image);
+    this.load.svg("arrow", "world/fruitdash/arrow.svg");
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,
       "death",
@@ -191,10 +192,17 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     const currentPlayerBody = this.currentPlayer
       .body as Phaser.Physics.Arcade.Body;
     if (this.movementAngle !== undefined) {
-      currentPlayerBody.setVelocity(
-        this.walkingSpeed * Math.cos((this.movementAngle * Math.PI) / 180),
-        this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180),
-      );
+      if (
+        (this.movementAngle == 180 && this.currentPlayer.x <= PLAYER_MIN_X) ||
+        (this.movementAngle == 0 && this.currentPlayer.x >= PLAYER_MAX_X)
+      ) {
+        currentPlayerBody.setVelocity(0, 0);
+      } else {
+        currentPlayerBody.setVelocity(
+          this.walkingSpeed * Math.cos((this.movementAngle * Math.PI) / 180),
+          this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180),
+        );
+      }
     } else {
       currentPlayerBody.setVelocity(0, 0);
     }
@@ -230,10 +238,10 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     this.currentPlayer?.setDepth(PLAYER_DEPTH);
     if (this.currentPlayer) {
       if (this.currentPlayer.x < PLAYER_MIN_X) {
-        this.currentPlayer.x = PLAYER_MIN_X;
+        //this.currentPlayer.x = PLAYER_MIN_X;
       }
       if (this.currentPlayer.x > PLAYER_MAX_X) {
-        this.currentPlayer.x = PLAYER_MAX_X;
+        //this.currentPlayer.x = PLAYER_MAX_X;
       }
       this.currentPlayer.y = PLAYER_Y;
     }
@@ -275,13 +283,14 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       const { x, y, centerX, centerY, width, height } = this.cameras.main;
       // Initialise buttons
       const realWidth = width / ZOOM;
-      const rightbutton = this.add
-        .circle(
+      const rightbutton = (this.add
+        .image(
           centerX + realWidth / 4,
           window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
-          SQUARE_WIDTH_TEXTURE,
+          "arrow",
         )
-        .setStrokeStyle(2, 0xff0000)
+        .setScale(0.08, 0.08)
+        .setAlpha(0.2)
         .setInteractive()
         .setDepth(1000)
         .on("pointerdown", () => {
@@ -293,15 +302,16 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
           if (this.mobileKeys) {
             this.mobileKeys.right = false;
           }
-        });
+        }).flipX = true);
 
       const leftbutton = this.add
-        .circle(
+        .image(
           centerX - realWidth / 4,
           window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
-          SQUARE_WIDTH_TEXTURE,
+          "arrow",
         )
-        .setStrokeStyle(2, 0xff0000)
+        .setScale(0.08, 0.08)
+        .setAlpha(0.2)
         .setInteractive()
         .setDepth(1000)
         .on("pointerdown", () => {
