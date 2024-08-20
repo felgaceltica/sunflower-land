@@ -30,7 +30,9 @@ export const FarmerRacePhaser: React.FC = () => {
       },
       backgroundColor: "#000000",
       parent: "phaser-example",
-
+      input: {
+        activePointers: 3,
+      },
       autoRound: true,
       pixelArt: true,
       plugins: {

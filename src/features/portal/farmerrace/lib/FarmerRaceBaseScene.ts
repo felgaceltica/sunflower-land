@@ -45,6 +45,8 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
   soundEffects: AudioController[] = [];
   groundFactory = new FarmerRaceGroundFactory(this);
   speedInterval: any;
+  leftButton!: Phaser.GameObjects.Image;
+  rightButton!: Phaser.GameObjects.Image;
   mobileKeys!: {
     left: boolean;
     right: boolean;
@@ -138,24 +140,24 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     camera.fadeIn();
   }
   private initialiseSounds() {
-    const audioMuted = getAudioMutedSetting();
-    if (!audioMuted) {
-      this.walkAudioController = new WalkAudioController(
-        this.sound.add("dirt_footstep"),
-      );
-    }
+    //const audioMuted = getAudioMutedSetting();
+    //if (!audioMuted) {
+    this.walkAudioController = new WalkAudioController(
+      this.sound.add("dirt_footstep"),
+    );
+    //}
   }
   public updatePlayer(speed_factor: number) {
     if (!this.currentPlayer?.body) {
       return;
     }
-    // joystick is active if force is greater than zero
-    // this.movementAngle = this.joystick?.force
-    //   ? this.joystick?.angle
-    //   : undefined;
-    // console.log(this.cursorKeys?.left.isDown);
-    // console.log(this.cursorKeys?.left.isUp);
-    // console.log("---");
+    if (this.isGamePlaying) {
+      this.leftButton.visible = true;
+      this.rightButton.visible = true;
+    } else {
+      this.leftButton.visible = false;
+      this.rightButton.visible = false;
+    }
     if (isTouchDevice()) {
       this.movementAngle = this.keysToAngle(
         this.mobileKeys.left,
@@ -228,7 +230,9 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     }
 
     if (this.walkAudioController) {
-      this.walkAudioController.handleWalkSound(isMoving);
+      this.walkAudioController.handleWalkSound(
+        isMoving && !getAudioMutedSetting(),
+      );
     } else {
       // eslint-disable-next-line no-console
       console.error("walkAudioController is undefined");
@@ -288,7 +292,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       const { x, y, centerX, centerY, width, height } = this.cameras.main;
       // Initialise buttons
       const realWidth = width / ZOOM;
-      const rightbutton = (this.add
+      this.rightButton = this.add
         .image(
           centerX + realWidth / 4,
           window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
@@ -302,14 +306,16 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
           if (this.mobileKeys) {
             this.mobileKeys.right = true;
           }
+          this.rightButton.setAlpha(0.8);
         })
         .on("pointerup", () => {
           if (this.mobileKeys) {
             this.mobileKeys.right = false;
           }
-        }).flipX = true);
-
-      const leftbutton = this.add
+          this.rightButton.setAlpha(0.2);
+        });
+      this.rightButton.flipX = true;
+      this.leftButton = this.add
         .image(
           centerX - realWidth / 4,
           window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
@@ -323,11 +329,13 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
           if (this.mobileKeys) {
             this.mobileKeys.left = true;
           }
+          this.leftButton.setAlpha(0.8);
         })
         .on("pointerup", () => {
           if (this.mobileKeys) {
             this.mobileKeys.left = false;
           }
+          this.leftButton.setAlpha(0.2);
         });
       // this.joystick = new VirtualJoystick(this, {
       //   x: centerX,
