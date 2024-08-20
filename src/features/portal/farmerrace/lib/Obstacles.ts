@@ -9,6 +9,7 @@ import {
 } from "../util/FarmerRaceConstants";
 import weightedRandom from "../util/Utils";
 import { FarmerRaceBaseScene } from "./FarmerRaceBaseScene";
+import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 
 export class FarmerRaceObstacleFactory {
   private _scene: FarmerRaceBaseScene;
@@ -174,10 +175,12 @@ export class FarmerRaceObstacleFactory {
                     //item.destroy();
                   },
                 });
-                if (obstacle.getName() == "bounty") {
-                  this._scene.bountySound?.play({ volume: 0.3 });
-                } else {
-                  this._scene.fruitSound?.play({ volume: 0.3 });
+                if (!getAudioMutedSetting()) {
+                  if (obstacle.getName() == "bounty") {
+                    this._scene.bountySound?.play({ volume: 0.3 });
+                  } else {
+                    this._scene.fruitSound?.play({ volume: 0.3 });
+                  }
                 }
                 this._scene.portalService?.send("GAIN_POINTS", {
                   points: obstacle.getPoints() * this._scene.speed,
@@ -221,7 +224,9 @@ export class FarmerRaceObstacleFactory {
 
     // freeze player
     this._scene.currentPlayer.setVisible(false);
-    this._scene.gameOverSound?.play({ volume: 0.3 });
+    if (!getAudioMutedSetting())
+      this._scene.gameOverSound?.play({ volume: 0.3 });
+
     const spriteName = "player_death";
     const spriteKey = "player_death_anim";
 
