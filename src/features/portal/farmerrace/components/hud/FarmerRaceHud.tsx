@@ -67,7 +67,7 @@ export const FarmerRaceHud: React.FC = () => {
           <FarmerRaceScores />
         </div>
 
-        {!isPlaying && (
+        {(!isJoystickActive || !isPlaying) && (
           <>
             <FarmerRaceTravel />
             <FarmerRaceSettings />

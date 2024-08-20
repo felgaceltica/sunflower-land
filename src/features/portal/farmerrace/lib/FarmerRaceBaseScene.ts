@@ -357,14 +357,9 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
           }
           this.leftButton.setAlpha(0.2);
         });
-      // this.joystick = new VirtualJoystick(this, {
-      //   x: centerX,
-      //   y: centerY - 35 + height / ZOOM / 2,
-      //   radius: 15,
-      //   base: this.add.circle(0, 0, 15, 0x000000, 0.2).setDepth(1000000000),
-      //   thumb: this.add.circle(0, 0, 7, 0xffffff, 0.2).setDepth(1000000000),
-      //   forceMin: 2,
-      // });
+      this.portalService?.send("SET_JOYSTICK_ACTIVE", {
+        isJoystickActive: true,
+      });
     }
     // Initialise Keyboard
     this.cursorKeys = this.input.keyboard?.createCursorKeys();
