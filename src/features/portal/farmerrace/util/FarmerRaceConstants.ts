@@ -60,7 +60,7 @@ export const OBSTACLES_SCORE_TABLE: {
   3: { item: ITEM_DETAILS["Orange"].image, points: 20, type: "Bonus" },
   4: { item: ITEM_DETAILS["Blueberry"].image, points: 20, type: "Bonus" },
   5: { item: ITEM_DETAILS["Oil Reserve"].image, points: 20, type: "Obstacle" },
-  6: { item: SUNNYSIDE.resource.stone_rock, points: 10, type: "Obstacle" },
+  6: { item: SUNNYSIDE.resource.stone_rock, points: 20, type: "Obstacle" },
   7: { item: SUNNYSIDE.resource.stone_small, points: 5, type: "Obstacle" },
   8: {
     item: SUNNYSIDE.decorations.bonniesTombstone,

@@ -77,7 +77,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     });
   }
   async create() {
-    //this.physics.world.setFPS(60);
+    this.physics.world.setFPS(60);
     this.physics.world.drawDebug = false;
     this.initialiseCamera();
     this.initialiseSounds();
@@ -118,8 +118,9 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     });
   }
   async update(time: number, delta: number) {
-    this.updatePlayer();
-    this.groundFactory.update(time, delta);
+    const speed_factor = delta / (1000 / 60); // 1000 ms / 60fps
+    this.updatePlayer(speed_factor);
+    this.groundFactory.update(speed_factor);
   }
   public get isGamePlaying() {
     return this.portalService?.state.matches("playing") === true;
@@ -144,7 +145,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       );
     }
   }
-  public updatePlayer() {
+  public updatePlayer(speed_factor: number) {
     if (!this.currentPlayer?.body) {
       return;
     }
@@ -199,8 +200,12 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
         currentPlayerBody.setVelocity(0, 0);
       } else {
         currentPlayerBody.setVelocity(
-          this.walkingSpeed * Math.cos((this.movementAngle * Math.PI) / 180),
-          this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180),
+          this.walkingSpeed *
+            speed_factor *
+            Math.cos((this.movementAngle * Math.PI) / 180),
+          this.walkingSpeed *
+            speed_factor *
+            Math.sin((this.movementAngle * Math.PI) / 180),
         );
       }
     } else {

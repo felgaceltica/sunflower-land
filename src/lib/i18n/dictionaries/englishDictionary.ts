@@ -5713,7 +5713,7 @@ const farmerRace: Record<FarmerRaceMessages, string> = {
   "farmer-race.instructions3":
     "Collect fruits during the game to gain extra points and boost your score",
   "farmer-race.instructions4":
-    "Find and collect chests to receive a larger amount of points at once",
+    "Find and collect bounties to receive a larger amount of points at once",
   "farmer-race.obstacles": "Obstacles and bonus",
   "farmer-race.cropDescription": "{{type}} - {{points}} points.",
   "farmer-race.score": "Score: {{score}}",

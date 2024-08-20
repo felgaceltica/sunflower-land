@@ -118,11 +118,10 @@ export class FarmerRaceGroundFactory {
     if (start) this.backgroundLines.unshift(container);
     else this.backgroundLines.push(container);
   }
-  public update(time: number, delta: number) {
-    const f = delta / (1000 / 60); // 1000 ms / 60fps
+  public update(speed_factor: number) {
     for (let index = 0; index < this.streetLines.length; index++) {
       this.streetLines[index].setDepth(GROUND_DEPTH);
-      this.streetLines[index].y += this._scene.speed * f;
+      this.streetLines[index].y += this._scene.speed * speed_factor;
     }
 
     const lastLine = this.streetLines[this.streetLines.length - 1];
@@ -138,12 +137,12 @@ export class FarmerRaceGroundFactory {
         this._obstaclesFactory.addRandomObstacle();
       }
     }
-    this._obstaclesFactory.update(f);
+    this._obstaclesFactory.update(speed_factor);
 
     for (let index = 0; index < this.backgroundLines.length; index++) {
       this.backgroundLines[index].setDepth(GROUND_DEPTH - 1);
       this.backgroundLines[index].y +=
-        (this._scene.speed / BACKGROUND_SPEED_RATIO) * f;
+        (this._scene.speed / BACKGROUND_SPEED_RATIO) * speed_factor;
     }
 
     const lastLineBG = this.backgroundLines[this.streetLines.length - 1];
@@ -160,6 +159,6 @@ export class FarmerRaceGroundFactory {
       this.nextDecoration = randomInt(0, MAX_DECORATIONS_LINES);
       this._decorationsFactory.addRandomDecoration();
     }
-    this._decorationsFactory.update(f);
+    this._decorationsFactory.update(speed_factor);
   }
 }

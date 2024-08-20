@@ -81,10 +81,7 @@ export const FarmerRaceGuide: React.FC<Props> = ({ onBack }) => {
           </div>
 
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon
-              icon={SUNNYSIDE.decorations.treasure_chest_opened}
-              width={7}
-            />
+            <SquareIcon icon={ITEM_DETAILS["Pirate Bounty"].image} width={7} />
             <p className="text-xs ml-3 flex-1">
               {t("farmer-race.instructions4")}
             </p>
@@ -116,7 +113,7 @@ export const FarmerRaceGuide: React.FC<Props> = ({ onBack }) => {
                     })}
                   </td>
                 </tr>
-              )
+              ),
             )}
           </tbody>
         </table>
