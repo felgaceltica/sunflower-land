@@ -31,7 +31,7 @@ export type Scenes = {
   bumpkin_house: Room<PlazaRoomState> | undefined;
   portal_example: Room<PlazaRoomState> | undefined;
   goblin_invasion: Room<PlazaRoomState> | undefined;
-  farmer_race: Room<PlazaRoomState> | undefined;
+  fruit_dash: Room<PlazaRoomState> | undefined;
 };
 
 export type SceneId = keyof Scenes;
@@ -240,7 +240,7 @@ export const mmoMachine = createMachine<MMOContext, MMOEvent, MMOState>({
           // Iterate through the available rooms and update the server population
           const servers = context.availableServers.map((server) => {
             const colyseusRoom = available?.find(
-              (room) => room.name === server.id
+              (room) => room.name === server.id,
             );
             const population = colyseusRoom?.clients ?? 0;
             return { ...server, population };
@@ -353,7 +353,7 @@ export const mmoMachine = createMachine<MMOContext, MMOEvent, MMOState>({
               sceneId: context.sceneId,
               experience: context.experience,
               moderation: context.moderation,
-            }
+            },
           );
 
           return { server };
@@ -392,7 +392,7 @@ export const mmoMachine = createMachine<MMOContext, MMOEvent, MMOState>({
           actions: () =>
             localStorage.setItem(
               "mmo_introduction.read",
-              Date.now().toString()
+              Date.now().toString(),
             ),
         },
       },

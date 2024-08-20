@@ -177,7 +177,7 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 16 * 11 + randomYOffset,
     },
   },
-  farmer_race: {
+  fruit_dash: {
     default: {
       x: 0,
       y: 0,

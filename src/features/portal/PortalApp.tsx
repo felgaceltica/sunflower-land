@@ -1,9 +1,9 @@
 import React from "react";
 
-import { PortalProvider } from "./farmerrace/lib/PortalProvider";
+import { PortalProvider } from "./fruitdash/lib/PortalProvider";
 
 import { WalletProvider } from "features/wallet/WalletProvider";
-import { FarmerRace } from "./farmerrace/FarmerRace";
+import { FruitDash } from "./fruitdash/FruitDash";
 
 export const PortalApp: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ export const PortalApp: React.FC = () => {
     <WalletProvider>
       {/* PortalProvider - gives you access to a xstate machine which handles state management */}
       <PortalProvider>
-        <FarmerRace />
+        <FruitDash />
       </PortalProvider>
     </WalletProvider>
   );

@@ -1137,44 +1137,44 @@ export type CropsAndChickensMessages =
   | "crops-and-chickens.portal.missionObjectives"
   | "crops-and-chickens.portal.rewardMessage";
 
-export type FarmerRaceMessages =
-  | "farmer-race.portal.title"
-  | "farmer-race.portal.description"
-  | "farmer-race.portal.missionObjectives"
-  | "farmer-race.portal.rewardMessage"
-  | "farmer-race.missionComplete"
-  | "farmer-race.missionFailed"
-  | "farmer-race.noPrizesAvailable"
-  | "farmer-race.completed"
-  | "farmer-race.unlimitedAttempts"
-  | "farmer-race.attemptsRemainingPlural"
-  | "farmer-race.attemptsRemainingSingular"
-  | "farmer-race.noAttemptsRemaining"
-  | "farmer-race.achievementUnlockedAt"
-  | "farmer-race.guide"
-  | "farmer-race.instructions"
-  | "farmer-race.instructions1"
-  | "farmer-race.instructions2"
-  | "farmer-race.instructions3"
-  | "farmer-race.instructions4"
-  | "farmer-race.obstacles"
-  | "farmer-race.cropDescription"
-  | "farmer-race.score"
-  | "farmer-race.bestToday"
-  | "farmer-race.bestAllTime"
-  | "farmer-race.donationDescription"
-  | "farmer-race.mission"
-  | "farmer-race.achievementUnlocked"
-  | "farmer-race.noAttemptsRemaining"
-  | "farmer-race.sflRequired"
-  | "farmer-race.youHaveRunOutOfAttempts"
-  | "farmer-race.wouldYouLikeToUnlock"
-  | "farmer-race.buyAttempts"
-  | "farmer-race.unlockAttempts"
-  | "farmer-race.endGameConfirmation"
-  | "farmer-race.endGame"
-  | "farmer-race.targetScore"
-  | "farmer-race.inventory";
+export type FruitDashMessages =
+  | "fruit-dash.portal.title"
+  | "fruit-dash.portal.description"
+  | "fruit-dash.portal.missionObjectives"
+  | "fruit-dash.portal.rewardMessage"
+  | "fruit-dash.missionComplete"
+  | "fruit-dash.missionFailed"
+  | "fruit-dash.noPrizesAvailable"
+  | "fruit-dash.completed"
+  | "fruit-dash.unlimitedAttempts"
+  | "fruit-dash.attemptsRemainingPlural"
+  | "fruit-dash.attemptsRemainingSingular"
+  | "fruit-dash.noAttemptsRemaining"
+  | "fruit-dash.achievementUnlockedAt"
+  | "fruit-dash.guide"
+  | "fruit-dash.instructions"
+  | "fruit-dash.instructions1"
+  | "fruit-dash.instructions2"
+  | "fruit-dash.instructions3"
+  | "fruit-dash.instructions4"
+  | "fruit-dash.obstacles"
+  | "fruit-dash.cropDescription"
+  | "fruit-dash.score"
+  | "fruit-dash.bestToday"
+  | "fruit-dash.bestAllTime"
+  | "fruit-dash.donationDescription"
+  | "fruit-dash.mission"
+  | "fruit-dash.achievementUnlocked"
+  | "fruit-dash.noAttemptsRemaining"
+  | "fruit-dash.sflRequired"
+  | "fruit-dash.youHaveRunOutOfAttempts"
+  | "fruit-dash.wouldYouLikeToUnlock"
+  | "fruit-dash.buyAttempts"
+  | "fruit-dash.unlockAttempts"
+  | "fruit-dash.endGameConfirmation"
+  | "fruit-dash.endGame"
+  | "fruit-dash.targetScore"
+  | "fruit-dash.inventory";
 
 export type DeliveryItem =
   | "deliveryitem.inventory"
@@ -3939,7 +3939,7 @@ export type TranslationKeys =
   | CropFruitDescriptions
   | CropMachine
   | CropsAndChickensMessages
-  | FarmerRaceMessages
+  | FruitDashMessages
   | DeliveryItem
   | DefaultDialogue
   | DecorationDescriptions

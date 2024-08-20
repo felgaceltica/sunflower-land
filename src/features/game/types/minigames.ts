@@ -9,7 +9,7 @@ export type MinigameName =
   | "festival-of-colors"
   | "crops-and-chickens"
   | "farmer-football"
-  | "farmer-race";
+  | "fruit-dash";
 
 export const SUPPORTED_MINIGAMES: MinigameName[] = [
   "crop-boom",
@@ -22,5 +22,5 @@ export const SUPPORTED_MINIGAMES: MinigameName[] = [
   "festival-of-colors",
   "crops-and-chickens",
   "farmer-football",
-  "farmer-race",
+  "fruit-dash",
 ];

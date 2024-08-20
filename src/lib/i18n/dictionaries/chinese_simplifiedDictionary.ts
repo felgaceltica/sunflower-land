@@ -175,7 +175,7 @@ import {
   FactionShopDescription,
   GuideFactionPet,
   DesertKeys,
-  FarmerRaceMessages,
+  FruitDashMessages,
 } from "./types";
 
 const generalTerms: Record<GeneralTerms, string> = {
@@ -4972,59 +4972,55 @@ export const desertTerms: Record<DesertKeys, string> = {
   "desert.buyDigs.confirmation": ENGLISH_TERMS["desert.buyDigs.confirmation"],
 };
 
-const farmerRace: Record<FarmerRaceMessages, string> = {
-  "farmer-race.portal.title": ENGLISH_TERMS["farmer-race.portal.title"],
-  "farmer-race.portal.description":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.portal.missionObjectives":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.portal.rewardMessage":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.missionComplete":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.missionFailed": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.noPrizesAvailable":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.completed": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.unlimitedAttempts":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.attemptsRemainingPlural":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.attemptsRemainingSingular":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.noAttemptsRemaining":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.achievementUnlockedAt":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.guide": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.instructions": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.instructions1": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.instructions2": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.instructions3": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.instructions4": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.obstacles": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.cropDescription":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.score": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.bestToday": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.bestAllTime": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.donationDescription":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.mission": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.achievementUnlocked":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.sflRequired": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.youHaveRunOutOfAttempts":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.wouldYouLikeToUnlock":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.buyAttempts": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.unlockAttempts": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.endGameConfirmation":
-    ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.endGame": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.targetScore": ENGLISH_TERMS["farmer-race.portal.description"],
-  "farmer-race.inventory": ENGLISH_TERMS["farmer-race.portal.description"],
+const farmerRace: Record<FruitDashMessages, string> = {
+  "fruit-dash.portal.title": ENGLISH_TERMS["fruit-dash.portal.title"],
+  "fruit-dash.portal.description":
+    ENGLISH_TERMS["fruit-dash.portal.description"],
+  "fruit-dash.portal.missionObjectives":
+    ENGLISH_TERMS["fruit-dash.portal.missionObjectives"],
+  "fruit-dash.portal.rewardMessage":
+    ENGLISH_TERMS["fruit-dash.portal.rewardMessage"],
+  "fruit-dash.missionComplete": ENGLISH_TERMS["fruit-dash.missionComplete"],
+  "fruit-dash.missionFailed": ENGLISH_TERMS["fruit-dash.missionFailed"],
+  "fruit-dash.noPrizesAvailable": ENGLISH_TERMS["fruit-dash.noPrizesAvailable"],
+  "fruit-dash.completed": ENGLISH_TERMS["fruit-dash.completed"],
+  "fruit-dash.unlimitedAttempts": ENGLISH_TERMS["fruit-dash.unlimitedAttempts"],
+  "fruit-dash.attemptsRemainingPlural":
+    ENGLISH_TERMS["fruit-dash.attemptsRemainingPlural"],
+  "fruit-dash.attemptsRemainingSingular":
+    ENGLISH_TERMS["fruit-dash.attemptsRemainingSingular"],
+  "fruit-dash.noAttemptsRemaining":
+    ENGLISH_TERMS["fruit-dash.noAttemptsRemaining"],
+  "fruit-dash.achievementUnlockedAt":
+    ENGLISH_TERMS["fruit-dash.achievementUnlockedAt"],
+  "fruit-dash.guide": ENGLISH_TERMS["fruit-dash.guide"],
+  "fruit-dash.instructions": ENGLISH_TERMS["fruit-dash.instructions"],
+  "fruit-dash.instructions1": ENGLISH_TERMS["fruit-dash.instructions1"],
+  "fruit-dash.instructions2": ENGLISH_TERMS["fruit-dash.instructions2"],
+  "fruit-dash.instructions3": ENGLISH_TERMS["fruit-dash.instructions3"],
+  "fruit-dash.instructions4": ENGLISH_TERMS["fruit-dash.instructions4"],
+  "fruit-dash.obstacles": ENGLISH_TERMS["fruit-dash.obstacles"],
+  "fruit-dash.cropDescription": ENGLISH_TERMS["fruit-dash.cropDescription"],
+  "fruit-dash.score": ENGLISH_TERMS["fruit-dash.score"],
+  "fruit-dash.bestToday": ENGLISH_TERMS["fruit-dash.bestToday"],
+  "fruit-dash.bestAllTime": ENGLISH_TERMS["fruit-dash.bestAllTime"],
+  "fruit-dash.donationDescription":
+    ENGLISH_TERMS["fruit-dash.donationDescription"],
+  "fruit-dash.mission": ENGLISH_TERMS["fruit-dash.mission"],
+  "fruit-dash.achievementUnlocked":
+    ENGLISH_TERMS["fruit-dash.achievementUnlocked"],
+  "fruit-dash.sflRequired": ENGLISH_TERMS["fruit-dash.sflRequired"],
+  "fruit-dash.youHaveRunOutOfAttempts":
+    ENGLISH_TERMS["fruit-dash.youHaveRunOutOfAttempts"],
+  "fruit-dash.wouldYouLikeToUnlock":
+    ENGLISH_TERMS["fruit-dash.wouldYouLikeToUnlock"],
+  "fruit-dash.buyAttempts": ENGLISH_TERMS["fruit-dash.buyAttempts"],
+  "fruit-dash.unlockAttempts": ENGLISH_TERMS["fruit-dash.unlockAttempts"],
+  "fruit-dash.endGameConfirmation":
+    ENGLISH_TERMS["fruit-dash.endGameConfirmation"],
+  "fruit-dash.endGame": ENGLISH_TERMS["fruit-dash.endGame"],
+  "fruit-dash.targetScore": ENGLISH_TERMS["fruit-dash.targetScore"],
+  "fruit-dash.inventory": ENGLISH_TERMS["fruit-dash.inventory"],
 };
 
 export const CHINESE_SIMPLIFIED_TERMS: Record<TranslationKeys, string> = {

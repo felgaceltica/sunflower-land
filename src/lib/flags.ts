@@ -32,7 +32,7 @@ export type FeatureName =
   | "FACTIONS"
   | "BANNER_SALES"
   | "CROPS_AND_CHICKENS"
-  | "FARMER_RACE"
+  | "FRUIT_DASH"
   | "CROP_MACHINE"
   | "DESERT_RECIPES"
   | "FACTION_HOUSE"
@@ -44,7 +44,7 @@ export type FeatureName =
   | "TEST_DIGGING"
   | "NEW_FRUITS"
   | "DESERT_PLAZA"
-  | "FARMER_RACE_BETA_TESTING"
+  | "FRUIT_DASH_BETA_TESTING"
   | "SKILLS_REVAMP"
   | "MARKETPLACE";
 
@@ -70,9 +70,9 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   CHAMPIONS: betaTimeBasedFeatureFlag(new Date("2024-07-15T00:00:00Z")),
   CROP_QUICK_SELECT: defaultFeatureFlag,
   CROPS_AND_CHICKENS: betaTimeBasedFeatureFlag(
-    new Date("2024-08-07T00:00:00Z")
+    new Date("2024-08-07T00:00:00Z"),
   ),
-  FARMER_RACE: betaTimeBasedFeatureFlag(new Date("2025-08-07T00:00:00Z")),
+  FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2025-08-07T00:00:00Z")),
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   DESERT_RECIPES: defaultFeatureFlag,
@@ -89,7 +89,7 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   TEST_DIGGING: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
   NEW_FRUITS: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
   DESERT_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
-  FARMER_RACE_BETA_TESTING: defaultFeatureFlag,
+  FRUIT_DASH_BETA_TESTING: defaultFeatureFlag,
   SKILLS_REVAMP: testnetFeatureFlag,
 };
 

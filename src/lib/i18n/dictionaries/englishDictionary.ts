@@ -174,7 +174,7 @@ import {
   FactionShopDescription,
   GuideFactionPet,
   DesertKeys,
-  FarmerRaceMessages,
+  FruitDashMessages,
 } from "./types";
 
 const generalTerms: Record<GeneralTerms, string> = {
@@ -5690,51 +5690,54 @@ export const desertTerms: Record<DesertKeys, string> = {
     "Are you sure you want to buy 5 digs for 1 Block Buck?",
 };
 
-const farmerRace: Record<FarmerRaceMessages, string> = {
-  "farmer-race.portal.title": "Minigame - Farmer Race",
-  "farmer-race.portal.description": "FARMER RACE DESCRIPTION",
-  "farmer-race.portal.missionObjectives": "OBJECTIVES",
-  "farmer-race.portal.rewardMessage": "REWARD",
-  "farmer-race.missionComplete": "COMPLETE",
-  "farmer-race.missionFailed": "FAILED",
-  "farmer-race.noPrizesAvailable": "No prizes available",
-  "farmer-race.completed": "completed",
-  "farmer-race.unlimitedAttempts": "Unlimited attempts",
-  "farmer-race.attemptsRemainingPlural": "{{attempts}} attempts left",
-  "farmer-race.attemptsRemainingSingular": "{{attempts}} attempt left",
-  "farmer-race.noAttemptsRemaining": "No attempts remaining",
-  "farmer-race.achievementUnlockedAt": "achievementUnlockedAt",
-  "farmer-race.guide": "Guide",
-  "farmer-race.instructions": "Instructions",
-  "farmer-race.instructions1":
+const farmerRace: Record<FruitDashMessages, string> = {
+  "fruit-dash.portal.title": "Minigame - FruitDash",
+  "fruit-dash.portal.description":
+    "Run through the farm, dodge obstacles, and collect delicious fruits.",
+  "fruit-dash.portal.missionObjectives":
+    "Mission: Reach {{targetScore}} points",
+  "fruit-dash.portal.rewardMessage":
+    "Congratulations, you completed the mission! Here is your reward.",
+  "fruit-dash.missionComplete": "Mission completed",
+  "fruit-dash.missionFailed": "Mission failed",
+  "fruit-dash.noPrizesAvailable": "No prizes available",
+  "fruit-dash.completed": "completed",
+  "fruit-dash.unlimitedAttempts": "Unlimited attempts",
+  "fruit-dash.attemptsRemainingPlural": "{{attempts}} attempts left",
+  "fruit-dash.attemptsRemainingSingular": "{{attempts}} attempt left",
+  "fruit-dash.noAttemptsRemaining": "No attempts remaining",
+  "fruit-dash.achievementUnlockedAt": "achievementUnlockedAt",
+  "fruit-dash.guide": "Guide",
+  "fruit-dash.instructions": "Instructions",
+  "fruit-dash.instructions1":
     "The game's speed gradually increases over time, requiring quicker reactions.",
-  "farmer-race.instructions2":
+  "fruit-dash.instructions2":
     "If you hit an obstacle, the game ends. Passing it earns you points",
-  "farmer-race.instructions3":
+  "fruit-dash.instructions3":
     "Collect fruits during the game to gain extra points and boost your score",
-  "farmer-race.instructions4":
+  "fruit-dash.instructions4":
     "Find and collect bounties to receive a larger amount of points at once",
-  "farmer-race.obstacles": "Obstacles and bonus",
-  "farmer-race.cropDescription": "{{type}} - {{points}} points.",
-  "farmer-race.score": "Score: {{score}}",
-  "farmer-race.bestToday": "Best (today): {{score}}",
-  "farmer-race.bestAllTime": "Best (all-time): {{score}}",
-  "farmer-race.donationDescription":
+  "fruit-dash.obstacles": "Obstacles and bonus",
+  "fruit-dash.cropDescription": "{{type}} - {{points}} points.",
+  "fruit-dash.score": "Score: {{score}}",
+  "fruit-dash.bestToday": "Best (today): {{score}}",
+  "fruit-dash.bestAllTime": "Best (all-time): {{score}}",
+  "fruit-dash.donationDescription":
     "This minigame is created for the community. Donations are greatly appreciated!",
-  "farmer-race.mission": "Mission",
-  "farmer-race.achievementUnlocked": "achievementUnlocked",
-  "farmer-race.sflRequired": "SFL required",
-  "farmer-race.youHaveRunOutOfAttempts":
+  "fruit-dash.mission": "Mission",
+  "fruit-dash.achievementUnlocked": "achievementUnlocked",
+  "fruit-dash.sflRequired": "SFL required",
+  "fruit-dash.youHaveRunOutOfAttempts":
     "You have run out of attempts for today.",
-  "farmer-race.wouldYouLikeToUnlock": "Would you like to buy more attempts?",
-  "farmer-race.buyAttempts": "Buy {{attempts}} attempts ({{sfl}} SFL)",
-  "farmer-race.unlockAttempts":
+  "fruit-dash.wouldYouLikeToUnlock": "Would you like to buy more attempts?",
+  "fruit-dash.buyAttempts": "Buy {{attempts}} attempts ({{sfl}} SFL)",
+  "fruit-dash.unlockAttempts":
     "Unlock unlimited attempts for today ({{sfl}} SFL)",
-  "farmer-race.endGameConfirmation":
+  "fruit-dash.endGameConfirmation":
     "Are you sure you want to end the game early?",
-  "farmer-race.endGame": "End game",
-  "farmer-race.targetScore": "Target Score: {{target}}",
-  "farmer-race.inventory": "inventory",
+  "fruit-dash.endGame": "End game",
+  "fruit-dash.targetScore": "Target Score: {{target}}",
+  "fruit-dash.inventory": "inventory",
 };
 
 export const ENGLISH_TERMS: Record<TranslationKeys, string> = {
