@@ -25,7 +25,7 @@ export const FarmerRaceScores: React.FC = () => {
         >
           <span>
             {t("farmer-race.score", {
-              score: score,
+              score: Math.round(score),
             })}
           </span>
         </div>

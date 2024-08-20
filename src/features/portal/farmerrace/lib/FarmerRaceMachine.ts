@@ -282,7 +282,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 state: context.state,
                 action: {
                   type: "minigame.played",
-                  score: context.score,
+                  score: Math.round(context.score),
                   id: "farmer-race",
                 },
               });
@@ -299,7 +299,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 state: context.state,
                 action: {
                   type: "minigame.played",
-                  score: context.score,
+                  score: Math.round(context.score),
                   id: "farmer-race",
                 },
               });

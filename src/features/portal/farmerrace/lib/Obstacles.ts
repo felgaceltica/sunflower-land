@@ -24,12 +24,12 @@ export class FarmerRaceObstacleFactory {
     //this.obstacles["coin"] = new CoinObstacle(5,10,true);
 
     this.obstacles["rock"] = new RockObstacle(100, 5, false);
-    this.obstacles["gravestone"] = new GraveStoneObstacle(100, 5, false);
+    this.obstacles["gravestone"] = new GraveStoneObstacle(100, 5.1, false);
     this.obstacles["oilpit"] = new OilPitObstacle(20, 20, false);
     this.obstacles["largerock"] = new StoneRockObstacle(20, 20, false);
     //Points
-    this.obstacles["fruit"] = new FruitObstacle(40, 10, true);
-    this.obstacles["chest"] = new ChestObstacle(0.1, 250, true);
+    this.obstacles["fruit"] = new FruitObstacle(40, 20, true);
+    this.obstacles["chest"] = new ChestObstacle(0, 250, true);
   }
 
   public addRandomObstacle(): void {
@@ -72,6 +72,16 @@ export class FarmerRaceObstacleFactory {
       this.obstaclesLines = this.obstaclesLines.filter(
         (item) => item.active == true,
       );
+    } else {
+      let currentScore = 0;
+      if (this._scene.portalService?.state?.context?.score) {
+        currentScore = this._scene.portalService?.state?.context?.score;
+      }
+      if (currentScore > 1000) {
+        (this.obstacles["chest"] as FarmerRaceObstacle).setWeight(0.1);
+      } else {
+        (this.obstacles["chest"] as FarmerRaceObstacle).setWeight(0);
+      }
     }
     for (let index = 0; index < this.obstaclesLines.length; index++) {
       if (!this._scene.isGamePlaying) {
@@ -313,6 +323,9 @@ abstract class FarmerRaceObstacle {
   abstract add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer;
   getWeight(): number {
     return this._weight;
+  }
+  setWeight(wheight: number) {
+    this._weight = wheight;
   }
 }
 class TurtleObstacle extends FarmerRaceObstacle {
@@ -603,21 +616,21 @@ class ChestObstacle extends FarmerRaceObstacle {
       this._points,
       this._isBounty,
     );
-    let image = scene.add.image(0, 0, "SunnySideSprites", 1895);
+    // let image = scene.add.image(0, 0, "SunnySideSprites", 1895);
+    // image.setOrigin(0, 0);
+    // container.add(image);
+    let image = scene.add.image(0, 0, "SunnySideSprites", 1896);
     image.setOrigin(0, 0);
     container.add(image);
-    image = scene.add.image(0, 0, "SunnySideSprites", 1896);
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(0, SQUARE_WIDTH_TEXTURE, "SunnySideSprites", 1959);
-    image.setOrigin(0, 0);
-    container.add(image);
+    // image = scene.add.image(0, SQUARE_WIDTH_TEXTURE, "SunnySideSprites", 1959);
+    // image.setOrigin(0, 0);
+    // container.add(image);
     image = scene.add.image(0, SQUARE_WIDTH_TEXTURE, "SunnySideSprites", 1960);
     image.setOrigin(0, 0);
     container.add(image);
     const bounds = container.getBounds();
-    const rect = new Phaser.Geom.Rectangle(0, 5, bounds.width, bounds.height);
-    Phaser.Geom.Rectangle.Inflate(rect, -1, -6);
+    const rect = new Phaser.Geom.Rectangle(0, 4, bounds.width, bounds.height);
+    Phaser.Geom.Rectangle.Inflate(rect, -3, -12);
     if (scene.physics.world.drawDebug) {
       const graphics = new Phaser.GameObjects.Graphics(scene, {
         lineStyle: { width: 1, color: 0xffff00 },

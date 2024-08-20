@@ -51,14 +51,14 @@ export const OBSTACLES_SCORE_TABLE: {
   };
 } = {
   0: {
-    item: SUNNYSIDE.decorations.treasure_chest_opened,
+    item: ITEM_DETAILS["Pirate Bounty"].image,
     points: 250,
     type: "Bonus",
   },
-  1: { item: ITEM_DETAILS["Apple"].image, points: 10, type: "Bonus" },
-  2: { item: ITEM_DETAILS["Banana"].image, points: 10, type: "Bonus" },
-  3: { item: ITEM_DETAILS["Orange"].image, points: 10, type: "Bonus" },
-  4: { item: ITEM_DETAILS["Blueberry"].image, points: 10, type: "Bonus" },
+  1: { item: ITEM_DETAILS["Apple"].image, points: 20, type: "Bonus" },
+  2: { item: ITEM_DETAILS["Banana"].image, points: 20, type: "Bonus" },
+  3: { item: ITEM_DETAILS["Orange"].image, points: 20, type: "Bonus" },
+  4: { item: ITEM_DETAILS["Blueberry"].image, points: 20, type: "Bonus" },
   5: { item: ITEM_DETAILS["Oil Reserve"].image, points: 20, type: "Obstacle" },
   6: { item: SUNNYSIDE.resource.stone_rock, points: 10, type: "Obstacle" },
   7: { item: SUNNYSIDE.resource.stone_small, points: 5, type: "Obstacle" },
