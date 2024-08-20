@@ -40,6 +40,7 @@ jobs:
           VITE_ANIMATION_URL: "https://animations-dev.sunflower-land.com"
           VITE_PORTAL_APP: "fruit-dash"
           VITE_PORTAL_GAME_URL: "https://sunflower-land.com/testnet/"
+          VITE_PORTAL_DONATION_ADDRESS: "0xB5228e9f7B488aE9B79ea655Fb43C50A1499a0F3"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1.5.9
