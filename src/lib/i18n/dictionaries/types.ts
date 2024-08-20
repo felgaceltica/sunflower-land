@@ -700,7 +700,7 @@ export type BumpkinDelivery =
   | "bumpkin.delivery.thanks"
   | "bumpkin.delivery.waiting"
   | "bumpkin.delivery.proveYourself"
-  | "bumpkin.delivery.earnScrolls"
+  | "bumpkin.delivery.earnTickets"
   | "bumpkin.delivery.earnSFL";
 
 export type BumpkinItemBuff =
@@ -970,7 +970,7 @@ export type ComposterDescription =
 export type ConfirmSkill = "confirm.skillClaim";
 
 export type ConfirmationTerms =
-  | "confirmation.sellCrops"
+  | "confirmation.sell"
   | "confirmation.buyCrops"
   | "confirmation.enterAmount"
   | "confirmation.sellSeasonalArtefact"
@@ -1022,6 +1022,14 @@ export type Conversations =
   | "pete.help.zero"
   | "pete.pumpkinPlaza.one"
   | "pete.pumpkinPlaza.two"
+  | "richie.challenge"
+  | "richie.rewarded"
+  | "richie.completed"
+  | "richie.completed.description"
+  | "richie.rewards"
+  | "richie.onboarding"
+  | "richie.dailyChallenges"
+  | "richie.final"
   | "sunflowerLand.islandDescription"
   | "sunflowerLand.opportunitiesDescription"
   | "sunflowerLand.returnHomeInstruction"
@@ -1031,6 +1039,9 @@ export type Conversations =
   | "luna.portals"
   | "luna.rewards"
   | "luna.travel"
+  | "richie.intro.one"
+  | "richie.intro.two"
+  | "richie.intro.three"
   | "pete.intro.one"
   | "pete.intro.two"
   | "pete.intro.three"
@@ -2244,13 +2255,6 @@ export type HarvestBeeHive =
   | "harvestBeeHive.notPlaced"
   | "harvestBeeHive.noHoney";
 
-export type HayseedHankPlaza =
-  | "hayseedHankPlaza.cannotCompleteChore"
-  | "hayseedHankPlaza.skipChore"
-  | "hayseedHankPlaza.canSkipIn"
-  | "hayseedHankPlaza.wellDone"
-  | "hayseedHankPlaza.lendAHand";
-
 export type HayseedHankV2 =
   | "hayseedHankv2.dialog1"
   | "hayseedHankv2.dialog2"
@@ -2258,7 +2262,8 @@ export type HayseedHankV2 =
   | "hayseedHankv2.title"
   | "hayseedHankv2.newChoresAvailable"
   | "hayseedHankv2.skipChores"
-  | "hayseedHankv2.greeting";
+  | "hayseedHankv2.greeting"
+  | "hayseedHankv2.confirmSkipChore";
 
 export type Helper =
   | "helper.highScore1"
@@ -3901,7 +3906,26 @@ export type DesertKeys =
   | "desert.hud.newSite"
   | "desert.extraDigs"
   | "desert.digs"
-  | "desert.buyDigs.confirmation";
+  | "desert.buyDigs.confirmation"
+  | "desert.noTreasureToSell";
+
+export type MarketplaceTerms =
+  | "marketplace.collectibles"
+  | "marketplace.walletRequired"
+  | "marketplace.listForSale"
+  | "marketplace.description"
+  | "marketplace.buyNow"
+  | "marketplace.listings"
+  | "marketplace.noListings"
+  | "marketplace.offers"
+  | "marketplace.noOffers"
+  | "marketplace.topOffer"
+  | "marketplace.acceptOffer"
+  | "marketplace.makeOffer"
+  | "marketplace.sfl"
+  | "marketplace.expiry"
+  | "marketplace.priceHistory"
+  | "marketplace.from";
 
 export type TranslationKeys =
   | AchievementsTerms
@@ -3984,7 +4008,6 @@ export type TranslationKeys =
   | Factions
   | Harvestflower
   | HarvestBeeHive
-  | HayseedHankPlaza
   | HayseedHankV2
   | Helper
   | HeliosSunflower
@@ -3998,6 +4021,7 @@ export type TranslationKeys =
   | LevelUpMessages
   | Loser
   | LostSunflorian
+  | MarketplaceTerms
   | MegaStore
   | MilestoneMessages
   | Minigame

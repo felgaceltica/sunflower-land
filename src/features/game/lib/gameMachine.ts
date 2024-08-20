@@ -95,6 +95,7 @@ import { setCachedMarketPrices } from "features/world/ui/market/lib/marketCache"
 import { MinigameName } from "../types/minigames";
 import { OFFLINE_FARM } from "./landData";
 import { isValidRedirect } from "features/portal/lib/portalUtil";
+import { Effect, postEffect } from "../actions/effect";
 
 // Run at startup in case removed from query params
 const portalName = new URLSearchParams(window.location.search).get("portal");
@@ -246,6 +247,7 @@ type ListingEvent = {
   sellerId: number;
   items: Partial<Record<InventoryItemName, number>>;
   sfl: number;
+  signature?: string;
 };
 
 type DeleteTradeListingEvent = {
@@ -271,6 +273,11 @@ type SellMarketResourceEvent = {
 export type UpdateUsernameEvent = {
   type: "UPDATE_USERNAME";
   username: string;
+};
+
+type PostEffectEvent = {
+  type: "POST_EFFECT";
+  effect: Effect;
 };
 
 export type BlockchainEvent =
@@ -337,6 +344,7 @@ export type BlockchainEvent =
   | DepositEvent
   | UpdateEvent
   | UpdateUsernameEvent
+  | PostEffectEvent
   | { type: "EXPAND" }
   | { type: "SAVE_SUCCESS" }
   | { type: "UPGRADE" }
@@ -389,7 +397,7 @@ const GAME_EVENT_HANDLERS: TransitionsConfig<Context, BlockchainEvent> =
         },
       ],
     }),
-    {}
+    {},
   );
 
 const PLACEMENT_EVENT_HANDLERS: TransitionsConfig<Context, BlockchainEvent> =
@@ -413,7 +421,7 @@ const PLACEMENT_EVENT_HANDLERS: TransitionsConfig<Context, BlockchainEvent> =
         })),
       },
     }),
-    {}
+    {},
   );
 
 export type BlockchainState = {
@@ -487,7 +495,7 @@ export const saveGame = async (
   context: Context,
   event: any,
   farmId: number,
-  rawToken: string
+  rawToken: string,
 ) => {
   const saveAt = new Date();
 
@@ -526,7 +534,7 @@ export const saveGame = async (
 const handleSuccessfulSave = (context: Context, event: any) => {
   // Actions that occured since the server request
   const recentActions = context.actions.filter(
-    (action) => action.createdAt.getTime() > event.data.saveAt.getTime()
+    (action) => action.createdAt.getTime() > event.data.saveAt.getTime(),
   );
 
   const updatedState = recentActions.reduce((state, action) => {
@@ -801,7 +809,7 @@ export function startGame(authContext: AuthContext) {
               target: "airdrop",
               cond: (context) => {
                 const airdrop = context.state.airdrops?.find(
-                  (airdrop) => !airdrop.coordinates
+                  (airdrop) => !airdrop.coordinates,
                 );
 
                 return !!airdrop;
@@ -948,18 +956,21 @@ export function startGame(authContext: AuthContext) {
              * It is a rare event but it saves a user from making too much progress that would not be synced
              */
             src: (context) => (cb) => {
-              const interval = setInterval(async () => {
-                if (!context.farmAddress) return;
+              const interval = setInterval(
+                async () => {
+                  if (!context.farmAddress) return;
 
-                const sessionID = await getSessionId(
-                  wallet.web3Provider,
-                  context.farmId as number
-                );
+                  const sessionID = await getSessionId(
+                    wallet.web3Provider,
+                    context.farmId as number,
+                  );
 
-                if (sessionID !== context.sessionId) {
-                  cb("EXPIRED");
-                }
-              }, 1000 * 60 * 2);
+                  if (sessionID !== context.sessionId) {
+                    cb("EXPIRED");
+                  }
+                },
+                1000 * 60 * 2,
+              );
 
               return () => {
                 clearInterval(interval);
@@ -1032,6 +1043,7 @@ export function startGame(authContext: AuthContext) {
               target: "buyingSFL",
             },
             LIST_TRADE: { target: "listing" },
+            POST_EFFECT: { target: "effect" },
             DELETE_TRADE_LISTING: { target: "deleteTradeListing" },
             FULFILL_TRADE_LISTING: { target: "fulfillTradeListing" },
             SELL_MARKET_RESOURCE: { target: "sellMarketResource" },
@@ -1105,7 +1117,7 @@ export function startGame(authContext: AuthContext) {
                 context,
                 event,
                 context.farmId as number,
-                authContext.user.rawToken as string
+                authContext.user.rawToken as string,
               );
 
               return data;
@@ -1116,13 +1128,13 @@ export function startGame(authContext: AuthContext) {
                 // If a SAVE was queued up, go back into saving
                 cond: (c) => c.saveQueued,
                 actions: assign((context: Context, event) =>
-                  handleSuccessfulSave(context, event)
+                  handleSuccessfulSave(context, event),
                 ),
               },
               {
                 target: "playing",
                 actions: assign((context: Context, event) =>
-                  handleSuccessfulSave(context, event)
+                  handleSuccessfulSave(context, event),
                 ),
               },
             ],
@@ -1355,7 +1367,7 @@ export function startGame(authContext: AuthContext) {
                       }
 
                       return lamp;
-                    }
+                    },
                   );
 
                   return {
@@ -1412,7 +1424,7 @@ export function startGame(authContext: AuthContext) {
                 // Delete the Lamp from the collectibles after it's been rubbed 3 times
                 const lamps = context.state.collectibles["Genie Lamp"];
                 const newLamps = lamps?.filter(
-                  (lamp) => !shouldRemoveLamp(lamp)
+                  (lamp) => !shouldRemoveLamp(lamp),
                 );
 
                 return {
@@ -1437,7 +1449,7 @@ export function startGame(authContext: AuthContext) {
                 // Delete the Bean from the collectibles
                 const beans = context.state.collectibles["Magic Bean"];
                 const newBeans = beans?.filter(
-                  (bean) => !(bean.id === event.id)
+                  (bean) => !(bean.id === event.id),
                 );
 
                 return {
@@ -1458,7 +1470,7 @@ export function startGame(authContext: AuthContext) {
           entry: "setTransactionId",
           invoke: {
             src: async (context, event) => {
-              const { sellerId, items, sfl } = event as ListingEvent;
+              const { sellerId, items, sfl, signature } = event as ListingEvent;
 
               if (context.actions.length > 0) {
                 await autosave({
@@ -1478,6 +1490,7 @@ export function startGame(authContext: AuthContext) {
                 items,
                 sfl,
                 transactionId: context.transactionId as string,
+                signature,
               });
 
               return { state };
@@ -1502,6 +1515,50 @@ export function startGame(authContext: AuthContext) {
         listed: {
           on: {
             CONTINUE: "playing",
+          },
+        },
+        effect: {
+          entry: "setTransactionId",
+          invoke: {
+            src: async (context, event) => {
+              const { effect } = event as PostEffectEvent;
+
+              if (context.actions.length > 0) {
+                await autosave({
+                  farmId: Number(context.farmId),
+                  sessionId: context.sessionId as string,
+                  actions: context.actions,
+                  token: authContext.user.rawToken as string,
+                  fingerprint: context.fingerprint as string,
+                  deviceTrackerId: context.deviceTrackerId as string,
+                  transactionId: context.transactionId as string,
+                });
+              }
+
+              const state = await postEffect({
+                farmId: Number(context.farmId),
+                effect,
+                token: authContext.user.rawToken as string,
+                transactionId: context.transactionId as string,
+              });
+
+              return { state };
+            },
+            onDone: [
+              {
+                target: "playing",
+                actions: [
+                  assign((_, event) => ({
+                    actions: [],
+                    state: event.data.state,
+                  })),
+                ],
+              },
+            ],
+            onError: {
+              target: "error",
+              actions: "assignErrorMessage",
+            },
           },
         },
         deleteTradeListing: {
@@ -1845,13 +1902,13 @@ export function startGame(authContext: AuthContext) {
                     gameMachineContext: context,
                     rawToken: authContext.user.rawToken as string,
                     farmId: context.farmId,
-                  } as SaveEvent),
-                { to: "landscaping" }
+                  }) as SaveEvent,
+                { to: "landscaping" },
               ),
             },
             SAVE_SUCCESS: {
               actions: assign((context: Context, event: any) =>
-                handleSuccessfulSave(context, event)
+                handleSuccessfulSave(context, event),
               ),
             },
           },
@@ -2032,7 +2089,10 @@ export function startGame(authContext: AuthContext) {
       actions: {
         initialiseAnalytics: (context, event: any) => {
           if (!ART_MODE) {
-            gameAnalytics.initialise(event.data.analyticsId);
+            gameAnalytics.initialise({
+              id: event.data.analyticsId,
+              experiments: context.state?.experiments ?? [],
+            });
             onboardingAnalytics.initialise({
               id: context.farmId,
             });
@@ -2080,6 +2140,6 @@ export function startGame(authContext: AuthContext) {
           transactionId: () => undefined,
         }),
       },
-    }
+    },
   );
 }

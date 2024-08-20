@@ -70,7 +70,6 @@ import {
   GuideTerms,
   Harvestflower,
   HarvestBeeHive,
-  HayseedHankPlaza,
   HayseedHankV2,
   Helper,
   HeliosSunflower,
@@ -175,6 +174,7 @@ import {
   FactionShopDescription,
   GuideFactionPet,
   DesertKeys,
+  MarketplaceTerms,
   FruitDashMessages,
 } from "./types";
 
@@ -1043,7 +1043,7 @@ const bumpkinDelivery: Record<BumpkinDelivery, string> = {
     "Eu estava esperando por isso. Obrigado! Volte logo para mais entregas.",
   "bumpkin.delivery.proveYourself":
     ENGLISH_TERMS["bumpkin.delivery.proveYourself"],
-  "bumpkin.delivery.earnScrolls": ENGLISH_TERMS["bumpkin.delivery.earnScrolls"],
+  "bumpkin.delivery.earnTickets": ENGLISH_TERMS["bumpkin.delivery.earnTickets"],
   "bumpkin.delivery.earnSFL": ENGLISH_TERMS["bumpkin.delivery.earnSFL"],
 };
 
@@ -1420,7 +1420,7 @@ const confirmSkill: Record<ConfirmSkill, string> = {
 };
 
 const confirmationTerms: Record<ConfirmationTerms, string> = {
-  "confirmation.sellCrops": ENGLISH_TERMS["confirmation.sellCrops"],
+  "confirmation.sell": ENGLISH_TERMS["confirmation.sell"],
   "confirmation.buyCrops": ENGLISH_TERMS["confirmation.buyCrops"],
   "confirmation.enterAmount": ENGLISH_TERMS["confirmation.enterAmount"],
   "confirmation.sellSeasonalArtefact":
@@ -1499,6 +1499,17 @@ const conversations: Record<Conversations, string> = {
     "À medida que você sobe de nível, desbloqueará novas áreas para explorar. Primeiro é a Pumpkin Plaza.... minha casa!",
   "pete.pumpkinPlaza.two":
     "Aqui você pode completar entregas por recompensas, fabricar itens mágicos e negociar com outros jogadores.",
+  "richie.intro.one": ENGLISH_TERMS["richie.intro.one"],
+  "richie.intro.two": ENGLISH_TERMS["richie.intro.two"],
+  "richie.intro.three": ENGLISH_TERMS["richie.intro.three"],
+  "richie.challenge": ENGLISH_TERMS["richie.challenge"],
+  "richie.rewarded": ENGLISH_TERMS["richie.rewarded"],
+  "richie.completed": ENGLISH_TERMS["richie.completed"],
+  "richie.completed.description": ENGLISH_TERMS["richie.completed.description"],
+  "richie.rewards": ENGLISH_TERMS["richie.rewards"],
+  "richie.onboarding": ENGLISH_TERMS["richie.onboarding"],
+  "richie.dailyChallenges": ENGLISH_TERMS["richie.dailyChallenges"],
+  "richie.final": ENGLISH_TERMS["richie.final"],
   "sunflowerLand.islandDescription":
     "Sunflower Land está cheia de ilhas emocionantes onde você pode completar entregas, fabricar NFTs raros e até mesmo cavar tesouros!",
   "sunflowerLand.opportunitiesDescription":
@@ -3150,15 +3161,6 @@ const harvestBeeHive: Record<HarvestBeeHive, string> = {
   "harvestBeeHive.noHoney": "Esta colméia não tem mel.",
 };
 
-const hayseedHankPlaza: Record<HayseedHankPlaza, string> = {
-  "hayseedHankPlaza.cannotCompleteChore":
-    "Não é possível completar esta tarefa?",
-  "hayseedHankPlaza.skipChore": "Pular tarefa",
-  "hayseedHankPlaza.canSkipIn": "Você pode pular esta tarefa em",
-  "hayseedHankPlaza.wellDone": "Bem feito",
-  "hayseedHankPlaza.lendAHand": "Dê uma mão?",
-};
-
 const hayseedHankV2: Record<HayseedHankV2, string> = {
   "hayseedHankv2.dialog1":
     "Bem, olá, jovens! Eu sou Hayseed Hank, um fazendeiro Bumpkin experiente, cuidando da terra como nos bons e velhos tempos.",
@@ -3169,6 +3171,8 @@ const hayseedHankV2: Record<HayseedHankV2, string> = {
     ENGLISH_TERMS["hayseedHankv2.newChoresAvailable"],
   "hayseedHankv2.skipChores": "Você pode pular tarefas a cada novo dia.",
   "hayseedHankv2.greeting": "Bem, olá, jovens! Eu sou Hayseed Hank...",
+  "hayseedHankv2.confirmSkipChore":
+    ENGLISH_TERMS["hayseedHankv2.confirmSkipChore"],
 };
 
 const heliosSunflower: Record<HeliosSunflower, string> = {
@@ -5665,6 +5669,26 @@ export const desertTerms: Record<DesertKeys, string> = {
   "desert.extraDigs": ENGLISH_TERMS["desert.extraDigs"],
   "desert.digs": ENGLISH_TERMS["desert.digs"],
   "desert.buyDigs.confirmation": ENGLISH_TERMS["desert.buyDigs.confirmation"],
+  "desert.noTreasureToSell": ENGLISH_TERMS["desert.noTreasureToSell"],
+};
+
+export const marketplaceTerms: Record<MarketplaceTerms, string> = {
+  "marketplace.collectibles": ENGLISH_TERMS["marketplace.collectibles"],
+  "marketplace.buyNow": ENGLISH_TERMS["marketplace.buyNow"],
+  "marketplace.description": ENGLISH_TERMS["marketplace.description"],
+  "marketplace.listForSale": ENGLISH_TERMS["marketplace.listForSale"],
+  "marketplace.walletRequired": ENGLISH_TERMS["marketplace.walletRequired"],
+  "marketplace.listings": ENGLISH_TERMS["marketplace.listings"],
+  "marketplace.noListings": ENGLISH_TERMS["marketplace.noListings"],
+  "marketplace.noOffers": ENGLISH_TERMS["marketplace.noOffers"],
+  "marketplace.offers": ENGLISH_TERMS["marketplace.offers"],
+  "marketplace.topOffer": ENGLISH_TERMS["marketplace.topOffer"],
+  "marketplace.acceptOffer": ENGLISH_TERMS["marketplace.acceptOffer"],
+  "marketplace.makeOffer": ENGLISH_TERMS["marketplace.makeOffer"],
+  "marketplace.expiry": ENGLISH_TERMS["marketplace.expiry"],
+  "marketplace.from": ENGLISH_TERMS["marketplace.from"],
+  "marketplace.priceHistory": ENGLISH_TERMS["marketplace.priceHistory"],
+  "marketplace.sfl": ENGLISH_TERMS["marketplace.sfl"],
 };
 
 const farmerRace: Record<FruitDashMessages, string> = {
@@ -5797,7 +5821,6 @@ export const PORTUGUESE_TERMS: Record<TranslationKeys, string> = {
   ...guideCompost,
   ...harvestflower,
   ...harvestBeeHive,
-  ...hayseedHankPlaza,
   ...hayseedHankV2,
   ...helper,
   ...heliosSunflower,
@@ -5812,6 +5835,7 @@ export const PORTUGUESE_TERMS: Record<TranslationKeys, string> = {
   ...levelUpMessages,
   ...loser,
   ...lostSunflorian,
+  ...marketplaceTerms,
   ...megaStore,
   ...milestoneMessages,
   ...minigame,

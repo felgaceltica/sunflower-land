@@ -69,7 +69,6 @@ import {
   GuideTerms,
   Harvestflower,
   HarvestBeeHive,
-  HayseedHankPlaza,
   HayseedHankV2,
   Helper,
   HeliosSunflower,
@@ -175,6 +174,7 @@ import {
   FactionShopDescription,
   GuideFactionPet,
   DesertKeys,
+  MarketplaceTerms,
   FruitDashMessages,
 } from "./types";
 
@@ -981,7 +981,7 @@ const bumpkinDelivery: Record<BumpkinDelivery, string> = {
     "我一直就是在等这个。非常感谢！请尽快回来获取更多送货订单。",
   "bumpkin.delivery.proveYourself":
     "证明你的价值。再扩展你的岛屿 {{missingLevels}} 次。",
-  "bumpkin.delivery.earnScrolls": "赚取 {{ticket}} 来铸造限定物品。",
+  "bumpkin.delivery.earnTickets": "赚取 {{ticket}} 来铸造限定物品。",
   "bumpkin.delivery.earnSFL": "赚取 SFL 来做买卖 & 成就您的伟业。",
 };
 
@@ -1269,8 +1269,8 @@ const composterDescription: Record<ComposterDescription, string> = {
 };
 
 const confirmationTerms: Record<ConfirmationTerms, string> = {
-  "confirmation.sellCrops":
-    "您确定要卖掉 {{cropAmount}} {{cropName}} 以换取 {{coinAmount}} 枚硬币吗？",
+  "confirmation.sell":
+    "您确定要卖掉 {{amount}} {{name}} 以换取 {{coinAmount}} 枚硬币吗？",
   "confirmation.buyCrops":
     "您确定要花 {{coinAmount}} 枚硬币购买 {{seedNo}} {{seedName}}s 吗？",
   "confirmation.enterAmount": "请输入出售数量：",
@@ -1345,6 +1345,18 @@ const conversations: Record<Conversations, string> = {
     "当你升级时，你将解锁新的领域以供探索。首先是南瓜广场……我的家！",
   "pete.pumpkinPlaza.two":
     "在这里，你可以完成送货收获奖励、锻造魔法物品以及与其他玩家做买卖。",
+  "richie.challenge": ENGLISH_TERMS["richie.challenge"],
+  "richie.rewarded": ENGLISH_TERMS["richie.rewarded"],
+  "richie.completed": ENGLISH_TERMS["richie.completed"],
+  "richie.completed.description": ENGLISH_TERMS["richie.completed.description"],
+  "richie.rewards": ENGLISH_TERMS["richie.rewards"],
+  "richie.onboarding": ENGLISH_TERMS["richie.onboarding"],
+  "richie.dailyChallenges": ENGLISH_TERMS["richie.dailyChallenges"],
+  "richie.final": ENGLISH_TERMS["richie.final"],
+  "richie.intro.one": ENGLISH_TERMS["richie.intro.one"],
+  "richie.intro.two": ENGLISH_TERMS["richie.intro.two"],
+  "richie.intro.three": ENGLISH_TERMS["richie.intro.three"],
+
   "sunflowerLand.islandDescription":
     "Sunflower Land 随处都是激动人心的列岛，供你完成送货、锻造稀有 NFT 甚至挖掘财宝！",
   "sunflowerLand.opportunitiesDescription":
@@ -2777,15 +2789,6 @@ const harvestflower: Record<Harvestflower, string> = {
   "harvestflower.alr.plant": ENGLISH_TERMS["harvestflower.alr.plant"],
 };
 
-const hayseedHankPlaza: Record<HayseedHankPlaza, string> = {
-  "hayseedHankPlaza.cannotCompleteChore":
-    ENGLISH_TERMS["hayseedHankPlaza.cannotCompleteChore"],
-  "hayseedHankPlaza.skipChore": ENGLISH_TERMS["hayseedHankPlaza.skipChore"],
-  "hayseedHankPlaza.canSkipIn": ENGLISH_TERMS["hayseedHankPlaza.canSkipIn"],
-  "hayseedHankPlaza.wellDone": ENGLISH_TERMS["hayseedHankPlaza.wellDone"],
-  "hayseedHankPlaza.lendAHand": ENGLISH_TERMS["hayseedHankPlaza.lendAHand"],
-};
-
 const hayseedHankV2: Record<HayseedHankV2, string> = {
   "hayseedHankv2.dialog1": ENGLISH_TERMS["hayseedHankv2.dialog1"],
   "hayseedHankv2.dialog2": ENGLISH_TERMS["hayseedHankv2.dialog2"],
@@ -2795,6 +2798,8 @@ const hayseedHankV2: Record<HayseedHankV2, string> = {
     ENGLISH_TERMS["hayseedHankv2.newChoresAvailable"],
   "hayseedHankv2.skipChores": ENGLISH_TERMS["hayseedHankv2.skipChores"],
   "hayseedHankv2.greeting": ENGLISH_TERMS["hayseedHankv2.greeting"],
+  "hayseedHankv2.confirmSkipChore":
+    ENGLISH_TERMS["hayseedHankv2.confirmSkipChore"],
 };
 
 const heliosSunflower: Record<HeliosSunflower, string> = {
@@ -4970,6 +4975,26 @@ export const desertTerms: Record<DesertKeys, string> = {
   "desert.extraDigs": ENGLISH_TERMS["desert.extraDigs"],
   "desert.digs": ENGLISH_TERMS["desert.digs"],
   "desert.buyDigs.confirmation": ENGLISH_TERMS["desert.buyDigs.confirmation"],
+  "desert.noTreasureToSell": ENGLISH_TERMS["desert.noTreasureToSell"],
+};
+
+export const marketplaceTerms: Record<MarketplaceTerms, string> = {
+  "marketplace.collectibles": ENGLISH_TERMS["marketplace.collectibles"],
+  "marketplace.buyNow": ENGLISH_TERMS["marketplace.buyNow"],
+  "marketplace.description": ENGLISH_TERMS["marketplace.description"],
+  "marketplace.listForSale": ENGLISH_TERMS["marketplace.listForSale"],
+  "marketplace.walletRequired": ENGLISH_TERMS["marketplace.walletRequired"],
+  "marketplace.listings": ENGLISH_TERMS["marketplace.listings"],
+  "marketplace.noListings": ENGLISH_TERMS["marketplace.noListings"],
+  "marketplace.noOffers": ENGLISH_TERMS["marketplace.noOffers"],
+  "marketplace.offers": ENGLISH_TERMS["marketplace.offers"],
+  "marketplace.topOffer": ENGLISH_TERMS["marketplace.topOffer"],
+  "marketplace.acceptOffer": ENGLISH_TERMS["marketplace.acceptOffer"],
+  "marketplace.makeOffer": ENGLISH_TERMS["marketplace.makeOffer"],
+  "marketplace.expiry": ENGLISH_TERMS["marketplace.expiry"],
+  "marketplace.priceHistory": ENGLISH_TERMS["marketplace.priceHistory"],
+  "marketplace.from": ENGLISH_TERMS["marketplace.from"],
+  "marketplace.sfl": ENGLISH_TERMS["marketplace.sfl"],
 };
 
 const farmerRace: Record<FruitDashMessages, string> = {
@@ -5101,7 +5126,6 @@ export const CHINESE_SIMPLIFIED_TERMS: Record<TranslationKeys, string> = {
   ...guideTerms,
   ...harvestBeeHive,
   ...harvestflower,
-  ...hayseedHankPlaza,
   ...hayseedHankV2,
   ...heliosSunflower,
   ...helper,
@@ -5115,6 +5139,7 @@ export const CHINESE_SIMPLIFIED_TERMS: Record<TranslationKeys, string> = {
   ...levelUpMessages,
   ...loser,
   ...lostSunflorian,
+  ...marketplaceTerms,
   ...megaStore,
   ...milestoneMessages,
   ...modalDescription,
