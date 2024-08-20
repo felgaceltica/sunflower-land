@@ -76,6 +76,7 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     });
   }
   async create() {
+    this.physics.world.setFPS(60);
     this.physics.world.drawDebug = false;
     this.initialiseCamera();
     this.initialiseSounds();
