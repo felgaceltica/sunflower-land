@@ -181,7 +181,7 @@ const somethingArrived = (state: MachineState) =>
 const isProvingPersonhood = (state: MachineState) =>
   state.matches("provingPersonhood");
 
-const GameContent = () => {
+const GameContent: React.FC = () => {
   const { gameService } = useContext(Context);
 
   useSound("desert", true);
@@ -281,7 +281,7 @@ export const GameWrapper: React.FC = ({ children }) => {
   const sniped = useSelector(gameService, isSniped);
   const tradeAlreadyFulfilled = useSelector(
     gameService,
-    isTradeAlreadyFulfilled
+    isTradeAlreadyFulfilled,
   );
   const marketPriceChanged = useSelector(gameService, hasMarketPriceChanged);
   const refreshing = useSelector(gameService, isRefreshing);
@@ -376,7 +376,7 @@ export const GameWrapper: React.FC = ({ children }) => {
           <Modal show backdrop={false}>
             <div
               className={classNames(
-                "relative flex items-center justify-center mb-4 w-full -mt-12 max-w-xl transition-opacity duration-500 opacity-100"
+                "relative flex items-center justify-center mb-4 w-full -mt-12 max-w-xl transition-opacity duration-500 opacity-100",
               )}
             >
               <div className="w-[90%] relative">
@@ -444,7 +444,12 @@ export const GameWrapper: React.FC = ({ children }) => {
   const stateValue = typeof state === "object" ? Object.keys(state)[0] : state;
 
   const onHide = () => {
-    listed || listingDeleted || traded || sniped || marketPriceChanged
+    listed ||
+    listingDeleted ||
+    traded ||
+    sniped ||
+    marketPriceChanged ||
+    tradeAlreadyFulfilled
       ? gameService.send("CONTINUE")
       : undefined;
   };

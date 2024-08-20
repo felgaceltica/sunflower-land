@@ -338,8 +338,13 @@ import {
 } from "./landExpansion/skipKingdomChore";
 import { leaveFaction, LeaveFactionAction } from "./landExpansion/leaveFaction";
 import { BuyMoreDigsAction, buyMoreDigs } from "./landExpansion/buyMoreDigs";
+import {
+  completeDailyChallenge,
+  CompleteDailyChallengeAction,
+} from "./landExpansion/completeDailyChallenge";
 
 export type PlayingEvent =
+  | CompleteDailyChallengeAction
   | OilGreenhouseAction
   | HarvestGreenhouseAction
   | PlantGreenhouseAction
@@ -485,7 +490,7 @@ export type GameEventName<T> = Extract<T, { type: string }>["type"];
 
 export function isEventType<T extends PlayingEvent>(
   action: PlayingEvent,
-  typeName: T["type"]
+  typeName: T["type"],
 ): action is T {
   return action.type === typeName;
 }
@@ -504,6 +509,7 @@ type Handlers<T> = {
 };
 
 export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
+  "dailyChallenge.completed": completeDailyChallenge,
   "faction.left": leaveFaction,
   "faction.prizeClaimed": claimFactionPrize,
   "greenhouse.oiled": oilGreenhouse,
