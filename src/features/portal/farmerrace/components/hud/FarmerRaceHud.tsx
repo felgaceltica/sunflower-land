@@ -19,6 +19,7 @@ const _target = (state: PortalMachineState) =>
   state.context.state?.minigames.prizes["farmer-race"]?.score ?? 0;
 const _achievements = (state: PortalMachineState) =>
   state.context.state?.minigames.games["farmer-race"]?.achievements ?? {};
+const _isPlaying = (state: PortalMachineState) => state.matches("playing");
 
 export const FarmerRaceHud: React.FC = () => {
   const { portalService } = useContext(PortalContext);
@@ -27,18 +28,19 @@ export const FarmerRaceHud: React.FC = () => {
   const isJoystickActive = useSelector(portalService, _isJoystickActive);
   const target = useSelector(portalService, _target);
   const achievements = useSelector(portalService, _achievements);
+  const isPlaying = useSelector(portalService, _isPlaying);
 
   // achievement toast provider
   const { showAchievementToasts } = useAchievementToast();
 
   // show new achievements
   const [existingAchievementNames, setExistingAchievements] = React.useState(
-    Object.keys(achievements)
+    Object.keys(achievements),
   );
   useEffect(() => {
     const achievementNames = Object.keys(achievements);
     const newAchievementNames = achievementNames.filter(
-      (achievement) => !existingAchievementNames.includes(achievement)
+      (achievement) => !existingAchievementNames.includes(achievement),
     );
 
     if (newAchievementNames.length > 0) {
@@ -48,7 +50,7 @@ export const FarmerRaceHud: React.FC = () => {
   }, [achievements]);
 
   return (
-    <HudContainer>
+    <HudContainer zIndex={99999}>
       <div
         className={classNames({
           "pointer-events-none": isJoystickActive,
@@ -65,9 +67,17 @@ export const FarmerRaceHud: React.FC = () => {
           <FarmerRaceScores />
         </div>
 
-        <FarmerRaceTimer />
-        <FarmerRaceTravel />
-        <FarmerRaceSettings />
+        {!isPlaying && (
+          <>
+            <FarmerRaceTravel />
+            <FarmerRaceSettings />
+          </>
+        )}
+        {isPlaying && (
+          <>
+            <FarmerRaceTimer />
+          </>
+        )}
       </div>
     </HudContainer>
   );
