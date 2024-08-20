@@ -45,6 +45,18 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
   soundEffects: AudioController[] = [];
   groundFactory = new FarmerRaceGroundFactory(this);
   speedInterval: any;
+  gameOverSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  bountySound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  fruitSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
   leftButton!: Phaser.GameObjects.Image;
   rightButton!: Phaser.GameObjects.Image;
   mobileKeys!: {
@@ -63,6 +75,11 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
     super(MINIGAME_NAME);
   }
   preload() {
+    //sounds: https://mixkit.co/free-sound-effects/game/
+    this.load.audio("game_over", "world/fruitdash/game_over.mp3");
+    this.load.audio("bounty", "world/fruitdash/bounty.mp3");
+    this.load.audio("fruit", "world/fruitdash/fruit.mp3");
+
     this.groundFactory.preload();
     this.load.image("apple", ITEM_DETAILS["Apple"].image);
     this.load.image("banana", ITEM_DETAILS["Banana"].image);
@@ -146,6 +163,9 @@ export abstract class FarmerRaceBaseScene extends Phaser.Scene {
       this.sound.add("dirt_footstep"),
     );
     //}
+    this.gameOverSound = this.sound.add("game_over");
+    this.bountySound = this.sound.add("bounty");
+    this.fruitSound = this.sound.add("fruit");
   }
   public updatePlayer(speed_factor: number) {
     if (!this.currentPlayer?.body) {

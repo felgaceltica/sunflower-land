@@ -29,7 +29,7 @@ export class FarmerRaceObstacleFactory {
     this.obstacles["largerock"] = new StoneRockObstacle(20, 20, false);
     //Points
     this.obstacles["fruit"] = new FruitObstacle(40, 20, true);
-    this.obstacles["chest"] = new ChestObstacle(0, 250, true);
+    this.obstacles["bounty"] = new ChestObstacle(0, 250, true);
   }
 
   public addRandomObstacle(): void {
@@ -48,7 +48,10 @@ export class FarmerRaceObstacleFactory {
     const obstacle = this.obstacles[
       keys[obstacleindex ? obstacleindex : 0]
     ] as FarmerRaceObstacle;
-    const obstacleToInsert = obstacle.add(this._scene);
+    const obstacleToInsert = obstacle.add(
+      this._scene,
+      keys[obstacleindex ? obstacleindex : 0] as string,
+    );
     let intersects = false;
     for (let index = 0; index < this.obstaclesLines.length; index++) {
       if (
@@ -78,9 +81,9 @@ export class FarmerRaceObstacleFactory {
         currentScore = this._scene.portalService?.state?.context?.score;
       }
       if (currentScore > 1000) {
-        (this.obstacles["chest"] as FarmerRaceObstacle).setWeight(0.1);
+        (this.obstacles["bounty"] as FarmerRaceObstacle).setWeight(0.1);
       } else {
-        (this.obstacles["chest"] as FarmerRaceObstacle).setWeight(0);
+        (this.obstacles["bounty"] as FarmerRaceObstacle).setWeight(0);
       }
     }
     for (let index = 0; index < this.obstaclesLines.length; index++) {
@@ -171,6 +174,11 @@ export class FarmerRaceObstacleFactory {
                     //item.destroy();
                   },
                 });
+                if (obstacle.getName() == "bounty") {
+                  this._scene.bountySound?.play({ volume: 0.3 });
+                } else {
+                  this._scene.fruitSound?.play({ volume: 0.3 });
+                }
                 this._scene.portalService?.send("GAIN_POINTS", {
                   points: obstacle.getPoints() * this._scene.speed,
                 });
@@ -213,7 +221,7 @@ export class FarmerRaceObstacleFactory {
 
     // freeze player
     this._scene.currentPlayer.setVisible(false);
-
+    this._scene.gameOverSound?.play({ volume: 0.3 });
     const spriteName = "player_death";
     const spriteKey = "player_death_anim";
 
@@ -239,6 +247,7 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
   protected _weight: number;
   protected _points: number;
   protected _isBounty: boolean;
+  protected _name: string;
   protected _type: "Circle" | "Rectangle" = "Rectangle";
   protected _isProcessed = false;
   protected _collisionShape?: Phaser.Geom.Rectangle | Phaser.Geom.Circle;
@@ -249,12 +258,14 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
     weight: number,
     points: number,
     isBounty: boolean,
+    name: string,
   ) {
     super(scene, x, y);
     scene.add.existing(this);
     this._weight = weight;
     this._points = points;
     this._isBounty = isBounty;
+    this._name = name;
   }
   getWeight(): number {
     return this._weight;
@@ -270,6 +281,9 @@ class FarmerRaceObstacleContainer extends Phaser.GameObjects.Container {
   }
   isProcessed(): boolean {
     return this._isProcessed;
+  }
+  getName(): string {
+    return this._name;
   }
   getType(): "Circle" | "Rectangle" {
     return this._type;
@@ -320,7 +334,10 @@ abstract class FarmerRaceObstacle {
     this._points = points;
     this._isBounty = isBounty;
   }
-  abstract add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer;
+  abstract add(
+    scene: FarmerRaceBaseScene,
+    name: string,
+  ): FarmerRaceObstacleContainer;
   getWeight(): number {
     return this._weight;
   }
@@ -329,7 +346,7 @@ abstract class FarmerRaceObstacle {
   }
 }
 class TurtleObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -337,6 +354,7 @@ class TurtleObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3714);
     image.setOrigin(0, 0);
@@ -374,7 +392,7 @@ class TurtleObstacle extends FarmerRaceObstacle {
   }
 }
 class OilBarrelObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -382,6 +400,7 @@ class OilBarrelObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3317);
     image.setOrigin(0, 0);
@@ -414,7 +433,7 @@ class OilBarrelObstacle extends FarmerRaceObstacle {
 }
 
 class GraveStoneObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -422,6 +441,7 @@ class GraveStoneObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 1004);
     image.setOrigin(0, 0);
@@ -446,7 +466,7 @@ class GraveStoneObstacle extends FarmerRaceObstacle {
 }
 
 class StoneWallObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -454,6 +474,7 @@ class StoneWallObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 109);
     image.setOrigin(0, 0);
@@ -477,7 +498,7 @@ class StoneWallObstacle extends FarmerRaceObstacle {
 }
 
 class StoneRockObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -485,6 +506,7 @@ class StoneRockObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 1907);
     image.setOrigin(0, 0);
@@ -528,7 +550,7 @@ class StoneRockObstacle extends FarmerRaceObstacle {
 }
 
 class OilPitObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       PLAYER_MIN_X,
@@ -536,6 +558,7 @@ class OilPitObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3443);
     image.setOrigin(0, 0);
@@ -577,7 +600,7 @@ class OilPitObstacle extends FarmerRaceObstacle {
 }
 
 class RockObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -585,6 +608,7 @@ class RockObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 288);
     image.setOrigin(0, 0);
@@ -607,7 +631,7 @@ class RockObstacle extends FarmerRaceObstacle {
   }
 }
 class ChestObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -615,6 +639,7 @@ class ChestObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     // let image = scene.add.image(0, 0, "SunnySideSprites", 1895);
     // image.setOrigin(0, 0);
@@ -647,7 +672,7 @@ class ChestObstacle extends FarmerRaceObstacle {
   }
 }
 class CoinObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const container = new FarmerRaceObstacleContainer(
       scene,
       0,
@@ -655,6 +680,7 @@ class CoinObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3736);
     image.setOrigin(0, 0);
@@ -681,7 +707,7 @@ class CoinObstacle extends FarmerRaceObstacle {
   }
 }
 class FruitObstacle extends FarmerRaceObstacle {
-  add(scene: FarmerRaceBaseScene): FarmerRaceObstacleContainer {
+  add(scene: FarmerRaceBaseScene, name: string): FarmerRaceObstacleContainer {
     const fruits = ["apple", "banana", "orange", "blueberry"];
     const container = new FarmerRaceObstacleContainer(
       scene,
@@ -690,6 +716,7 @@ class FruitObstacle extends FarmerRaceObstacle {
       this._weight,
       this._points,
       this._isBounty,
+      name,
     );
     const image = scene.add.image(0, 0, fruits[randomInt(0, fruits.length)]);
     image.setOrigin(0, 0.2);
