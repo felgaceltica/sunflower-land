@@ -1,5 +1,5 @@
 # Example Portal Deploy
-name: Portal deploy
+name: Portal deploy (new)
 
 on:
   workflow_dispatch:
