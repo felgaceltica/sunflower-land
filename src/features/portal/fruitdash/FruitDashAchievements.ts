@@ -1,7 +1,7 @@
-export type FarmerRaceAchievementsName = "Achievement 1";
+export type FruitDashAchievementsName = "Achievement 1";
 
 export const AVAILABLE_ACHIEVEMENTS: Record<
-  FarmerRaceAchievementsName,
+  FruitDashAchievementsName,
   { title: string; description: string; icon: string }
 > = {
   "Achievement 1": {
