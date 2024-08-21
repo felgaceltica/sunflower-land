@@ -9,7 +9,6 @@ import { FruitDashTimer } from "./FruitDashTimer";
 import { FruitDashSettings } from "./FruitDashSettings";
 import { FruitDashTravel } from "./FruitDashTravel";
 import { FruitDashScores } from "./FruitDashScores";
-import classNames from "classnames";
 import { useAchievementToast } from "../../providers/AchievementToastProvider";
 import { FruitDashTarget } from "./FruitDashTarget";
 
@@ -51,11 +50,7 @@ export const FruitDashHud: React.FC = () => {
 
   return (
     <HudContainer zIndex={99999}>
-      <div
-        className={classNames({
-          "pointer-events-none": isJoystickActive,
-        })}
-      >
+      <div>
         <div
           className="absolute"
           style={{
