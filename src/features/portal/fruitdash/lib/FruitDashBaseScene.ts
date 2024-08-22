@@ -57,6 +57,10 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
     | Phaser.Sound.WebAudioSound;
+  musicSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
   leftButton!: Phaser.GameObjects.Image;
   rightButton!: Phaser.GameObjects.Image;
   mobileKeys!: {
@@ -76,9 +80,12 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   }
   preload() {
     //sounds: https://mixkit.co/free-sound-effects/game/
+    //music: https://www.fesliyanstudios.com/royalty-free-music/downloads-c/8-bit-music/6
+
     this.load.audio("game_over", "world/fruitdash/game_over.mp3");
     this.load.audio("bounty", "world/fruitdash/bounty.mp3");
     this.load.audio("fruit", "world/fruitdash/fruit.mp3");
+    this.load.audio("music", "world/fruitdash/music.mp3");
 
     this.groundFactory.preload();
     this.load.image("apple", ITEM_DETAILS["Apple"].image);
@@ -157,17 +164,28 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     camera.fadeIn();
   }
   private initialiseSounds() {
-    //const audioMuted = getAudioMutedSetting();
-    //if (!audioMuted) {
+    const audioMuted = getAudioMutedSetting();
     this.walkAudioController = new WalkAudioController(
       this.sound.add("dirt_footstep"),
     );
-    //}
     this.gameOverSound = this.sound.add("game_over");
     this.bountySound = this.sound.add("bounty");
     this.fruitSound = this.sound.add("fruit");
+    this.musicSound = this.sound.add("music");
+    this.musicSound.loop = true;
+    if (!audioMuted) {
+      this.musicSound?.play({ volume: 0.2 });
+    }
   }
   public updatePlayer(speed_factor: number) {
+    const audioMuted = getAudioMutedSetting();
+    if (this.musicSound) {
+      if (!audioMuted) {
+        this.musicSound.volume = 0.2;
+      } else {
+        this.musicSound.volume = 0;
+      }
+    }
     if (!this.currentPlayer?.body) {
       return;
     }
