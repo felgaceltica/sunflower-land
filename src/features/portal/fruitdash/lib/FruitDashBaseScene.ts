@@ -92,10 +92,10 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
 
     this.groundFactory.preload();
     this.load.image("slowdown", fisherHourglassFull);
-    this.load.image("apple", ITEM_DETAILS["Apple"].image);
-    this.load.image("banana", ITEM_DETAILS["Banana"].image);
-    this.load.image("orange", ITEM_DETAILS["Orange"].image);
-    this.load.image("blueberry", ITEM_DETAILS["Blueberry"].image);
+    this.load.image("Apple", ITEM_DETAILS["Apple"].image);
+    this.load.image("Banana", ITEM_DETAILS["Banana"].image);
+    this.load.image("Orange", ITEM_DETAILS["Orange"].image);
+    this.load.image("Blueberry", ITEM_DETAILS["Blueberry"].image);
     this.load.svg("arrow", "world/fruitdash/arrow.svg");
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,

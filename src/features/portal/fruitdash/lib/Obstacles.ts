@@ -12,6 +12,7 @@ import {
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
+import { InventoryItemName } from "features/game/types/game";
 
 export class FruitDashObstacleFactory {
   private _scene: FruitDashBaseScene;
@@ -100,7 +101,7 @@ export class FruitDashObstacleFactory {
         currentScore = this._scene.portalService?.state?.context?.score;
       }
       if (currentScore > 500) {
-        (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0.1);
+        (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0.2);
         (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(2);
       } else {
         (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0);
@@ -196,12 +197,16 @@ export class FruitDashObstacleFactory {
                   },
                 });
                 if (!getAudioMutedSetting()) {
-                  if (obstacle.getName() == "bounty") {
+                  if (obstacle.getName() == "Pirate Bounty") {
                     this._scene.bountySound?.play({ volume: 0.15 });
                   } else {
                     this._scene.fruitSound?.play({ volume: 0.15 });
                   }
                 }
+                this._scene.currentPlayer.react(
+                  obstacle.getName() as InventoryItemName,
+                  Math.round(obstacle.getPoints() * this._scene.speed),
+                );
                 this._scene.portalService?.send("GAIN_POINTS", {
                   points: obstacle.getPoints() * this._scene.speed,
                 });
@@ -695,7 +700,7 @@ class ChestObstacle extends FruitDashObstacle {
       this._weight,
       this._points,
       this._type,
-      name,
+      "Pirate Bounty",
     );
     // let image = scene.add.image(0, 0, "SunnySideSprites", 1895);
     // image.setOrigin(0, 0);
@@ -797,7 +802,8 @@ class CoinObstacle extends FruitDashObstacle {
 }
 class FruitObstacle extends FruitDashObstacle {
   add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
-    const fruits = ["apple", "banana", "orange", "blueberry"];
+    const fruits = ["Apple", "Banana", "Orange", "Blueberry"];
+    const fruit = fruits[randomInt(0, fruits.length)];
     const container = new FruitDashObstacleContainer(
       scene,
       0,
@@ -805,9 +811,9 @@ class FruitObstacle extends FruitDashObstacle {
       this._weight,
       this._points,
       this._type,
-      name,
+      fruit,
     );
-    const image = scene.add.image(0, 0, fruits[randomInt(0, fruits.length)]);
+    const image = scene.add.image(0, 0, fruit);
     image.setOrigin(0, 0.2);
     container.add(image);
     const bounds = container.getBounds();
