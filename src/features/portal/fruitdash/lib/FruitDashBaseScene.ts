@@ -33,6 +33,7 @@ import { FruitDashGroundFactory } from "./Ground";
 import { getAnimationUrl } from "features/world/lib/animations";
 import { ITEM_DETAILS } from "features/game/types/images";
 import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
+import { SUNNYSIDE } from "assets/sunnyside";
 
 export abstract class FruitDashBaseScene extends Phaser.Scene {
   //joystick?: VirtualJoystick;
@@ -40,6 +41,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   speed = INITIAL_SPEED;
   next_speed = INITIAL_SPEED;
   slow_down = false;
+  ghost = false;
   currentPlayer: BumpkinContainer | undefined;
   movementAngle: number | undefined;
   isFacingLeft = false;
@@ -96,6 +98,8 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.image("Banana", ITEM_DETAILS["Banana"].image);
     this.load.image("Orange", ITEM_DETAILS["Orange"].image);
     this.load.image("Blueberry", ITEM_DETAILS["Blueberry"].image);
+    this.load.image("ghost", SUNNYSIDE.resource.magic_mushroom);
+
     this.load.svg("arrow", "world/fruitdash/arrow.svg");
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,

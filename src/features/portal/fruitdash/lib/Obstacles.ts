@@ -36,6 +36,7 @@ export class FruitDashObstacleFactory {
     this.obstacles["bounty"] = new ChestObstacle(0, 250, "bounty");
     //PowerUps
     this.obstacles["slowdown"] = new SlowDownPowerUp(0, 250, "powerup");
+    this.obstacles["ghost"] = new GhostPowerUp(2, 250, "powerup");
   }
 
   public addRandomObstacle(): void {
@@ -71,7 +72,8 @@ export class FruitDashObstacleFactory {
     }
     if (
       intersects ||
-      (obstacleToInsert.getName() == "slowdown" && this._scene.slow_down)
+      (obstacleToInsert.getName() == "slowdown" && this._scene.slow_down) ||
+      (obstacleToInsert.getName() == "ghost" && this._scene.ghost)
     ) {
       //console.log('destroy ' + obstacleToInsert.getName());
       obstacleToInsert.destroy();
@@ -87,10 +89,13 @@ export class FruitDashObstacleFactory {
         (item) => item.active == true,
       );
     } else {
-      if (this._scene.slow_down) {
+      if (this._scene.slow_down || this._scene.ghost) {
         this.obstaclesLines.forEach((item) => {
           const obstacle = item as FruitDashObstacleContainer;
-          if (obstacle.getName() == "slowdown") {
+          if (obstacle.getName() == "slowdown" && this._scene.slow_down) {
+            obstacle.markProcessed();
+            obstacle.destroy();
+          } else if (obstacle.getName() == "ghost" && this._scene.ghost) {
             obstacle.markProcessed();
             obstacle.destroy();
           }
@@ -210,7 +215,7 @@ export class FruitDashObstacleFactory {
                 this._scene.portalService?.send("GAIN_POINTS", {
                   points: obstacle.getPoints() * this._scene.speed,
                 });
-              } else if (obstacle.isObstacle()) {
+              } else if (obstacle.isObstacle() && !this._scene.ghost) {
                 obstacle.markProcessed();
                 if (this._scene.currentPlayer.visible) this.killPlayer();
               } else if (obstacle.isPowerUp()) {
@@ -248,6 +253,34 @@ export class FruitDashObstacleFactory {
                   //     this._scene.slow_down = false;
                   //   }
                   // }, SLOW_DOWN_DURATION * 1000);
+                } else if (obstacle.getName() == "ghost") {
+                  this._scene.ghost = true;
+                  this._scene.tweens.add({
+                    targets: this._scene.currentPlayer,
+                    alpha: 0.3,
+                    ease: "Cubic.easeOut",
+                    duration: 500,
+                    repeat: 8,
+                    yoyo: true,
+                    onComplete: (item) => {
+                      this._scene.tweens.add({
+                        targets: this._scene.currentPlayer,
+                        alpha: 0.3,
+                        ease: "Cubic.easeOut",
+                        duration: 100,
+                        repeat: 10,
+                        yoyo: true,
+                        onComplete: (item) => {
+                          if (this._scene.currentPlayer && this._scene.ghost) {
+                            this._scene.currentPlayer.alpha = 1;
+                            this._scene.ghost = false;
+                          }
+                          //(item.targets[0] as FruitDashObstacleContainer).destroy();
+                          //item.destroy();
+                        },
+                      });
+                    },
+                  });
                 }
               }
             }
@@ -773,6 +806,43 @@ class SlowDownPowerUp extends FruitDashObstacle {
       container.add(graphics);
     }
     container.setCollisionRect(rect);
+    return container;
+  }
+}
+
+class GhostPowerUp extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "ghost");
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Circle(
+      bounds.width / 2,
+      bounds.height / 2,
+      bounds.width / 2,
+    );
+    //Phaser.Geom.Rectangle.Inflate(rect, -2, -2);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeCircleShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionCircle(rect);
     return container;
   }
 }

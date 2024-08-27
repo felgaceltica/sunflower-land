@@ -85,6 +85,11 @@ export const POWERUPS_SCORE_TABLE: {
     description: "Decrease speed by 30% - Chance after 500 points",
     //description: "Slow down for 10 seconds - Chance after 500 points",
   },
+  1: {
+    item: SUNNYSIDE.resource.magic_mushroom,
+    description: "Walk through obstacles for 10 seconds",
+    //description: "Slow down for 10 seconds - Chance after 500 points",
+  },
 };
 export const SLOW_DOWN_DURATION = 10;
 export const MINIGAME_NAME = "fruit_dash";
