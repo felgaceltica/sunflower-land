@@ -1,6 +1,7 @@
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Equipped } from "features/game/types/bumpkin";
 import { ITEM_DETAILS } from "features/game/types/images";
+import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
 
 export const ZOOM = window.innerWidth < 500 ? 3 : 4;
 export const SQUARE_WIDTH_TEXTURE = 18;
@@ -43,31 +44,48 @@ export const DECORATION_DEPTH = 200;
 export const UNLIMITED_ATTEMPTS_SFL = 3;
 export const RESTOCK_ATTEMPTS_SFL = 1;
 export const DAILY_ATTEMPTS = 5;
-export const OBSTACLES_SCORE_TABLE: {
+export const BONUS_SCORE_TABLE: {
   [key: number]: {
     item: string;
-    points: number;
-    type: string;
+    description: string;
   };
 } = {
   0: {
     item: ITEM_DETAILS["Pirate Bounty"].image,
-    points: 250,
-    type: "Bonus",
+    description: "250 base points - Chance after 500 points",
   },
-  1: { item: ITEM_DETAILS["Apple"].image, points: 20, type: "Bonus" },
-  2: { item: ITEM_DETAILS["Banana"].image, points: 20, type: "Bonus" },
-  3: { item: ITEM_DETAILS["Orange"].image, points: 20, type: "Bonus" },
-  4: { item: ITEM_DETAILS["Blueberry"].image, points: 20, type: "Bonus" },
-  5: { item: ITEM_DETAILS["Oil Reserve"].image, points: 20, type: "Obstacle" },
-  6: { item: SUNNYSIDE.resource.stone_rock, points: 20, type: "Obstacle" },
-  7: { item: SUNNYSIDE.resource.stone_small, points: 5, type: "Obstacle" },
-  8: {
+  1: { item: ITEM_DETAILS["Apple"].image, description: "20 base points" },
+  2: { item: ITEM_DETAILS["Banana"].image, description: "20 base points" },
+  3: { item: ITEM_DETAILS["Orange"].image, description: "20 base points" },
+  4: { item: ITEM_DETAILS["Blueberry"].image, description: "20 base points" },
+};
+
+export const OBSTACLES_SCORE_TABLE: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: { item: ITEM_DETAILS["Oil Reserve"].image, description: "5 points" },
+  1: { item: SUNNYSIDE.resource.stone_rock, description: "5 points" },
+  2: { item: SUNNYSIDE.resource.stone_small, description: "2 points" },
+  3: {
     item: SUNNYSIDE.decorations.bonniesTombstone,
-    points: 5,
-    type: "Obstacle",
+    description: "2 points",
   },
 };
+export const POWERUPS_SCORE_TABLE: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: {
+    item: fisherHourglassFull,
+    description: "Slow down for 10 seconds - Chance after 500 points",
+  },
+};
+export const SLOW_DOWN_DURATION = 10;
 export const MINIGAME_NAME = "fruit_dash";
 export const NAME_TAG_OFFSET_PX = 12;
 export const MAX_OBSTACLES_LINES = 5;

@@ -5,7 +5,11 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { SquareIcon } from "components/ui/SquareIcon";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { Label } from "components/ui/Label";
-import { OBSTACLES_SCORE_TABLE } from "../../util/FruitDashConstants";
+import {
+  BONUS_SCORE_TABLE,
+  OBSTACLES_SCORE_TABLE,
+  POWERUPS_SCORE_TABLE,
+} from "../../util/FruitDashConstants";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
 
@@ -87,13 +91,12 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
             </p>
           </div>
         </div>
-
         {/* legend */}
-        <Label type="default">{t("fruit-dash.obstacles")}</Label>
+        <Label type="default">{t("fruit-dash.powerups")}</Label>
         <table className="w-full text-xs table-fixed border-collapse">
           <tbody>
-            {Object.values(OBSTACLES_SCORE_TABLE).map(
-              ({ item, points, type }, index) => (
+            {Object.values(POWERUPS_SCORE_TABLE).map(
+              ({ item, description }, index) => (
                 <tr key={index}>
                   <td
                     style={{ border: "1px solid #b96f50" }}
@@ -107,9 +110,64 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
                     style={{ border: "1px solid #b96f50" }}
                     className="p-1.5 w-5/6"
                   >
-                    {t("fruit-dash.cropDescription", {
-                      points: points,
-                      type: type,
+                    {t("fruit-dash.scoreDescription", {
+                      description: description,
+                    })}
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+        {/* legend */}
+        <Label type="default">{t("fruit-dash.bonus")}</Label>
+        <table className="w-full text-xs table-fixed border-collapse">
+          <tbody>
+            {Object.values(BONUS_SCORE_TABLE).map(
+              ({ item, description }, index) => (
+                <tr key={index}>
+                  <td
+                    style={{ border: "1px solid #b96f50" }}
+                    className="p-1.5 w-1/6"
+                  >
+                    <div className="flex items-center justify-center">
+                      {<SquareIcon icon={item} width={7} />}
+                    </div>
+                  </td>
+                  <td
+                    style={{ border: "1px solid #b96f50" }}
+                    className="p-1.5 w-5/6"
+                  >
+                    {t("fruit-dash.scoreDescription", {
+                      description: description,
+                    })}
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+        {/* legend */}
+        <Label type="default">{t("fruit-dash.obstacles")}</Label>
+        <table className="w-full text-xs table-fixed border-collapse">
+          <tbody>
+            {Object.values(OBSTACLES_SCORE_TABLE).map(
+              ({ item, description }, index) => (
+                <tr key={index}>
+                  <td
+                    style={{ border: "1px solid #b96f50" }}
+                    className="p-1.5 w-1/6"
+                  >
+                    <div className="flex items-center justify-center">
+                      {<SquareIcon icon={item} width={7} />}
+                    </div>
+                  </td>
+                  <td
+                    style={{ border: "1px solid #b96f50" }}
+                    className="p-1.5 w-5/6"
+                  >
+                    {t("fruit-dash.scoreDescription", {
+                      description: description,
                     })}
                   </td>
                 </tr>

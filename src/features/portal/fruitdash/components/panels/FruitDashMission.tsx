@@ -90,19 +90,22 @@ export const FruitDashMission: React.FC<Props> = ({
                 {showScore && (
                   <span>
                     {t("fruit-dash.score", {
-                      score: score,
+                      score: Math.round(score),
                     })}
                   </span>
                 )}
                 <span>
                   {t("fruit-dash.bestToday", {
-                    score: minigame?.history[dateKey]?.highscore ?? 0,
+                    score: minigame?.history[dateKey]?.highscore
+                      ? Math.round(minigame?.history[dateKey]?.highscore)
+                      : 0,
                   })}
                 </span>
                 <span>
                   {t("fruit-dash.bestAllTime", {
                     score: Object.values(minigame?.history ?? {}).reduce(
-                      (acc, { highscore }) => Math.max(acc, highscore),
+                      (acc, { highscore }) =>
+                        Math.round(Math.max(acc, highscore)),
                       0,
                     ),
                   })}

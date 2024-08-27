@@ -6,6 +6,8 @@ import {
   OBSTACLES_DEPTH,
   PLAYER_MIN_X,
   PLAYER_MAX_X,
+  INITIAL_SPEED,
+  SLOW_DOWN_DURATION,
 } from "../util/FruitDashConstants";
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
@@ -24,13 +26,15 @@ export class FruitDashObstacleFactory {
     //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
     //this.obstacles["coin"] = new CoinObstacle(5,10,true);
 
-    this.obstacles["rock"] = new RockObstacle(100, 5, false);
-    this.obstacles["gravestone"] = new GraveStoneObstacle(100, 5.1, false);
-    this.obstacles["oilpit"] = new OilPitObstacle(20, 20, false);
-    this.obstacles["largerock"] = new StoneRockObstacle(20, 20, false);
+    this.obstacles["rock"] = new RockObstacle(100, 2, "obstacle");
+    this.obstacles["gravestone"] = new GraveStoneObstacle(100, 2, "obstacle");
+    this.obstacles["oilpit"] = new OilPitObstacle(20, 5, "obstacle");
+    this.obstacles["largerock"] = new StoneRockObstacle(20, 5, "obstacle");
     //Points
-    this.obstacles["fruit"] = new FruitObstacle(40, 20, true);
-    this.obstacles["bounty"] = new ChestObstacle(0, 250, true);
+    this.obstacles["fruit"] = new FruitObstacle(50, 20, "bounty");
+    this.obstacles["bounty"] = new ChestObstacle(0, 250, "bounty");
+    //PowerUps
+    this.obstacles["slowdown"] = new SlowDownPowerUp(0, 250, "powerup");
   }
 
   public addRandomObstacle(): void {
@@ -64,7 +68,11 @@ export class FruitDashObstacleFactory {
         intersects = true;
       }
     }
-    if (intersects) {
+    if (
+      intersects ||
+      (obstacleToInsert.getName() == "slowdown" && this._scene.slow_down)
+    ) {
+      //console.log('destroy ' + obstacleToInsert.getName());
       obstacleToInsert.destroy();
     } else {
       this.obstaclesLines.push(obstacleToInsert);
@@ -72,19 +80,31 @@ export class FruitDashObstacleFactory {
   }
 
   public update(f: number) {
+    //console.log(this._scene.speed)
     if (!this._scene.isGamePlaying) {
       this.obstaclesLines = this.obstaclesLines.filter(
         (item) => item.active == true,
       );
     } else {
+      if (this._scene.slow_down) {
+        this.obstaclesLines.forEach((item) => {
+          const obstacle = item as FruitDashObstacleContainer;
+          if (obstacle.getName() == "slowdown") {
+            obstacle.markProcessed();
+            obstacle.destroy();
+          }
+        });
+      }
       let currentScore = 0;
       if (this._scene.portalService?.state?.context?.score) {
         currentScore = this._scene.portalService?.state?.context?.score;
       }
-      if (currentScore > 1000) {
+      if (currentScore > 500) {
         (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0.1);
+        (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(2);
       } else {
         (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0);
+        (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(0);
       }
     }
     for (let index = 0; index < this.obstaclesLines.length; index++) {
@@ -177,17 +197,41 @@ export class FruitDashObstacleFactory {
                 });
                 if (!getAudioMutedSetting()) {
                   if (obstacle.getName() == "bounty") {
-                    this._scene.bountySound?.play({ volume: 0.3 });
+                    this._scene.bountySound?.play({ volume: 0.15 });
                   } else {
-                    this._scene.fruitSound?.play({ volume: 0.3 });
+                    this._scene.fruitSound?.play({ volume: 0.15 });
                   }
                 }
                 this._scene.portalService?.send("GAIN_POINTS", {
                   points: obstacle.getPoints() * this._scene.speed,
                 });
-              } else {
+              } else if (obstacle.isObstacle()) {
                 obstacle.markProcessed();
                 if (this._scene.currentPlayer.visible) this.killPlayer();
+              } else if (obstacle.isPowerUp()) {
+                obstacle.markProcessed();
+                this._scene.tweens.add({
+                  targets: obstacle,
+                  alpha: 0,
+                  ease: "Cubic.easeOut",
+                  duration: 100,
+                  repeat: 1,
+                  yoyo: false,
+                  onComplete: (item) => {
+                    (item.targets[0] as FruitDashObstacleContainer).destroy();
+                    //item.destroy();
+                  },
+                });
+                if (!getAudioMutedSetting()) {
+                  this._scene.fruitSound?.play({ volume: 0.15 });
+                }
+                this._scene.next_speed = this._scene.speed;
+                this._scene.speed = INITIAL_SPEED;
+                this._scene.slow_down = true;
+                setTimeout(() => {
+                  this._scene.speed = this._scene.next_speed;
+                  this._scene.slow_down = false;
+                }, SLOW_DOWN_DURATION * 1000);
               }
             }
           }
@@ -195,7 +239,8 @@ export class FruitDashObstacleFactory {
             obstacle.y >
             this._scene.currentPlayer?.y + SQUARE_WIDTH_TEXTURE * 1
           ) {
-            if (!obstacle.isBounty() && !obstacle.isProcessed()) {
+            //console.log('O - ' + obstacle.isObstacle() + ' B - ' + obstacle.isBounty()+ ' P - ' + obstacle.isPowerUp())
+            if (obstacle.isObstacle() && !obstacle.isProcessed()) {
               obstacle.markProcessed();
               this._scene.portalService?.send("GAIN_POINTS", {
                 points: obstacle.getPoints(),
@@ -225,7 +270,7 @@ export class FruitDashObstacleFactory {
     // freeze player
     this._scene.currentPlayer.setVisible(false);
     if (!getAudioMutedSetting())
-      this._scene.gameOverSound?.play({ volume: 0.3 });
+      this._scene.gameOverSound?.play({ volume: 0.15 });
 
     const spriteName = "player_death";
     const spriteKey = "player_death_anim";
@@ -251,9 +296,9 @@ export class FruitDashObstacleFactory {
 class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
   protected _weight: number;
   protected _points: number;
-  protected _isBounty: boolean;
   protected _name: string;
-  protected _type: "Circle" | "Rectangle" = "Rectangle";
+  protected _geometry_type: "Circle" | "Rectangle" = "Rectangle";
+  protected _type: string;
   protected _isProcessed = false;
   protected _collisionShape?: Phaser.Geom.Rectangle | Phaser.Geom.Circle;
   constructor(
@@ -262,14 +307,14 @@ class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
     y: number,
     weight: number,
     points: number,
-    isBounty: boolean,
+    type: string,
     name: string,
   ) {
     super(scene, x, y);
     scene.add.existing(this);
     this._weight = weight;
     this._points = points;
-    this._isBounty = isBounty;
+    this._type = type;
     this._name = name;
   }
   getWeight(): number {
@@ -279,7 +324,13 @@ class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
     return this._points;
   }
   isBounty(): boolean {
-    return this._isBounty;
+    return this._type == "bounty";
+  }
+  isObstacle(): boolean {
+    return this._type == "obstacle";
+  }
+  isPowerUp(): boolean {
+    return this._type == "powerup";
   }
   markProcessed() {
     this._isProcessed = true;
@@ -291,12 +342,12 @@ class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
     return this._name;
   }
   getType(): "Circle" | "Rectangle" {
-    return this._type;
+    return this._geometry_type;
   }
   setCollisionRect(collisionRect: Phaser.Geom.Rectangle) {
     this.x = getBaseX(collisionRect.x, collisionRect.width);
     this._collisionShape = collisionRect;
-    this._type = "Rectangle";
+    this._geometry_type = "Rectangle";
   }
   setCollisionCircle(collisionCircle: Phaser.Geom.Circle) {
     this.x = getBaseX(
@@ -304,7 +355,7 @@ class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
       collisionCircle.radius * 2,
     );
     this._collisionShape = collisionCircle;
-    this._type = "Circle";
+    this._geometry_type = "Circle";
   }
   getCollisionRect(): Phaser.Geom.Rectangle {
     if (this._collisionShape) {
@@ -333,11 +384,11 @@ class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
 abstract class FruitDashObstacle {
   protected _weight: number;
   protected _points: number;
-  protected _isBounty: boolean;
-  constructor(weight: number, points: number, isBounty: boolean) {
+  protected _type: string;
+  constructor(weight: number, points: number, type: string) {
     this._weight = weight;
     this._points = points;
-    this._isBounty = isBounty;
+    this._type = type;
   }
   abstract add(
     scene: FruitDashBaseScene,
@@ -358,7 +409,7 @@ class TurtleObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3714);
@@ -404,7 +455,7 @@ class OilBarrelObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3317);
@@ -445,7 +496,7 @@ class GraveStoneObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 1004);
@@ -478,7 +529,7 @@ class StoneWallObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 109);
@@ -510,7 +561,7 @@ class StoneRockObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 1907);
@@ -562,7 +613,7 @@ class OilPitObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3443);
@@ -612,7 +663,7 @@ class RockObstacle extends FruitDashObstacle {
       START_HEIGHT,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     const image = scene.add.image(0, 0, "SunnySideSprites", 288);
@@ -643,7 +694,7 @@ class ChestObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     // let image = scene.add.image(0, 0, "SunnySideSprites", 1895);
@@ -676,6 +727,39 @@ class ChestObstacle extends FruitDashObstacle {
     return container;
   }
 }
+class SlowDownPowerUp extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "slowdown");
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Rectangle(0, 0, bounds.width, bounds.height);
+    //Phaser.Geom.Rectangle.Inflate(rect, -2, -2);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeRectShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionRect(rect);
+    return container;
+  }
+}
+
 class CoinObstacle extends FruitDashObstacle {
   add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
     const container = new FruitDashObstacleContainer(
@@ -684,7 +768,7 @@ class CoinObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     let image = scene.add.image(0, 0, "SunnySideSprites", 3736);
@@ -720,7 +804,7 @@ class FruitObstacle extends FruitDashObstacle {
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
       this._weight,
       this._points,
-      this._isBounty,
+      this._type,
       name,
     );
     const image = scene.add.image(0, 0, fruits[randomInt(0, fruits.length)]);

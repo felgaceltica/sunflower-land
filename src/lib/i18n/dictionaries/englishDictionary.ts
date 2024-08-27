@@ -5771,8 +5771,10 @@ const farmerRace: Record<FruitDashMessages, string> = {
     "Collect fruits during the game to gain extra points and boost your score",
   "fruit-dash.instructions4":
     "Find and collect bounties to receive a larger amount of points at once",
-  "fruit-dash.obstacles": "Obstacles and bonus",
-  "fruit-dash.cropDescription": "{{type}} - {{points}} points.",
+  "fruit-dash.obstacles": "Obstacles - Fixed points",
+  "fruit-dash.bonus": "Bonus - Base points + speed bonus points",
+  "fruit-dash.powerups": "Powerups",
+  "fruit-dash.scoreDescription": "{{description}}.",
   "fruit-dash.score": "Score: {{score}}",
   "fruit-dash.bestToday": "Best (today): {{score}}",
   "fruit-dash.bestAllTime": "Best (all-time): {{score}}",

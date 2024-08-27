@@ -32,11 +32,14 @@ import { MINIGAME_NAME } from "../util/FruitDashConstants";
 import { FruitDashGroundFactory } from "./Ground";
 import { getAnimationUrl } from "features/world/lib/animations";
 import { ITEM_DETAILS } from "features/game/types/images";
+import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
 
 export abstract class FruitDashBaseScene extends Phaser.Scene {
   //joystick?: VirtualJoystick;
   sceneId: SceneId = "fruit_dash";
   speed = INITIAL_SPEED;
+  next_speed = INITIAL_SPEED;
+  slow_down = false;
   currentPlayer: BumpkinContainer | undefined;
   movementAngle: number | undefined;
   isFacingLeft = false;
@@ -88,6 +91,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.audio("music", "world/fruitdash/music.mp3");
 
     this.groundFactory.preload();
+    this.load.image("slowdown", fisherHourglassFull);
     this.load.image("apple", ITEM_DETAILS["Apple"].image);
     this.load.image("banana", ITEM_DETAILS["Banana"].image);
     this.load.image("orange", ITEM_DETAILS["Orange"].image);
@@ -104,13 +108,13 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   }
   async create() {
     this.physics.world.setFPS(60);
-    this.physics.world.drawDebug = false;
+    this.physics.world.drawDebug = true;
     this.initialiseCamera();
     this.initialiseSounds();
     this.initialiseControls();
     this.groundFactory.createBaseRoad();
     this.speedInterval = setInterval(() => {
-      if (this.isGamePlaying) {
+      if (this.isGamePlaying && !this.slow_down) {
         this.speed = this.speed + SPEED_INCREMENT;
         this.walkingSpeed = this.walkingSpeed + WALK_SPEED_INCREMENT;
         if (this.speed > MAX_SPEED) {
@@ -174,14 +178,14 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.musicSound = this.sound.add("music");
     this.musicSound.loop = true;
     if (!audioMuted) {
-      this.musicSound?.play({ volume: 0.2 });
+      this.musicSound?.play({ volume: 0.07 });
     }
   }
   public updatePlayer(speed_factor: number) {
     const audioMuted = getAudioMutedSetting();
     if (this.musicSound) {
       if (!audioMuted) {
-        this.musicSound.volume = 0.2;
+        this.musicSound.volume = 0.07;
       } else {
         this.musicSound.volume = 0;
       }
