@@ -7,7 +7,7 @@ import {
   PLAYER_MIN_X,
   PLAYER_MAX_X,
   INITIAL_SPEED,
-  SLOW_DOWN_DURATION,
+  INITIAL_WALK_SPEED,
 } from "../util/FruitDashConstants";
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
@@ -231,15 +231,23 @@ export class FruitDashObstacleFactory {
                   this._scene.fruitSound?.play({ volume: 0.15 });
                 }
                 if (obstacle.getName() == "slowdown") {
-                  this._scene.next_speed = this._scene.speed;
-                  this._scene.speed = INITIAL_SPEED;
-                  this._scene.slow_down = true;
-                  setTimeout(() => {
-                    if (this._scene.slow_down) {
-                      this._scene.speed = this._scene.next_speed;
-                      this._scene.slow_down = false;
-                    }
-                  }, SLOW_DOWN_DURATION * 1000);
+                  this._scene.speed =
+                    this._scene.speed - this._scene.speed * 0.3;
+                  if (this._scene.speed < INITIAL_SPEED)
+                    this._scene.speed = INITIAL_SPEED;
+                  this._scene.walkingSpeed =
+                    this._scene.walkingSpeed - this._scene.walkingSpeed * 0.3;
+                  if (this._scene.walkingSpeed < INITIAL_WALK_SPEED)
+                    this._scene.walkingSpeed = INITIAL_WALK_SPEED;
+                  // this._scene.next_speed = this._scene.speed;
+                  // this._scene.speed = INITIAL_SPEED;
+                  // this._scene.slow_down = true;
+                  // setTimeout(() => {
+                  //   if (this._scene.slow_down) {
+                  //     this._scene.speed = this._scene.next_speed;
+                  //     this._scene.slow_down = false;
+                  //   }
+                  // }, SLOW_DOWN_DURATION * 1000);
                 }
               }
             }

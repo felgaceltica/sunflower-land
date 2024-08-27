@@ -82,7 +82,8 @@ export const POWERUPS_SCORE_TABLE: {
 } = {
   0: {
     item: fisherHourglassFull,
-    description: "Slow down for 10 seconds - Chance after 500 points",
+    description: "Decrease speed in 30% - Chance after 500 points",
+    //description: "Slow down for 10 seconds - Chance after 500 points",
   },
 };
 export const SLOW_DOWN_DURATION = 10;
