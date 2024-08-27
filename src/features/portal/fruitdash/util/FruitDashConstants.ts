@@ -90,6 +90,12 @@ export const POWERUPS_SCORE_TABLE: {
     description: "Walk through obstacles for 10 seconds",
     //description: "Slow down for 10 seconds - Chance after 500 points",
   },
+  2: {
+    item: SUNNYSIDE.tools.axe,
+    description:
+      "Collect axes and press space or hit the button to throw them at obstacles",
+    //description: "Slow down for 10 seconds - Chance after 500 points",
+  },
 };
 export const SLOW_DOWN_DURATION = 10;
 export const MINIGAME_NAME = "fruit_dash";

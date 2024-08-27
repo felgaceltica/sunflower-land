@@ -19,6 +19,7 @@ export class FruitDashObstacleFactory {
   //private obstaclesMethods = [];
   private obstacles: any = {};
   private obstaclesLines: Phaser.GameObjects.Container[] = [];
+  private throwableLines: Phaser.GameObjects.Container[] = [];
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
@@ -35,8 +36,9 @@ export class FruitDashObstacleFactory {
     this.obstacles["fruit"] = new FruitObstacle(50, 20, "bounty");
     this.obstacles["bounty"] = new ChestObstacle(0, 250, "bounty");
     //PowerUps
-    this.obstacles["slowdown"] = new SlowDownPowerUp(0, 250, "powerup");
-    this.obstacles["ghost"] = new GhostPowerUp(2, 250, "powerup");
+    this.obstacles["slowdown"] = new SlowDownPowerUp(0, 0, "powerup");
+    this.obstacles["ghost"] = new GhostPowerUp(2, 0, "powerup");
+    this.obstacles["axe"] = new AxePowerUp(3, 0, "powerup");
   }
 
   public addRandomObstacle(): void {
@@ -82,12 +84,37 @@ export class FruitDashObstacleFactory {
     }
   }
 
+  public throwAxe() {
+    const obstacle = this.obstacles["axe"] as FruitDashObstacle;
+    const obstacleToInsert = obstacle.add(this._scene, "axe");
+    obstacleToInsert.x = this._scene.currentPlayer
+      ? this._scene.currentPlayer?.x
+      : 0;
+    obstacleToInsert.y = this._scene.currentPlayer
+      ? this._scene.currentPlayer?.y
+      : 0;
+    (obstacleToInsert.list[0] as Phaser.GameObjects.Image).setOrigin(0.5, 0.5);
+    obstacleToInsert.setDepth(OBSTACLES_DEPTH);
+    this._scene.tweens.add({
+      targets: obstacleToInsert,
+      angle: 360,
+      ease: "Linear",
+      duration: 2000,
+      repeat: -1,
+      yoyo: false,
+    });
+    this.throwableLines.push(obstacleToInsert);
+  }
+
   public update(f: number) {
-    //console.log(this._scene.speed)
     if (!this._scene.isGamePlaying) {
       this.obstaclesLines = this.obstaclesLines.filter(
         (item) => item.active == true,
       );
+      this.throwableLines = this.throwableLines.filter(
+        (item) => item.active == true,
+      );
+      this._scene.tweens.killAll();
     } else {
       if (this._scene.slow_down || this._scene.ghost) {
         this.obstaclesLines.forEach((item) => {
@@ -101,6 +128,7 @@ export class FruitDashObstacleFactory {
           }
         });
       }
+
       let currentScore = 0;
       if (this._scene.portalService?.state?.context?.score) {
         currentScore = this._scene.portalService?.state?.context?.score;
@@ -113,32 +141,90 @@ export class FruitDashObstacleFactory {
         (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(0);
       }
     }
-    for (let index = 0; index < this.obstaclesLines.length; index++) {
-      if (!this._scene.isGamePlaying) {
-        this.obstaclesLines[index].visible = false;
-        this.obstaclesLines[index].destroy();
-      } else {
-        this.obstaclesLines[index].setDepth(OBSTACLES_DEPTH);
-        this.obstaclesLines[index].y += this._scene.speed * f;
+    if (this._scene.currentPlayer) {
+      const playerrect = new Phaser.Geom.Rectangle(
+        this._scene.currentPlayer.x -
+          (this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body)
+            .width *
+            this._scene.currentPlayer.originX,
+        this._scene.currentPlayer.y -
+          (this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body)
+            .height *
+            this._scene.currentPlayer.originY,
+        (this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body).width,
+        (this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body).height,
+      );
+      for (let index = 0; index < this.throwableLines.length; index++) {
+        if (!this._scene.isGamePlaying) {
+          this.throwableLines[index].visible = false;
+          this.throwableLines[index].destroy();
+        } else {
+          this.throwableLines[index].setDepth(OBSTACLES_DEPTH);
+          this.throwableLines[index].y -= this._scene.speed * f;
+          const throwableObstacle = this.throwableLines[
+            index
+          ] as FruitDashObstacleContainer;
+          if (!throwableObstacle.isProcessed()) {
+            for (
+              let index1 = 0;
+              index1 < this.obstaclesLines.length;
+              index1++
+            ) {
+              let collideObstacle = false;
+              const obstacle = this.obstaclesLines[
+                index1
+              ] as FruitDashObstacleContainer;
+              if (!obstacle.isObstacle() || obstacle.isProcessed()) continue;
+              if (
+                obstacle.getType() == "Rectangle" &&
+                Phaser.Geom.Intersects.CircleToRectangle(
+                  throwableObstacle.getCollisionCircle(),
+                  obstacle.getCollisionRect(),
+                )
+              ) {
+                collideObstacle = true;
+              } else if (
+                obstacle.getType() == "Circle" &&
+                Phaser.Geom.Intersects.CircleToCircle(
+                  obstacle.getCollisionCircle(),
+                  throwableObstacle.getCollisionCircle(),
+                )
+              ) {
+                collideObstacle = true;
+              }
+              if (collideObstacle) {
+                throwableObstacle.markProcessed();
+                throwableObstacle.destroy();
+                obstacle.markProcessed();
+                this._scene.tweens.add({
+                  targets: obstacle,
+                  alpha: 0,
+                  ease: "Cubic.easeOut",
+                  duration: 100,
+                  repeat: 1,
+                  yoyo: false,
+                  onComplete: (item) => {
+                    (item.targets[0] as FruitDashObstacleContainer).destroy();
+                    //item.destroy();
+                  },
+                });
+              }
+            }
+          }
 
-        if (this._scene.currentPlayer) {
-          const playerrect = new Phaser.Geom.Rectangle(
-            this._scene.currentPlayer.x -
-              (this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body)
-                .width *
-                this._scene.currentPlayer.originX,
-            this._scene.currentPlayer.y -
-              (this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body)
-                .height *
-                this._scene.currentPlayer.originY,
-            (
-              this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body
-            ).width,
-            (
-              this._scene.currentPlayer?.body as Phaser.Physics.Arcade.Body
-            ).height,
-          );
-
+          if (this.throwableLines[index].y < START_HEIGHT) {
+            this.throwableLines[index].visible = false;
+            this.throwableLines[index].destroy();
+          }
+        }
+      }
+      for (let index = 0; index < this.obstaclesLines.length; index++) {
+        if (!this._scene.isGamePlaying) {
+          this.obstaclesLines[index].visible = false;
+          this.obstaclesLines[index].destroy();
+        } else {
+          this.obstaclesLines[index].setDepth(OBSTACLES_DEPTH);
+          this.obstaclesLines[index].y += this._scene.speed * f;
           const obstacle = this.obstaclesLines[
             index
           ] as FruitDashObstacleContainer;
@@ -275,12 +361,13 @@ export class FruitDashObstacleFactory {
                             this._scene.currentPlayer.alpha = 1;
                             this._scene.ghost = false;
                           }
-                          //(item.targets[0] as FruitDashObstacleContainer).destroy();
-                          //item.destroy();
                         },
                       });
                     },
                   });
+                } else if (obstacle.getName() == "axe") {
+                  this._scene.portalService?.send("COLLECT_AXE");
+                  this._scene.currentPlayer.react("Axe", 1);
                 }
               }
             }
@@ -297,16 +384,13 @@ export class FruitDashObstacleFactory {
               });
             }
           }
-        }
-        if (this.obstaclesLines[index].y > FINAL_HEIGHT) {
-          this.obstaclesLines[index].visible = false;
-          this.obstaclesLines[index].destroy();
+
+          if (this.obstaclesLines[index].y > FINAL_HEIGHT) {
+            this.obstaclesLines[index].visible = false;
+            this.obstaclesLines[index].destroy();
+          }
         }
       }
-
-      // this.obstaclesLines = this.obstaclesLines.filter(
-      //   (item) => item.active == true,
-      // );
     }
   }
   /**
@@ -822,6 +906,43 @@ class GhostPowerUp extends FruitDashObstacle {
       name,
     );
     const image = scene.add.image(0, 0, "ghost");
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Circle(
+      bounds.width / 2,
+      bounds.height / 2,
+      bounds.width / 2,
+    );
+    //Phaser.Geom.Rectangle.Inflate(rect, -2, -2);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeCircleShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionCircle(rect);
+    return container;
+  }
+}
+
+class AxePowerUp extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "axe");
     image.setOrigin(0, 0);
     container.add(image);
     const bounds = container.getBounds();

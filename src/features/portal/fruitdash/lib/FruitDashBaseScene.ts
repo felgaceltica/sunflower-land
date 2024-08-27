@@ -68,6 +68,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     | Phaser.Sound.WebAudioSound;
   leftButton!: Phaser.GameObjects.Image;
   rightButton!: Phaser.GameObjects.Image;
+  axeButton!: Phaser.GameObjects.Image;
   mobileKeys!: {
     left: boolean;
     right: boolean;
@@ -78,6 +79,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
         right: Phaser.Input.Keyboard.Key;
         a?: Phaser.Input.Keyboard.Key;
         d?: Phaser.Input.Keyboard.Key;
+        space?: Phaser.Input.Keyboard.Key;
       }
     | undefined;
   constructor() {
@@ -99,8 +101,10 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.image("Orange", ITEM_DETAILS["Orange"].image);
     this.load.image("Blueberry", ITEM_DETAILS["Blueberry"].image);
     this.load.image("ghost", SUNNYSIDE.resource.magic_mushroom);
+    this.load.image("axe", SUNNYSIDE.tools.axe);
 
     this.load.svg("arrow", "world/fruitdash/arrow.svg");
+    this.load.svg("axebutton", "world/fruitdash/axe.svg");
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,
       "death",
@@ -201,9 +205,19 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       if (this.isGamePlaying) {
         this.leftButton.visible = true;
         this.rightButton.visible = true;
+        if (this.portalService?.state?.context?.axes) {
+          const currentAxes = this.portalService?.state?.context?.axes;
+          this.axeButton.visible = false;
+          if (currentAxes > 0) {
+            this.axeButton.visible = true;
+          }
+        } else {
+          this.axeButton.visible = false;
+        }
       } else {
         this.leftButton.visible = false;
         this.rightButton.visible = false;
+        this.axeButton.visible = false;
       }
       this.movementAngle = this.keysToAngle(
         this.mobileKeys.left,
@@ -226,6 +240,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
 
       this.movementAngle = this.keysToAngle(left, right, false, false);
     }
+
     // change player direction if angle is changed from left to right or vise versa
     if (
       this.movementAngle !== undefined &&
@@ -340,7 +355,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       const realWidth = width / ZOOM;
       this.rightButton = this.add
         .image(
-          centerX + realWidth / 4,
+          centerX + realWidth / 3.25,
           window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
           "arrow",
         )
@@ -363,7 +378,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       this.rightButton.flipX = true;
       this.leftButton = this.add
         .image(
-          centerX - realWidth / 4,
+          centerX - realWidth / 3.25,
           window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
           "arrow",
         )
@@ -383,6 +398,25 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
           }
           this.leftButton.setAlpha(0.2);
         });
+
+      this.axeButton = this.add
+        .image(
+          centerX,
+          window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
+          "axebutton",
+        )
+        .setScale(0.06, 0.06)
+        .setAlpha(0.2)
+        .setInteractive()
+        .setDepth(1000)
+        .on("pointerdown", () => {
+          this.throwAxe();
+          this.axeButton.setAlpha(0.8);
+        })
+        .on("pointerup", () => {
+          this.axeButton.setAlpha(0.2);
+        });
+
       this.portalService?.send("SET_JOYSTICK_ACTIVE", {
         isJoystickActive: true,
       });
@@ -402,10 +436,23 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       );
       this.cursorKeys.d = this.input.keyboard?.addKey("D", false);
 
-      this.input.keyboard?.removeCapture("SPACE");
+      //this.input.keyboard?.removeCapture("SPACE");
+      this.cursorKeys.space?.on("down", () => {
+        this.throwAxe();
+      });
     }
 
     this.input.setTopOnly(true);
+  }
+
+  throwAxe() {
+    if (this.portalService?.state?.context?.axes) {
+      const currentAxes = this.portalService?.state?.context?.axes;
+      if (currentAxes > 0) {
+        this.portalService?.send("THROW_AXE");
+        this.groundFactory.throwAxe();
+      }
+    }
   }
 
   createPlayer({

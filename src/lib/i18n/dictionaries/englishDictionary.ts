@@ -5748,6 +5748,7 @@ const farmerRace: Record<FruitDashMessages, string> = {
   "fruit-dash.powerups": "Powerups",
   "fruit-dash.scoreDescription": "{{description}}.",
   "fruit-dash.score": "Score: {{score}}",
+  "fruit-dash.axes": "Axes: {{axes}}",
   "fruit-dash.bestToday": "Best (today): {{score}}",
   "fruit-dash.bestAllTime": "Best (all-time): {{score}}",
   "fruit-dash.donationDescription":

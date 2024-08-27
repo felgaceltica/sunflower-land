@@ -53,6 +53,9 @@ export class FruitDashGroundFactory {
       );
     }
   }
+  public throwAxe() {
+    this._obstaclesFactory.throwAxe();
+  }
   private addRoadLine(startY: number, start: boolean) {
     const container = this._scene.add.container();
     container.y = startY;

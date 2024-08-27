@@ -1175,6 +1175,7 @@ export type FruitDashMessages =
   | "fruit-dash.powerups"
   | "fruit-dash.scoreDescription"
   | "fruit-dash.score"
+  | "fruit-dash.axes"
   | "fruit-dash.bestToday"
   | "fruit-dash.bestAllTime"
   | "fruit-dash.donationDescription"

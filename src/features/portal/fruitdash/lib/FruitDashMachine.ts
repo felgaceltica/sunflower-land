@@ -33,6 +33,7 @@ export interface Context {
   isJoystickActive: boolean;
   state: GameState | undefined;
   score: number;
+  axes: number;
   startedAt: number;
   attemptsLeft: number;
 }
@@ -64,6 +65,8 @@ export type PortalEvent =
   | { type: "END_GAME_EARLY" }
   | { type: "GAME_OVER" }
   | GainPointsEvent
+  | { type: "COLLECT_AXE" }
+  | { type: "THROW_AXE" }
   // | { type: "CROP_DEPOSITED" }
   // | { type: "KILL_PLAYER" }
   | UnlockAchievementsEvent;
@@ -107,6 +110,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 
     score: 0,
+    axes: 0,
     attemptsLeft: 0,
     startedAt: 0,
   },
@@ -252,6 +256,8 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "playing",
           actions: assign<Context>({
             startedAt: () => Date.now(),
+            score: 0,
+            axes: 0,
             state: (context: any) => {
               startAttempt();
               return startMinigameAttempt({
@@ -277,18 +283,20 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             },
           }),
         },
-        // CROP_DEPOSITED: {
-        //   actions: assign<Context, any>({
-        //     score: (context: Context) => {
-        //       return context.score + context.inventory;
-        //     },
-        //   }),
-        // },
-        // KILL_PLAYER: {
-        //   actions: assign<Context, any>({
-
-        //   }),
-        // },
+        COLLECT_AXE: {
+          actions: assign<Context, any>({
+            axes: (context: Context, event: GainPointsEvent) => {
+              return context.axes + 1;
+            },
+          }),
+        },
+        THROW_AXE: {
+          actions: assign<Context, any>({
+            axes: (context: Context, event: GainPointsEvent) => {
+              return context.axes - 1;
+            },
+          }),
+        },
         END_GAME_EARLY: {
           actions: assign<Context, any>({
             startedAt: (context: any) => 0,
@@ -355,7 +363,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "loser",
           actions: assign({
             score: () => 0,
-            inventory: () => 0,
+            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -368,7 +376,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
-            inventory: () => 0,
+            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -381,7 +389,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
-            inventory: () => 0,
+            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -394,7 +402,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
-            inventory: () => 0,
+            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
