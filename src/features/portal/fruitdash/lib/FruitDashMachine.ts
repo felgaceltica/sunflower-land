@@ -9,8 +9,14 @@ import {
 } from "../util/FruitDashConstants";
 import { GameState } from "features/game/types/game";
 import { purchaseMinigameItem } from "features/game/events/minigames/purchaseMinigameItem";
-import { playMinigame } from "features/game/events/minigames/playMinigame";
-import { achievementsUnlocked, played } from "features/portal/lib/portalUtil";
+//import { playMinigame  } from "features/game/events/minigames/playMinigame";
+import { startMinigameAttempt } from "features/game/events/minigames/startMinigameAttempt";
+import { submitMinigameScore } from "features/game/events/minigames/submitMinigameScore";
+import {
+  achievementsUnlocked,
+  submitScore,
+  startAttempt,
+} from "features/portal/lib/portalUtil";
 import { getUrl, loadPortal } from "features/portal/actions/loadPortal";
 import { getAttemptsLeft } from "../util/Utils";
 import { unlockMinigameAchievements } from "features/game/events/minigames/unlockMinigameAchievements";
@@ -246,6 +252,16 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "playing",
           actions: assign<Context>({
             startedAt: () => Date.now(),
+            state: (context: any) => {
+              startAttempt();
+              return startMinigameAttempt({
+                state: context.state,
+                action: {
+                  type: "minigame.attemptStarted",
+                  id: "fruit-dash",
+                },
+              });
+            },
             attemptsLeft: (context: Context) => context.attemptsLeft - 1,
           }) as any,
         },
@@ -277,11 +293,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign<Context, any>({
             startedAt: (context: any) => 0,
             state: (context: any) => {
-              played({ score: context.score });
-              return playMinigame({
+              submitScore({ score: context.score });
+              return submitMinigameScore({
                 state: context.state,
                 action: {
-                  type: "minigame.played",
+                  type: "minigame.scoreSubmitted",
                   score: Math.round(context.score),
                   id: "fruit-dash",
                 },
@@ -294,11 +310,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "gameOver",
           actions: assign({
             state: (context: any) => {
-              played({ score: context.score });
-              return playMinigame({
+              submitScore({ score: context.score });
+              return submitMinigameScore({
                 state: context.state,
                 action: {
-                  type: "minigame.played",
+                  type: "minigame.scoreSubmitted",
                   score: Math.round(context.score),
                   id: "fruit-dash",
                 },
