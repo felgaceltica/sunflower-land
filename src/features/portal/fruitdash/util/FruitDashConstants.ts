@@ -82,7 +82,7 @@ export const POWERUPS_SCORE_TABLE: {
 } = {
   0: {
     item: fisherHourglassFull,
-    description: "Decrease speed in 30% - Chance after 500 points",
+    description: "Decrease speed by 30% - Chance after 500 points",
     //description: "Slow down for 10 seconds - Chance after 500 points",
   },
 };

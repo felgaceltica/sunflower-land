@@ -5738,11 +5738,11 @@ const farmerRace: Record<FruitDashMessages, string> = {
   "fruit-dash.instructions1":
     "The game's speed gradually increases over time, requiring quicker reactions.",
   "fruit-dash.instructions2":
-    "If you hit an obstacle, the game ends. Passing it earns you points",
+    "If you hit an obstacle, the game ends. Passing it earns you points.",
   "fruit-dash.instructions3":
-    "Collect fruits during the game to gain extra points and boost your score",
+    "Collect fruits during the game to gain extra points and boost your score.",
   "fruit-dash.instructions4":
-    "Find and collect bounties to receive a larger amount of points at once",
+    "Find and collect bounties to receive a larger amount of points at once.",
   "fruit-dash.obstacles": "Obstacles - Fixed points",
   "fruit-dash.bonus": "Bonus - Base points + speed bonus points",
   "fruit-dash.powerups": "Powerups",
