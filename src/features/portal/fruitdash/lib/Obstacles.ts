@@ -230,13 +230,17 @@ export class FruitDashObstacleFactory {
                 if (!getAudioMutedSetting()) {
                   this._scene.fruitSound?.play({ volume: 0.15 });
                 }
-                this._scene.next_speed = this._scene.speed;
-                this._scene.speed = INITIAL_SPEED;
-                this._scene.slow_down = true;
-                setTimeout(() => {
-                  this._scene.speed = this._scene.next_speed;
-                  this._scene.slow_down = false;
-                }, SLOW_DOWN_DURATION * 1000);
+                if (obstacle.getName() == "slowdown") {
+                  this._scene.next_speed = this._scene.speed;
+                  this._scene.speed = INITIAL_SPEED;
+                  this._scene.slow_down = true;
+                  setTimeout(() => {
+                    if (this._scene.slow_down) {
+                      this._scene.speed = this._scene.next_speed;
+                      this._scene.slow_down = false;
+                    }
+                  }, SLOW_DOWN_DURATION * 1000);
+                }
               }
             }
           }

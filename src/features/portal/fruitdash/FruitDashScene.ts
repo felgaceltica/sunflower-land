@@ -17,6 +17,7 @@ export class FruitDashScene extends FruitDashBaseScene {
     if (this.currentPlayer) {
       if (!this.isGamePlaying) {
         this.currentPlayer.visible = false;
+        this.slow_down = false;
         this.speed = INITIAL_SPEED;
         this.walkingSpeed = INITIAL_WALK_SPEED;
         if (this.isGameReady) {
