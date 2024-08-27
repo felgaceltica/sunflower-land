@@ -79,7 +79,6 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   CROPS_AND_CHICKENS: betaTimeBasedFeatureFlag(
     new Date("2024-08-07T00:00:00Z"),
   ),
-  FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2025-08-07T00:00:00Z")),
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   DESERT_RECIPES: defaultFeatureFlag,
