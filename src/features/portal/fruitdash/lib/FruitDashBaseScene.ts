@@ -108,7 +108,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   }
   async create() {
     this.physics.world.setFPS(60);
-    this.physics.world.drawDebug = true;
+    this.physics.world.drawDebug = false;
     this.initialiseCamera();
     this.initialiseSounds();
     this.initialiseControls();
