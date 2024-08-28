@@ -78,10 +78,16 @@ export class FruitDashGroundFactory {
     const imageLeft = this._scene.add.image(x, y, "SunnySideSprites", 454);
     imageLeft.setOrigin(0, 0);
     container.add(imageLeft);
+    const fenceLeft = this._scene.add.image(x, y, "SunnySideSprites", 232);
+    fenceLeft.setOrigin(0, 0);
+    container.add(fenceLeft);
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     const imageRight = this._scene.add.image(x, y, "SunnySideSprites", 515);
     imageRight.setOrigin(0, 0);
     container.add(imageRight);
+    const fenceRight = this._scene.add.image(x, y, "SunnySideSprites", 232);
+    fenceRight.setOrigin(0, 0);
+    container.add(fenceRight);
     if (start) this.streetLines.unshift(container);
     else this.streetLines.push(container);
   }
