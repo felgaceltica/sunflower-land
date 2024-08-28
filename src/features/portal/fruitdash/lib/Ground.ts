@@ -7,7 +7,6 @@ import {
   GRASS_COLUMNS,
   FINAL_HEIGHT,
   GROUND_DEPTH,
-  MAX_DECORATIONS_LINES,
   MAX_OBSTACLES_LINES,
   BACKGROUND_SPEED_RATIO,
 } from "../util/FruitDashConstants";
@@ -24,7 +23,7 @@ export class FruitDashGroundFactory {
   public grassWeights = [90, 1, 1, 1, 1, 1, 1, 1];
   private streetLines: Phaser.GameObjects.Container[] = [];
   private backgroundLines: Phaser.GameObjects.Container[] = [];
-  nextDecoration: number = randomInt(0, MAX_DECORATIONS_LINES);
+  nextDecoration = 0; //randomInt(0, MAX_DECORATIONS_LINES);
   private _decorationsFactory: FruitDashDecorationFactory;
   nextObstacle: number = randomInt(0, MAX_OBSTACLES_LINES);
   private _obstaclesFactory: FruitDashObstacleFactory;
@@ -159,7 +158,7 @@ export class FruitDashGroundFactory {
       this.nextDecoration--;
     }
     if (this.nextDecoration < 0) {
-      this.nextDecoration = randomInt(0, MAX_DECORATIONS_LINES);
+      this.nextDecoration = 2; //randomInt(0, MAX_DECORATIONS_LINES);
       this._decorationsFactory.addRandomDecoration();
     }
     this._decorationsFactory.update(speed_factor);

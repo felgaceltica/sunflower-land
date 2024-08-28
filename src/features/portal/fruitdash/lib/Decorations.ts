@@ -21,8 +21,8 @@ export class FruitDashDecorationFactory {
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
-    // this.decorations["tree"] = new TreeDecoration(60);
-    this.decorations["flower"] = new FlowerDecoration(20);
+    this.decorations["tree"] = new TreeDecoration(60);
+    //this.decorations["flower"] = new FlowerDecoration(20);
     // this.decorations["bush"] = new BushDecoration(15);
     // this.decorations["mushroom"] = new MushroomDecoration(15);
     // this.decorations["choppedtree"] = new ChoppedTreeDecoration(10);
@@ -46,17 +46,17 @@ export class FruitDashDecorationFactory {
       keys[decorationindex ? decorationindex : 0]
     ] as FruitDashDecoration;
     const decorationToInsert = decoration.add(this._scene);
-    let intersects = false;
-    for (let index = 0; index < this.decorationsLines.length; index++) {
-      if (
-        Phaser.Geom.Intersects.RectangleToRectangle(
-          this.decorationsLines[index].getBounds(),
-          decorationToInsert.getBounds(),
-        )
-      ) {
-        intersects = true;
-      }
-    }
+    const intersects = false;
+    // for (let index = 0; index < this.decorationsLines.length; index++) {
+    //   if (
+    //     Phaser.Geom.Intersects.RectangleToRectangle(
+    //       this.decorationsLines[index].getBounds(),
+    //       decorationToInsert.getBounds(),
+    //     )
+    //   ) {
+    //     intersects = true;
+    //   }
+    // }
     if (intersects) {
       decorationToInsert.destroy();
     } else {
@@ -91,11 +91,12 @@ abstract class FruitDashDecoration {
 }
 class TreeDecoration extends FruitDashDecoration {
   add(scene: Phaser.Scene): Phaser.GameObjects.Container {
-    const baseX = getBaseX(2);
-    const container = scene.add.container(
-      baseX,
+    const containerbase = scene.add.container(
+      0,
       START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
     );
+    const baseX = getBaseXL(2);
+    const container = scene.add.container(baseX, 0);
     let image = scene.add.image(0, 0, "SunnySideSprites", 119);
     image.setOrigin(0, 0);
     container.add(image);
@@ -129,7 +130,45 @@ class TreeDecoration extends FruitDashDecoration {
     );
     image.setOrigin(0, 0);
     container.add(image);
-    return container;
+    containerbase.add(container);
+
+    const baseX1 = getBaseXR(2);
+    const container1 = scene.add.container(baseX1, 0);
+    let image1 = scene.add.image(0, 0, "SunnySideSprites", 119);
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(SQUARE_WIDTH_TEXTURE, 0, "SunnySideSprites", 120);
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(0, SQUARE_WIDTH_TEXTURE, "SunnySideSprites", 309);
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE,
+      "SunnySideSprites",
+      444,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      0,
+      SQUARE_WIDTH_TEXTURE * 2,
+      "SunnySideSprites",
+      507,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE * 2,
+      "SunnySideSprites",
+      508,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    containerbase.add(container1);
+    return containerbase;
   }
 }
 class MushroomDecoration extends FruitDashDecoration {
@@ -226,6 +265,7 @@ class ChoppedTreeDecoration extends FruitDashDecoration {
   }
 }
 function getBaseX(squares: number): number {
+  return GRASS_LEFT_MAX - (GRASS_LEFT_MAX - GRASS_LEFT_MIN) / 4;
   //Left or right
   if (randomBoolean()) {
     return randomInt(
@@ -238,4 +278,11 @@ function getBaseX(squares: number): number {
       GRASS_RIGHT_MAX - squares * SQUARE_WIDTH_TEXTURE,
     );
   }
+}
+
+function getBaseXL(squares: number): number {
+  return GRASS_LEFT_MAX - 15 - squares * SQUARE_WIDTH_TEXTURE; // - ((GRASS_LEFT_MAX - GRASS_LEFT_MIN) / 4);
+}
+function getBaseXR(squares: number): number {
+  return GRASS_RIGHT_MIN + 15; // + ((GRASS_RIGHT_MAX - GRASS_RIGHT_MIN) / 4);
 }

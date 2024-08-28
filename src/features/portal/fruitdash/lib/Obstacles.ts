@@ -134,7 +134,7 @@ export class FruitDashObstacleFactory {
         currentScore = this._scene.portalService?.state?.context?.score;
       }
       if (currentScore > 500) {
-        (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0.2);
+        (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0.3);
         (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(2);
       } else {
         (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0);
@@ -299,7 +299,7 @@ export class FruitDashObstacleFactory {
                   Math.round(obstacle.getPoints() * this._scene.speed),
                 );
                 this._scene.portalService?.send("GAIN_POINTS", {
-                  points: obstacle.getPoints() * this._scene.speed,
+                  points: obstacle.getPoints() * (this._scene.speed * 1.1),
                 });
               } else if (obstacle.isObstacle() && !this._scene.ghost) {
                 obstacle.markProcessed();
