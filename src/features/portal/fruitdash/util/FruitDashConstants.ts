@@ -108,7 +108,7 @@ export const SPEED_INCREMENT = 0.12;
 export const INITIAL_WALK_SPEED = 70;
 export const MAX_WALK_SPEED = 150;
 export const WALK_SPEED_INCREMENT = 5;
-export const BACKGROUND_SPEED_RATIO = 3;
+export const BACKGROUND_SPEED_RATIO = 2;
 export type FruitDashNPCName = "Felga";
 export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
   Felga: {
