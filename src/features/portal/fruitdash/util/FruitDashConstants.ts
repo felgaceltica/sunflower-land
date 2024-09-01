@@ -116,10 +116,9 @@ export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
     shirt: "Skull Shirt",
     pants: "Farmer Pants",
     background: "Seashore Background",
-    necklace: "Green Amulet",
     hat: "Feather Hat",
     body: "Beige Farmer Potion",
     shoes: "Yellow Boots",
-    tool: "Sunflower Rod",
+    tool: "Farmer Pitchfork",
   },
 };
