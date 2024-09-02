@@ -39,6 +39,7 @@ import { getImageUrl } from "lib/utils/getImageURLS";
 import { MachineState } from "features/game/lib/gameMachine";
 import { Context as GameContext } from "features/game/GameProvider";
 import { GameWallet } from "features/wallet/Wallet";
+import { formatEther } from "viem";
 
 const imageDomain = CONFIG.NETWORK === "mainnet" ? "buds" : "testnet-buds";
 
@@ -49,7 +50,7 @@ export function transferInventoryItem(
   >,
   setTo: React.Dispatch<
     React.SetStateAction<Partial<Record<InventoryItemName, Decimal>>>
-  >
+  >,
 ) {
   let amount = new Decimal(1);
 
@@ -85,7 +86,7 @@ interface Props {
       | "wearableIds"
       | "wearableAmounts"
       | "budIds"
-    >
+    >,
   ) => void;
   onClose?: () => void;
   onLoaded?: (loaded: boolean) => void;
@@ -151,7 +152,7 @@ const DepositOptions: React.FC<Props> = ({
     if (status !== "loading") return;
     // Load balances from the user's personal wallet
     const loadBalances = async () => {
-      if (!wallet.myAccount) {
+      if (!wallet.getAccount()) {
         setStatus("error");
         // Notify parent that we're done loading
         onLoaded && onLoaded(false);
@@ -159,24 +160,18 @@ const DepositOptions: React.FC<Props> = ({
       }
 
       try {
-        const sflBalanceFn = sflBalanceOf(
-          wallet.web3Provider,
-          wallet.myAccount
-        );
+        const sflBalanceFn = sflBalanceOf(wallet.getAccount() as `0x${string}`);
 
         const inventoryBalanceFn = getInventoryBalances(
-          wallet.web3Provider,
-          wallet.myAccount
+          wallet.getAccount() as `0x${string}`,
         );
 
         const wearableBalanceFn = loadWardrobe(
-          wallet.web3Provider,
-          wallet.myAccount
+          wallet.getAccount() as `0x${string}`,
         );
 
         const budBalanceFn = getBudsBalance(
-          wallet.web3Provider,
-          wallet.myAccount
+          wallet.getAccount() as `0x${string}`,
         );
 
         const [sflBalance, inventoryBalance, wearableBalance, budBalance] =
@@ -187,7 +182,7 @@ const DepositOptions: React.FC<Props> = ({
             budBalanceFn,
           ]);
 
-        setSflBalance(new Decimal(fromWei(sflBalance)));
+        setSflBalance(new Decimal(formatEther(sflBalance)));
         setInventoryBalance(balancesToInventory(inventoryBalance));
         setWardrobeBalance(wearableBalance);
         setBudBalance(budBalance);
@@ -273,12 +268,12 @@ const DepositOptions: React.FC<Props> = ({
   const handleDeposit = async () => {
     const itemIds = selectedItems.map((item) => KNOWN_IDS[item]);
     const itemAmounts = selectedItems.map((item) =>
-      toWei(inventoryToDeposit[item]?.toString() as string, getItemUnit(item))
+      toWei(inventoryToDeposit[item]?.toString() as string, getItemUnit(item)),
     );
 
     const wearableIds = selectedWearables.map((item) => ITEM_IDS[item]);
     const wearableAmounts = selectedWearables.map(
-      (item) => wearablesToDeposit[item]
+      (item) => wearablesToDeposit[item],
     ) as number[];
 
     onDeposit({
@@ -294,7 +289,7 @@ const DepositOptions: React.FC<Props> = ({
   };
 
   const amountGreaterThanBalance = toBN(toWei(sflDepositAmount.toString())).gt(
-    toBN(toWei(sflBalance.toString()))
+    toBN(toWei(sflBalance.toString())),
   );
 
   const sflBalString = fromWei(toBN(toWei(sflBalance.toString())));
@@ -367,7 +362,7 @@ const DepositOptions: React.FC<Props> = ({
                             "text-shadow shadow-inner shadow-black bg-brown-200 w-full p-2",
                             {
                               "text-error": amountGreaterThanBalance,
-                            }
+                            },
                           )}
                         />
                         <span className="text-xxs md:text-xs absolute top-1/2 -translate-y-1/2 right-2">{`${
@@ -547,7 +542,7 @@ interface DepositModalProps {
   farmAddress: string;
   showDepositModal: boolean;
   handleDeposit: (
-    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">
+    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">,
   ) => void;
   handleClose: () => void;
 }
@@ -578,7 +573,7 @@ export const DepositWrapper: React.FC = () => {
   const farmAddress = useSelector(gameService, _farmAddress);
 
   const handleDeposit = (
-    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">
+    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">,
   ) => {
     gameService.send("DEPOSIT", args);
   };

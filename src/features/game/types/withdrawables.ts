@@ -1156,7 +1156,7 @@ export const WITHDRAWABLES: Record<InventoryItemName, () => boolean> = {
       ...acc,
       [key]: DECORATION_TEMPLATES[key]?.isWithdrawable ?? (() => false),
     }),
-    {} as Record<TemplateDecorationName, () => boolean>
+    {} as Record<TemplateDecorationName, () => boolean>,
   ),
 };
 
@@ -1596,4 +1596,9 @@ export const BUMPKIN_WITHDRAWABLES: Record<
   "Goblin Medallion": () => false,
   "Nightshade Medallion": () => false,
   "Sunflorian Medallion": () => false,
+
+  // Map Background
+  "Pumpkin Plaza Background": () => false,
+  "Goblin Retreat Background": () => false,
+  "Kingdom Background": () => false,
 };
