@@ -37,8 +37,9 @@ import {
   TRADE_LIMITS,
   TRADE_MINIMUMS,
 } from "features/game/actions/tradeLimits";
+import { PIXEL_SCALE } from "features/game/lib/constants";
+import { CannotTrade } from "features/world/ui/CannotTrade";
 
-const MAX_NON_VIP_LISTINGS = 1;
 const MAX_SFL = 150;
 
 const ISLAND_LIMITS: Record<IslandType, number> = {
@@ -175,8 +176,8 @@ const ListTrade: React.FC<{
             unitPrice.lessThan(floorPrices[selected] ?? 0)
               ? "danger"
               : unitPrice.greaterThan(floorPrices[selected] ?? 0)
-              ? "success"
-              : "warning"
+                ? "success"
+                : "warning"
           }
           className="my-1"
         >
@@ -195,7 +196,7 @@ const ListTrade: React.FC<{
                 new Decimal(floorPrices[selected] ?? 0).mul(0.8),
                 {
                   decimalPlaces: 4,
-                }
+                },
               ),
             })}
           </Label>
@@ -207,7 +208,7 @@ const ListTrade: React.FC<{
                 new Decimal(floorPrices[selected] ?? 0).mul(1.2),
                 {
                   decimalPlaces: 4,
-                }
+                },
               ),
             })}
           </Label>
@@ -250,14 +251,14 @@ const ListTrade: React.FC<{
               // auto generate price
               if (floorPrices[selected]) {
                 const estimated = setPrecision(
-                  new Decimal(floorPrices[selected] ?? 0).mul(value)
+                  new Decimal(floorPrices[selected] ?? 0).mul(value),
                 );
                 setSfl(estimated);
               }
             }}
           />
         </div>
-        <div className="flex-1 flex flex-col items-end ml-2">
+        <div className="flex-1 flex flex-col items-end">
           <div className="flex items-center">
             {sfl.greaterThan(MAX_SFL) && (
               <Label type="danger" className="my-1 ml-2 mr-1">
@@ -385,8 +386,8 @@ const TradeDetails: React.FC<{
                       (name !== "Tomato" && name !== "Lemon") ||
                       hasFeatureAccess(
                         gameService.state.context.state,
-                        "NEW_FRUITS"
-                      )
+                        "NEW_FRUITS",
+                      ),
                   )
                   .map((name) => (
                     <Box
@@ -474,7 +475,7 @@ export const Trade: React.FC<{
   const trades = gameState.context.state.trades?.listings ?? {};
   const { t } = useAppTranslation();
   const level = getBumpkinLevel(
-    gameState.context.state.bumpkin?.experience ?? 0
+    gameState.context.state.bumpkin?.experience ?? 0,
   );
 
   const onList = (items: Items, sfl: number) => {
@@ -500,18 +501,7 @@ export const Trade: React.FC<{
   };
 
   if (level < 10) {
-    return (
-      <div className="relative">
-        <div className="p-1 flex flex-col items-center">
-          <img
-            src={SUNNYSIDE.icons.lock}
-            className="w-1/5 mx-auto my-2 img-highlight-heavy"
-          />
-          <p className="text-sm">{t("bumpkinTrade.minLevel")}</p>
-          <p className="text-xs mb-2">{t("statements.lvlUp")}</p>
-        </div>
-      </div>
-    );
+    return <CannotTrade />;
   }
 
   if (showListing) {
@@ -553,7 +543,9 @@ export const Trade: React.FC<{
         <div className="p-1 flex flex-col items-center">
           <img
             src={tradeIcon}
-            className="w-1/5 mx-auto my-2 img-highlight-heavy"
+            style={{
+              width: `${PIXEL_SCALE * 17}px`,
+            }}
           />
           <p className="text-sm">{t("bumpkinTrade.noTradeListed")}</p>
           <p className="text-xs mb-2">{t("bumpkinTrade.sell")}</p>
@@ -595,7 +587,7 @@ export const Trade: React.FC<{
         .filter((listingId) => {
           const items = Object.keys(trades[listingId].items);
           return !items.some((item) =>
-            Object.values(FACTION_EMBLEMS).includes(item as FactionEmblem)
+            Object.values(FACTION_EMBLEMS).includes(item as FactionEmblem),
           );
         })
         .map((listingId, index) => {
