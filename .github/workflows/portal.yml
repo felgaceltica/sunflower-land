@@ -43,7 +43,7 @@ jobs:
           VITE_PORTAL_DONATION_ADDRESS: "0xB5228e9f7B488aE9B79ea655Fb43C50A1499a0F3"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1.5.9
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.PORTAL_DEPLOY_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.PORTAL_DEPLOY_SECRET }}
