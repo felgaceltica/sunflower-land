@@ -51,6 +51,7 @@ import {
   RESTOCK_ATTEMPTS_SFL,
   UNLIMITED_ATTEMPTS_SFL,
   DAILY_ATTEMPTS,
+  RESTOCK_ATTEMPTS,
 } from "./FruitDashConstants";
 
 /**
@@ -85,7 +86,7 @@ export const getAttemptsLeft = (minigame?: Minigame) => {
 
   const attemptsToday = history[dateKey]?.attempts ?? 0;
   const attemptsLeft =
-    DAILY_ATTEMPTS - attemptsToday + DAILY_ATTEMPTS * restockedCount;
+    DAILY_ATTEMPTS - attemptsToday + RESTOCK_ATTEMPTS * restockedCount;
 
   return attemptsLeft;
 };

@@ -10,8 +10,8 @@ import { PortalMachineState } from "../../lib/FruitDashMachine";
 import sfl from "assets/icons/sfl.webp";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import {
-  DAILY_ATTEMPTS,
   FRUIT_DASH_NPC_WEREABLES,
+  RESTOCK_ATTEMPTS,
   RESTOCK_ATTEMPTS_SFL,
   UNLIMITED_ATTEMPTS_SFL,
 } from "../../util/FruitDashConstants";
@@ -76,7 +76,7 @@ export const FruitDashNoAttemptsPanel: React.FC = () => {
           }
         >
           {t("fruit-dash.buyAttempts", {
-            attempts: DAILY_ATTEMPTS,
+            attempts: RESTOCK_ATTEMPTS,
             sfl: RESTOCK_ATTEMPTS_SFL,
           })}
         </Button>
