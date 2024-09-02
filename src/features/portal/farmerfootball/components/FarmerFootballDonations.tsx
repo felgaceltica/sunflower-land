@@ -99,7 +99,7 @@ export const FarmerFootballDonations: React.FC = () => {
               </div>
             </div>
             <span className="text-xs font-secondary my-2">
-              {t("amount.matic")}
+              {t("amount.pol")}
             </span>
           </div>
 

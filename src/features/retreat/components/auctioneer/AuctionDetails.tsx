@@ -17,7 +17,6 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { GameState } from "features/game/types/game";
 import { getImageUrl } from "lib/utils/getImageURLS";
 import classNames from "classnames";
-import { translateTerms } from "lib/i18n/translate";
 
 type Props = {
   item: Auction;
@@ -73,7 +72,7 @@ export const AuctionDetails: React.FC<Props> = ({
 
   const hasIngredients =
     getKeys(item.ingredients).every((name) =>
-      (game.inventory[name] ?? new Decimal(0)).gte(item.ingredients[name] ?? 0)
+      (game.inventory[name] ?? new Decimal(0)).gte(item.ingredients[name] ?? 0),
     ) ?? false;
 
   const MintButton = () => {
@@ -134,9 +133,7 @@ export const AuctionDetails: React.FC<Props> = ({
         )}
 
         <p className="text-center text-xs mb-3">
-          {isCollectible
-            ? translateTerms(ITEM_DETAILS[item.collectible].description)
-            : ""}
+          {isCollectible ? ITEM_DETAILS[item.collectible].description : ""}
         </p>
 
         <div className="relative mb-2">

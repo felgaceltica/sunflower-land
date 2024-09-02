@@ -130,7 +130,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
               this.alert?.destroy();
             }
           }
-        }
+        },
       );
     }
 
@@ -146,10 +146,6 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
   get directionFacing() {
     return this.direction;
-  }
-
-  get isWalking() {
-    return !!this.sprite?.anims?.currentAnim?.key?.includes("bumpkin-walking");
   }
 
   private async loadSprites(scene: Phaser.Scene) {
@@ -285,7 +281,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.scene.anims.create({
       key: this.drillAnimationKey,
       frames: this.scene.anims.generateFrameNumbers(
-        this.drillAnimationKey as string
+        this.drillAnimationKey as string,
       ),
       frameRate: 10,
       repeat: -1,
@@ -298,7 +294,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.scene.anims.create({
       key: this.digAnimationKey,
       frames: this.scene.anims.generateFrameNumbers(
-        this.digAnimationKey as string
+        this.digAnimationKey as string,
       ),
       frameRate: 10,
       repeat: -1,
@@ -315,7 +311,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         {
           start: 0,
           end: 8,
-        }
+        },
       ),
       repeat: -1,
       frameRate: 10,
@@ -332,7 +328,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         {
           start: 0,
           end: 7,
-        }
+        },
       ),
       repeat: -1,
       frameRate: 10,
@@ -349,7 +345,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         {
           start: 0,
           end: 7,
-        }
+        },
       ),
       repeat: -1,
       frameRate: 10,
@@ -366,7 +362,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         {
           start: 0,
           end: 7,
-        }
+        },
       ),
       repeat: -1,
       frameRate: 10,
@@ -485,7 +481,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
           {
             frameWidth: 20,
             frameHeight: 19,
-          }
+          },
         );
 
         backauraLoader.once(Phaser.Loader.Events.COMPLETE, () => {
@@ -525,7 +521,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
           {
             frameWidth: 20,
             frameHeight: 19,
-          }
+          },
         );
 
         frontauraLoader.once(Phaser.Loader.Events.COMPLETE, () => {
@@ -628,7 +624,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.speech = new SpeechBubble(
       this.scene,
       text,
-      this.sprite?.scaleX === 1 ? "right" : "left"
+      this.sprite?.scaleX === 1 ? "right" : "left",
     );
     this.add(this.speech);
 
@@ -676,7 +672,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         "Teeny Tiny Pixls",
         `+${quantity}`,
         5,
-        1
+        1,
       );
       label.setX(-label.width);
       offsetReaction = true;
@@ -896,7 +892,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         if (p.downElement.nodeName === "CANVAS") {
           onClick();
         }
-      }
+      },
     );
   }
 }

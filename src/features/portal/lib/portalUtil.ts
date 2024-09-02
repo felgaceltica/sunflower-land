@@ -43,7 +43,7 @@ export function purchase({
         sfl,
         items,
       },
-      "*"
+      "*",
     );
   } else {
     // Ask parent to confirm
@@ -63,7 +63,7 @@ export function donate({ matic, address }: { matic: number; address: string }) {
         matic,
         address,
       },
-      "*"
+      "*",
     );
   } else {
     // Ask parent to confirm
@@ -94,18 +94,6 @@ export function submitScore({ score }: { score: number }) {
 }
 
 /**
- * @deprecated Use `attemptStarted` and `scoreSubmitted` instead
- * When to want to store the score
- */
-export function played({ score }: { score: number }) {
-  if (!isInIframe) {
-    alert(`Sunflower Land running in test mode - played`);
-  } else {
-    window.parent.postMessage({ event: "played", score }, "*");
-  }
-}
-
-/**
  * When a player unlocks achievements
  */
 export function achievementsUnlocked({
@@ -118,7 +106,7 @@ export function achievementsUnlocked({
   } else {
     window.parent.postMessage(
       { event: "achievementsUnlocked", achievementNames },
-      "*"
+      "*",
     );
   }
 }
