@@ -323,11 +323,11 @@ export class FruitDashObstacleFactory {
                 }
                 if (obstacle.getName() == "slowdown") {
                   this._scene.speed =
-                    this._scene.speed - this._scene.speed * 0.3;
+                    this._scene.speed - this._scene.speed * 0.2;
                   if (this._scene.speed < INITIAL_SPEED)
                     this._scene.speed = INITIAL_SPEED;
                   this._scene.walkingSpeed =
-                    this._scene.walkingSpeed - this._scene.walkingSpeed * 0.3;
+                    this._scene.walkingSpeed - this._scene.walkingSpeed * 0.2;
                   if (this._scene.walkingSpeed < INITIAL_WALK_SPEED)
                     this._scene.walkingSpeed = INITIAL_WALK_SPEED;
                   // this._scene.next_speed = this._scene.speed;
