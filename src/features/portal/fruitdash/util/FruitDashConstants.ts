@@ -3,7 +3,7 @@ import { Equipped } from "features/game/types/bumpkin";
 import { ITEM_DETAILS } from "features/game/types/images";
 import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
 
-export const ZOOM = window.innerWidth < 500 ? 3 : 4;
+export const ZOOM = window.innerWidth < 500 ? 2 : 4;
 export const SQUARE_WIDTH_TEXTURE = 18;
 export const STREET_COLUMNS = 6;
 export const TOTAL_LINES =

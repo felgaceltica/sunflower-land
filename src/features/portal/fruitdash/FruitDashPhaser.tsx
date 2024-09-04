@@ -24,7 +24,7 @@ export const FruitDashPhaser: React.FC = () => {
       type: AUTO,
       fps: {
         //min: 30,
-        //limit: 30,
+        //limit: 60,
         target: 60,
         smoothStep: true,
       },

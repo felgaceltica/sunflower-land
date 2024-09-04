@@ -115,7 +115,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     });
   }
   async create() {
-    this.physics.world.setFPS(60);
+    //this.physics.world.setFPS(30);
     this.physics.world.drawDebug = false;
     this.initialiseCamera();
     this.initialiseSounds();
@@ -157,7 +157,8 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   }
   async update(time: number, delta: number) {
     const speed_factor = delta / (1000 / 60); // 1000 ms / 60fps
-    this.updatePlayer(speed_factor);
+    const player_speed_factor = 16 / (1000 / 60); // 1000 ms / 60fps
+    this.updatePlayer(player_speed_factor);
     this.groundFactory.update(speed_factor);
   }
   public get isGamePlaying() {
