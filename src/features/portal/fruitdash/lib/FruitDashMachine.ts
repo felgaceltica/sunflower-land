@@ -301,7 +301,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign<Context, any>({
             startedAt: (context: any) => 0,
             state: (context: any) => {
-              submitScore({ score: context.score });
+              submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
                 state: context.state,
                 action: {
@@ -318,7 +318,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "gameOver",
           actions: assign({
             state: (context: any) => {
-              submitScore({ score: context.score });
+              submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
                 state: context.state,
                 action: {
