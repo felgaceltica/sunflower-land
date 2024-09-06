@@ -68,7 +68,8 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     | Phaser.Sound.WebAudioSound;
   leftButton!: Phaser.GameObjects.Image;
   rightButton!: Phaser.GameObjects.Image;
-  axeButton!: Phaser.GameObjects.Image;
+  axeButtonCount!: Phaser.GameObjects.Text;
+  axeButton!: Phaser.GameObjects.Container;
   mobileKeys!: {
     left: boolean;
     right: boolean;
@@ -101,10 +102,10 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.image("Orange", ITEM_DETAILS["Orange"].image);
     this.load.image("Blueberry", ITEM_DETAILS["Blueberry"].image);
     this.load.image("ghost", SUNNYSIDE.resource.magic_mushroom);
-    this.load.image("axe", SUNNYSIDE.tools.axe);
+    this.load.image("axe", SUNNYSIDE.tools.gold_pickaxe);
 
     this.load.svg("arrow", "world/fruitdash/arrow.svg");
-    this.load.svg("axebutton", "world/fruitdash/axe.svg");
+    this.load.image("axebutton", "world/fruitdash/pickaxe.png");
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,
       "death",
@@ -160,6 +161,10 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     const player_speed_factor = 16 / (1000 / 60); // 1000 ms / 60fps
     this.updatePlayer(player_speed_factor);
     this.groundFactory.update(speed_factor);
+    if (this.portalService?.state?.context?.axes) {
+      const currentAxes = this.portalService?.state?.context?.axes;
+      this.axeButtonCount.text = currentAxes.toString();
+    }
   }
   public get isGamePlaying() {
     return this.portalService?.state.matches("playing") === true;
@@ -357,10 +362,12 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       this.rightButton = this.add
         .image(
           centerX + realWidth / 3.25,
-          window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
+          window.innerHeight / 2 +
+            SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3) -
+            5,
           "arrow",
         )
-        .setScale(0.08, 0.08)
+        .setScale(0.11, 0.11)
         .setAlpha(0.2)
         .setInteractive()
         .setDepth(1000)
@@ -375,15 +382,24 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
             this.mobileKeys.right = false;
           }
           this.rightButton.setAlpha(0.2);
+        })
+        .on("pointerout", () => {
+          if (this.mobileKeys) {
+            this.mobileKeys.right = false;
+          }
+          this.rightButton.setAlpha(0.2);
         });
+
       this.rightButton.flipX = true;
       this.leftButton = this.add
         .image(
           centerX - realWidth / 3.25,
-          window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
+          window.innerHeight / 2 +
+            SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3) -
+            5,
           "arrow",
         )
-        .setScale(0.08, 0.08)
+        .setScale(0.11, 0.11)
         .setAlpha(0.2)
         .setInteractive()
         .setDepth(1000)
@@ -398,25 +414,66 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
             this.mobileKeys.left = false;
           }
           this.leftButton.setAlpha(0.2);
+        })
+        .on("pointerout", () => {
+          if (this.mobileKeys) {
+            this.mobileKeys.left = false;
+          }
+          this.leftButton.setAlpha(0.2);
         });
 
-      this.axeButton = this.add
-        .image(
-          centerX,
-          window.innerHeight / 2 + SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3),
-          "axebutton",
-        )
-        .setScale(0.06, 0.06)
-        .setAlpha(0.2)
+      const container = this.add.container(
+        centerX,
+        window.innerHeight / 2 +
+          SQUARE_WIDTH_TEXTURE * (TOTAL_LINES / 2 - 3) -
+          5,
+      );
+
+      const image = this.add
+        .image(0, 0, "axebutton")
+        .setScale(0.08, 0.08)
         .setInteractive()
-        .setDepth(1000)
         .on("pointerdown", () => {
           this.throwAxe();
           this.axeButton.setAlpha(0.8);
         })
         .on("pointerup", () => {
           this.axeButton.setAlpha(0.2);
+        })
+        .on("pointerout", () => {
+          this.axeButton.setAlpha(0.2);
         });
+
+      container.add(image);
+      container.setAlpha(0.2).setDepth(1000);
+
+      const rect = new Phaser.Geom.Circle(
+        (image.width / 2) * image.scaleX,
+        (image.height / 2) * image.scaleX * -1,
+        8,
+      );
+      const graphics = new Phaser.GameObjects.Graphics(this, {
+        lineStyle: { width: 2, color: 0x000000 },
+        fillStyle: { color: 0x000000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      //graphics.lineStyle(2, 0x000000);
+      graphics.strokeCircleShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+      this.add.text;
+      this.axeButtonCount = this.add
+        .text(rect.x, rect.y, "0", {
+          fontSize: "12px",
+          resolution: 4,
+          align: "center",
+          fontFamily: "monospace",
+          //padding: { x: 2, y: 2 },
+          color: "#000",
+        })
+        .setOrigin(0.5, 0.5);
+      container.add(this.axeButtonCount);
+      this.axeButton = container;
 
       this.portalService?.send("SET_JOYSTICK_ACTIVE", {
         isJoystickActive: true,

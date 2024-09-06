@@ -32,6 +32,7 @@ export type Scenes = {
   portal_example: Room<PlazaRoomState> | undefined;
   goblin_invasion: Room<PlazaRoomState> | undefined;
   fruit_dash: Room<PlazaRoomState> | undefined;
+  irrigate: Room<PlazaRoomState> | undefined;
 };
 
 export type SceneId = keyof Scenes;

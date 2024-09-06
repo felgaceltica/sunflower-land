@@ -7,17 +7,19 @@ import { Button } from "components/ui/Button";
 
 import { PortalContext, PortalProvider } from "./lib/PortalProvider";
 import { WalletProvider } from "features/wallet/WalletProvider";
-import { FruitDashHud } from "./components/hud/FruitDashHud";
-import { FruitDashPhaser } from "./FruitDashPhaser";
+import { Ocean } from "features/world/ui/Ocean";
+import { IrrigateHUD } from "./components/IrrigateHUD";
+import { IrrigatePhaser } from "./IrrigatePhaser";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { PortalMachineState } from "./lib/FruitDashMachine";
+import { PortalMachineState } from "./lib/IrrigateMachine";
 import { Loading } from "features/auth/components";
 import { CONFIG } from "lib/config";
-import { authorisePortal, claimPrize } from "../lib/portalUtil";
-import { FruitDashRulesPanel } from "./components/panels/FruitDashRulesPanel";
-import { FruitDashNoAttemptsPanel } from "./components/panels/FruitDashNoAttemptsPanel";
-import AchievementToastProvider from "./providers/AchievementToastProvider";
+import { authorisePortal } from "../lib/portalUtil";
+
+// import { IrrigateRulesPanel } from "./components/panels/IrrigateRulesPanel";
+// import { IrrigateNoAttemptsPanel } from "./components/panels/IrrigateNoAttemptsPanel";
+// import AchievementToastProvider from "./providers/AchievementToastProvider";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
 const _isError = (state: PortalMachineState) => state.matches("error");
@@ -32,17 +34,19 @@ const _isLoser = (state: PortalMachineState) => state.matches("loser");
 const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
 
-export const FruitDashApp: React.FC = () => {
+export const IrrigateApp: React.FC = () => {
   return (
     <WalletProvider>
       <PortalProvider>
-        <FruitDash />
+        <Ocean>
+          <Irrigate />
+        </Ocean>
       </PortalProvider>
     </WalletProvider>
   );
 };
 
-export const FruitDash: React.FC = () => {
+export const Irrigate: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
 
@@ -115,15 +119,15 @@ export const FruitDash: React.FC = () => {
 
   return (
     <div>
-      {isNoAttempts && (
+      {/* {isNoAttempts && (
         <Modal show>
-          <FruitDashNoAttemptsPanel />
+          <IrrigateNoAttemptsPanel />
         </Modal>
       )}
 
       {isIntroduction && (
         <Modal show>
-          <FruitDashRulesPanel
+          <IrrigateRulesPanel
             mode={"introduction"}
             showScore={false}
             showExitButton={true}
@@ -135,7 +139,7 @@ export const FruitDash: React.FC = () => {
 
       {isLoser && (
         <Modal show>
-          <FruitDashRulesPanel
+          <IrrigateRulesPanel
             mode={"failed"}
             showScore={true}
             showExitButton={true}
@@ -147,7 +151,7 @@ export const FruitDash: React.FC = () => {
 
       {isWinner && (
         <Modal show>
-          <FruitDashRulesPanel
+          <IrrigateRulesPanel
             mode={"success"}
             showScore={true}
             showExitButton={false}
@@ -159,7 +163,7 @@ export const FruitDash: React.FC = () => {
 
       {isComplete && (
         <Modal show>
-          <FruitDashRulesPanel
+          <IrrigateRulesPanel
             mode={"introduction"}
             showScore={true}
             showExitButton={true}
@@ -167,13 +171,15 @@ export const FruitDash: React.FC = () => {
             onConfirm={() => portalService.send("RETRY")}
           />
         </Modal>
-      )}
+      )} */}
 
       {sflBalance && (
-        <AchievementToastProvider>
-          <FruitDashHud />
-          <FruitDashPhaser />
-        </AchievementToastProvider>
+        <>
+          {/* <AchievementToastProvider> */}
+          <IrrigateHUD />
+          <IrrigatePhaser />
+          {/* </AchievementToastProvider> */}
+        </>
       )}
     </div>
   );

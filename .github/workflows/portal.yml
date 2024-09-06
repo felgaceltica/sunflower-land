@@ -1,5 +1,5 @@
 # Example Portal Deploy
-name: Portal deploy (new)
+name: Portal deploy (Fruit Dash)
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy:
-    concurrency: portal-deploy
+    concurrency: portal-deploy-fruit-dash
     environment: develop
     runs-on: ubuntu-latest
     steps:

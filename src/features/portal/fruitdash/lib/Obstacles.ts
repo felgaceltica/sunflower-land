@@ -85,15 +85,15 @@ export class FruitDashObstacleFactory {
   }
 
   public throwAxe() {
-    const obstacle = this.obstacles["axe"] as FruitDashObstacle;
-    const obstacleToInsert = obstacle.add(this._scene, "axe");
+    const obstacle = this.obstacles["axe"] as AxePowerUp;
+    const obstacleToInsert = obstacle.addThorawble(this._scene, "axe", true);
     obstacleToInsert.x = this._scene.currentPlayer
       ? this._scene.currentPlayer?.x
       : 0;
     obstacleToInsert.y = this._scene.currentPlayer
       ? this._scene.currentPlayer?.y
       : 0;
-    (obstacleToInsert.list[0] as Phaser.GameObjects.Image).setOrigin(0.5, 0.5);
+    obstacleToInsert.list[0] as Phaser.GameObjects.Image;
     obstacleToInsert.setDepth(OBSTACLES_DEPTH);
     this._scene.tweens.add({
       targets: obstacleToInsert,
@@ -367,6 +367,7 @@ export class FruitDashObstacleFactory {
                   });
                 } else if (obstacle.getName() == "axe") {
                   this._scene.portalService?.send("COLLECT_AXE");
+                  //this._scene.currentPlayer.react("Axe", this._scene.portalService?.state?.context?.axes);
                   this._scene.currentPlayer.react("Axe", 1);
                 }
               }
@@ -503,6 +504,7 @@ class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
       return this.getBounds();
     }
   }
+
   getCollisionCircle(): Phaser.Geom.Circle {
     if (this._collisionShape) {
       return new Phaser.Geom.Circle(
@@ -933,6 +935,13 @@ class GhostPowerUp extends FruitDashObstacle {
 
 class AxePowerUp extends FruitDashObstacle {
   add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    return this.addThorawble(scene, name, false);
+  }
+  addThorawble(
+    scene: FruitDashBaseScene,
+    name: string,
+    throwable: boolean,
+  ): FruitDashObstacleContainer {
     const container = new FruitDashObstacleContainer(
       scene,
       0,
@@ -943,7 +952,7 @@ class AxePowerUp extends FruitDashObstacle {
       name,
     );
     const image = scene.add.image(0, 0, "axe");
-    image.setOrigin(0, 0);
+
     container.add(image);
     const bounds = container.getBounds();
     const rect = new Phaser.Geom.Circle(
@@ -951,6 +960,15 @@ class AxePowerUp extends FruitDashObstacle {
       bounds.height / 2,
       bounds.width / 2,
     );
+    if (throwable) {
+      // image.x = image.width / 2;
+      // image.y = image.height / 2;
+      // image.setOrigin(0.5, 0.5);
+      rect.setPosition(0, 0);
+      rect.radius = rect.radius * 1.3;
+    } else {
+      image.setOrigin(0, 0);
+    }
     //Phaser.Geom.Rectangle.Inflate(rect, -2, -2);
     if (scene.physics.world.drawDebug) {
       const graphics = new Phaser.GameObjects.Graphics(scene, {
