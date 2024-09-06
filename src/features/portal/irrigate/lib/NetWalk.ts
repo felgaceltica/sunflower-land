@@ -1,4 +1,6 @@
 import _ from "lodash";
+import { IrrigateScene } from "../IrrigateScene";
+import { BOARD_SIZE } from "../util/IrrigateConstants";
 
 interface NetwalkOptions {
   rows?: number;
@@ -26,8 +28,12 @@ export class Netwalk {
   private toDraw: Phaser.Math.Vector2[] = [];
   private toRandomize: Phaser.Math.Vector2[] = [];
   private connectedCells: NewWalkVector[] = [];
+  private _scene: IrrigateScene;
+  private _boardContainer?: Phaser.GameObjects.Container;
+  private TILE_SIZE: number;
 
-  constructor(options: NetwalkOptions = {}) {
+  constructor(options: NetwalkOptions = {}, scene: IrrigateScene) {
+    this._scene = scene;
     const defaults: Required<NetwalkOptions> = {
       rows: 6,
       columns: 6,
@@ -49,7 +55,15 @@ export class Netwalk {
       line: [3, 12],
       tee: [13, 11, 14, 7],
     };
-
+    this.TILE_SIZE = BOARD_SIZE / this.options.rows;
+    this.serverVector = new NewWalkVector(1, 1, 0, 0);
+  }
+  public newGame() {
+    const { x, y, centerX, centerY, width, height } = this._scene.cameras.main;
+    this._boardContainer = this._scene.add.container(
+      centerX - BOARD_SIZE / 2,
+      centerY - BOARD_SIZE / 2,
+    );
     this.buildMatrix();
 
     this.serverVector = new NewWalkVector(
@@ -60,41 +74,110 @@ export class Netwalk {
     );
     //this.serverVector = new NewWalkVector(1, 1, 0, 0);
     this.putOnBoard(this.serverVector, 16);
-    //  while (this.tick()) {
-
-    //  }
+    this.generateBoard();
+    this.randomize();
     // console.log(this.board);
     // console.log(this.neighbours);
-    // console.log(this.board);
-    // const drawTicks = setInterval(() => {
-    //   if (!this.tick()) {
-    //     clearInterval(drawTicks);
-    //     this.drawingIsDone = true;
-    //   }
-    // }, 1);
+    this.drawBoard();
+  }
+  private drawBaseBoard() {
+    const boardRect = new Phaser.Geom.Rectangle(0, 0, BOARD_SIZE, BOARD_SIZE);
+    const graphics = new Phaser.GameObjects.Graphics(this._scene, {
+      lineStyle: { width: 1, color: 0x4da76f, alpha: 0.6 },
+      fillStyle: { color: 0xff0000, alpha: 0 },
+    });
+    graphics.alpha = 1;
+    graphics.strokeRectShape(boardRect);
+    for (let row = 1; row < this.options.rows; row++) {
+      const boardLine = new Phaser.Geom.Line(
+        0,
+        row * this.TILE_SIZE,
+        BOARD_SIZE,
+        row * this.TILE_SIZE,
+      );
+      graphics.strokeLineShape(boardLine);
+    }
+    for (let column = 1; column < this.options.columns; column++) {
+      const boardLine = new Phaser.Geom.Line(
+        column * this.TILE_SIZE,
+        0,
+        column * this.TILE_SIZE,
+        BOARD_SIZE,
+      );
+      graphics.strokeLineShape(boardLine);
+    }
+    this._boardContainer?.add(graphics);
+  }
+  private drawBoard() {
+    this._boardContainer?.removeAll();
+    for (let row = 0; row < this.options.rows; row++) {
+      for (let column = 0; column < this.options.columns; column++) {
+        const imageBoardIndex = row * this.options.rows + column;
+        const image = this._scene.add.image(
+          column * this.TILE_SIZE,
+          row * this.TILE_SIZE,
+          this.board[imageBoardIndex].toString(),
+        );
+        image
+          .setScale(this.TILE_SIZE / image.width, this.TILE_SIZE / image.height)
+          .setOrigin(0, 0)
+          .setInteractive()
+          .on("pointerup", () => {
+            this.rotate(imageBoardIndex);
+            this.drawBoard();
+          });
+        this._boardContainer?.add(image);
+      }
+    }
+    this.drawBaseBoard();
+    //this._boardContainer.
+  }
 
-    // const randomizeTicks = setInterval(() => {
-    //   if (!this.drawingIsDone) {
-    //     return;
-    //   }
+  private rotate(cell: number): void {
+    let className, figure;
+    figure = this.board[cell];
+    figure = this.turnFigure(figure);
+    this.board[cell] = figure;
+  }
 
-    //   if (!this.randomize()) {
-    //     this.draw();
-    //     clearInterval(randomizeTicks);
-    //     this.highlightConnectedNeighboursOf(this.serverVector);
-    //   }
-    // }, 1);
+  private randomize(): void {
+    while (this.toRandomize.length != 0) {
+      let figure, j;
+      const i = _.random(this.toRandomize.length - 1);
+      const vector = this.toRandomize[i];
+      const cell = this.getCellByVector(vector);
+      figure = this.board[cell];
+      j = _.random(3);
+      while (j) {
+        figure = this.turnFigure(figure);
+        --j;
+      }
+      this.board[cell] = figure;
+      this.toRandomize.splice(i, 1);
+    }
+  }
 
-    // this.container.on('selectstart', () => false).children().each((i, tail) => {
-    //   $(tail).on('click', (event) => {
-    //     this.rotate(i);
-    //     $('>', this.container).each(function() {
-    //       $(this).attr('class', 'tail');
-    //     });
-    //     this.connectedCells = [];
-    //     this.highlightConnectedNeighboursOf(this.serverVector);
-    //   });
-    // });
+  private turnFigure(figure: number): number {
+    let figureIndex, figures, newFigure, newFigureIndex;
+    newFigure = 0;
+    const type = this.typeOfFigure(figure);
+    if (type != null) {
+      figures = this.figures[type];
+      figureIndex = _.indexOf(figures, figure);
+      newFigureIndex = ++figureIndex < figures.length ? figureIndex : 0;
+      newFigure = figures[newFigureIndex];
+    }
+    return newFigure;
+  }
+
+  private typeOfFigure(figure: number): string | null {
+    let type;
+    for (type in this.figures) {
+      if (_.indexOf(this.figures[type], figure) !== -1) {
+        return type;
+      }
+    }
+    return null;
   }
 
   private buildMatrix(): void {
@@ -117,11 +200,6 @@ export class Netwalk {
         }
       }
     }
-    // for (let cell = 0; cell < this.options.columns! * this.options.rows!; cell++) {
-    //   this.container.append('<div class="tail"><div class="tail__blank"></div></div>');
-    // }
-    // console.log(this.board);
-    // console.log(this.neighbours);
   }
 
   private putOnBoard(vector: Phaser.Math.Vector2, directionBit: number) {
@@ -130,11 +208,7 @@ export class Netwalk {
       this.toDraw.push(vector);
       this.toRandomize.push(vector);
     }
-    // console.log(cell);
-    // console.log(this.board[cell]);
     this.board[cell] |= directionBit;
-    // console.log(directionBit);
-    // console.log(this.board[cell]);
     for (const d in this.Dir) {
       const nvector = this.addVector(vector, this.Dir[d]);
       const ncell = this.getCellByVector(nvector);
@@ -152,30 +226,24 @@ export class Netwalk {
     );
   }
 
-  private tick(): boolean {
-    if (this.toDraw.length === 0) {
-      return false;
-    }
-    let madeConnection = false;
-    while (!madeConnection && this.toDraw.length > 0) {
-      const i = _.random(this.toDraw.length - 1);
-      const vector = this.toDraw[i];
-      const cell = this.getCellByVector(vector);
-      const d = this.randomFreeDir(cell);
-      // console.log(d);
-      if (d) {
-        this.putOnBoard(vector, d.flag);
-        // console.log(vector.x, vector.y);
-        // console.log(d.x, d.y);
-        // console.log("-");
-        this.putOnBoard(this.addVector(vector, d), d.opposite);
-        madeConnection = true;
-      }
-      if ((this.neighbours[cell] & 15) === 0) {
-        this.toDraw.splice(i, 1);
+  private generateBoard(): void {
+    while (this.toDraw.length != 0) {
+      let madeConnection = false;
+      while (!madeConnection && this.toDraw.length > 0) {
+        const i = _.random(this.toDraw.length - 1);
+        const vector = this.toDraw[i];
+        const cell = this.getCellByVector(vector);
+        const d = this.randomFreeDir(cell);
+        if (d) {
+          this.putOnBoard(vector, d.flag);
+          this.putOnBoard(this.addVector(vector, d), d.opposite);
+          madeConnection = true;
+        }
+        if ((this.neighbours[cell] & 15) === 0) {
+          this.toDraw.splice(i, 1);
+        }
       }
     }
-    return true;
   }
 
   private getCellByVector(v: Phaser.Math.Vector2): number {
