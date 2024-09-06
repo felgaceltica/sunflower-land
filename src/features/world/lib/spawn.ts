@@ -183,4 +183,10 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 0,
     },
   },
+  irrigate: {
+    default: {
+      x: 0,
+      y: 0,
+    },
+  },
 });
