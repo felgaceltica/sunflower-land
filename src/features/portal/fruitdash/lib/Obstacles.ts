@@ -368,7 +368,7 @@ export class FruitDashObstacleFactory {
                 } else if (obstacle.getName() == "axe") {
                   this._scene.portalService?.send("COLLECT_AXE");
                   //this._scene.currentPlayer.react("Axe", this._scene.portalService?.state?.context?.axes);
-                  this._scene.currentPlayer.react("Axe", 1);
+                  this._scene.currentPlayer.react("Gold Pickaxe", 1);
                 }
               }
             }
