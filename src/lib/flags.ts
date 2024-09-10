@@ -48,7 +48,9 @@ export type FeatureName =
   | "SKILLS_REVAMP"
   | "MARKETPLACE"
   | "ONBOARDING_REWARDS"
-  | "FRUIT_DASH";
+  | "FRUIT_DASH"
+  | "IRRIGATE"
+  | "IRRIGATE_BETA_TESTING";
 
 // Used for testing production features
 export const ADMIN_IDS = [1, 3, 51, 39488, 128727];
@@ -96,6 +98,8 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   NEW_FRUITS: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
   DESERT_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-08-01T00:00:00Z")),
   FRUIT_DASH_BETA_TESTING: defaultFeatureFlag,
+  IRRIGATE_BETA_TESTING: defaultFeatureFlag,
+  IRRIGATE: defaultFeatureFlag,
   SKILLS_REVAMP: testnetFeatureFlag,
 };
 

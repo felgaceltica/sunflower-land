@@ -87,7 +87,11 @@ export function startAttempt() {
  */
 export function submitScore({ score }: { score: number }) {
   if (!isInIframe) {
-    alert(`Sunflower Land running in test mode - score submitted`);
+    alert(
+      `Sunflower Land running in test mode - score submitted (` +
+        score.toString() +
+        `)`,
+    );
   } else {
     window.parent.postMessage({ event: "scoreSubmitted", score }, "*");
   }

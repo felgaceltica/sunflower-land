@@ -27,15 +27,21 @@ export interface Context {
   jwt: string | null;
   isJoystickActive: boolean;
   state: GameState | undefined;
-  score: number;
-  axes: number;
-  startedAt: number;
+  movesLeft: number;
+  endAt: number;
+  solved: boolean;
   attemptsLeft: number;
+  score: number;
 }
 
-type GainPointsEvent = {
-  type: "GAIN_POINTS";
-  points: number;
+type StartEvent = {
+  type: "START";
+  duration: number;
+  totalMoves: number;
+};
+type MakeMoveEvent = {
+  type: "MAKE_MOVE";
+  solved: boolean;
 };
 
 // type UnlockAchievementsEvent = {
@@ -50,7 +56,6 @@ type SetJoystickActiveEvent = {
 
 export type PortalEvent =
   | SetJoystickActiveEvent
-  | { type: "START" }
   | { type: "CLAIM" }
   | { type: "CANCEL_PURCHASE" }
   | { type: "PURCHASED_RESTOCK" }
@@ -59,9 +64,8 @@ export type PortalEvent =
   | { type: "CONTINUE" }
   | { type: "END_GAME_EARLY" }
   | { type: "GAME_OVER" }
-  | GainPointsEvent
-  | { type: "COLLECT_AXE" }
-  | { type: "THROW_AXE" };
+  | StartEvent
+  | MakeMoveEvent;
 // | { type: "CROP_DEPOSITED" }
 // | { type: "KILL_PLAYER" }
 //| UnlockAchievementsEvent;
@@ -103,11 +107,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     isJoystickActive: false,
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
-
-    score: 0,
-    axes: 0,
+    movesLeft: 0,
     attemptsLeft: 0,
-    startedAt: 0,
+    solved: false,
+    endAt: 0,
+    score: 0,
   },
   on: {
     SET_JOYSTICK_ACTIVE: {
@@ -169,7 +173,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         },
         onDone: [
           {
-            target: "introduction",
+            target: "introduction", //TODO: introduction
             actions: assign({
               state: (_: any, event) => event.data.game,
               id: (_: any, event) => event.data.farmId,
@@ -249,10 +253,14 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       on: {
         START: {
           target: "playing",
-          actions: assign<Context>({
-            startedAt: () => Date.now(),
+          actions: assign<Context, any>({
+            endAt: (context: Context, event: StartEvent) => {
+              return Date.now() + event.duration;
+            },
+            movesLeft: (context: Context, event: StartEvent) => {
+              return event.totalMoves;
+            },
             score: 0,
-            axes: 0,
             state: (context: any) => {
               startAttempt();
               return startMinigameAttempt({
@@ -271,37 +279,16 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
 
     playing: {
       on: {
-        GAIN_POINTS: {
-          actions: assign<Context, any>({
-            score: (context: Context, event: GainPointsEvent) => {
-              return context.score + event.points;
-            },
-          }),
-        },
-        COLLECT_AXE: {
-          actions: assign<Context, any>({
-            axes: (context: Context, event: GainPointsEvent) => {
-              return context.axes + 1;
-            },
-          }),
-        },
-        THROW_AXE: {
-          actions: assign<Context, any>({
-            axes: (context: Context, event: GainPointsEvent) => {
-              return context.axes - 1;
-            },
-          }),
-        },
         END_GAME_EARLY: {
           actions: assign<Context, any>({
-            startedAt: (context: any) => 0,
+            endAt: (context: any) => 0,
             state: (context: any) => {
-              submitScore({ score: Math.round(context.score) });
+              submitScore({ score: 0 });
               return submitMinigameScore({
                 state: context.state,
                 action: {
                   type: "minigame.scoreSubmitted",
-                  score: Math.round(context.score),
+                  score: 0,
                   id: "irrigate",
                 },
               });
@@ -309,16 +296,29 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           }),
           target: "introduction",
         },
+        MAKE_MOVE: {
+          actions: assign<Context, any>({
+            solved: (context: Context, event: MakeMoveEvent) => {
+              return event.solved;
+            },
+            movesLeft: (context: Context, event: MakeMoveEvent) => {
+              return (context.movesLeft = context.movesLeft - 1);
+            },
+          }),
+        },
         GAME_OVER: {
           target: "gameOver",
           actions: assign({
             state: (context: any) => {
-              submitScore({ score: Math.round(context.score) });
+              const prize = context.state?.minigames.prizes["irrigate"];
+              //console.log(prize);
+              const scoretoSubmit = 0; //context.solved ? prize.score : 0;
+              submitScore({ score: Math.round(scoretoSubmit) });
               return submitMinigameScore({
                 state: context.state,
                 action: {
                   type: "minigame.scoreSubmitted",
-                  score: Math.round(context.score),
+                  score: Math.round(scoretoSubmit),
                   id: "irrigate",
                 },
               });
@@ -346,12 +346,12 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "winner",
           cond: (context) => {
-            const prize = context.state?.minigames.prizes["irrigate"];
-            if (!prize) {
-              return false;
-            }
+            // const prize = context.state?.minigames.prizes["irrigate"];
+            // if (!prize) {
+            //   return false;
+            // }
 
-            return context.score >= prize.score;
+            return context.solved && context.movesLeft >= 0;
           },
         },
         {

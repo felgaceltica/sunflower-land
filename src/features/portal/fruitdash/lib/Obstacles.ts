@@ -135,7 +135,7 @@ export class FruitDashObstacleFactory {
       }
       if (currentScore > 500) {
         (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0.3);
-        (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(2);
+        (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(3);
       } else {
         (this.obstacles["bounty"] as FruitDashObstacle).setWeight(0);
         (this.obstacles["slowdown"] as FruitDashObstacle).setWeight(0);

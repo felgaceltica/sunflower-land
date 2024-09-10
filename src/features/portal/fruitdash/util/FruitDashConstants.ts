@@ -3,7 +3,7 @@ import { Equipped } from "features/game/types/bumpkin";
 import { ITEM_DETAILS } from "features/game/types/images";
 import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
 
-export const ZOOM = window.innerWidth < 500 ? 2 : 4;
+export const ZOOM = window.innerWidth < 500 ? 2 : 3;
 export const SQUARE_WIDTH_TEXTURE = 18;
 export const STREET_COLUMNS = 6;
 export const TOTAL_LINES =
@@ -92,7 +92,7 @@ export const POWERUPS_SCORE_TABLE: {
     //description: "Slow down for 10 seconds - Chance after 500 points",
   },
   2: {
-    item: SUNNYSIDE.tools.axe,
+    item: SUNNYSIDE.tools.gold_pickaxe,
     description:
       "Collect axes and press space or hit the button to throw them at obstacles",
     //description: "Slow down for 10 seconds - Chance after 500 points",
@@ -106,8 +106,8 @@ export const MAX_DECORATIONS_LINES = 20;
 export const INITIAL_SPEED = 1.4;
 export const MAX_SPEED = 5;
 export const SPEED_INCREMENT = 0.12;
-export const INITIAL_WALK_SPEED = 90;
-export const MAX_WALK_SPEED = 150;
+export const INITIAL_WALK_SPEED = 100;
+export const MAX_WALK_SPEED = 170;
 export const WALK_SPEED_INCREMENT = 5;
 export const BACKGROUND_SPEED_RATIO = 2;
 export type FruitDashNPCName = "Felga";

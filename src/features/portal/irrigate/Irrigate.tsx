@@ -8,17 +8,17 @@ import { Button } from "components/ui/Button";
 import { PortalContext, PortalProvider } from "./lib/PortalProvider";
 import { WalletProvider } from "features/wallet/WalletProvider";
 import { Ocean } from "features/world/ui/Ocean";
-import { IrrigateHUD } from "./components/IrrigateHUD";
+import { IrrigateHud } from "./components/hud/IrrigateHud";
 import { IrrigatePhaser } from "./IrrigatePhaser";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "./lib/IrrigateMachine";
 import { Loading } from "features/auth/components";
 import { CONFIG } from "lib/config";
-import { authorisePortal } from "../lib/portalUtil";
+import { authorisePortal, claimPrize } from "../lib/portalUtil";
 
-// import { IrrigateRulesPanel } from "./components/panels/IrrigateRulesPanel";
-// import { IrrigateNoAttemptsPanel } from "./components/panels/IrrigateNoAttemptsPanel";
+import { IrrigateRulesPanel } from "./components/panels/IrrigateRulesPanel";
+import { IrrigateNoAttemptsPanel } from "./components/panels/IrrigateNoAttemptsPanel";
 // import AchievementToastProvider from "./providers/AchievementToastProvider";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
@@ -119,7 +119,7 @@ export const Irrigate: React.FC = () => {
 
   return (
     <div>
-      {/* {isNoAttempts && (
+      {isNoAttempts && (
         <Modal show>
           <IrrigateNoAttemptsPanel />
         </Modal>
@@ -171,12 +171,12 @@ export const Irrigate: React.FC = () => {
             onConfirm={() => portalService.send("RETRY")}
           />
         </Modal>
-      )} */}
+      )}
 
       {sflBalance && (
         <>
           {/* <AchievementToastProvider> */}
-          <IrrigateHUD />
+          <IrrigateHud />
           <IrrigatePhaser />
           {/* </AchievementToastProvider> */}
         </>
