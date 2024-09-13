@@ -824,7 +824,7 @@
   "irrigate.powerups": "Powerups",
   "irrigate.scoreDescription": "{{description}}.",
   "irrigate.score": "Score: {{score}}",
-  "irrigate.axes": "Axes: {{axes}}",
+  "irrigate.movesLeft": "Moves:",
   "irrigate.bestToday": "Best (today): {{score}}",
   "irrigate.bestAllTime": "Best (all-time): {{score}}",
   "irrigate.donationDescription": "This minigame is created for the community. Donations are greatly appreciated!",

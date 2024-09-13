@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { Game, AUTO } from "phaser";
 import NinePatchPlugin from "phaser3-rex-plugins/plugins/ninepatch-plugin.js";
+import GesturesPlugin from "phaser3-rex-plugins/plugins/gestures-plugin.js";
 
 import { Preloader } from "features/world/scenes/Preloader";
 import { PortalContext } from "./lib/PortalProvider";
@@ -37,17 +38,19 @@ export const IrrigatePhaser: React.FC = () => {
       autoRound: true,
       pixelArt: true,
       plugins: {
+        scene: [
+          {
+            key: "rexGestures",
+            plugin: GesturesPlugin,
+            mapping: "rexGestures",
+          },
+        ],
         global: [
           {
             key: "rexNinePatchPlugin",
             plugin: NinePatchPlugin,
             start: true,
           },
-          // {
-          //   key: "rexVirtualJoystick",
-          //   plugin: VirtualJoystickPlugin,
-          //   start: true,
-          // },
         ],
       },
       width: window.innerWidth,

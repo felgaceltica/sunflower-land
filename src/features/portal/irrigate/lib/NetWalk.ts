@@ -37,6 +37,7 @@ export class Netwalk {
   private totalMoves = 0;
   private boardSize = 0;
   private duration = 0;
+  private difficulty = 0;
 
   constructor(scene: IrrigateScene) {
     this._scene = scene;
@@ -60,6 +61,7 @@ export class Netwalk {
     this.connectedCells = [];
   }
   public newGame(difficulty: number) {
+    this.difficulty = difficulty;
     switch (difficulty) {
       case 1: //easy
         this.options.rows = 5;
@@ -275,7 +277,14 @@ export class Netwalk {
                       this._scene.movesLeft <= 0 ||
                       this._scene.portalService?.state?.context.solved
                     ) {
-                      this._scene.endGame();
+                      let score = 0;
+                      if (this._scene.portalService?.state?.context.solved) {
+                        const maxScore = this.minMoves * this.difficulty * 10;
+                        const moves = this.totalMoves - this._scene.movesLeft;
+                        score = maxScore - (this.minMoves - moves) * 10;
+                        //console.log(score);
+                      }
+                      this._scene.endGame(score);
                     }
                   }
                 },

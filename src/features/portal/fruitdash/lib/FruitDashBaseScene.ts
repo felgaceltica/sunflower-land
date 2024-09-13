@@ -34,9 +34,12 @@ import { getAnimationUrl } from "features/world/lib/animations";
 import { ITEM_DETAILS } from "features/game/types/images";
 import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
 import { SUNNYSIDE } from "assets/sunnyside";
+import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
+import RexGesturePlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 
 export abstract class FruitDashBaseScene extends Phaser.Scene {
-  //joystick?: VirtualJoystick;
+  joystick?: VirtualJoystick;
+  rexGestures: RexGesturePlugin | undefined;
   sceneId: SceneId = "fruit_dash";
   speed = INITIAL_SPEED;
   next_speed = INITIAL_SPEED;
@@ -225,12 +228,18 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
         this.rightButton.visible = false;
         this.axeButton.visible = false;
       }
+
       this.movementAngle = this.keysToAngle(
         this.mobileKeys.left,
         this.mobileKeys.right,
         false,
         false,
       );
+
+      // // joystick is active if force is greater than zero
+      // this.movementAngle = this.joystick?.force
+      //   ? this.joystick?.angle
+      //   : undefined;
     } else {
       this.movementAngle = undefined;
     }
@@ -262,9 +271,20 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     const currentPlayerBody = this.currentPlayer
       .body as Phaser.Physics.Arcade.Body;
     if (this.movementAngle !== undefined) {
+      // let cursorKeys = this.joystick?.createCursorKeys();
+      // let left = false;
+      // let right = false
+      // if(cursorKeys){
+      //   left = cursorKeys["left"].isDown;
+      //   right = cursorKeys["right"].isDown;
+      // }
+
+      const left = this.movementAngle == 180;
+      const right = this.movementAngle == 0;
+
       if (
-        (this.movementAngle == 180 && this.currentPlayer.x <= PLAYER_MIN_X) ||
-        (this.movementAngle == 0 && this.currentPlayer.x >= PLAYER_MAX_X)
+        (left && this.currentPlayer.x <= PLAYER_MIN_X) ||
+        (right && this.currentPlayer.x >= PLAYER_MAX_X)
       ) {
         currentPlayerBody.setVelocity(0, 0);
       } else {
@@ -280,7 +300,12 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     } else {
       currentPlayerBody.setVelocity(0, 0);
     }
-
+    if (this.currentPlayer.x < PLAYER_MIN_X) {
+      this.currentPlayer.x = PLAYER_MIN_X;
+    }
+    if (this.currentPlayer.x > PLAYER_MAX_X) {
+      this.currentPlayer.x = PLAYER_MAX_X;
+    }
     const isMoving =
       this.movementAngle !== undefined && this.walkingSpeed !== 0;
 
@@ -355,6 +380,20 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
 
   public initialiseControls() {
     if (isTouchDevice()) {
+      // // Initialise joystick
+      // const { centerX, centerY, height } = this.cameras.main;
+      // this.joystick = new VirtualJoystick(this, {
+      //   x: centerX,
+      //   y: centerY - 35 + height / ZOOM / 2,
+      //   radius: 25,
+      //   dir: 'left&right',   // 'up&down'|0|'left&right'|1|'4dir'|2|'8dir'|3
+      //   base: this.add.circle(0, 0, 25, 0x000000, 0.2).setDepth(1000000000),
+      //   thumb: this.add.circle(0, 0, 10, 0xffffff, 0.2).setDepth(1000000000),
+      //   forceMin: 2,
+      // });
+      // this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      //   this.throwAxe();
+      // });
       this.mobileKeys = { left: false, right: false };
       const { x, y, centerX, centerY, width, height } = this.cameras.main;
       // Initialise buttons

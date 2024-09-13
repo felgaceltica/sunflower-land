@@ -43,6 +43,10 @@ type MakeMoveEvent = {
   type: "MAKE_MOVE";
   solved: boolean;
 };
+type GameOverEvent = {
+  type: "GAME_OVER";
+  score: number;
+};
 
 // type UnlockAchievementsEvent = {
 //   type: "UNLOCKED_ACHIEVEMENTS";
@@ -63,7 +67,7 @@ export type PortalEvent =
   | { type: "RETRY" }
   | { type: "CONTINUE" }
   | { type: "END_GAME_EARLY" }
-  | { type: "GAME_OVER" }
+  | GameOverEvent
   | StartEvent
   | MakeMoveEvent;
 // | { type: "CROP_DEPOSITED" }
@@ -309,16 +313,14 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         GAME_OVER: {
           target: "gameOver",
           actions: assign({
-            state: (context: any) => {
-              const prize = context.state?.minigames.prizes["irrigate"];
-              //console.log(prize);
-              const scoretoSubmit = 0; //context.solved ? prize.score : 0;
-              submitScore({ score: Math.round(scoretoSubmit) });
+            state: (context: any, event: GameOverEvent) => {
+              context.score = event.score;
+              submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
                 state: context.state,
                 action: {
                   type: "minigame.scoreSubmitted",
-                  score: Math.round(scoretoSubmit),
+                  score: Math.round(context.score),
                   id: "irrigate",
                 },
               });
@@ -341,6 +343,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
 
             return !!history[dateKey]?.prizeClaimedAt;
           },
+          actions: assign({
+            score: () => 0,
+            axes: () => 0,
+            startedAt: () => 0,
+          }) as any,
         },
 
         {
@@ -353,6 +360,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
 
             return context.solved && context.movesLeft >= 0;
           },
+          actions: assign({
+            score: () => 0,
+            axes: () => 0,
+            startedAt: () => 0,
+          }) as any,
         },
         {
           target: "loser",

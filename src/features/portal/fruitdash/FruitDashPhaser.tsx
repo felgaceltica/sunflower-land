@@ -6,6 +6,8 @@ import { Preloader } from "features/world/scenes/Preloader";
 import { PortalContext } from "./lib/PortalProvider";
 import { useActor } from "@xstate/react";
 import { FruitDashScene } from "./FruitDashScene";
+import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
+import GesturesPlugin from "phaser3-rex-plugins/plugins/gestures-plugin";
 
 export const FruitDashPhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
@@ -36,17 +38,24 @@ export const FruitDashPhaser: React.FC = () => {
       autoRound: true,
       pixelArt: true,
       plugins: {
+        scene: [
+          {
+            key: "rexGestures",
+            plugin: GesturesPlugin,
+            mapping: "rexGestures",
+          },
+        ],
         global: [
           {
             key: "rexNinePatchPlugin",
             plugin: NinePatchPlugin,
             start: true,
           },
-          // {
-          //   key: "rexVirtualJoystick",
-          //   plugin: VirtualJoystickPlugin,
-          //   start: true,
-          // },
+          {
+            key: "rexVirtualJoystick",
+            plugin: VirtualJoystickPlugin,
+            start: true,
+          },
         ],
       },
       width: window.innerWidth,

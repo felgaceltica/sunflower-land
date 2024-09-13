@@ -5,6 +5,7 @@ import mapJson from "./assets/irrigate.json";
 import defaultTilesetConfig from "assets/map/tileset.json";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
 import { MachineInterpreter } from "./lib/IrrigateMachine";
+import RexGesturePlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 
 export class IrrigateScene extends Phaser.Scene {
   sceneId: SceneId = MINIGAME_NAME;
@@ -13,6 +14,7 @@ export class IrrigateScene extends Phaser.Scene {
   layers: Record<string, Phaser.Tilemaps.TilemapLayer> = {};
   zoomLevel = 0;
   ZOOM = 0;
+  rexGestures: RexGesturePlugin | undefined;
   dragState: any = { active: false, prevPointer: null, start: 0 };
 
   constructor() {
@@ -27,6 +29,9 @@ export class IrrigateScene extends Phaser.Scene {
       tilesets: defaultTilesetConfig.tilesets,
     };
     this.load.tilemapTiledJSON("irrigatemap", json);
+    const url =
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexpinchplugin.min.js";
+    this.load.plugin("rexpinchplugin", url, true);
   }
 
   async create() {
@@ -59,16 +64,18 @@ export class IrrigateScene extends Phaser.Scene {
   async update(time: number, delta: number) {
     // console.log(this.portalService?.state.value);
     // console.log(this.portalService?.state.context.movesLeft);
-    if (this.isGameReady) this.gameBoard.newGame(1);
+    if (this.isGameReady) this.gameBoard.newGame(2);
 
     if (!this.isGamePlaying) this.gameBoard.cleanBoard();
     // end game when time is up
     if (this.isGamePlaying && this.secondsLeft <= 0) {
-      this.endGame();
+      this.endGame(0);
     }
   }
-  public endGame = () => {
-    this.portalService?.send("GAME_OVER");
+  public endGame = (score: number) => {
+    this.portalService?.send("GAME_OVER", {
+      score: score,
+    });
 
     // // play sound
     // const sound = this.sound.add("game_over");
@@ -107,6 +114,53 @@ export class IrrigateScene extends Phaser.Scene {
       },
     );
 
+    const pinch = this.rexGestures?.add.pinch(this);
+    if (pinch) {
+      this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+        if (this.dragState.start > 0) {
+          const duration = Date.now() - this.dragState.start;
+          if (duration > 100) {
+            this.dragState.active = true;
+          }
+        }
+      });
+      pinch
+        .on("drag1start", () => {
+          this.dragState.start = Date.now();
+        })
+        .on("drag1end", () => {
+          this.dragState.start = 0;
+          this.dragState.active = false;
+        })
+        .on("pinchstart", () => {
+          this.dragState.active = true;
+          this.dragState.start = Date.now();
+        })
+        .on("pinchend", () => {
+          setTimeout(() => {
+            this.dragState.active = false;
+          }, 100);
+        })
+        .on("drag1", function (pinch: { drag1Vector: any }) {
+          const drag1Vector = pinch.drag1Vector;
+          camera.scrollX -= drag1Vector.x / camera.zoom;
+          camera.scrollY -= drag1Vector.y / camera.zoom;
+        })
+        .on(
+          "pinch",
+          function (pinch: { scaleFactor: any }) {
+            const scaleFactor = pinch.scaleFactor;
+            const newZoom = Phaser.Math.Clamp(
+              camera.zoom * scaleFactor,
+              baseZoom / (20 * SQUARE_WIDTH),
+              baseZoom / (20 * SQUARE_WIDTH) + 1.5,
+            );
+            camera.setZoom(newZoom);
+          },
+          this,
+        );
+    }
+    /*
     window.addEventListener("zoomIn", (event) => {
       const camera = this.cameras.main;
       if (event.type === "zoomIn") {
@@ -133,20 +187,12 @@ export class IrrigateScene extends Phaser.Scene {
       this.dragState.start = Date.now();
       this.dragState.prevPointer = { x: pointer.x, y: pointer.y };
     });
-    this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-      if (this.dragState.start > 0) {
-        const duration = Date.now() - this.dragState.start;
-        if (duration > 100) {
-          this.dragState.active = true;
-        }
-      }
-      this.handlePan(pointer);
-    });
+
 
     this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
       this.dragState.start = 0;
       this.dragState.active = false;
-    });
+    });*/
   }
   handleZoom(pointer: Phaser.Input.Pointer, deltaX: number, deltaY: number) {
     const zoomDirection = deltaY > 0 ? -1 : 1;
@@ -160,7 +206,7 @@ export class IrrigateScene extends Phaser.Scene {
           : window.innerHeight;
       this.ZOOM = this.cameras.main.zoom + zoomDirection * 0.5;
       const newZoom = Phaser.Math.Clamp(
-        this.cameras.main.zoom + zoomDirection * 0.5,
+        this.ZOOM,
         baseZoom / (20 * SQUARE_WIDTH),
         baseZoom / (20 * SQUARE_WIDTH) + 1.5,
       );

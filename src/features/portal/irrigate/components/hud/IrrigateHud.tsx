@@ -153,9 +153,9 @@ import { PortalMachineState } from "../../lib/IrrigateMachine";
 import { IrrigateTimer } from "./IrrigateTimer";
 import { IrrigateSettings } from "./IrrigateSettings";
 import { IrrigateTravel } from "./IrrigateTravel";
-// import { FruitDashScores } from "./FruitDashScores";
+import { PIXEL_SCALE } from "features/game/lib/constants";
+import { IrrigateScores } from "./IrrigateScores";
 //import { useAchievementToast } from "../../providers/AchievementToastProvider";
-// import { FruitDashTarget } from "./FruitDashTarget";
 
 const _isJoystickActive = (state: PortalMachineState) =>
   state.context.isJoystickActive;
@@ -196,17 +196,17 @@ export const IrrigateHud: React.FC = () => {
   return (
     <HudContainer zIndex={99999}>
       <div>
-        {/* <div
+        <div
           className="absolute"
           style={{
-            top: `${PIXEL_SCALE * 4}px`,
-            left: `${PIXEL_SCALE * 6}px`,
+            top: `${PIXEL_SCALE * 0}px`,
+            left: `${PIXEL_SCALE * 3}px`,
           }}
         >
-          <FruitDashTarget />
-          <FruitDashScores />
+          {/* <IrrigateTarget /> */}
+          <IrrigateScores />
         </div>
-      */}
+
         {
           <>
             <IrrigateTravel />

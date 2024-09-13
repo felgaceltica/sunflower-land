@@ -17,10 +17,10 @@ import weightedRandom from "../util/Utils";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
-  public dirtyTiles = [449, 457, 458, 459, 521, 522];
-  public dirtyWeights = [90, 1, 1, 1, 1, 1];
-  public grassTiles = [66, 129, 130, 131, 194, 199, 257, 258];
-  public grassWeights = [90, 1, 1, 1, 1, 1, 1, 1];
+  public dirtyTiles = [449]; //[449, 457, 458, 459, 521, 522];
+  public dirtyWeights = [1]; //[90, 1, 1, 1, 1, 1];
+  public grassTiles = [66]; //[66, 129, 130, 131, 194, 199, 257, 258];
+  public grassWeights = [1]; //[90, 1, 1, 1, 1, 1, 1, 1];
   private streetLines: Phaser.GameObjects.Container[] = [];
   private backgroundLines: Phaser.GameObjects.Container[] = [];
   nextDecoration = 0; //randomInt(0, MAX_DECORATIONS_LINES);
