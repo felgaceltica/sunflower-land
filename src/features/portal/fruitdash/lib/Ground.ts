@@ -17,8 +17,8 @@ import weightedRandom from "../util/Utils";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
-  public dirtyTiles = [449, 457, 458, 459, 521, 522];
-  public dirtyWeights = [180, 1, 1, 1, 1, 1];
+  public dirtyTiles = [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
+  public dirtyWeights = [180, 1, 1]; //[180, 1, 1, 1, 1, 1];
   public grassTiles = [66, 129, 130, 131, 194, 199, 257, 258];
   public grassWeights = [250, 1, 1, 1, 1, 1, 1, 1];
   public fenceCount = 0;
