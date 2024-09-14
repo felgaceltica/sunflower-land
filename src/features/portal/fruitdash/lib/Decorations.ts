@@ -65,6 +65,11 @@ export class FruitDashDecorationFactory {
   }
 
   public update(f: number) {
+    if (!this._scene.isGamePlaying) {
+      this.decorationsLines = this.decorationsLines.filter(
+        (item) => item.active == true,
+      );
+    }
     for (let index = 0; index < this.decorationsLines.length; index++) {
       this.decorationsLines[index].setDepth(DECORATION_DEPTH);
       this.decorationsLines[index].y +=
@@ -74,9 +79,6 @@ export class FruitDashDecorationFactory {
         this.decorationsLines[index].destroy();
       }
     }
-    this.decorationsLines = this.decorationsLines.filter(
-      (item) => item.active == true,
-    );
   }
 }
 abstract class FruitDashDecoration {

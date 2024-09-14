@@ -17,10 +17,11 @@ import weightedRandom from "../util/Utils";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
-  public dirtyTiles = [449]; //[449, 457, 458, 459, 521, 522];
-  public dirtyWeights = [1]; //[90, 1, 1, 1, 1, 1];
-  public grassTiles = [66]; //[66, 129, 130, 131, 194, 199, 257, 258];
-  public grassWeights = [1]; //[90, 1, 1, 1, 1, 1, 1, 1];
+  public dirtyTiles = [449, 457, 458, 459, 521, 522];
+  public dirtyWeights = [180, 1, 1, 1, 1, 1];
+  public grassTiles = [66, 129, 130, 131, 194, 199, 257, 258];
+  public grassWeights = [250, 1, 1, 1, 1, 1, 1, 1];
+  public fenceCount = 0;
   private streetLines: Phaser.GameObjects.Container[] = [];
   private backgroundLines: Phaser.GameObjects.Container[] = [];
   nextDecoration = 0; //randomInt(0, MAX_DECORATIONS_LINES);
@@ -41,11 +42,14 @@ export class FruitDashGroundFactory {
       frameWidth: 18,
       frameHeight: 18,
     });
+    this._scene.load.image("fence", "world/fruitdash/fence.png");
   }
 
   public createBaseRoad() {
     for (let index = 0; index < TOTAL_LINES; index++) {
+      this.addBaseRoadLine(START_HEIGHT + SQUARE_WIDTH_TEXTURE * index);
       this.addRoadLine(START_HEIGHT + SQUARE_WIDTH_TEXTURE * index, false);
+      this.addBaseBackgroundLine(START_HEIGHT + SQUARE_WIDTH_TEXTURE * index);
       this.addBackgroundLine(
         START_HEIGHT + SQUARE_WIDTH_TEXTURE * index,
         false,
@@ -55,20 +59,30 @@ export class FruitDashGroundFactory {
   public throwAxe() {
     this._obstaclesFactory.throwAxe();
   }
+  private addBaseRoadLine(startY: number) {
+    const container = this._scene.add.container();
+    container.y = startY;
+    let x = window.innerWidth / 2 - SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
+    const y = 0;
+    for (let index = 0; index < STREET_COLUMNS; index++) {
+      const image = this._scene.add.image(x, y, "SunnySideSprites", 449);
+      image.setOrigin(0, 0);
+      container.add(image);
+      x = x + SQUARE_WIDTH_TEXTURE;
+    }
+  }
   private addRoadLine(startY: number, start: boolean) {
     const container = this._scene.add.container();
     container.y = startY;
     let x = window.innerWidth / 2 - SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     const y = 0;
     for (let index = 0; index < STREET_COLUMNS; index++) {
-      const image = this._scene.add.image(
-        x,
-        y,
-        "SunnySideSprites",
-        weightedRandom(this.dirtyTiles, this.dirtyWeights)?.item,
-      );
-      image.setOrigin(0, 0);
-      container.add(image);
+      const item = weightedRandom(this.dirtyTiles, this.dirtyWeights)?.item;
+      if (item != 449) {
+        const image = this._scene.add.image(x, y, "SunnySideSprites", item);
+        image.setOrigin(0, 0);
+        container.add(image);
+      }
       x = x + SQUARE_WIDTH_TEXTURE;
     }
     x =
@@ -78,20 +92,26 @@ export class FruitDashGroundFactory {
     const imageLeft = this._scene.add.image(x, y, "SunnySideSprites", 454);
     imageLeft.setOrigin(0, 0);
     container.add(imageLeft);
-    const fenceLeft = this._scene.add.image(x, y, "SunnySideSprites", 232);
-    fenceLeft.setOrigin(0, 0);
-    container.add(fenceLeft);
+    if (this.fenceCount == 3) {
+      const fenceLeft = this._scene.add.image(x, y, "SunnySideSprites", 233);
+      fenceLeft.setOrigin(0, 0);
+      container.add(fenceLeft);
+    }
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     const imageRight = this._scene.add.image(x, y, "SunnySideSprites", 515);
     imageRight.setOrigin(0, 0);
     container.add(imageRight);
-    const fenceRight = this._scene.add.image(x, y, "SunnySideSprites", 232);
-    fenceRight.setOrigin(0, 0);
-    container.add(fenceRight);
+    if (this.fenceCount == 3) {
+      const fenceRight = this._scene.add.image(x, y, "SunnySideSprites", 233);
+      fenceRight.setOrigin(0, 0);
+      container.add(fenceRight);
+      this.fenceCount = -1;
+    }
+    this.fenceCount++;
     if (start) this.streetLines.unshift(container);
     else this.streetLines.push(container);
   }
-  private addBackgroundLine(startY: number, start: boolean) {
+  private addBaseBackgroundLine(startY: number) {
     const container = this._scene.add.container();
     container.y = startY;
     let x = window.innerWidth / 2 - SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
@@ -101,26 +121,61 @@ export class FruitDashGroundFactory {
       SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
       SQUARE_WIDTH_TEXTURE;
     for (let index = 0; index < GRASS_COLUMNS; index++) {
-      const image = this._scene.add.image(
-        x,
-        y,
-        "SunnySideSprites",
-        weightedRandom(this.grassTiles, this.grassWeights)?.item,
-      );
+      const image = this._scene.add.image(x, y, "SunnySideSprites", 66);
       image.setOrigin(0, 0);
       container.add(image);
       x = x - SQUARE_WIDTH_TEXTURE;
     }
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     for (let index = 0; index < GRASS_COLUMNS; index++) {
-      const image = this._scene.add.image(
-        x,
-        y,
-        "SunnySideSprites",
-        weightedRandom(this.grassTiles, this.grassWeights)?.item,
-      );
+      const image = this._scene.add.image(x, y, "SunnySideSprites", 66);
       image.setOrigin(0, 0);
       container.add(image);
+      x = x + SQUARE_WIDTH_TEXTURE;
+    }
+    x =
+      window.innerWidth / 2 -
+      SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
+      SQUARE_WIDTH_TEXTURE;
+
+    const fenceLeft = this._scene.add.image(x, y, "fence");
+    fenceLeft.setOrigin(0, 0);
+    container.add(fenceLeft);
+    x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
+
+    const fenceRight = this._scene.add.image(x, y, "fence");
+    fenceRight.setOrigin(0, 0);
+    container.add(fenceRight);
+  }
+  private addBackgroundLine(startY: number, start: boolean) {
+    const container = this._scene.add.container();
+    container.y = startY;
+    let x = window.innerWidth / 2 - SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
+    const y = 0;
+    x =
+      window.innerWidth / 2 -
+      SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
+      SQUARE_WIDTH_TEXTURE * 2;
+    for (let index = 1; index < GRASS_COLUMNS - 1; index++) {
+      const item = weightedRandom(this.grassTiles, this.grassWeights)?.item;
+      if (item != 66) {
+        const image = this._scene.add.image(x, y, "SunnySideSprites", item);
+        image.setOrigin(0, 0);
+        container.add(image);
+      }
+      x = x - SQUARE_WIDTH_TEXTURE;
+    }
+    x =
+      window.innerWidth / 2 +
+      SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) +
+      SQUARE_WIDTH_TEXTURE;
+    for (let index = 1; index < GRASS_COLUMNS; index++) {
+      const item = weightedRandom(this.grassTiles, this.grassWeights)?.item;
+      if (item != 66) {
+        const image = this._scene.add.image(x, y, "SunnySideSprites", item);
+        image.setOrigin(0, 0);
+        container.add(image);
+      }
       x = x + SQUARE_WIDTH_TEXTURE;
     }
     if (start) this.backgroundLines.unshift(container);

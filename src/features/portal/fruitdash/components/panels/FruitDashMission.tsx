@@ -27,7 +27,7 @@ interface Props {
 
 const _minigame = (state: PortalMachineState) =>
   state.context.state?.minigames.games["fruit-dash"];
-const _score = (state: PortalMachineState) => state.context.score;
+const _lastScore = (state: PortalMachineState) => state.context.lastScore;
 const _state = (state: PortalMachineState) => state.context.state;
 
 export const FruitDashMission: React.FC<Props> = ({
@@ -43,7 +43,7 @@ export const FruitDashMission: React.FC<Props> = ({
 
   const minigame = useSelector(portalService, _minigame);
   const attemptsLeft = getAttemptsLeft(minigame);
-  const score = useSelector(portalService, _score);
+  const lastScore = useSelector(portalService, _lastScore);
   const state = useSelector(portalService, _state);
 
   const hasBetaAccess = state
@@ -90,7 +90,7 @@ export const FruitDashMission: React.FC<Props> = ({
                 {showScore && (
                   <span>
                     {t("fruit-dash.score", {
-                      score: Math.round(score),
+                      score: Math.round(lastScore),
                     })}
                   </span>
                 )}

@@ -33,6 +33,7 @@ export interface Context {
   isJoystickActive: boolean;
   state: GameState | undefined;
   score: number;
+  lastScore: number;
   axes: number;
   startedAt: number;
   attemptsLeft: number;
@@ -110,6 +111,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 
     score: 0,
+    lastScore: 0,
     axes: 0,
     attemptsLeft: 0,
     startedAt: 0,
@@ -300,6 +302,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         END_GAME_EARLY: {
           actions: assign<Context, any>({
             startedAt: (context: any) => 0,
+            lastScore: (context: any) => {
+              return context.score;
+            },
             state: (context: any) => {
               submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
@@ -317,6 +322,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         GAME_OVER: {
           target: "gameOver",
           actions: assign({
+            lastScore: (context: any) => {
+              return context.score;
+            },
             state: (context: any) => {
               submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
