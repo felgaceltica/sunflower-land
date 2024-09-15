@@ -12,6 +12,7 @@ import { Label } from "components/ui/Label";
 // } from "../../util/FruitDashConstants";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
+import { BUMPKIN_SKILL_TREE } from "features/game/types/bumpkinSkills";
 
 type Props = {
   onBack: () => void;
@@ -60,27 +61,59 @@ export const IrrigateGuide: React.FC<Props> = ({ onBack }) => {
 
       {/* content */}
       <div className="flex flex-col gap-1 overflow-y-auto scrollable pr-1">
-        {/* instructions */}
-        <Label type="default">{t("irrigate.instructions")}</Label>
+        {/* objective */}
+        <Label type="default">{t("irrigate.topic1")}</Label>
         <div>
           <div className="flex items-center mb-3 mx-2">
+            <SquareIcon icon={SUNNYSIDE.icons.water} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic1.a")}</p>
+          </div>
+        </div>
+        {/* how to play */}
+        <Label type="default">{t("irrigate.topic2")}</Label>
+        <div>
+          <div className="flex items-center mb-3 mx-2">
+            <SquareIcon
+              icon={BUMPKIN_SKILL_TREE["Free Range"].image}
+              width={7}
+            />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic2.a")}</p>
+          </div>
+          <div className="flex items-center mb-3 mx-2">
+            <SquareIcon icon={ITEM_DETAILS["Pumpkin"].image} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic2.b")}</p>
+          </div>
+          <div className="flex items-center mb-3 mx-2">
             <SquareIcon icon={SUNNYSIDE.icons.stopwatch} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("irrigate.instructions1")}</p>
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic2.c")}</p>
           </div>
-
+        </div>
+        {/* tips */}
+        <Label type="default">{t("irrigate.topic3")}</Label>
+        <div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Oil Reserve"].image} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("irrigate.instructions2")}</p>
+            <SquareIcon icon={SUNNYSIDE.icons.expression_confused} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic3.a")}</p>
           </div>
-
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Apple"].image} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("irrigate.instructions3")}</p>
+            <SquareIcon icon={SUNNYSIDE.icons.confirm} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic3.b")}</p>
           </div>
-
+        </div>
+        {/* levels */}
+        <Label type="default">{t("irrigate.topic4")}</Label>
+        <div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Pirate Bounty"].image} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("irrigate.instructions4")}</p>
+            <SquareIcon icon={ITEM_DETAILS["Iron"].image} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic4.a")}</p>
+          </div>
+          <div className="flex items-center mb-3 mx-2">
+            <SquareIcon icon={ITEM_DETAILS["Gold"].image} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic4.b")}</p>
+          </div>
+          <div className="flex items-center mb-3 mx-2">
+            <SquareIcon icon={ITEM_DETAILS["Crimstone"].image} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("irrigate.topic4.c")}</p>
           </div>
         </div>
       </div>
