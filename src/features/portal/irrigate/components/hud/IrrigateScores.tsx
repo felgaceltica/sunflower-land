@@ -5,13 +5,13 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "../../lib/IrrigateMachine";
 
 // const _score = (state: PortalMachineState) => state.context.score;
-const _movesLeft = (state: PortalMachineState) => state.context.movesLeft;
+const _movesMade = (state: PortalMachineState) => state.context.movesMade;
 
 export const IrrigateScores: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
   // const score = useSelector(portalService, _score);
-  const movesLeft = useSelector(portalService, _movesLeft);
+  const movesMade = useSelector(portalService, _movesMade);
 
   return (
     <>
@@ -48,7 +48,7 @@ export const IrrigateScores: React.FC = () => {
           }}
         >
           <span>
-            {t("irrigate.movesLeft")}
+            {t("irrigate.moves")}
             <div
               style={{
                 fontSize: "10vh",
@@ -57,7 +57,7 @@ export const IrrigateScores: React.FC = () => {
                 width: "160px",
               }}
             >
-              {movesLeft}
+              {movesMade}
             </div>
           </span>
         </div>

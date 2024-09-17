@@ -155,6 +155,7 @@ import { IrrigateSettings } from "./IrrigateSettings";
 import { IrrigateTravel } from "./IrrigateTravel";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { IrrigateScores } from "./IrrigateScores";
+import { IrrigateTarget } from "./IrrigateTarget";
 //import { useAchievementToast } from "../../providers/AchievementToastProvider";
 
 const _isJoystickActive = (state: PortalMachineState) =>
@@ -203,8 +204,12 @@ export const IrrigateHud: React.FC = () => {
             left: `${PIXEL_SCALE * 3}px`,
           }}
         >
-          {/* <IrrigateTarget /> */}
-          <IrrigateScores />
+          {isPlaying && (
+            <>
+              <IrrigateTarget />
+              <IrrigateScores />
+            </>
+          )}
         </div>
 
         {

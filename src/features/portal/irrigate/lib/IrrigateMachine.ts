@@ -27,7 +27,8 @@ export interface Context {
   jwt: string | null;
   isJoystickActive: boolean;
   state: GameState | undefined;
-  movesLeft: number;
+  maxMoves: number;
+  movesMade: number;
   endAt: number;
   solved: boolean;
   attemptsLeft: number;
@@ -111,7 +112,8 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     isJoystickActive: false,
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
-    movesLeft: 0,
+    movesMade: 0,
+    maxMoves: 0,
     attemptsLeft: 0,
     solved: false,
     endAt: 0,
@@ -261,9 +263,10 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             endAt: (context: Context, event: StartEvent) => {
               return Date.now() + event.duration;
             },
-            movesLeft: (context: Context, event: StartEvent) => {
+            maxMoves: (context: Context, event: StartEvent) => {
               return event.totalMoves;
             },
+            movesMade: 0,
             score: 0,
             state: (context: any) => {
               startAttempt();
@@ -305,8 +308,8 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             solved: (context: Context, event: MakeMoveEvent) => {
               return event.solved;
             },
-            movesLeft: (context: Context, event: MakeMoveEvent) => {
-              return (context.movesLeft = context.movesLeft - 1);
+            movesMade: (context: Context, event: MakeMoveEvent) => {
+              return (context.movesMade = context.movesMade + 1);
             },
           }),
         },
@@ -358,7 +361,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             //   return false;
             // }
 
-            return context.solved && context.movesLeft >= 0;
+            return context.solved && context.movesMade <= context.maxMoves;
           },
           actions: assign({
             score: () => 0,

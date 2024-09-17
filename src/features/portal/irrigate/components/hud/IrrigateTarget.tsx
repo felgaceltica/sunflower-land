@@ -5,20 +5,18 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "../../lib/IrrigateMachine";
-import { MINIGAME_NAME } from "../../util/IrrigateConstants";
 
-const _target = (state: PortalMachineState) =>
-  state.context.state?.minigames.prizes[MINIGAME_NAME]?.score ?? 1080;
-const _score = (state: PortalMachineState) => state.context.score;
+const _targetMoves = (state: PortalMachineState) => state.context.maxMoves + 1;
+const _movesMade = (state: PortalMachineState) => state.context.movesMade;
 
 export const IrrigateTarget: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
 
-  const target = useSelector(portalService, _target);
-  const score = useSelector(portalService, _score);
+  const targetMoves = useSelector(portalService, _targetMoves);
+  const movesMade = useSelector(portalService, _movesMade);
 
-  const isTargetReached = score >= target;
+  const isTargetReached = movesMade < targetMoves;
 
   return (
     <Label
@@ -27,7 +25,7 @@ export const IrrigateTarget: React.FC = () => {
       type={isTargetReached ? "success" : "vibrant"}
     >
       {t("irrigate.targetScore", {
-        target: target,
+        moves: targetMoves,
       })}
     </Label>
   );

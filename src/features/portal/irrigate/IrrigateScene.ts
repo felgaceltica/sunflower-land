@@ -64,7 +64,7 @@ export class IrrigateScene extends Phaser.Scene {
   async update(time: number, delta: number) {
     // console.log(this.portalService?.state.value);
     // console.log(this.portalService?.state.context.movesLeft);
-    if (this.isGameReady) this.gameBoard.newGame(2);
+    if (this.isGameReady) this.gameBoard.newGame(1);
 
     if (!this.isGamePlaying) this.gameBoard.cleanBoard();
     // end game when time is up
@@ -88,8 +88,11 @@ export class IrrigateScene extends Phaser.Scene {
     return secondsLeft;
   }
 
-  public get movesLeft() {
-    return this.portalService ? this.portalService?.state.context.movesLeft : 0;
+  public get movesMade() {
+    return this.portalService ? this.portalService?.state.context.movesMade : 0;
+  }
+  public get maxMoves() {
+    return this.portalService ? this.portalService?.state.context.maxMoves : 0;
   }
   private initialiseCamera() {
     const camera = this.cameras.main;

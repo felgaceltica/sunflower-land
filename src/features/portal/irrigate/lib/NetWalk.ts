@@ -67,17 +67,17 @@ export class Netwalk {
       case 1: //easy
         this.options.rows = 5;
         this.options.columns = 5;
-        this.duration = 90 * 1000;
+        this.duration = 150 * 1000;
         break;
       case 2: //medium
         this.options.rows = 7;
         this.options.columns = 7;
-        this.duration = 180 * 1000;
+        this.duration = 300 * 1000;
         break;
       case 3: //hard
         this.options.rows = 9;
         this.options.columns = 9;
-        this.duration = 300 * 1000;
+        this.duration = 450 * 1000;
         break;
       default:
         this.options.rows = 9;
@@ -274,15 +274,15 @@ export class Netwalk {
                     this._scene.portalService?.send("MAKE_MOVE", {
                       solved: isCompleted,
                     });
-                    if (
-                      this._scene.movesLeft <= 0 ||
-                      this._scene.portalService?.state?.context.solved
-                    ) {
+                    if (this._scene.portalService?.state?.context.solved) {
                       let score = 0;
-                      if (this._scene.portalService?.state?.context.solved) {
+                      if (this._scene.movesMade <= this._scene.maxMoves) {
                         const maxScore = this.minMoves * this.difficulty * 10;
-                        const moves = this.totalMoves - this._scene.movesLeft;
-                        score = maxScore - (this.minMoves - moves) * 10;
+                        score =
+                          maxScore -
+                          (this._scene.movesMade - this.minMoves) *
+                            this.difficulty *
+                            10;
                         //console.log(score);
                       }
                       this._scene.endGame(score);
