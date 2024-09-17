@@ -38,7 +38,7 @@ export type BumpkinRevampSkillName =
   | "Strong Roots"
   | "Coin Swindler"
   | "Golden Sunflower"
-  | "SFL Swindler"
+  | "Betty's Friend"
   | "Chonky Scarecrow"
   | "Horror Mike"
   | "Instant Growth"
@@ -47,8 +47,10 @@ export type BumpkinRevampSkillName =
   | "Premium Worms"
   | "Laurie's Gains"
   // Fruit
+  | "Red Sour"
   | "Fruitful Fumble"
   | "Tropical Orchard"
+  | "Catchup"
   | "Fruit Turbocharge"
   | "Prime Produce"
   | "Fruity Profit"
@@ -438,7 +440,7 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       skill: 0,
     },
     boosts:
-      "+0.1 Medium Crop Yield (Carrots, Cabbages, Soybeans, Beetroots, Cauliflowers, Parsnips",
+      "+0.1 Medium Crop Yield (Carrots, Cabbages, Soybeans, Beetroots, Cauliflowers, Parsnips)",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Efficient Bin": {
@@ -448,7 +450,7 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       points: 1,
       skill: 0,
     },
-    boosts: "+5 Sprout Mix (Requires Compost Bin)",
+    boosts: "+3 Sprout Mix when collecting from Compost Bin",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Turbo Charged": {
@@ -458,7 +460,7 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       points: 1,
       skill: 0,
     },
-    boosts: "+5 Fruitful Blend (Requires Turbo Composter)",
+    boosts: "+5 Fruitful Blend when collecting from Turbo Composter",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Old Farmer": {
@@ -489,7 +491,7 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       points: 2,
       skill: 2,
     },
-    boosts: "+10% profit selling crops (Seed Shop)",
+    boosts: "+10% coins to base value of plot crops in Betty's Market",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Golden Sunflower": {
@@ -499,17 +501,18 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       points: 2,
       skill: 2,
     },
-    boosts: "Golden Sunflower (1/700 chance)",
+    boosts:
+      "Chance of getting +0.35 gold when manually harvesting sunflowers (0.15%)",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
-  "SFL Swindler": {
-    name: "SFL Swindler",
+  "Betty's Friend": {
+    name: "Betty's Friend",
     tree: "Crops",
     requirements: {
       points: 2,
       skill: 2,
     },
-    boosts: "+10% Crop deliveries SFL profit",
+    boosts: "Betty Coin delivery revenue increased by 20%",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Chonky Scarecrow": {
@@ -572,7 +575,7 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       points: 3,
       skill: 5,
     },
-    boosts: "+10 Rapid Root (Requires Premium Composter)",
+    boosts: "+10 Rapid Root when collecting from Premium Composter",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Laurie's Gains": {
@@ -587,6 +590,16 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
   },
 
   // Fruit - Tier 1
+  "Red Sour": {
+    name: "Red Sour",
+    tree: "Fruit",
+    requirements: {
+      points: 1,
+      skill: 0,
+    },
+    boosts: "+0.1 Fruit Yield (Tomatoes, Lemons)",
+    image: SUNNYSIDE?.skills?.green_thumb_LE,
+  },
   "Fruitful Fumble": {
     name: "Fruitful Fumble",
     tree: "Fruit",
@@ -608,6 +621,16 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   // Fruit - Tier 2
+  Catchup: {
+    name: "Catchup",
+    tree: "Fruit",
+    requirements: {
+      points: 2,
+      skill: 2,
+    },
+    boosts: "Tomatoes & Lemons grows 10% faster",
+    image: SUNNYSIDE?.skills?.green_thumb_LE,
+  },
   "Fruit Turbocharge": {
     name: "Fruit Turbocharge",
     tree: "Fruit",
@@ -636,7 +659,7 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
       points: 3,
       skill: 5,
     },
-    boosts: "+30% Fruit Deliveries SFL revenue",
+    boosts: "Tango Coin delivery revenue +50%",
     image: SUNNYSIDE?.skills?.green_thumb_LE,
   },
   "Fruity Rush Hour": {
@@ -1471,27 +1494,27 @@ export const BUMPKIN_REVAMP_SKILL_TREE: Record<
 
 export const SKILL_TREE_CATEGORIES = Array.from(
   new Set(
-    getKeys(BUMPKIN_SKILL_TREE).map((skill) => BUMPKIN_SKILL_TREE[skill].tree)
-  )
+    getKeys(BUMPKIN_SKILL_TREE).map((skill) => BUMPKIN_SKILL_TREE[skill].tree),
+  ),
 );
 
 export const REVAMP_SKILL_TREE_CATEGORIES = Array.from(
   new Set(
     getKeys(BUMPKIN_REVAMP_SKILL_TREE).map(
-      (skill) => BUMPKIN_REVAMP_SKILL_TREE[skill].tree
-    )
-  )
+      (skill) => BUMPKIN_REVAMP_SKILL_TREE[skill].tree,
+    ),
+  ),
 );
 
 export const getSkills = (treeName: BumpkinSkillTree) => {
   return Object.values(BUMPKIN_SKILL_TREE).filter(
-    (skill) => skill.tree === treeName
+    (skill) => skill.tree === treeName,
   );
 };
 
 export const getRevampSkills = (treeName: BumpkinRevampSkillTree) => {
   return Object.values(BUMPKIN_REVAMP_SKILL_TREE).filter(
-    (skill) => skill.tree === treeName
+    (skill) => skill.tree === treeName,
   );
 };
 
@@ -1500,7 +1523,7 @@ export const createSkillPath = (skills: BumpkinSkill[]) => {
   const path = [[startingSkill?.name as BumpkinSkillName]];
 
   const remainingLevels = new Set(
-    skills.map((item) => item.requirements.skill)
+    skills.map((item) => item.requirements.skill),
   );
 
   for (let index = 0; index < remainingLevels.size - 1; index++) {
