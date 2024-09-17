@@ -124,7 +124,7 @@ export const MAX_ITEMS: Inventory = {
   Wood: new Decimal("8000"),
   "Wild Mushroom": new Decimal("100"),
   Honey: new Decimal("350"),
-  Oil: new Decimal("300"),
+  Oil: new Decimal("1500"),
 
   "War Bond": new Decimal(500),
   "Human War Banner": new Decimal(1),
@@ -235,6 +235,15 @@ export const MAX_ITEMS: Inventory = {
 
   "Tomato Bombard": new Decimal(1),
   Cannonball: new Decimal(1),
+
+  // New Blacksmith Equipment
+  "Stone Beetle": new Decimal(5),
+  "Iron Beetle": new Decimal(5),
+  "Gold Beetle": new Decimal(5),
+  "Fairy Circle": new Decimal(5),
+  Squirrel: new Decimal(5),
+  Butterfly: new Decimal(5),
+  Macaw: new Decimal(5),
 
   ...(Object.keys(EXOTIC_CROPS) as InventoryItemName[]).reduce(
     (acc, name) => ({
