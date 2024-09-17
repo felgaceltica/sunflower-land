@@ -164,7 +164,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     const player_speed_factor = 16 / (1000 / 60); // 1000 ms / 60fps
     this.updatePlayer(player_speed_factor);
     this.groundFactory.update(speed_factor);
-    if (this.portalService?.state?.context?.axes) {
+    if (this.portalService?.state?.context?.axes && this.axeButtonCount) {
       const currentAxes = this.portalService?.state?.context?.axes;
       this.axeButtonCount.text = currentAxes.toString();
     }

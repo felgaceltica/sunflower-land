@@ -15,7 +15,6 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { IrrigateGuide } from "./IrrigateGuide";
 import { SquareIcon } from "components/ui/SquareIcon";
 import { PIXEL_SCALE } from "features/game/lib/constants";
-import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -46,9 +45,9 @@ export const IrrigateMission: React.FC<Props> = ({
   const score = useSelector(portalService, _score);
   const state = useSelector(portalService, _state);
 
-  const hasBetaAccess = state
-    ? hasFeatureAccess(state, "IRRIGATE_BETA_TESTING")
-    : false;
+  // const hasBetaAccess = state
+  //   ? hasFeatureAccess(state, "IRRIGATE")
+  //   : false;
 
   const dateKey = new Date().toISOString().slice(0, 10);
 

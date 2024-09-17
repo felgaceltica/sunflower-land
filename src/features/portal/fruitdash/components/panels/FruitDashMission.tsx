@@ -46,9 +46,7 @@ export const FruitDashMission: React.FC<Props> = ({
   const lastScore = useSelector(portalService, _lastScore);
   const state = useSelector(portalService, _state);
 
-  const hasBetaAccess = state
-    ? hasFeatureAccess(state, "FRUIT_DASH_BETA_TESTING")
-    : false;
+  const hasBetaAccess = state ? hasFeatureAccess(state, "FRUIT_DASH") : false;
 
   const dateKey = new Date().toISOString().slice(0, 10);
 
