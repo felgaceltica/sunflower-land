@@ -262,6 +262,12 @@ export class IrrigateScene extends Phaser.Scene {
     this.load.image("18", "world/irrigate/18.png");
     this.load.image("20", "world/irrigate/20.png");
     this.load.image("24", "world/irrigate/24.png");
+    this.load.image("source", "world/irrigate/source.png");
+    this.load.image("cropplot", "world/irrigate/cropplot.png");
+    this.load.image("crop1", "world/irrigate/crop1.png");
+    this.load.image("crop2", "world/irrigate/crop2.png");
+    this.load.image("crop3", "world/irrigate/crop3.png");
+    this.load.image("crop4", "world/irrigate/crop4.png");
   }
 
   public initialiseMap() {

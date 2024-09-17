@@ -24,6 +24,7 @@ export class Netwalk {
   private figures: Record<string, number[]>;
   private board: number[] = [];
   private solution: number[] = [];
+  private crops: number[] = [];
   private serverVector: NewWalkVector;
   private neighbours: number[] = [];
   private toDraw: Phaser.Math.Vector2[] = [];
@@ -292,6 +293,49 @@ export class Netwalk {
             }
           });
         this._boardContainer?.add(image);
+        if (type == "server") {
+          const image = this._scene.add.image(
+            column * this.TILE_SIZE,
+            row * this.TILE_SIZE,
+            "source",
+          );
+          image
+            .setScale(
+              this.TILE_SIZE / image.width,
+              this.TILE_SIZE / image.height,
+            )
+            .setOrigin(0, 0);
+          this._boardContainer?.add(image);
+        }
+        if (type == "computer") {
+          if (this.connectedCells.indexOf(imageBoardIndex) == -1) {
+            const image = this._scene.add.image(
+              column * this.TILE_SIZE,
+              row * this.TILE_SIZE,
+              "cropplot",
+            );
+            image
+              .setScale(
+                this.TILE_SIZE / image.width,
+                this.TILE_SIZE / image.height,
+              )
+              .setOrigin(0, 0);
+            this._boardContainer?.add(image);
+          } else {
+            const image = this._scene.add.image(
+              column * this.TILE_SIZE,
+              row * this.TILE_SIZE,
+              "crop" + this.crops[imageBoardIndex].toString(),
+            );
+            image
+              .setScale(
+                this.TILE_SIZE / image.width,
+                this.TILE_SIZE / image.height,
+              )
+              .setOrigin(0, 0);
+            this._boardContainer?.add(image);
+          }
+        }
       }
     }
     this.drawBoardLines();
@@ -408,6 +452,9 @@ export class Netwalk {
           this.toDraw.splice(i, 1);
         }
       }
+    }
+    for (let i = 0; i < this.board.length; i++) {
+      this.crops.push(_.random(1, 4));
     }
     this.solution = Object.assign([], this.board);
   }

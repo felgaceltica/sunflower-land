@@ -76,7 +76,7 @@ export function donate({ matic, address }: { matic: number; address: string }) {
  */
 export function startAttempt() {
   if (!isInIframe) {
-    alert(`Sunflower Land running in test mode - attempt started`);
+    //alert(`Sunflower Land running in test mode - attempt started`);
   } else {
     window.parent.postMessage({ event: "attemptStarted" }, "*");
   }
@@ -87,11 +87,11 @@ export function startAttempt() {
  */
 export function submitScore({ score }: { score: number }) {
   if (!isInIframe) {
-    alert(
+    /*alert(
       `Sunflower Land running in test mode - score submitted (` +
         score.toString() +
         `)`,
-    );
+    );*/
   } else {
     window.parent.postMessage({ event: "scoreSubmitted", score }, "*");
   }
@@ -106,7 +106,7 @@ export function achievementsUnlocked({
   achievementNames: string[];
 }) {
   if (!isInIframe) {
-    alert(`Sunflower Land running in test mode - achievements unlocked`);
+    //alert(`Sunflower Land running in test mode - achievements unlocked`);
   } else {
     window.parent.postMessage(
       { event: "achievementsUnlocked", achievementNames },
