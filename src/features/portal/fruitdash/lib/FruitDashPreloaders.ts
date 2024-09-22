@@ -2,7 +2,6 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { CONFIG } from "lib/config";
 import { SOUNDS } from "assets/sound-effects/soundEffects";
 import { createErrorLogger } from "lib/errorLogger";
-import { IS_HALLOWEEN } from "../util/FruitDashConstants";
 
 export abstract class FruitDashPreloader extends Phaser.Scene {
   public get id() {
@@ -42,12 +41,12 @@ export abstract class FruitDashPreloader extends Phaser.Scene {
         "tileset",
         `${CONFIG.PROTECTED_IMAGE_URL}/world/map-extruded.png`,
       );
-      if (IS_HALLOWEEN) {
-        this.load.image(
-          "halloween_tileset",
-          "world/fruitdash/SFL_Halloween_Tileset_v1.png",
-        );
-      }
+      // if (IS_HALLOWEEN) {
+      //   this.load.image(
+      //     "halloween_tileset",
+      //     "world/fruitdash/SFL_Halloween_Tileset_v1.png",
+      //   );
+      // }
       this.load.image(
         "easter-tileset",
         `${CONFIG.PROTECTED_IMAGE_URL}/world/easter-map-extruded.png`,

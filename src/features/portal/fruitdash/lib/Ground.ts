@@ -60,11 +60,11 @@ export class FruitDashGroundFactory {
       frameWidth: 18,
       frameHeight: 18,
     });
-    if (IS_HALLOWEEN) {
-      this._scene.load.image("fence", "world/fruitdash/fence_halloween.png");
-    } else {
-      this._scene.load.image("fence", "world/fruitdash/fence.png");
-    }
+    // if (IS_HALLOWEEN) {
+    //   this._scene.load.image("fence", "world/fruitdash/fence_halloween.png");
+    // } else {
+    this._scene.load.image("fence", "world/fruitdash/fence.png");
+    //}
   }
 
   public createBaseRoad() {
