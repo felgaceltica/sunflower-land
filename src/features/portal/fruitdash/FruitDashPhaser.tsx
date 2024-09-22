@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useRef } from "react";
 import { Game, AUTO } from "phaser";
 import NinePatchPlugin from "phaser3-rex-plugins/plugins/ninepatch-plugin.js";
 
-import { Preloader } from "features/world/scenes/Preloader";
 import { PortalContext } from "./lib/PortalProvider";
 import { useActor } from "@xstate/react";
 import { FruitDashScene } from "./FruitDashScene";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 import GesturesPlugin from "phaser3-rex-plugins/plugins/gestures-plugin";
+import { FruitDashPreloader } from "./lib/FruitDashPreloaders";
 
 export const FruitDashPhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
@@ -19,7 +19,7 @@ export const FruitDashPhaser: React.FC = () => {
   const scene = "fruit_dash";
 
   // Preloader is useful if you want to load the standard Sunflower Land assets + SFX
-  const scenes = [Preloader, FruitDashScene];
+  const scenes = [FruitDashPreloader, FruitDashScene];
 
   useEffect(() => {
     const config: Phaser.Types.Core.GameConfig = {

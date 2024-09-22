@@ -9,6 +9,7 @@ import {
   GROUND_DEPTH,
   MAX_OBSTACLES_LINES,
   BACKGROUND_SPEED_RATIO,
+  IS_HALLOWEEN,
 } from "../util/FruitDashConstants";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { FruitDashDecorationFactory } from "./Decorations";
@@ -17,10 +18,14 @@ import weightedRandom from "../util/Utils";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
-  public dirtyTiles = [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
+  public dirtyTiles = IS_HALLOWEEN ? [117, 69, 121] : [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
   public dirtyWeights = [180, 1, 1]; //[180, 1, 1, 1, 1, 1];
-  public grassTiles = [66, 129, 130, 131, 194, 199, 257, 258];
-  public grassWeights = [250, 1, 1, 1, 1, 1, 1, 1];
+  public grassTiles = IS_HALLOWEEN
+    ? [55, 4, 5, 6, 112]
+    : [66, 129, 130, 131, 194, 199, 257, 258];
+  public grassWeights = IS_HALLOWEEN
+    ? [250, 1, 1, 1, 1]
+    : [250, 1, 1, 1, 1, 1, 1, 1];
   public fenceCount = 0;
   private streetLines: Phaser.GameObjects.Container[] = [];
   private backgroundLines: Phaser.GameObjects.Container[] = [];
@@ -35,6 +40,19 @@ export class FruitDashGroundFactory {
     this._obstaclesFactory = new FruitDashObstacleFactory(scene);
   }
   public preload() {
+    if (IS_HALLOWEEN) {
+      const texturehalloween = this._scene.textures.get("halloween_tileset");
+      const textureimagehalloween: HTMLImageElement =
+        texturehalloween.getSourceImage() as HTMLImageElement;
+      this._scene.textures.addSpriteSheet(
+        "SunnySideSpritesHalloween",
+        textureimagehalloween,
+        {
+          frameWidth: 16,
+          frameHeight: 16,
+        },
+      );
+    }
     const texture = this._scene.textures.get("tileset");
     const textureimage: HTMLImageElement =
       texture.getSourceImage() as HTMLImageElement;
@@ -42,7 +60,11 @@ export class FruitDashGroundFactory {
       frameWidth: 18,
       frameHeight: 18,
     });
-    this._scene.load.image("fence", "world/fruitdash/fence.png");
+    if (IS_HALLOWEEN) {
+      this._scene.load.image("fence", "world/fruitdash/fence_halloween.png");
+    } else {
+      this._scene.load.image("fence", "world/fruitdash/fence.png");
+    }
   }
 
   public createBaseRoad() {
@@ -65,7 +87,14 @@ export class FruitDashGroundFactory {
     let x = window.innerWidth / 2 - SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     const y = 0;
     for (let index = 0; index < STREET_COLUMNS; index++) {
-      const image = this._scene.add.image(x, y, "SunnySideSprites", 449);
+      let image = this._scene.add.image(x, y, "SunnySideSprites", 449);
+      if (IS_HALLOWEEN) {
+        image = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 117);
+        image.setScale(
+          SQUARE_WIDTH_TEXTURE / image.width,
+          SQUARE_WIDTH_TEXTURE / image.height,
+        );
+      }
       image.setOrigin(0, 0);
       container.add(image);
       x = x + SQUARE_WIDTH_TEXTURE;
@@ -78,8 +107,20 @@ export class FruitDashGroundFactory {
     const y = 0;
     for (let index = 0; index < STREET_COLUMNS; index++) {
       const item = weightedRandom(this.dirtyTiles, this.dirtyWeights)?.item;
-      if (item != 449) {
-        const image = this._scene.add.image(x, y, "SunnySideSprites", item);
+      if (item != 449 && item != 117) {
+        let image = this._scene.add.image(x, y, "SunnySideSprites", item);
+        if (IS_HALLOWEEN) {
+          image = this._scene.add.image(
+            x,
+            y,
+            "SunnySideSpritesHalloween",
+            item,
+          );
+          image.setScale(
+            SQUARE_WIDTH_TEXTURE / image.width,
+            SQUARE_WIDTH_TEXTURE / image.height,
+          );
+        }
         image.setOrigin(0, 0);
         container.add(image);
       }
@@ -89,20 +130,63 @@ export class FruitDashGroundFactory {
       window.innerWidth / 2 -
       SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
       SQUARE_WIDTH_TEXTURE;
-    const imageLeft = this._scene.add.image(x, y, "SunnySideSprites", 454);
+    let imageLeft = this._scene.add.image(x, y, "SunnySideSprites", 454);
+    if (IS_HALLOWEEN) {
+      imageLeft = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 115);
+      imageLeft.setScale(
+        SQUARE_WIDTH_TEXTURE / imageLeft.width,
+        SQUARE_WIDTH_TEXTURE / imageLeft.height,
+      );
+    }
     imageLeft.setOrigin(0, 0);
     container.add(imageLeft);
     if (this.fenceCount == 3) {
-      const fenceLeft = this._scene.add.image(x, y, "SunnySideSprites", 233);
+      let fenceLeft = this._scene.add.image(x, y, "SunnySideSprites", 233);
+      if (IS_HALLOWEEN) {
+        fenceLeft = this._scene.add.image(
+          x,
+          y,
+          "SunnySideSpritesHalloween",
+          1389,
+        );
+        fenceLeft.setScale(
+          SQUARE_WIDTH_TEXTURE / fenceLeft.width,
+          SQUARE_WIDTH_TEXTURE / fenceLeft.height,
+        );
+      }
       fenceLeft.setOrigin(0, 0);
       container.add(fenceLeft);
     }
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
-    const imageRight = this._scene.add.image(x, y, "SunnySideSprites", 515);
+    let imageRight = this._scene.add.image(x, y, "SunnySideSprites", 515);
+    if (IS_HALLOWEEN) {
+      imageRight = this._scene.add.image(
+        x,
+        y,
+        "SunnySideSpritesHalloween",
+        119,
+      );
+      imageRight.setScale(
+        SQUARE_WIDTH_TEXTURE / imageRight.width,
+        SQUARE_WIDTH_TEXTURE / imageRight.height,
+      );
+    }
     imageRight.setOrigin(0, 0);
     container.add(imageRight);
     if (this.fenceCount == 3) {
-      const fenceRight = this._scene.add.image(x, y, "SunnySideSprites", 233);
+      let fenceRight = this._scene.add.image(x, y, "SunnySideSprites", 233);
+      if (IS_HALLOWEEN) {
+        fenceRight = this._scene.add.image(
+          x,
+          y,
+          "SunnySideSpritesHalloween",
+          1389,
+        );
+        fenceRight.setScale(
+          SQUARE_WIDTH_TEXTURE / fenceRight.width,
+          SQUARE_WIDTH_TEXTURE / fenceRight.height,
+        );
+      }
       fenceRight.setOrigin(0, 0);
       container.add(fenceRight);
       this.fenceCount = -1;
@@ -121,14 +205,28 @@ export class FruitDashGroundFactory {
       SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
       SQUARE_WIDTH_TEXTURE;
     for (let index = 0; index < GRASS_COLUMNS; index++) {
-      const image = this._scene.add.image(x, y, "SunnySideSprites", 66);
+      let image = this._scene.add.image(x, y, "SunnySideSprites", 66);
+      if (IS_HALLOWEEN) {
+        image = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 55);
+        image.setScale(
+          SQUARE_WIDTH_TEXTURE / image.width,
+          SQUARE_WIDTH_TEXTURE / image.height,
+        );
+      }
       image.setOrigin(0, 0);
       container.add(image);
       x = x - SQUARE_WIDTH_TEXTURE;
     }
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     for (let index = 0; index < GRASS_COLUMNS; index++) {
-      const image = this._scene.add.image(x, y, "SunnySideSprites", 66);
+      let image = this._scene.add.image(x, y, "SunnySideSprites", 66);
+      if (IS_HALLOWEEN) {
+        image = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 55);
+        image.setScale(
+          SQUARE_WIDTH_TEXTURE / image.width,
+          SQUARE_WIDTH_TEXTURE / image.height,
+        );
+      }
       image.setOrigin(0, 0);
       container.add(image);
       x = x + SQUARE_WIDTH_TEXTURE;
@@ -136,13 +234,11 @@ export class FruitDashGroundFactory {
     x =
       window.innerWidth / 2 -
       SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
-      SQUARE_WIDTH_TEXTURE;
-
+      SQUARE_WIDTH_TEXTURE * 1;
     const fenceLeft = this._scene.add.image(x, y, "fence");
     fenceLeft.setOrigin(0, 0);
     container.add(fenceLeft);
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
-
     const fenceRight = this._scene.add.image(x, y, "fence");
     fenceRight.setOrigin(0, 0);
     container.add(fenceRight);
@@ -158,8 +254,20 @@ export class FruitDashGroundFactory {
       SQUARE_WIDTH_TEXTURE * 2;
     for (let index = 1; index < GRASS_COLUMNS - 1; index++) {
       const item = weightedRandom(this.grassTiles, this.grassWeights)?.item;
-      if (item != 66) {
-        const image = this._scene.add.image(x, y, "SunnySideSprites", item);
+      if (item != 66 && item != 55) {
+        let image = this._scene.add.image(x, y, "SunnySideSprites", item);
+        if (IS_HALLOWEEN) {
+          image = this._scene.add.image(
+            x,
+            y,
+            "SunnySideSpritesHalloween",
+            item,
+          );
+          image.setScale(
+            SQUARE_WIDTH_TEXTURE / image.width,
+            SQUARE_WIDTH_TEXTURE / image.height,
+          );
+        }
         image.setOrigin(0, 0);
         container.add(image);
       }
@@ -171,8 +279,20 @@ export class FruitDashGroundFactory {
       SQUARE_WIDTH_TEXTURE;
     for (let index = 1; index < GRASS_COLUMNS; index++) {
       const item = weightedRandom(this.grassTiles, this.grassWeights)?.item;
-      if (item != 66) {
-        const image = this._scene.add.image(x, y, "SunnySideSprites", item);
+      if (item != 66 && item != 55) {
+        let image = this._scene.add.image(x, y, "SunnySideSprites", item);
+        if (IS_HALLOWEEN) {
+          image = this._scene.add.image(
+            x,
+            y,
+            "SunnySideSpritesHalloween",
+            item,
+          );
+          image.setScale(
+            SQUARE_WIDTH_TEXTURE / image.width,
+            SQUARE_WIDTH_TEXTURE / image.height,
+          );
+        }
         image.setOrigin(0, 0);
         container.add(image);
       }

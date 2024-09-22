@@ -9,6 +9,7 @@ import {
   FINAL_HEIGHT,
   DECORATION_DEPTH,
   BACKGROUND_SPEED_RATIO,
+  IS_HALLOWEEN,
 } from "../util/FruitDashConstants";
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
@@ -21,7 +22,11 @@ export class FruitDashDecorationFactory {
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
-    this.decorations["tree"] = new TreeDecoration(60);
+    if (IS_HALLOWEEN) {
+      this.decorations["tree"] = new HalloweenTreeDecoration(60);
+    } else {
+      this.decorations["tree"] = new TreeDecoration(60);
+    }
     //this.decorations["flower"] = new FlowerDecoration(20);
     // this.decorations["bush"] = new BushDecoration(15);
     // this.decorations["mushroom"] = new MushroomDecoration(15);
@@ -89,6 +94,157 @@ abstract class FruitDashDecoration {
   abstract add(scene: Phaser.Scene): Phaser.GameObjects.Container;
   getWeight(): number {
     return this._weight;
+  }
+}
+class HalloweenTreeDecoration extends FruitDashDecoration {
+  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
+    const containerbase = scene.add.container(
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+    );
+    const baseX = getBaseXL(2);
+    const container = scene.add.container(baseX, 0);
+    let image = scene.add.image(0, 0, "SunnySideSpritesHalloween", 125);
+    image.setScale(
+      SQUARE_WIDTH_TEXTURE / image.width,
+      SQUARE_WIDTH_TEXTURE / image.height,
+    );
+    image.setOrigin(0, 0);
+    container.add(image);
+    image = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      0,
+      "SunnySideSpritesHalloween",
+      126,
+    );
+    image.setScale(
+      SQUARE_WIDTH_TEXTURE / image.width,
+      SQUARE_WIDTH_TEXTURE / image.height,
+    );
+    image.setOrigin(0, 0);
+    container.add(image);
+    image = scene.add.image(
+      0,
+      SQUARE_WIDTH_TEXTURE,
+      "SunnySideSpritesHalloween",
+      178,
+    );
+    image.setScale(
+      SQUARE_WIDTH_TEXTURE / image.width,
+      SQUARE_WIDTH_TEXTURE / image.height,
+    );
+    image.setOrigin(0, 0);
+    container.add(image);
+    image = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE,
+      "SunnySideSpritesHalloween",
+      179,
+    );
+    image.setScale(
+      SQUARE_WIDTH_TEXTURE / image.width,
+      SQUARE_WIDTH_TEXTURE / image.height,
+    );
+    image.setOrigin(0, 0);
+    container.add(image);
+    image = scene.add.image(
+      0,
+      SQUARE_WIDTH_TEXTURE * 2,
+      "SunnySideSpritesHalloween",
+      231,
+    );
+    image.setScale(
+      SQUARE_WIDTH_TEXTURE / image.width,
+      SQUARE_WIDTH_TEXTURE / image.height,
+    );
+    image.setOrigin(0, 0);
+    container.add(image);
+    image = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE * 2,
+      "SunnySideSpritesHalloween",
+      232,
+    );
+    image.setScale(
+      SQUARE_WIDTH_TEXTURE / image.width,
+      SQUARE_WIDTH_TEXTURE / image.height,
+    );
+    image.setOrigin(0, 0);
+    container.add(image);
+
+    containerbase.add(container);
+
+    const baseX1 = getBaseXR(2);
+    const container1 = scene.add.container(baseX1, 0);
+    let image1 = scene.add.image(0, 0, "SunnySideSpritesHalloween", 125);
+    image1.setScale(
+      SQUARE_WIDTH_TEXTURE / image1.width,
+      SQUARE_WIDTH_TEXTURE / image1.height,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      0,
+      "SunnySideSpritesHalloween",
+      126,
+    );
+    image1.setScale(
+      SQUARE_WIDTH_TEXTURE / image1.width,
+      SQUARE_WIDTH_TEXTURE / image1.height,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      0,
+      SQUARE_WIDTH_TEXTURE,
+      "SunnySideSpritesHalloween",
+      178,
+    );
+    image1.setScale(
+      SQUARE_WIDTH_TEXTURE / image1.width,
+      SQUARE_WIDTH_TEXTURE / image1.height,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE,
+      "SunnySideSpritesHalloween",
+      179,
+    );
+    image1.setScale(
+      SQUARE_WIDTH_TEXTURE / image1.width,
+      SQUARE_WIDTH_TEXTURE / image1.height,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      0,
+      SQUARE_WIDTH_TEXTURE * 2,
+      "SunnySideSpritesHalloween",
+      231,
+    );
+    image1.setScale(
+      SQUARE_WIDTH_TEXTURE / image1.width,
+      SQUARE_WIDTH_TEXTURE / image1.height,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    image1 = scene.add.image(
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE * 2,
+      "SunnySideSpritesHalloween",
+      232,
+    );
+    image1.setScale(
+      SQUARE_WIDTH_TEXTURE / image1.width,
+      SQUARE_WIDTH_TEXTURE / image1.height,
+    );
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    containerbase.add(container1);
+    return containerbase;
   }
 }
 class TreeDecoration extends FruitDashDecoration {

@@ -51,17 +51,31 @@ export const FruitDashHud: React.FC = () => {
   return (
     <HudContainer zIndex={99999}>
       <div>
-        <div
-          className="absolute"
-          style={{
-            top: `${PIXEL_SCALE * 4}px`,
-            left: `${PIXEL_SCALE * 6}px`,
-          }}
-        >
-          <FruitDashTarget />
-          <FruitDashScores />
-        </div>
-
+        {isJoystickActive && (
+          <div
+            className="absolute"
+            style={{
+              top: `${PIXEL_SCALE * 4}px`,
+              left: `${PIXEL_SCALE * 6}px`,
+            }}
+          >
+            <FruitDashTarget />
+            <FruitDashScores />
+          </div>
+        )}
+        {!isJoystickActive && (
+          <div
+            className="absolute"
+            style={{
+              top: `${PIXEL_SCALE * 4}px`,
+              left: "50%",
+              transform: "translate(-50%, 0)",
+            }}
+          >
+            <FruitDashTarget />
+            <FruitDashScores />
+          </div>
+        )}
         {(!isJoystickActive || !isPlaying) && (
           <>
             <FruitDashTravel />

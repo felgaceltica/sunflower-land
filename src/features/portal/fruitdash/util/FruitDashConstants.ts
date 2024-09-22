@@ -123,3 +123,4 @@ export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
     tool: "Farmer Pitchfork",
   },
 };
+export const IS_HALLOWEEN = false;
