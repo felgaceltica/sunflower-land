@@ -75,6 +75,19 @@ export const OBSTACLES_SCORE_TABLE: {
     description: "2 points",
   },
 };
+
+export const OBSTACLES_SCORE_TABLE_HALLOWEEN: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: { item: "world/fruitdash/oilpit_halloween.png", description: "5 points" },
+  1: { item: "world/fruitdash/tree_halloween.png", description: "5 points" },
+  2: { item: "world/fruitdash/pumpkim.png", description: "2 points" },
+  3: { item: "world/fruitdash/skullbox.png", description: "2 points" },
+  4: { item: SUNNYSIDE.decorations.bonniesTombstone, description: "2 points" },
+};
 export const POWERUPS_SCORE_TABLE: {
   [key: number]: {
     item: string;
@@ -124,3 +137,4 @@ export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
   },
 };
 export const IS_HALLOWEEN = false;
+export const SQUARE_WIDTH_TEXTURE_HALLOWEEN = 16;

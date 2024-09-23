@@ -33,19 +33,32 @@ export const FruitDashScores: React.FC = () => {
         </div>
       </div>
       <div className="relative">
-        <div className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse" />
+        <div
+          className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
+          style={{
+            height: "62px",
+          }}
+        />
         <div
           className="flex items-center space-x-2 text-xs text-white text-shadow"
           style={{
-            width: "180px",
-            paddingTop: "7px",
-            paddingLeft: "3px",
+            width: "200px",
+            paddingTop: "10px",
+            paddingLeft: "4px",
           }}
         >
           <span>
-            {t("fruit-dash.axes", {
-              axes: Math.round(axes),
-            })}
+            {t("fruit-dash.axes")}
+            <div
+              style={{
+                fontSize: "10vh",
+                paddingLeft: "60px",
+                textAlign: "left",
+                width: "160px",
+              }}
+            >
+              {axes}
+            </div>
           </span>
         </div>
       </div>

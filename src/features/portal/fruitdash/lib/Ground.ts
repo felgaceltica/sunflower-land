@@ -60,11 +60,31 @@ export class FruitDashGroundFactory {
       frameWidth: 18,
       frameHeight: 18,
     });
-    // if (IS_HALLOWEEN) {
-    //   this._scene.load.image("fence", "world/fruitdash/fence_halloween.png");
-    // } else {
-    this._scene.load.image("fence", "world/fruitdash/fence.png");
-    //}
+    if (IS_HALLOWEEN) {
+      this._scene.load.image(
+        "oilpit_halloween",
+        "world/fruitdash/oilpit_halloween.png",
+      );
+      this._scene.load.image(
+        "tree_halloween",
+        "world/fruitdash/tree_halloween.png",
+      );
+      this._scene.load.image("fence", "world/fruitdash/fence_halloween.png");
+      this._scene.anims.create({
+        key: "pumpkim",
+        frames: this._scene.anims.generateFrameNames(
+          "SunnySideSpritesHalloween",
+          {
+            start: 23,
+            end: 25,
+          },
+        ),
+        repeat: -1,
+        duration: 2000,
+      });
+    } else {
+      this._scene.load.image("fence", "world/fruitdash/fence.png");
+    }
   }
 
   public createBaseRoad() {
