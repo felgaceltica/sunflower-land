@@ -8,7 +8,8 @@ import { PortalMachineState } from "../../lib/FruitDashMachine";
 import { FruitDashTimer } from "./FruitDashTimer";
 import { FruitDashSettings } from "./FruitDashSettings";
 import { FruitDashTravel } from "./FruitDashTravel";
-import { FruitDashScores } from "./FruitDashScores";
+import { FruitDashScoresMobile } from "./FruitDashScoresMobile";
+import { FruitDashScoresPC } from "./FruitDashScoresPC";
 import { useAchievementToast } from "../../providers/AchievementToastProvider";
 import { FruitDashTarget } from "./FruitDashTarget";
 
@@ -59,7 +60,8 @@ export const FruitDashHud: React.FC = () => {
           }}
         >
           <FruitDashTarget />
-          <FruitDashScores />
+          {!isJoystickActive && <FruitDashScoresPC />}
+          {isJoystickActive && <FruitDashScoresMobile />}
         </div>
         {(!isJoystickActive || !isPlaying) && (
           <>
