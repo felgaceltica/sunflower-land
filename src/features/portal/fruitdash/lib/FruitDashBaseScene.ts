@@ -51,7 +51,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   walkingSpeed = INITIAL_WALK_SPEED;
   walkAudioController?: WalkAudioController;
   soundEffects: AudioController[] = [];
-  groundFactory = new FruitDashGroundFactory(this);
+  groundFactory?: FruitDashGroundFactory;
   speedInterval: any;
   gameOverSound?:
     | Phaser.Sound.NoAudioSound
@@ -97,7 +97,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.audio("bounty", "world/fruitdash/bounty.mp3");
     this.load.audio("fruit", "world/fruitdash/fruit.mp3");
     this.load.audio("music", "world/fruitdash/music.mp3");
-
+    this.groundFactory = new FruitDashGroundFactory(this);
     this.groundFactory.preload();
     this.load.image("slowdown", fisherHourglassFull);
     this.load.image("Apple", ITEM_DETAILS["Apple"].image);
@@ -124,7 +124,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.initialiseCamera();
     this.initialiseSounds();
     this.initialiseControls();
-    this.groundFactory.createBaseRoad();
+    this.groundFactory?.createBaseRoad();
     this.speedInterval = setInterval(() => {
       if (this.isGamePlaying && !this.slow_down) {
         this.speed = this.speed + SPEED_INCREMENT;
@@ -163,7 +163,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     const speed_factor = delta / (1000 / 60); // 1000 ms / 60fps
     const player_speed_factor = 16 / (1000 / 60); // 1000 ms / 60fps
     this.updatePlayer(player_speed_factor);
-    this.groundFactory.update(speed_factor);
+    this.groundFactory?.update(speed_factor);
     if (this.portalService?.state?.context?.axes && this.axeButtonCount) {
       const currentAxes = this.portalService?.state?.context?.axes;
       this.axeButtonCount.text = currentAxes.toString();
@@ -547,7 +547,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       const currentAxes = this.portalService?.state?.context?.axes;
       if (currentAxes > 0) {
         this.portalService?.send("THROW_AXE");
-        this.groundFactory.throwAxe();
+        this.groundFactory?.throwAxe();
       }
     }
   }

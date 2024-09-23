@@ -8,13 +8,13 @@ import {
   PLAYER_MAX_X,
   INITIAL_SPEED,
   INITIAL_WALK_SPEED,
-  IS_HALLOWEEN,
   SQUARE_WIDTH_TEXTURE_HALLOWEEN,
 } from "../util/FruitDashConstants";
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import { InventoryItemName } from "features/game/types/game";
+import { hasFeatureAccess } from "lib/flags";
 
 export class FruitDashObstacleFactory {
   private _scene: FruitDashBaseScene;
@@ -22,15 +22,22 @@ export class FruitDashObstacleFactory {
   private obstacles: any = {};
   private obstaclesLines: Phaser.GameObjects.Container[] = [];
   private throwableLines: Phaser.GameObjects.Container[] = [];
+  private IS_HALLOWEEN = false;
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
+    this.IS_HALLOWEEN = hasFeatureAccess(
+      this._scene.gameState,
+      "FRUIT_DASH_HALLOWEEN",
+    )
+      ? true
+      : false;
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
     // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
     //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
     //this.obstacles["coin"] = new CoinObstacle(5,10,true);
 
-    if (IS_HALLOWEEN) {
+    if (this.IS_HALLOWEEN) {
       this.obstacles["oilpit"] = new OilPitHalloweenObstacle(20, 5, "obstacle");
       this.obstacles["rock"] = new RockHalloweenObstacle(100, 2, "obstacle");
       this.obstacles["largerock"] = new StoneRockHalloweenObstacle(

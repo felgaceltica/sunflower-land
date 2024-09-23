@@ -9,23 +9,19 @@ import {
   GROUND_DEPTH,
   MAX_OBSTACLES_LINES,
   BACKGROUND_SPEED_RATIO,
-  IS_HALLOWEEN,
 } from "../util/FruitDashConstants";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { FruitDashDecorationFactory } from "./Decorations";
 import { FruitDashObstacleFactory } from "./Obstacles";
 import weightedRandom from "../util/Utils";
+import { hasFeatureAccess } from "lib/flags";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
-  public dirtyTiles = IS_HALLOWEEN ? [117, 69, 121] : [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
-  public dirtyWeights = [180, 1, 1]; //[180, 1, 1, 1, 1, 1];
-  public grassTiles = IS_HALLOWEEN
-    ? [55, 4, 5, 6, 112]
-    : [66, 129, 130, 131, 194, 199, 257, 258];
-  public grassWeights = IS_HALLOWEEN
-    ? [250, 1, 1, 1, 1]
-    : [250, 1, 1, 1, 1, 1, 1, 1];
+  public dirtyTiles: number[] = [];
+  public dirtyWeights: number[] = [];
+  public grassTiles: number[] = [];
+  public grassWeights: number[] = [];
   public fenceCount = 0;
   private streetLines: Phaser.GameObjects.Container[] = [];
   private backgroundLines: Phaser.GameObjects.Container[] = [];
@@ -33,14 +29,29 @@ export class FruitDashGroundFactory {
   private _decorationsFactory: FruitDashDecorationFactory;
   nextObstacle: number = randomInt(0, MAX_OBSTACLES_LINES);
   private _obstaclesFactory: FruitDashObstacleFactory;
+  private IS_HALLOWEEN = false;
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
+    this.IS_HALLOWEEN = hasFeatureAccess(
+      this._scene.gameState,
+      "FRUIT_DASH_HALLOWEEN",
+    )
+      ? true
+      : false;
+    this.dirtyTiles = this.IS_HALLOWEEN ? [117, 69, 121] : [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
+    this.dirtyWeights = [180, 1, 1]; //[180, 1, 1, 1, 1, 1];
+    this.grassTiles = this.IS_HALLOWEEN
+      ? [55, 4, 5, 6, 112]
+      : [66, 129, 130, 131, 194, 199, 257, 258];
+    this.grassWeights = this.IS_HALLOWEEN
+      ? [250, 1, 1, 1, 1]
+      : [250, 1, 1, 1, 1, 1, 1, 1];
     this._decorationsFactory = new FruitDashDecorationFactory(scene);
     this._obstaclesFactory = new FruitDashObstacleFactory(scene);
   }
   public preload() {
-    if (IS_HALLOWEEN) {
+    if (this.IS_HALLOWEEN) {
       const texturehalloween = this._scene.textures.get("halloween_tileset");
       const textureimagehalloween: HTMLImageElement =
         texturehalloween.getSourceImage() as HTMLImageElement;
@@ -60,7 +71,7 @@ export class FruitDashGroundFactory {
       frameWidth: 18,
       frameHeight: 18,
     });
-    if (IS_HALLOWEEN) {
+    if (this.IS_HALLOWEEN) {
       this._scene.load.image(
         "oilpit_halloween",
         "world/fruitdash/oilpit_halloween.png",
@@ -108,7 +119,7 @@ export class FruitDashGroundFactory {
     const y = 0;
     for (let index = 0; index < STREET_COLUMNS; index++) {
       let image = this._scene.add.image(x, y, "SunnySideSprites", 449);
-      if (IS_HALLOWEEN) {
+      if (this.IS_HALLOWEEN) {
         image = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 117);
         image.setScale(
           SQUARE_WIDTH_TEXTURE / image.width,
@@ -129,7 +140,7 @@ export class FruitDashGroundFactory {
       const item = weightedRandom(this.dirtyTiles, this.dirtyWeights)?.item;
       if (item != 449 && item != 117) {
         let image = this._scene.add.image(x, y, "SunnySideSprites", item);
-        if (IS_HALLOWEEN) {
+        if (this.IS_HALLOWEEN) {
           image = this._scene.add.image(
             x,
             y,
@@ -151,7 +162,7 @@ export class FruitDashGroundFactory {
       SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2) -
       SQUARE_WIDTH_TEXTURE;
     let imageLeft = this._scene.add.image(x, y, "SunnySideSprites", 454);
-    if (IS_HALLOWEEN) {
+    if (this.IS_HALLOWEEN) {
       imageLeft = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 115);
       imageLeft.setScale(
         SQUARE_WIDTH_TEXTURE / imageLeft.width,
@@ -162,7 +173,7 @@ export class FruitDashGroundFactory {
     container.add(imageLeft);
     if (this.fenceCount == 3) {
       let fenceLeft = this._scene.add.image(x, y, "SunnySideSprites", 233);
-      if (IS_HALLOWEEN) {
+      if (this.IS_HALLOWEEN) {
         fenceLeft = this._scene.add.image(
           x,
           y,
@@ -179,7 +190,7 @@ export class FruitDashGroundFactory {
     }
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     let imageRight = this._scene.add.image(x, y, "SunnySideSprites", 515);
-    if (IS_HALLOWEEN) {
+    if (this.IS_HALLOWEEN) {
       imageRight = this._scene.add.image(
         x,
         y,
@@ -195,7 +206,7 @@ export class FruitDashGroundFactory {
     container.add(imageRight);
     if (this.fenceCount == 3) {
       let fenceRight = this._scene.add.image(x, y, "SunnySideSprites", 233);
-      if (IS_HALLOWEEN) {
+      if (this.IS_HALLOWEEN) {
         fenceRight = this._scene.add.image(
           x,
           y,
@@ -226,7 +237,7 @@ export class FruitDashGroundFactory {
       SQUARE_WIDTH_TEXTURE;
     for (let index = 0; index < GRASS_COLUMNS; index++) {
       let image = this._scene.add.image(x, y, "SunnySideSprites", 66);
-      if (IS_HALLOWEEN) {
+      if (this.IS_HALLOWEEN) {
         image = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 55);
         image.setScale(
           SQUARE_WIDTH_TEXTURE / image.width,
@@ -240,7 +251,7 @@ export class FruitDashGroundFactory {
     x = window.innerWidth / 2 + SQUARE_WIDTH_TEXTURE * (STREET_COLUMNS / 2);
     for (let index = 0; index < GRASS_COLUMNS; index++) {
       let image = this._scene.add.image(x, y, "SunnySideSprites", 66);
-      if (IS_HALLOWEEN) {
+      if (this.IS_HALLOWEEN) {
         image = this._scene.add.image(x, y, "SunnySideSpritesHalloween", 55);
         image.setScale(
           SQUARE_WIDTH_TEXTURE / image.width,
@@ -276,7 +287,7 @@ export class FruitDashGroundFactory {
       const item = weightedRandom(this.grassTiles, this.grassWeights)?.item;
       if (item != 66 && item != 55) {
         let image = this._scene.add.image(x, y, "SunnySideSprites", item);
-        if (IS_HALLOWEEN) {
+        if (this.IS_HALLOWEEN) {
           image = this._scene.add.image(
             x,
             y,
@@ -301,7 +312,7 @@ export class FruitDashGroundFactory {
       const item = weightedRandom(this.grassTiles, this.grassWeights)?.item;
       if (item != 66 && item != 55) {
         let image = this._scene.add.image(x, y, "SunnySideSprites", item);
-        if (IS_HALLOWEEN) {
+        if (this.IS_HALLOWEEN) {
           image = this._scene.add.image(
             x,
             y,

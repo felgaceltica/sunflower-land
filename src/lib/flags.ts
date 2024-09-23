@@ -4,6 +4,9 @@ import { CONFIG } from "lib/config";
 const defaultFeatureFlag = ({ inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" || !!inventory["Beta Pass"]?.gt(0);
 
+const betaFeatureFlag = ({ inventory }: GameState) =>
+  !!inventory["Beta Pass"]?.gt(0);
+
 const testnetFeatureFlag = () => CONFIG.NETWORK === "amoy";
 
 const timeBasedFeatureFlag = (date: Date) => () => {
@@ -30,6 +33,7 @@ export type FeatureName =
   | "MARKETPLACE"
   | "ONBOARDING_REWARDS"
   | "FRUIT_DASH"
+  | "FRUIT_DASH_HALLOWEEN"
   | "TREASURE_UPDATES"
   | "NEW_RESOURCES_GE";
 
@@ -53,6 +57,7 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   MARKETPLACE: testnetFeatureFlag,
   CROP_QUICK_SELECT: () => false,
   FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2024-09-10T00:00:00Z")),
+  FRUIT_DASH_HALLOWEEN: betaFeatureFlag,
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   EASTER: () => false, // To re-enable next easter

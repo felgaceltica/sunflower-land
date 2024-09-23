@@ -15,7 +15,6 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { FruitDashGuide } from "./FruitDashGuide";
 import { SquareIcon } from "components/ui/SquareIcon";
 import { PIXEL_SCALE } from "features/game/lib/constants";
-import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -28,7 +27,6 @@ interface Props {
 const _minigame = (state: PortalMachineState) =>
   state.context.state?.minigames.games["fruit-dash"];
 const _lastScore = (state: PortalMachineState) => state.context.lastScore;
-const _state = (state: PortalMachineState) => state.context.state;
 
 export const FruitDashMission: React.FC<Props> = ({
   mode,
@@ -44,9 +42,6 @@ export const FruitDashMission: React.FC<Props> = ({
   const minigame = useSelector(portalService, _minigame);
   const attemptsLeft = getAttemptsLeft(minigame);
   const lastScore = useSelector(portalService, _lastScore);
-  const state = useSelector(portalService, _state);
-
-  const hasBetaAccess = state ? hasFeatureAccess(state, "FRUIT_DASH") : false;
 
   const dateKey = new Date().toISOString().slice(0, 10);
 

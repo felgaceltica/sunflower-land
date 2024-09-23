@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { SUNNYSIDE } from "assets/sunnyside";
@@ -7,22 +7,28 @@ import { ITEM_DETAILS } from "features/game/types/images";
 import { Label } from "components/ui/Label";
 import {
   BONUS_SCORE_TABLE,
-  IS_HALLOWEEN,
   OBSTACLES_SCORE_TABLE,
   OBSTACLES_SCORE_TABLE_HALLOWEEN,
   POWERUPS_SCORE_TABLE,
 } from "../../util/FruitDashConstants";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
+import { hasFeatureAccess } from "lib/flags";
+import { useSelector } from "@xstate/react";
+import { PortalMachineState } from "../../lib/FruitDashMachine";
+import { PortalContext } from "../../lib/PortalProvider";
 
 type Props = {
   onBack: () => void;
 };
+const _state = (state: PortalMachineState) => state.context.state;
 
 export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
   const { t } = useAppTranslation();
-
   const button = useSound("button");
+  const { portalService } = useContext(PortalContext);
+  const state = useSelector(portalService, _state);
+  const IS_HALLOWEEN = state ? hasFeatureAccess(state, "FRUIT_DASH") : false;
 
   return (
     <div className="flex flex-col gap-1 max-h-[75vh]">
