@@ -2,7 +2,6 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { Equipped } from "features/game/types/bumpkin";
 import { ITEM_DETAILS } from "features/game/types/images";
 import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
-import { CONFIG } from "lib/config";
 
 export const ZOOM = window.innerWidth < 500 ? 2 : 3;
 export const SQUARE_WIDTH_TEXTURE = 18;
@@ -137,5 +136,5 @@ export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
     tool: "Farmer Pitchfork",
   },
 };
-export const IS_HALLOWEEN = CONFIG.NETWORK == "amoy" ? true : false;
+export const IS_HALLOWEEN = false;
 export const SQUARE_WIDTH_TEXTURE_HALLOWEEN = 16;
