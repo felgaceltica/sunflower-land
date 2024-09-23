@@ -61,6 +61,19 @@ export const BONUS_SCORE_TABLE: {
   4: { item: ITEM_DETAILS["Blueberry"].image, description: "20 base points" },
 };
 
+export const BONUS_SCORE_TABLE_HALLOWEEN: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: {
+    item: ITEM_DETAILS["Pirate Bounty"].image,
+    description: "250 base points - Chance after 500 points",
+  },
+  1: { item: "world/fruitdash/pumpkim.png", description: "20 base points" },
+};
+
 export const OBSTACLES_SCORE_TABLE: {
   [key: number]: {
     item: string;
@@ -70,10 +83,7 @@ export const OBSTACLES_SCORE_TABLE: {
   0: { item: ITEM_DETAILS["Oil Reserve"].image, description: "5 points" },
   1: { item: SUNNYSIDE.resource.stone_rock, description: "5 points" },
   2: { item: SUNNYSIDE.resource.stone_small, description: "2 points" },
-  3: {
-    item: SUNNYSIDE.decorations.bonniesTombstone,
-    description: "2 points",
-  },
+  3: { item: SUNNYSIDE.decorations.bonniesTombstone, description: "2 points" },
 };
 
 export const OBSTACLES_SCORE_TABLE_HALLOWEEN: {
@@ -84,7 +94,7 @@ export const OBSTACLES_SCORE_TABLE_HALLOWEEN: {
 } = {
   0: { item: "world/fruitdash/oilpit_halloween.png", description: "5 points" },
   1: { item: "world/fruitdash/tree_halloween.png", description: "5 points" },
-  2: { item: "world/fruitdash/pumpkim.png", description: "2 points" },
+  2: { item: SUNNYSIDE.resource.stone_small, description: "2 points" },
   3: { item: "world/fruitdash/skullbox.png", description: "2 points" },
   4: { item: SUNNYSIDE.decorations.bonniesTombstone, description: "2 points" },
 };
