@@ -63,11 +63,15 @@ export const getAttemptsLeft = (minigame?: Minigame) => {
   const dateKey = new Date().toISOString().slice(0, 10);
 
   const history = minigame?.history ?? {};
+
   const purchases = minigame?.purchases ?? [];
 
   const now = new Date();
   const startOfTodayUTC = getStartOfUTCDay(now);
   const endOfTodayUTC = startOfTodayUTC + 24 * 60 * 60 * 1000; // 24 hours later
+
+  const isComplete = !!history[dateKey]?.prizeClaimedAt;
+
   const hasUnlimitedAttempts = purchases.some(
     (purchase) =>
       purchase.sfl === UNLIMITED_ATTEMPTS_SFL &&
@@ -75,7 +79,7 @@ export const getAttemptsLeft = (minigame?: Minigame) => {
       purchase.purchasedAt < endOfTodayUTC,
   );
 
-  if (hasUnlimitedAttempts) return Infinity;
+  if (hasUnlimitedAttempts || isComplete) return Infinity;
 
   const restockedCount = purchases.filter(
     (purchase) =>
