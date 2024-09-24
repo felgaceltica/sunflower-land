@@ -82,7 +82,7 @@ export const FruitDashMission: React.FC<Props> = ({
               <div className="flex justify-between flex-col space-y-1 px-1 mb-3 text-sm flex-grow">
                 {showScore && (
                   <span>
-                    {t("fruit-dash.score", {
+                    {t("fruit-dash.mainScore", {
                       score: Math.round(lastScore),
                     })}
                   </span>
