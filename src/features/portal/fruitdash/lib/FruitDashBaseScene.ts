@@ -52,7 +52,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   walkAudioController?: WalkAudioController;
   soundEffects: AudioController[] = [];
   groundFactory?: FruitDashGroundFactory;
-  speedInterval: any;
+  speedInterval?: NodeJS.Timer = undefined;
   gameOverSound?:
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
@@ -117,6 +117,15 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       frameWidth: 96,
       frameHeight: 64,
     });
+    this.loadTexture("Halloween Pumpkin", "world/fruitdash/pumpkim.png");
+  }
+  private loadTexture(key: string, url: string) {
+    if (url.startsWith("data:")) {
+      this.textures.addBase64(key, url);
+    } else if (!this.textures.exists(key)) {
+      this.load.image(key, url);
+      this.load.start();
+    }
   }
   async create() {
     //this.physics.world.setFPS(30);
