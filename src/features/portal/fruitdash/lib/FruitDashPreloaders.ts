@@ -2,7 +2,6 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { CONFIG } from "lib/config";
 import { SOUNDS } from "assets/sound-effects/soundEffects";
 import { createErrorLogger } from "lib/errorLogger";
-import { hasFeatureAccess } from "lib/flags";
 import { GameState } from "features/game/types/game";
 
 export abstract class FruitDashPreloader extends Phaser.Scene {
@@ -46,18 +45,10 @@ export abstract class FruitDashPreloader extends Phaser.Scene {
         "tileset",
         `${CONFIG.PROTECTED_IMAGE_URL}/world/map-extruded.png`,
       );
-      const IS_HALLOWEEN = hasFeatureAccess(
-        this.gameState,
-        "FRUIT_DASH_HALLOWEEN",
-      )
-        ? true
-        : false;
-      if (IS_HALLOWEEN) {
-        this.load.image(
-          "halloween_tileset",
-          "world/fruitdash/SFL_Halloween_Tileset_v1.png",
-        );
-      }
+      this.load.image(
+        "halloween_tileset",
+        "world/fruitdash/SFL_Halloween_Tileset_v1.png",
+      );
       this.load.image(
         "easter-tileset",
         `${CONFIG.PROTECTED_IMAGE_URL}/world/easter-map-extruded.png`,

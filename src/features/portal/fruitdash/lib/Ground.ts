@@ -14,7 +14,7 @@ import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { FruitDashDecorationFactory } from "./Decorations";
 import { FruitDashObstacleFactory } from "./Obstacles";
 import weightedRandom from "../util/Utils";
-import { hasFeatureAccess } from "lib/flags";
+import { getHalloweenModeSetting } from "../util/useIsHalloweenMode";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
@@ -33,12 +33,7 @@ export class FruitDashGroundFactory {
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
-    this.IS_HALLOWEEN = hasFeatureAccess(
-      this._scene.gameState,
-      "FRUIT_DASH_HALLOWEEN",
-    )
-      ? true
-      : false;
+    this.IS_HALLOWEEN = getHalloweenModeSetting();
     this.dirtyTiles = this.IS_HALLOWEEN ? [117, 69, 121] : [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
     this.dirtyWeights = [180, 1, 1]; //[180, 1, 1, 1, 1, 1];
     this.grassTiles = this.IS_HALLOWEEN
@@ -51,10 +46,10 @@ export class FruitDashGroundFactory {
     this._obstaclesFactory = new FruitDashObstacleFactory(scene);
   }
   public preload() {
-    if (this.IS_HALLOWEEN) {
-      const texturehalloween = this._scene.textures.get("halloween_tileset");
-      const textureimagehalloween: HTMLImageElement =
-        texturehalloween.getSourceImage() as HTMLImageElement;
+    const texturehalloween = this._scene.textures.get("halloween_tileset");
+    const textureimagehalloween: HTMLImageElement =
+      texturehalloween.getSourceImage() as HTMLImageElement;
+    if (!this._scene.textures.exists("SunnySideSpritesHalloween"))
       this._scene.textures.addSpriteSheet(
         "SunnySideSpritesHalloween",
         textureimagehalloween,
@@ -63,39 +58,40 @@ export class FruitDashGroundFactory {
           frameHeight: 16,
         },
       );
-    }
     const texture = this._scene.textures.get("tileset");
     const textureimage: HTMLImageElement =
       texture.getSourceImage() as HTMLImageElement;
-    this._scene.textures.addSpriteSheet("SunnySideSprites", textureimage, {
-      frameWidth: 18,
-      frameHeight: 18,
-    });
-    if (this.IS_HALLOWEEN) {
-      this._scene.load.image(
-        "oilpit_halloween",
-        "world/fruitdash/oilpit_halloween.png",
-      );
-      this._scene.load.image(
-        "tree_halloween",
-        "world/fruitdash/tree_halloween.png",
-      );
-      this._scene.load.image("fence", "world/fruitdash/fence_halloween.png");
-      this._scene.anims.create({
-        key: "pumpkim",
-        frames: this._scene.anims.generateFrameNames(
-          "SunnySideSpritesHalloween",
-          {
-            start: 23,
-            end: 25,
-          },
-        ),
-        repeat: -1,
-        duration: 2000,
+    if (!this._scene.textures.exists("SunnySideSprites"))
+      this._scene.textures.addSpriteSheet("SunnySideSprites", textureimage, {
+        frameWidth: 18,
+        frameHeight: 18,
       });
-    } else {
-      this._scene.load.image("fence", "world/fruitdash/fence.png");
-    }
+    this._scene.load.image(
+      "oilpit_halloween",
+      "world/fruitdash/oilpit_halloween.png",
+    );
+    this._scene.load.image(
+      "tree_halloween",
+      "world/fruitdash/tree_halloween.png",
+    );
+    this._scene.load.image(
+      "fence_halloween",
+      "world/fruitdash/fence_halloween.png",
+    );
+    this._scene.anims.create({
+      key: "pumpkim",
+      frames: this._scene.anims.generateFrameNames(
+        "SunnySideSpritesHalloween",
+        {
+          start: 23,
+          end: 25,
+        },
+      ),
+      repeat: -1,
+      duration: 2000,
+    });
+
+    this._scene.load.image("fence", "world/fruitdash/fence.png");
   }
 
   public createBaseRoad() {

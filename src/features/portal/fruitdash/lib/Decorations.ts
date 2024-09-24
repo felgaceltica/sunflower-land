@@ -12,7 +12,7 @@ import {
 } from "../util/FruitDashConstants";
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
-import { hasFeatureAccess } from "lib/flags";
+import { getHalloweenModeSetting } from "../util/useIsHalloweenMode";
 
 export class FruitDashDecorationFactory {
   private _scene: FruitDashBaseScene;
@@ -23,12 +23,7 @@ export class FruitDashDecorationFactory {
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
-    this.IS_HALLOWEEN = hasFeatureAccess(
-      this._scene.gameState,
-      "FRUIT_DASH_HALLOWEEN",
-    )
-      ? true
-      : false;
+    this.IS_HALLOWEEN = getHalloweenModeSetting();
     if (this.IS_HALLOWEEN) {
       this.decorations["tree"] = new HalloweenTreeDecoration(60);
     } else {

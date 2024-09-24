@@ -7,7 +7,9 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { useSound } from "lib/utils/hooks/useSound";
 // import { useIsDarkMode } from "lib/utils/hooks/useIsDarkMode";
-// import darkModeIcon from "assets/icons/dark_mode.png";
+import darkModeIcon from "assets/icons/dark_mode.png";
+import lightModeIcon from "assets/icons/light_mode.png";
+
 import { PortalContext } from "../../lib/PortalProvider";
 import { PortalMachineState } from "../../lib/FruitDashMachine";
 import { useSelector } from "@xstate/react";
@@ -16,16 +18,20 @@ import { isTouchDevice } from "features/world/lib/device";
 import sound_on from "assets/icons/sound_on.png";
 import sound_off from "assets/icons/sound_off.png";
 import { useIsAudioMuted } from "lib/utils/hooks/useIsAudioMuted";
+import { useIsHalloweenMode } from "../../util/useIsHalloweenMode";
+import { hasFeatureAccess } from "lib/flags";
 
 const buttonWidth = PIXEL_SCALE * 22;
 const buttonHeight = PIXEL_SCALE * 23;
 
 const _isJoystickActive = (state: PortalMachineState) =>
   state.context.isJoystickActive;
+const _state = (state: PortalMachineState) => state.context.state;
 
 export const FruitDashSettings: React.FC = () => {
   const { portalService } = useContext(PortalContext);
-  //const { isDarkMode, toggleDarkMode } = useIsDarkMode();
+  const state = useSelector(portalService, _state);
+  const { isHalloweenMode, toggleHalloweenMode } = useIsHalloweenMode();
 
   const { isAudioMuted, toggleAudioMuted } = useIsAudioMuted();
 
@@ -115,23 +121,24 @@ export const FruitDashSettings: React.FC = () => {
       />,
     );
 
-  // const darkModeButton = (index: number) =>
-  //   settingButton(
-  //     index,
-  //     () => {
-  //       button.play();
-  //       toggleDarkMode();
-  //     },
-  //     <img
-  //       src={isDarkMode ? darkModeIcon : lightModeIcon}
-  //       className="absolute"
-  //       style={{
-  //         top: `${PIXEL_SCALE * 6}px`,
-  //         left: `${PIXEL_SCALE * 6}px`,
-  //         width: `${PIXEL_SCALE * 10}px`,
-  //       }}
-  //     />,
-  //   );
+  const halloweenModeButton = (index: number) =>
+    settingButton(
+      index,
+      () => {
+        button.play();
+        toggleHalloweenMode();
+        PubSub.publish("restartScene");
+      },
+      <img
+        src={isHalloweenMode ? lightModeIcon : darkModeIcon}
+        className="absolute"
+        style={{
+          top: `${PIXEL_SCALE * 6}px`,
+          left: `${PIXEL_SCALE * 6}px`,
+          width: `${PIXEL_SCALE * 10}px`,
+        }}
+      />,
+    );
 
   const gearButton = (index: number) =>
     settingButton(
@@ -153,6 +160,8 @@ export const FruitDashSettings: React.FC = () => {
 
   // list of buttons to show in the HUD from right to left in order
   const buttons = [gearButton, audioButton];
+  if (state ? hasFeatureAccess(state, "FRUIT_DASH_HALLOWEEN") : false)
+    buttons.push(halloweenModeButton);
 
   return (
     <div

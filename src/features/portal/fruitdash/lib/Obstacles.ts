@@ -14,7 +14,7 @@ import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import { InventoryItemName } from "features/game/types/game";
-import { hasFeatureAccess } from "lib/flags";
+import { getHalloweenModeSetting } from "../util/useIsHalloweenMode";
 
 export class FruitDashObstacleFactory {
   private _scene: FruitDashBaseScene;
@@ -26,12 +26,7 @@ export class FruitDashObstacleFactory {
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
-    this.IS_HALLOWEEN = hasFeatureAccess(
-      this._scene.gameState,
-      "FRUIT_DASH_HALLOWEEN",
-    )
-      ? true
-      : false;
+    this.IS_HALLOWEEN = getHalloweenModeSetting();
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
     // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
     //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);

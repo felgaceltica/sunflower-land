@@ -127,25 +127,37 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       this.load.start();
     }
   }
+  init() {
+    this.speed = INITIAL_SPEED;
+    this.next_speed = INITIAL_SPEED;
+    this.isFacingLeft = false;
+    this.walkingSpeed = INITIAL_WALK_SPEED;
+  }
   async create() {
     //this.physics.world.setFPS(30);
     this.physics.world.drawDebug = false;
     this.initialiseCamera();
     this.initialiseSounds();
     this.initialiseControls();
+    const audioMuted = getAudioMutedSetting();
+    if (!audioMuted) {
+      this.musicSound?.play({ volume: 0.07 });
+    }
     this.groundFactory?.createBaseRoad();
-    this.speedInterval = setInterval(() => {
-      if (this.isGamePlaying && !this.slow_down) {
-        this.speed = this.speed + SPEED_INCREMENT;
-        this.walkingSpeed = this.walkingSpeed + WALK_SPEED_INCREMENT;
-        if (this.speed > MAX_SPEED) {
-          this.speed = MAX_SPEED;
+    if (!this.speedInterval)
+      this.speedInterval = setInterval(() => {
+        if (this.isGamePlaying && !this.slow_down) {
+          this.speed = this.speed + SPEED_INCREMENT;
+          this.walkingSpeed = this.walkingSpeed + WALK_SPEED_INCREMENT;
+          if (this.speed > MAX_SPEED) {
+            this.speed = MAX_SPEED;
+          }
+          if (this.walkingSpeed > MAX_WALK_SPEED) {
+            this.walkingSpeed = MAX_WALK_SPEED;
+          }
         }
-        if (this.walkingSpeed > MAX_WALK_SPEED) {
-          this.walkingSpeed = MAX_WALK_SPEED;
-        }
-      }
-    }, 5000);
+      }, 5000);
+
     this.createPlayer({
       x: window.innerWidth / 2,
       y: PLAYER_Y,
@@ -161,12 +173,24 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       experience: 0,
       sessionId: "",
     });
-    this.anims.create({
-      key: "player_death_anim",
-      frames: this.anims.generateFrameNumbers("player_death"),
-      frameRate: 10,
-      repeat: 0,
+    if (!this.anims.exists("player_death_anim"))
+      this.anims.create({
+        key: "player_death_anim",
+        frames: this.anims.generateFrameNumbers("player_death"),
+        frameRate: 10,
+        repeat: 0,
+      });
+    PubSub.subscribe("restartScene", () => {
+      this.RestartScene();
     });
+  }
+  private RestartScene() {
+    //this.registry.destroy(); // destroy registry
+    //this.events.off(); // disable all active events
+    this.musicSound?.stop();
+    // if(this.speedInterval)
+    //   clearInterval(this.speedInterval);
+    this.scene.restart(); // restart current scene
   }
   async update(time: number, delta: number) {
     const speed_factor = delta / (1000 / 60); // 1000 ms / 60fps
@@ -194,17 +218,15 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     camera.fadeIn();
   }
   private initialiseSounds() {
-    const audioMuted = getAudioMutedSetting();
     this.walkAudioController = new WalkAudioController(
       this.sound.add("dirt_footstep"),
     );
-    this.gameOverSound = this.sound.add("game_over");
-    this.bountySound = this.sound.add("bounty");
-    this.fruitSound = this.sound.add("fruit");
-    this.musicSound = this.sound.add("music");
-    this.musicSound.loop = true;
-    if (!audioMuted) {
-      this.musicSound?.play({ volume: 0.07 });
+    if (!this.gameOverSound) this.gameOverSound = this.sound.add("game_over");
+    if (!this.bountySound) this.bountySound = this.sound.add("bounty");
+    if (!this.fruitSound) this.fruitSound = this.sound.add("fruit");
+    if (!this.musicSound) {
+      this.musicSound = this.sound.add("music");
+      this.musicSound.loop = true;
     }
   }
   public updatePlayer(speed_factor: number) {

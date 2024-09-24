@@ -66,7 +66,7 @@ export const FruitDashHud: React.FC = () => {
         {(!isJoystickActive || !isPlaying) && (
           <>
             <FruitDashTravel />
-            <FruitDashSettings />
+            {!isPlaying && <FruitDashSettings />}
           </>
         )}
         {isPlaying && (
