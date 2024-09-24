@@ -1216,7 +1216,7 @@ class FruitHalloweenObstacle extends FruitDashObstacle {
       this._weight,
       this._points,
       this._type,
-      "Pumpkim",
+      "Pumpkin",
     );
     const image = scene.add.sprite(0, 0, "SunnySideSpritesHalloween", 25);
     image.setOrigin(0, 0);
