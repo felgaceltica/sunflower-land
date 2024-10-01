@@ -23,9 +23,10 @@ export class FruitDashObstacleFactory {
   private obstaclesLines: Phaser.GameObjects.Container[] = [];
   private throwableLines: Phaser.GameObjects.Container[] = [];
   private IS_HALLOWEEN = false;
-
+  private deadObstacles: number;
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
+    this.deadObstacles = 0;
     this.IS_HALLOWEEN = getHalloweenModeSetting();
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
     // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
@@ -138,6 +139,7 @@ export class FruitDashObstacleFactory {
         (item) => item.active == true,
       );
       this._scene.tweens.killAll();
+      this.deadObstacles = 0;
     } else {
       if (this._scene.slow_down || this._scene.ghost) {
         this.obstaclesLines.forEach((item) => {
@@ -241,10 +243,15 @@ export class FruitDashObstacleFactory {
           }
         }
       }
-      for (let index = 0; index < this.obstaclesLines.length; index++) {
+      for (
+        let index = this.deadObstacles;
+        index < this.obstaclesLines.length;
+        index++
+      ) {
         if (!this._scene.isGamePlaying) {
           this.obstaclesLines[index].visible = false;
           this.obstaclesLines[index].destroy();
+          this.deadObstacles++;
         } else {
           this.obstaclesLines[index].setDepth(OBSTACLES_DEPTH);
           this.obstaclesLines[index].y += this._scene.speed * f;
@@ -415,6 +422,7 @@ export class FruitDashObstacleFactory {
           if (this.obstaclesLines[index].y > FINAL_HEIGHT) {
             this.obstaclesLines[index].visible = false;
             this.obstaclesLines[index].destroy();
+            this.deadObstacles++;
           }
         }
       }
