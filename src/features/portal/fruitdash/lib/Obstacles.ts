@@ -1251,7 +1251,7 @@ class FruitHalloweenObstacle extends FruitDashObstacle {
 
 class FruitObstacle extends FruitDashObstacle {
   add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
-    const fruits = ["Apple", "Banana", "Orange", "Blueberry"];
+    const fruits = ["Apple", "Banana", "Orange", "Blueberry", "Grape"];
     const fruit = fruits[randomInt(0, fruits.length)];
     const container = new FruitDashObstacleContainer(
       scene,

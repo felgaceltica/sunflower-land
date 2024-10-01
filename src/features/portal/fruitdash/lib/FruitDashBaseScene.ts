@@ -119,6 +119,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.image("Banana", ITEM_DETAILS["Banana"].image);
     this.load.image("Orange", ITEM_DETAILS["Orange"].image);
     this.load.image("Blueberry", ITEM_DETAILS["Blueberry"].image);
+    this.load.image("Grape", ITEM_DETAILS["Grape"].image);
     this.load.image("ghost", SUNNYSIDE.resource.magic_mushroom);
     this.load.image("axe", SUNNYSIDE.tools.gold_pickaxe);
 

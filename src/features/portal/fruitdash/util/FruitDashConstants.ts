@@ -59,6 +59,7 @@ export const BONUS_SCORE_TABLE: {
   2: { item: ITEM_DETAILS["Banana"].image, description: "20 base points" },
   3: { item: ITEM_DETAILS["Orange"].image, description: "20 base points" },
   4: { item: ITEM_DETAILS["Blueberry"].image, description: "20 base points" },
+  5: { item: ITEM_DETAILS["Grape"].image, description: "20 base points" },
 };
 
 export const BONUS_SCORE_TABLE_HALLOWEEN: {
