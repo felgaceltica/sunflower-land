@@ -372,7 +372,9 @@ export class FruitDashObstacleFactory {
                     repeat: 8,
                     yoyo: true,
                     onComplete: (item) => {
-                      this._scene.timeTickingSound?.play({ volume: 0.8 });
+                      if (!getAudioMutedSetting()) {
+                        this._scene.timeTickingSound?.play({ volume: 0.8 });
+                      }
                       this._scene.tweens.add({
                         targets: this._scene.currentPlayer,
                         alpha: 0.3,

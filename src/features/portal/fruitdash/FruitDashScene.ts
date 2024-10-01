@@ -1,3 +1,4 @@
+import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import { FruitDashBaseScene } from "./lib/FruitDashBaseScene";
 import { INITIAL_SPEED, INITIAL_WALK_SPEED } from "./util/FruitDashConstants";
 
@@ -44,9 +45,11 @@ export class FruitDashScene extends FruitDashBaseScene {
         }
         if (!this.target && currentScore >= targetScore) {
           this.target = true;
-          if (this.bountySound?.isPlaying) this.bountySound?.stop();
-          if (this.fruitSound?.isPlaying) this.fruitSound?.stop();
-          this.targetReachedSound?.play({ volume: 0.8 });
+          if (!getAudioMutedSetting()) {
+            if (this.bountySound?.isPlaying) this.bountySound?.stop();
+            if (this.fruitSound?.isPlaying) this.fruitSound?.stop();
+            this.targetReachedSound?.play({ volume: 0.8 });
+          }
         }
       }
     }
