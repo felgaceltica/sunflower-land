@@ -83,7 +83,7 @@ export const BoundaryError: React.FC<BoundaryErrorProps> = ({
     window.open(
       "https://sunflowerland.freshdesk.com",
       "_blank",
-      "noopener,noreferrer"
+      "noopener,noreferrer",
     );
   };
 
@@ -91,7 +91,7 @@ export const BoundaryError: React.FC<BoundaryErrorProps> = ({
     window.open(
       "https://discord.gg/sunflowerland",
       "_blank",
-      "noopener,noreferrer"
+      "noopener,noreferrer",
     );
   };
 
@@ -176,7 +176,7 @@ export const SomethingWentWrong: React.FC = () => {
 
   // If we get a connecting error before the game has loaded then try to connect again via the authService
   const service = gameService ?? authService;
-  const id = service.state.context?.farmId;
+  const id = service.state?.context?.farmId;
 
   const [
     {
@@ -185,6 +185,7 @@ export const SomethingWentWrong: React.FC = () => {
   ] = useActor(service);
 
   const onAcknowledge = () => {
+    window.history.pushState({}, "", window.location.pathname);
     service.send("REFRESH");
   };
 
