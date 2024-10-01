@@ -35,7 +35,9 @@ export type FeatureName =
   | "FRUIT_DASH"
   | "FRUIT_DASH_HALLOWEEN"
   | "TREASURE_UPDATES"
-  | "NEW_RESOURCES_GE";
+  | "NEW_RESOURCES_GE"
+  | "FSL"
+  | "ANIMAL_BUILDINGS";
 
 // Used for testing production features
 export const ADMIN_IDS = [1, 3, 51, 39488, 128727];
@@ -63,7 +65,9 @@ const featureFlags: Record<FeatureName, FeatureFlag> = {
   EASTER: () => false, // To re-enable next easter
   SKILLS_REVAMP: testnetFeatureFlag,
   TREASURE_UPDATES: betaTimeBasedFeatureFlag(new Date("2024-09-16T00:00:00Z")),
+  FSL: defaultFeatureFlag,
   NEW_RESOURCES_GE: defaultFeatureFlag,
+  ANIMAL_BUILDINGS: testnetFeatureFlag,
 };
 
 export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {
