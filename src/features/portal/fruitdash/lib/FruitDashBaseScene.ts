@@ -45,6 +45,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
   next_speed = INITIAL_SPEED;
   slow_down = false;
   ghost = false;
+  target = false;
   currentPlayer: BumpkinContainer | undefined;
   movementAngle: number | undefined;
   isFacingLeft = false;
@@ -66,6 +67,14 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     | Phaser.Sound.HTML5AudioSound
     | Phaser.Sound.WebAudioSound;
   musicSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  targetReachedSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
+  timeTickingSound?:
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
     | Phaser.Sound.WebAudioSound;
@@ -95,6 +104,12 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
 
     this.load.audio("game_over", "world/fruitdash/game_over.mp3");
     this.load.audio("bounty", "world/fruitdash/bounty.mp3");
+    this.load.audio("fruit", "world/fruitdash/fruit.mp3");
+    this.load.audio("target_reached", "world/fruitdash/target_reached.mp3");
+    this.load.audio(
+      "time_ticking",
+      "world/fruitdash/time_ticking_preparation.mp3",
+    );
     this.load.audio("fruit", "world/fruitdash/fruit.mp3");
     this.load.audio("music", "world/fruitdash/music.mp3");
     this.groundFactory = new FruitDashGroundFactory(this);
@@ -223,6 +238,10 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     );
     if (!this.gameOverSound) this.gameOverSound = this.sound.add("game_over");
     if (!this.bountySound) this.bountySound = this.sound.add("bounty");
+    if (!this.targetReachedSound)
+      this.targetReachedSound = this.sound.add("target_reached");
+    if (!this.timeTickingSound)
+      this.timeTickingSound = this.sound.add("time_ticking");
     if (!this.fruitSound) this.fruitSound = this.sound.add("fruit");
     if (!this.musicSound) {
       this.musicSound = this.sound.add("music");

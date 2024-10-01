@@ -28,10 +28,7 @@ export const FarmerFootballHud: React.FC = () => {
           <Balances
             sfl={portalState.context.state.balance}
             coins={portalState.context.state.coins}
-            blockBucks={
-              portalState.context.state.inventory["Block Buck"] ??
-              new Decimal(0)
-            }
+            gems={portalState.context.state.inventory["Gem"] ?? new Decimal(0)}
           />
           <div
             className="fixed z-50 flex flex-col justify-between"
@@ -73,7 +70,7 @@ export const FarmerFootballHud: React.FC = () => {
             </div>
           </div>
         </div>,
-        document.body
+        document.body,
       )}
     </>
   );
