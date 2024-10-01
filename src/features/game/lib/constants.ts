@@ -6,6 +6,7 @@ import {
   Inventory,
   ExpansionConstruction,
   PlacedItem,
+  BB_TO_GEM_RATIO,
 } from "../types/game";
 import { getKeys } from "../types/craftables";
 import { BumpkinParts, tokenUriBuilder } from "lib/utils/tokenUriBuilder";
@@ -65,16 +66,21 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
 
   // increase in 50% tool stock if you have a toolshed
   if (state?.buildings.Toolshed && isBuildingReady(state.buildings.Toolshed)) {
-    for (const tool in tools) {
-      tools[tool as keyof typeof tools] = new Decimal(
-        Math.ceil(tools[tool as keyof typeof tools].toNumber() * 1.5),
-      );
-    }
+    getKeys(tools).forEach(
+      (tool) =>
+        (tools[tool] = new Decimal(Math.ceil(tools[tool].mul(1.5).toNumber()))),
+    );
   }
 
   // increase Axe stock by 20% if player has More Axes skill
   if (state?.bumpkin?.skills["More Axes"]) {
     tools.Axe = new Decimal(Math.ceil(tools.Axe.toNumber() * 1.2));
+  }
+
+  if (state?.bumpkin?.skills["More Picks"]) {
+    tools.Pickaxe = tools.Pickaxe.add(new Decimal(70));
+    tools["Stone Pickaxe"] = tools["Stone Pickaxe"].add(new Decimal(20));
+    tools["Iron Pickaxe"] = tools["Iron Pickaxe"].add(new Decimal(7));
   }
 
   const seeds: Record<SeedName, Decimal> = {
@@ -114,11 +120,10 @@ export const INITIAL_STOCK = (state?: GameState): Inventory => {
     isBuildingReady(state.buildings.Warehouse)
   ) {
     // Multiply each seed quantity by 1.2 and round up
-    for (const seed in seeds) {
-      seeds[seed as keyof typeof seeds] = new Decimal(
-        Math.ceil(seeds[seed as keyof typeof seeds].toNumber() * 1.2),
-      );
-    }
+    getKeys(seeds).forEach(
+      (seed) =>
+        (seeds[seed] = new Decimal(Math.ceil(seeds[seed].mul(1.2).toNumber()))),
+    );
   }
 
   return {
@@ -341,6 +346,7 @@ export const INITIAL_FARM: GameState = {
   balance: new Decimal(0),
   previousBalance: new Decimal(0),
   inventory: {
+    "Lifetime Farmer Banner": new Decimal(1),
     "Town Center": new Decimal(1),
     Market: new Decimal(1),
     Workbench: new Decimal(1),
@@ -349,7 +355,7 @@ export const INITIAL_FARM: GameState = {
     Tree: new Decimal(getKeys(INITIAL_RESOURCES.trees).length),
     "Stone Rock": new Decimal(getKeys(INITIAL_RESOURCES.stones).length),
     Axe: new Decimal(10),
-    "Block Buck": new Decimal(1),
+    Gem: new Decimal(1 * BB_TO_GEM_RATIO),
     Rug: new Decimal(1),
     Wardrobe: new Decimal(1),
     Shovel: new Decimal(1),
@@ -357,6 +363,10 @@ export const INITIAL_FARM: GameState = {
   previousInventory: {},
   wardrobe: {},
   previousWardrobe: {},
+
+  competitions: {
+    progress: {},
+  },
 
   bumpkin: INITIAL_BUMPKIN,
 
@@ -581,6 +591,9 @@ export const TEST_FARM: GameState = {
   minigames: {
     games: {},
     prizes: {},
+  },
+  competitions: {
+    progress: {},
   },
   kingdomChores: {
     chores: [],
@@ -885,6 +898,9 @@ export const EMPTY: GameState = {
   conversations: [],
   farmHands: {
     bumpkins: {},
+  },
+  competitions: {
+    progress: {},
   },
   kingdomChores: {
     chores: [],

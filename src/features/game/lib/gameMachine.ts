@@ -64,7 +64,7 @@ import {
   Currency,
   buyBlockBucks,
   buyBlockBucksMATIC,
-} from "../actions/buyBlockBucks";
+} from "../actions/buyGems";
 import { getSessionId } from "lib/blockchain/Session";
 import { BumpkinItem } from "../types/bumpkin";
 import { getAuctionResults } from "../actions/getAuctionResults";
@@ -100,6 +100,12 @@ const getRedirect = () => {
   return code;
 };
 
+const getError = () => {
+  const error = new URLSearchParams(window.location.search).get("error");
+
+  return error;
+};
+
 export type PastAction = GameEvent & {
   createdAt: Date;
 };
@@ -133,6 +139,9 @@ export interface Context {
   paused?: boolean;
   verified?: boolean;
   purchases: Purchase[];
+  discordId?: string;
+  fslId?: string;
+  oauthNonce: string;
 }
 
 export type Moderation = {
@@ -162,13 +171,13 @@ type WalletUpdatedEvent = {
 };
 
 type BuyBlockBucksEvent = {
-  type: "BUY_BLOCK_BUCKS";
+  type: "BUY_GEMS";
   currency: Currency;
   amount: number;
 };
 
 type UpdateBlockBucksEvent = {
-  type: "UPDATE_BLOCK_BUCKS";
+  type: "UPDATE_GEMS";
   amount: number;
 };
 
@@ -406,6 +415,7 @@ export type BlockchainState = {
     | "gameRules"
     | "portalling"
     | "introduction"
+    | "gems"
     | "playing"
     | "autosaving"
     | "buyingSFL"
@@ -532,6 +542,7 @@ export function startGame(authContext: AuthContext) {
       id: "gameMachine",
       initial: "loading",
       context: {
+        fslId: "123",
         farmId: Math.floor(Math.random() * 1000),
         actions: [],
         state: EMPTY,
@@ -544,6 +555,7 @@ export function startGame(authContext: AuthContext) {
         saveQueued: false,
         verified: !CONFIG.API_URL,
         purchases: [],
+        oauthNonce: "",
       },
       states: {
         loading: {
@@ -552,6 +564,13 @@ export function startGame(authContext: AuthContext) {
             {
               target: "loadLandToVisit",
               cond: () => window.location.href.includes("visit"),
+            },
+            {
+              target: "error",
+              cond: () => !!getError(),
+              actions: assign({
+                errorCode: (_) => getError() as ErrorCode,
+              }),
             },
             {
               target: "notifying",
@@ -591,6 +610,9 @@ export function startGame(authContext: AuthContext) {
                 wallet: response.wallet,
                 verified: response.verified,
                 purchases: response.purchases,
+                discordId: response.discordId,
+                fslId: response.fslId,
+                oauthNonce: response.oauthNonce,
               };
             },
             onDone: [
@@ -603,6 +625,7 @@ export function startGame(authContext: AuthContext) {
                 cond: () => !!portalName,
                 actions: ["assignGame"],
               },
+
               {
                 target: "notifying",
                 actions: ["assignGame", "assignUrl", "initialiseAnalytics"],
@@ -642,6 +665,7 @@ export function startGame(authContext: AuthContext) {
             },
           },
         },
+
         loadLandToVisit: {
           invoke: {
             src: async (_, event) => {
@@ -719,6 +743,13 @@ export function startGame(authContext: AuthContext) {
                   context.state.bumpkin?.experience === 0 &&
                   !getIntroductionRead()
                 );
+              },
+            },
+
+            {
+              target: "gems",
+              cond: (context) => {
+                return !!context.state.inventory["Block Buck"]?.gte(1);
               },
             },
 
@@ -966,7 +997,7 @@ export function startGame(authContext: AuthContext) {
             TRANSACT: {
               target: "transacting",
             },
-            BUY_BLOCK_BUCKS: {
+            BUY_GEMS: {
               target: "buyingBlockBucks",
             },
             REVEAL: {
@@ -1001,21 +1032,21 @@ export function startGame(authContext: AuthContext) {
             DELETE_TRADE_LISTING: { target: "deleteTradeListing" },
             FULFILL_TRADE_LISTING: { target: "fulfillTradeListing" },
             SELL_MARKET_RESOURCE: { target: "sellMarketResource" },
-            UPDATE_BLOCK_BUCKS: {
+            UPDATE_GEMS: {
               actions: assign((context, event) => ({
                 state: {
                   ...context.state,
                   inventory: {
                     ...context.state.inventory,
-                    "Block Buck": (
-                      context.state.inventory["Block Buck"] ?? new Decimal(0)
-                    ).add(event.amount),
+                    Gem: (context.state.inventory["Gem"] ?? new Decimal(0)).add(
+                      event.amount,
+                    ),
                   },
                 },
                 purchases: [
                   ...context.purchases,
                   {
-                    id: "Block Buck",
+                    id: "Gem",
                     method: "XSOLLA",
                     purchasedAt: Date.now(),
                     usd: 1, // Placeholder
@@ -1181,15 +1212,15 @@ export function startGame(authContext: AuthContext) {
                   ...context.state,
                   inventory: {
                     ...context.state.inventory,
-                    "Block Buck": (
-                      context.state.inventory["Block Buck"] ?? new Decimal(0)
-                    ).add(event.data.amount),
+                    Gem: (context.state.inventory["Gem"] ?? new Decimal(0)).add(
+                      event.data.amount,
+                    ),
                   },
                 },
                 purchases: [
                   ...context.purchases,
                   {
-                    id: `${event.data.amount} Block Buck`,
+                    id: `${event.data.amount} Gem`,
                     method: "MATIC",
                     purchasedAt: Date.now(),
                     usd: 1, // Placeholder
@@ -1775,6 +1806,18 @@ export function startGame(authContext: AuthContext) {
             ACKNOWLEDGE: {
               target: "notifying",
             },
+            "competition.started": (GAME_EVENT_HANDLERS as any)[
+              "competition.started"
+            ],
+          },
+        },
+
+        gems: {
+          on: {
+            ACKNOWLEDGE: {
+              target: "notifying",
+            },
+            "garbage.sold": (GAME_EVENT_HANDLERS as any)["garbage.sold"],
           },
         },
 
@@ -1951,6 +1994,9 @@ export function startGame(authContext: AuthContext) {
           nftId: (_, event) => event.data.nftId,
           verified: (_, event) => event.data.verified,
           purchases: (_, event) => event.data.purchases,
+          discordId: (_, event) => event.data.discordId,
+          fslId: (_, event) => event.data.fslId,
+          oauthNonce: (_, event) => event.data.oauthNonce,
         }),
         setTransactionId: assign<Context, any>({
           transactionId: () => randomID(),
