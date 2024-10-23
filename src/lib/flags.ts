@@ -8,7 +8,7 @@ const defaultFeatureFlag = ({ inventory }: GameState) =>
 const betaFeatureFlag = ({ inventory }: GameState) =>
   !!inventory["Beta Pass"]?.gt(0);
 
-const testnetFeatureFlag = () => CONFIG.NETWORK === "mainnet";
+const testnetFeatureFlag = () => CONFIG.NETWORK === "amoy";
 
 const timeBasedFeatureFlag = (date: Date) => () => {
   return testnetFeatureFlag() || Date.now() > date.getTime();
