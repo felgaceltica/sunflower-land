@@ -22,6 +22,8 @@ import { SeasonalMutants } from "../components/SeasonalMutants";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { MegaStoreMonthly } from "features/world/ui/megastore/MegaStoreMonthly";
 import { MegaStoreSeasonal } from "features/world/ui/megastore/MegaStoreSeasonal";
+import { SeasonalStore } from "features/world/ui/megastore/SeasonalStore";
+import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   id: string;
@@ -63,7 +65,6 @@ export const Season: React.FC<Props> = ({ id, isLoading, data }) => {
           </p>
         </div>
       </InnerPanel>
-
       <InnerPanel className="mb-1">
         <div
           style={{
@@ -76,7 +77,6 @@ export const Season: React.FC<Props> = ({ id, isLoading, data }) => {
           }}
         ></div>
       </InnerPanel>
-
       <InnerPanel className="mb-1">
         <div className="p-1">
           <div className="flex justify-between mb-2">
@@ -103,19 +103,23 @@ export const Season: React.FC<Props> = ({ id, isLoading, data }) => {
           />
         </div>
       </InnerPanel>
-
+      {/*Update logic after release*/}
+      {hasFeatureAccess(
+        gameService.getSnapshot().context.state,
+        "SEASONAL_TIERS",
+      ) && (
+        <InnerPanel className="mb-1">
+          <SeasonalStore readonly />
+        </InnerPanel>
+      )}
       <InnerPanel className="mb-1">
         <MegaStoreMonthly readonly />
       </InnerPanel>
-
       <InnerPanel className="mb-1">
         <MegaStoreSeasonal readonly />
       </InnerPanel>
-
       <SeasonalAuctions gameState={state} farmId={farmId} />
-
       <SeasonalMutants />
-
       <InnerPanel className="mb-1">
         <TicketsLeaderboard id={id} isLoading={isLoading} data={data} />
       </InnerPanel>
