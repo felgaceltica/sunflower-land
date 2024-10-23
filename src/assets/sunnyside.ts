@@ -251,6 +251,9 @@ export const SUNNYSIDE = {
     tent_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/tent_inside.png`,
     house_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/house_inside.png`,
     manor_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/manor_inside.png`,
+    animal_house_inside_one: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_one.png`,
+    animal_house_inside_two: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_two.png`,
+    animal_house_inside_three: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_three.png`,
   },
   //Soil
   soil: {
@@ -265,13 +268,38 @@ export const SUNNYSIDE = {
     boxChicken: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/box_chicken.png`,
     hungryChicken: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/hungry_2.gif`,
     happyChicken: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/happy_2.gif`,
+    sadChicken: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/sad_2.gif`,
     walkingChickenSheet: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/walking_sheet_2.png`,
     sleepingChicken: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/sleeping_2.gif`,
     chickenShadow: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/chicken_shadow.png`,
     layingEggSheet: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/laying-egg-sheet_2.png`,
     wheatOnGround: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/wheat_2.png`,
 
+    // New Animals
+    chickenIdle: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/idle_chicken.gif`,
+    chickenAsleep: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/sleeping_chicken.gif`,
+    chickenReady: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/ready.webp`,
+    chickenSick: `${CONFIG.PROTECTED_IMAGE_URL}/animals/chickens/sick.webp`,
+    cowIdle: `${CONFIG.PROTECTED_IMAGE_URL}/animals/cows/idle.webp`,
+    cowReady: `${CONFIG.PROTECTED_IMAGE_URL}/animals/cows/ready.webp`,
+    cowSleeping: `${CONFIG.PROTECTED_IMAGE_URL}/animals/cows/sleeping.webp`,
+    cowFed: `${CONFIG.PROTECTED_IMAGE_URL}/animals/cows/fed.webp`,
+    cowSick: `${CONFIG.PROTECTED_IMAGE_URL}/animals/cows/sick.webp`,
+    sheepIdle: `${CONFIG.PROTECTED_IMAGE_URL}/animals/sheep/idle.webp`,
+    sheepReady: `${CONFIG.PROTECTED_IMAGE_URL}/animals/sheep/ready.webp`,
+    sheepSleeping: `${CONFIG.PROTECTED_IMAGE_URL}/animals/sheep/sleeping.webp`,
+    sheepFed: `${CONFIG.PROTECTED_IMAGE_URL}/animals/sheep/fed.webp`,
+    sheepSick: `${CONFIG.PROTECTED_IMAGE_URL}/animals/sheep/sick.webp`,
+
     bird: `${CONFIG.PROTECTED_IMAGE_URL}/animals/bird_sheet.png`,
+  },
+  animalFoods: {
+    hay: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/hay.webp`,
+    kernel_blend: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/kernel_blend.webp`,
+    nutribarley: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/nutribarley.webp`,
+    mixed_grain: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/mixed_grain.webp`,
+    fish_oil: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/fish_oil.webp`,
+    barn_delight: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/barn_delight.webp`,
   },
   //VFXs
   vfx: {
@@ -303,6 +331,7 @@ export const SUNNYSIDE = {
   building: {
     smoke: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/smoke.gif`,
     wishingwell: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/wishing_well.png`,
+    bountyBoard: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/bounty_board.png`,
     //BASIC
     firePit: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/fire_pit.png`,
     kitchen: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/kitchen.png`,
@@ -320,6 +349,8 @@ export const SUNNYSIDE = {
     toolshed: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/toolshed.png`,
     warehouse: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/warehouse.png`,
     fruitPatchDirt: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/fruit_patch.png`,
+    barn: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/barn_sm.webp`,
+    feederMachine: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/feeder_machine.webp`,
 
     //DESERT
     desertFirePit: `${CONFIG.PROTECTED_IMAGE_URL}/desert/buildings/fire_pit.webp`,
@@ -383,9 +414,11 @@ export const SUNNYSIDE = {
     drag: `${CONFIG.PROTECTED_IMAGE_URL}/icons/drag.png`,
     dragging: `${CONFIG.PROTECTED_IMAGE_URL}/icons/dragging.png`,
     expand: `${CONFIG.PROTECTED_IMAGE_URL}/icons/expand.png`,
+    expression_stress: `${CONFIG.PROTECTED_IMAGE_URL}/icons/expression_stress.png`,
     expression_alerted: `${CONFIG.PROTECTED_IMAGE_URL}/icons/expression_alerted.png`,
     expression_chat: `${CONFIG.PROTECTED_IMAGE_URL}/icons/expression_chat.png`,
     expression_confused: `${CONFIG.PROTECTED_IMAGE_URL}/icons/expression_confused.png`,
+    expression_ready: `${CONFIG.PROTECTED_IMAGE_URL}/icons/expression_confused-1.png`,
     fish: `${CONFIG.PROTECTED_IMAGE_URL}/icons/fish.png`,
     hammer: `${CONFIG.PROTECTED_IMAGE_URL}/icons/hammer.png`,
     heart: `${CONFIG.PROTECTED_IMAGE_URL}/icons/heart.png`,
@@ -399,6 +432,7 @@ export const SUNNYSIDE = {
     seedling: `${CONFIG.PROTECTED_IMAGE_URL}/icons/seedling.png`,
     seeds: `${CONFIG.PROTECTED_IMAGE_URL}/icons/seeds.png`,
     shop: `${CONFIG.PROTECTED_IMAGE_URL}/icons/shop.png`,
+    sleeping: `${CONFIG.PROTECTED_IMAGE_URL}/icons/sleeping.webp`,
     stopwatch: `${CONFIG.PROTECTED_IMAGE_URL}/icons/stopwatch.png`,
     sunflorea: `${CONFIG.PROTECTED_IMAGE_URL}/icons/sunflorea.png`,
     sword: `${CONFIG.PROTECTED_IMAGE_URL}/icons/sword.png`,
@@ -457,6 +491,7 @@ export const SUNNYSIDE = {
     toolshedIcon: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/icons/toolshed_icon.png`,
     warehouseIcon: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/icons/warehouse_icon.png`,
     greenhouseIcon: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/icons/greenhouse_icon.webp`,
+    upgradeBuildingIcon: `${CONFIG.PROTECTED_IMAGE_URL}/icons/upgrade_building.webp`,
   },
   //NPCs
   npcs: {
@@ -534,8 +569,16 @@ export const SUNNYSIDE = {
   },
   //Resources
   resource: {
-    chicken: `${CONFIG.PROTECTED_IMAGE_URL}/resources/chicken.png`,
-    egg: `${CONFIG.PROTECTED_IMAGE_URL}/resources/egg.png`,
+    // Animals
+    chicken: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/chicken.png`,
+    egg: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/egg.png`,
+    feather: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/feather.webp`,
+    leather: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/leather.webp`,
+    merino_wool: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/merino_wool.webp`,
+    milk: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/milk.webp`,
+    wool: `${CONFIG.PROTECTED_IMAGE_URL}/resources/animals/wool.webp`,
+
+    cow: `${CONFIG.PROTECTED_IMAGE_URL}/resources/cow.png`,
     //Treasures
     sand: `${CONFIG.PROTECTED_IMAGE_URL}/resources/treasures/sand.webp`,
     clam_shell: `${CONFIG.PROTECTED_IMAGE_URL}/resources/treasures/clam_shell.webp`,
