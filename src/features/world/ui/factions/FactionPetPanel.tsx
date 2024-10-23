@@ -21,7 +21,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { TypingMessage } from "../TypingMessage";
 import {
   calculatePoints,
-  getFactionWeek,
+  getWeekKey,
   getFactionWeekEndTime,
   getFactionWeekday,
 } from "features/game/lib/factions";
@@ -63,11 +63,11 @@ export const PET_SLEEP_DURATION = 7 * 24 * 60 * 60 * 1000;
 
 const PetSleeping = ({ onWake }: { onWake: () => void }) => {
   const { t } = useAppTranslation();
-  const week = getFactionWeek({ date: new Date() });
+  const week = getWeekKey({ date: new Date() });
   const beginningOfWeek = new Date(week).getTime();
   const wakeTime = beginningOfWeek + PET_SLEEP_DURATION;
   const [secondsTillWakeUp, setSecondsTillWakeUp] = useState(
-    (wakeTime - Date.now()) / 1000
+    (wakeTime - Date.now()) / 1000,
   );
 
   useEffect(() => {
@@ -148,7 +148,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
   const inventory = useSelector(gameService, _inventory);
   const autosaving = useSelector(gameService, _autosaving);
 
-  const week = getFactionWeek({ date: new Date() });
+  const week = getWeekKey({ date: new Date() });
   const pet = faction.pet as FactionPet;
   const collectivePet = faction.history[week].collectivePet as CollectivePet;
   const now = Date.now();
@@ -163,7 +163,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
   const [streak, setStreak] = useState(collectivePet?.streak ?? 0);
   const [refreshing, setRefreshing] = useState(false);
   const [petState, setPetState] = useState<PetState>(
-    getPetState(collectivePet)
+    getPetState(collectivePet),
   );
   const [tab, setTab] = useState(0);
   const [showBoostInfo, setShowBoostInfo] = useState(false);
@@ -195,7 +195,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
 
     const totalXP = getTotalXPForRequest(
       gameService.state.context.state,
-      pet.requests[selectedRequestIdx]
+      pet.requests[selectedRequestIdx],
     );
     setFedXP((prev) => prev + totalXP);
     setShowConfirm(false);
@@ -228,7 +228,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
   const fulfilled = selectedRequest.dailyFulfilled?.[day] ?? 0;
   const selectedRequestReward = calculatePoints(
     fulfilled,
-    PET_FED_REWARDS_KEY[selectedRequestIdx as DifficultyIndex]
+    PET_FED_REWARDS_KEY[selectedRequestIdx as DifficultyIndex],
   );
   const { goalXP } = collectivePet;
 
@@ -238,16 +238,16 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
 
   const boost = getKingdomPetBoost(
     gameService.state.context.state,
-    selectedRequestReward
+    selectedRequestReward,
   )[0];
 
   const boostedMarks = selectedRequestReward + boost;
 
   const isContributingMemberForThisWeek = pet.requests.every(
-    (request) => getKeys(request.dailyFulfilled).length > 0
+    (request) => getKeys(request.dailyFulfilled).length > 0,
   );
 
-  const lastWeek = getFactionWeek({
+  const lastWeek = getWeekKey({
     date: new Date(new Date(week).getTime() - 7 * 24 * 60 * 60 * 1000),
   });
   const isStreakWeek =
@@ -336,12 +336,12 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                           const fulfilled = request.dailyFulfilled[day] ?? 0;
                           const points = calculatePoints(
                             fulfilled,
-                            PET_FED_REWARDS_KEY[idx as DifficultyIndex]
+                            PET_FED_REWARDS_KEY[idx as DifficultyIndex],
                           );
 
                           const boost = getKingdomPetBoost(
                             gameService.state.context.state,
-                            points
+                            points,
                           )[0];
 
                           const boostedMarks = points + boost;
@@ -353,7 +353,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                                 "flex relative flex-col flex-1 items-center p-2 cursor-pointer hover:bg-brown-300",
                                 {
                                   "img-highlight": selectedRequestIdx === idx,
-                                }
+                                },
                               )}
                               onClick={() => setSelectedRequestIdx(idx)}
                             >
@@ -416,7 +416,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                       {collectivePet.streak > 0 && (
                         <div className="flex items-center space-x-1">
                           <p className="text-xs pb-1">{`${t(
-                            "faction.pet.contributingMember"
+                            "faction.pet.contributingMember",
                           )}: `}</p>
                           <img
                             className="w-3"
@@ -470,7 +470,7 @@ export const FactionPetPanel: React.FC<Props> = ({ onClose }) => {
                             "flex justify-between items-center sm:justify-center",
                             {
                               "-mt-1": isMobile,
-                            }
+                            },
                           )}
                           showLabel={isMobile}
                           hideIcon={!isMobile}

@@ -12,6 +12,8 @@ import { NPCName } from "lib/npcs";
 import { FactionName } from "features/game/types/game";
 import { translate } from "lib/i18n/translate";
 
+import { EVENT_BUMPKINS, sheepPlace } from "../ui/npcs/Sheep"; // Remove after released
+
 export type FactionNPC = {
   npc: NPCName;
   x: number;
@@ -113,6 +115,12 @@ export const PLAZA_BUMPKINS: NPCBumpkin[] = [
     x: 442,
     y: 173,
     npc: "mayor",
+    direction: "left",
+  },
+  {
+    x: 845,
+    y: 270,
+    npc: "chase",
     direction: "left",
   },
 ];
@@ -261,6 +269,11 @@ export class PlazaScene extends BaseScene {
 
     this.initialiseNPCs(PLAZA_BUMPKINS);
 
+    // Remove after release
+    if (sheepPlace() === this.sceneId) {
+      this.initialiseNPCs(EVENT_BUMPKINS);
+    }
+
     if (!this.joystick && !localStorage.getItem("mmo_introduction.read")) {
       this.arrows = this.add
         .sprite(
@@ -280,6 +293,16 @@ export class PlazaScene extends BaseScene {
       this.add.sprite(106, 140, "key_disc").setDepth(1000000000);
     } else {
       this.add.sprite(106, 140, "locked_disc").setDepth(1000000000);
+    }
+
+    if (this.gameState.inventory["Beta Pass"]) {
+      // Add an invisible clickable square at x and y coords
+      const clickableSquare = this.add.rectangle(775, 248, 16, 16, 0, 0);
+      clickableSquare
+        .setInteractive({ cursor: "pointer" })
+        .on("pointerdown", () => {
+          interactableModalManager.open("flower_bounties");
+        });
     }
 
     // Sprites
