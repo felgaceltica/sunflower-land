@@ -8,7 +8,7 @@ const defaultFeatureFlag = ({ inventory }: GameState) =>
 const betaFeatureFlag = ({ inventory }: GameState) =>
   !!inventory["Beta Pass"]?.gt(0);
 
-const testnetFeatureFlag = () => CONFIG.NETWORK === "amoy";
+const testnetFeatureFlag = () => CONFIG.NETWORK === "mainnet";
 
 const timeBasedFeatureFlag = (date: Date) => () => {
   return testnetFeatureFlag() || Date.now() > date.getTime();
@@ -16,6 +16,13 @@ const timeBasedFeatureFlag = (date: Date) => () => {
 
 const betaTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
   return defaultFeatureFlag(game) || Date.now() > date.getTime();
+};
+
+const periodBasedFeatureFlag = (startDate: Date, endDate: Date) => () => {
+  return (
+    testnetFeatureFlag() ||
+    (Date.now() > startDate.getTime() && Date.now() < endDate.getTime())
+  );
 };
 
 // Used for testing production features
@@ -47,7 +54,11 @@ const featureFlags = {
   MARKETPLACE: testnetFeatureFlag,
   CROP_QUICK_SELECT: () => false,
   FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2024-09-10T00:00:00Z")),
-  FRUIT_DASH_HALLOWEEN: betaFeatureFlag,
+  FRUIT_DASH_HALLOWEEN: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
+  FRUIT_DASH_HALLOWEEN_EVENT: periodBasedFeatureFlag(
+    new Date("2024-10-25T00:00:00Z"),
+    new Date("2024-11-01T00:00:00Z"),
+  ),
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
   EASTER: () => false, // To re-enable next easter

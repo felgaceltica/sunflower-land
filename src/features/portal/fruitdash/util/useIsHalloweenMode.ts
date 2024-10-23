@@ -1,3 +1,5 @@
+import { OFFLINE_FARM } from "features/game/lib/landData";
+import { hasFeatureAccess } from "lib/flags";
 import { useState, useEffect } from "react";
 
 const LOCAL_STORAGE_KEY = "settings.halloweenMode";
@@ -11,6 +13,7 @@ export function cacheHalloweenModeSetting(value: boolean) {
 }
 
 export function getHalloweenModeSetting(): boolean {
+  if (hasFeatureAccess(OFFLINE_FARM, "FRUIT_DASH_HALLOWEEN_EVENT")) return true;
   const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
   return cached ? JSON.parse(cached) : false;
 }
