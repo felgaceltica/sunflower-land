@@ -129,7 +129,7 @@ export const INITIAL_RESOURCES: Pick<
 };
 
 const INITIAL_STOCK: Inventory = {
-  "Sunflower Seed": new Decimal(400),
+  "Sunflower Seed": new Decimal(0),
   "Potato Seed": new Decimal(200),
   "Pumpkin Seed": new Decimal(100),
   "Carrot Seed": new Decimal(100),
@@ -217,6 +217,11 @@ export const STATIC_OFFLINE_FARM: GameState = {
   greenhouse: {
     pots: {},
     oil: 50,
+  },
+  faction: {
+    name: "goblins",
+    history: {},
+    pledgedAt: 100,
   },
   home: {
     collectibles: {
@@ -324,7 +329,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
       type: "Woodlands",
     },
   },
-  coins: 10,
+  coins: 1000000,
   balance: new Decimal(100.1023810291823),
   previousBalance: new Decimal(0),
   previousInventory: {
@@ -555,7 +560,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     Egg: new Decimal(12),
     Beehive: new Decimal(1),
     Banana: new Decimal(12),
-    Crimstone: new Decimal(20),
+    Crimstone: new Decimal(100),
     Gem: new Decimal(200),
     Gold: new Decimal("400"),
     Iron: new Decimal("800"),
@@ -750,6 +755,28 @@ export const STATIC_OFFLINE_FARM: GameState = {
 
   conversations: ["hank-intro"],
 
+  bounties: {
+    completed: [],
+    requests: [
+      {
+        id: "1",
+        name: "Chicken",
+        level: 2,
+        coins: 100,
+      },
+      {
+        id: "2",
+        name: "Red Balloon Flower",
+        coins: 100,
+      },
+      {
+        id: "3",
+        name: "White Pansy",
+        items: { Scroll: 1 },
+      },
+    ],
+  },
+
   fishing: {
     dailyAttempts: {},
     weather: "Full Moon",
@@ -844,7 +871,29 @@ export const STATIC_OFFLINE_FARM: GameState = {
       {
         coordinates: {
           x: -5,
-          y: -2,
+          y: 7,
+        },
+        createdAt: 0,
+        id: "1",
+        readyAt: 0,
+      },
+    ],
+    "Hen House": [
+      {
+        coordinates: {
+          x: 4,
+          y: 6,
+        },
+        createdAt: 0,
+        id: "1",
+        readyAt: 0,
+      },
+    ],
+    Barn: [
+      {
+        coordinates: {
+          x: 9,
+          y: 10,
         },
         createdAt: 0,
         id: "1",
@@ -868,6 +917,26 @@ export const STATIC_OFFLINE_FARM: GameState = {
           x: -5,
           y: -6,
         },
+        id: "1",
+        readyAt: 0,
+        createdAt: 0,
+        // crafting: {
+        //   name: "Pumpkin Soup",
+        //   readyAt: Date.now() + 25 * 60 * 1000,
+        // },
+      },
+    ],
+    Workbench: [
+      {
+        coordinates: { x: -2, y: -6 },
+        id: "1",
+        readyAt: 0,
+        createdAt: 0,
+      },
+    ],
+    "Crafting Box": [
+      {
+        coordinates: { x: 1, y: -6 },
         id: "1",
         readyAt: 0,
         createdAt: 0,
@@ -909,6 +978,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
       total: 10,
       claimedAt: new Date("2024-02-15").getTime(),
     },
+    doubleDelivery: false,
   },
 
   ...INITIAL_RESOURCES,
@@ -921,6 +991,11 @@ export const STATIC_OFFLINE_FARM: GameState = {
         width: 3,
         x: 2,
         y: 0,
+        flower: {
+          amount: 1,
+          plantedAt: 0,
+          name: "Blue Balloon Flower",
+        },
       },
     },
   },
