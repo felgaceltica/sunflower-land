@@ -31,6 +31,7 @@ export function makeGame(farm: any): GameState {
       }),
       {} as Record<InventoryItemName, Decimal>,
     ),
+    bounties: farm.bounties,
     island: farm.island,
     home: farm.home,
     createdAt: farm.createdAt,
@@ -48,6 +49,9 @@ export function makeGame(farm: any): GameState {
     expansionConstruction: farm.expansionConstruction,
     expandedAt: farm.expandedAt,
     greenhouse: farm.greenhouse,
+    choreBoard: farm.choreBoard,
+
+    shipments: farm.shipments,
 
     bumpkin: farm.bumpkin,
     buildings: farm.buildings,
@@ -113,5 +117,8 @@ export function makeGame(farm: any): GameState {
       : undefined,
     desert: farm.desert,
     transaction: farm.transaction,
+    henHouse: farm.henHouse,
+    barn: farm.barn,
+    craftingBox: farm.craftingBox,
   };
 }

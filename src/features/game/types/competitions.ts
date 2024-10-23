@@ -33,12 +33,13 @@ export const COMPETITION_TASK_PROGRESS: Record<
     }
 
     if (game.island.type === "spring") {
-      expansions += 6; // On basic island
+      expansions += 7; // On basic island
       expansions -= 4; // Remove initial
     }
 
     if (game.island.type === "desert") {
-      expansions += 12; // On spring island
+      expansions += 7; // On basic island
+      expansions += 13; // On spring island
       expansions -= 4; // Remove initial
     }
 
@@ -59,20 +60,20 @@ export const COMPETITION_POINTS: Record<
     startAt: new Date("2024-09-04T00:00:00Z").getTime(),
     endAt: new Date("2024-10-06T00:00:00Z").getTime(),
     points: {
-      "Complete chore": 2,
+      "Complete chore": 1,
       "Complete delivery": 2,
-      "Expand island": 10,
-      "Level up": 5,
+      "Level up": 10,
+      "Expand island": 15,
     },
   },
   FSL: {
-    startAt: new Date("2024-10-10T00:00:00Z").getTime(),
-    endAt: new Date("2024-11-01T00:00:00Z").getTime(),
+    startAt: new Date("2024-10-08T00:00:00Z").getTime(),
+    endAt: new Date("2024-10-29T00:00:00Z").getTime(),
     points: {
-      "Complete chore": 2,
+      "Complete chore": 1,
       "Complete delivery": 2,
-      "Expand island": 10,
-      "Level up": 5,
+      "Level up": 10,
+      "Expand island": 15,
     },
   },
 };

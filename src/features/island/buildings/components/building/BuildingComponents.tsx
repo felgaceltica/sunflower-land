@@ -37,6 +37,8 @@ import {
 
 import { Greenhouse } from "./greenhouse/Greenhouse";
 import { CropMachine } from "./cropMachine/CropMachine";
+import { Barn } from "./barn/Barn";
+import { CraftingBox } from "./craftingBox/CraftingBox";
 
 export interface BuildingProps {
   buildingId: string;
@@ -106,6 +108,7 @@ export const BUILDING_COMPONENTS: Record<
   Warehouse: Warehouse,
   Toolshed: Toolshed,
   "Hen House": ChickenHouse,
+  Barn: Barn,
   Kitchen: ({
     buildingId,
     buildingIndex,
@@ -183,6 +186,7 @@ export const BUILDING_COMPONENTS: Record<
   "Crop Machine": ({ buildingId }: Pick<BuildingProps, "buildingId">) => (
     <CropMachine id={buildingId} />
   ),
+  "Crafting Box": CraftingBox,
 };
 
 export const READONLY_BUILDINGS: (
@@ -222,7 +226,7 @@ export const READONLY_BUILDINGS: (
   ),
   "Hen House": () => (
     <img
-      src={HEN_HOUSE_VARIANTS[island]}
+      src={HEN_HOUSE_VARIANTS[island][1] as string}
       className="absolute bottom-0"
       style={{
         width: `${PIXEL_SCALE * 61}px`,
@@ -334,6 +338,25 @@ export const READONLY_BUILDINGS: (
         className="w-full absolute"
         style={{
           width: `${PIXEL_SCALE * 80}px`,
+          bottom: `${PIXEL_SCALE * 0}px`,
+        }}
+      />
+    </div>
+  ),
+  "Crafting Box": () => (
+    <div
+      className="absolute bottom-0"
+      style={{
+        width: `${PIXEL_SCALE * 16 * 3}px`,
+        bottom: `${PIXEL_SCALE * 0}px`,
+      }}
+    >
+      <img
+        src={ITEM_DETAILS["Crafting Box"].image}
+        className="w-full absolute"
+        style={{
+          left: `${PIXEL_SCALE * -1}px`,
+          width: `${PIXEL_SCALE * 46}px`,
           bottom: `${PIXEL_SCALE * 0}px`,
         }}
       />

@@ -28,7 +28,8 @@ const _experience = (state: MachineState) =>
   state.context.state.bumpkin?.experience;
 const _potatoCount = (state: MachineState) =>
   state.context.state.inventory.Potato ?? new Decimal(0);
-
+const _cooking = (id: number) => (state: MachineState) =>
+  state.context.state.buildings["Fire Pit"]?.[id]?.crafting;
 export const FirePit: React.FC<Props> = ({
   buildingId,
   crafting,

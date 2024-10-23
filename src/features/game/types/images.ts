@@ -22,6 +22,11 @@ import communityEgg from "assets/sfts/easter_donation_egg.webp";
 import hungryHare from "assets/sfts/hungryHare.png";
 
 // NFTs
+import marty from "assets/sfts/morchi_marty.webp";
+import miffy from "assets/sfts/morchi_miffy.webp";
+import mog from "assets/sfts/morchi_mog.webp";
+import morty from "assets/sfts/morchi_morty.webp";
+
 import grinxsHammer from "assets/sfts/grinx_hammer.png";
 import chickenCoop from "assets/sfts/chicken_coop.png";
 import christmasTree from "assets/sfts/christmas_tree.png";
@@ -692,6 +697,12 @@ import macaw from "assets/sfts/macaw.webp";
 import butterfly from "assets/sfts/butterfly.webp";
 import squirrel from "assets/sfts/squirrel.webp";
 
+import pettingHand from "assets/animals/petting_hand.webp";
+import brush from "assets/animals/brush.webp";
+import musicBox from "assets/animals/music_box.webp";
+
+import craftingBox from "assets/buildings/crafting_table.webp";
+
 import { COUPONS, EASTER_EGG, FERTILISERS, InventoryItemName } from "./game";
 
 import { CROPS, CROP_SEEDS, GREENHOUSE_CROPS, GREENHOUSE_SEEDS } from "./crops";
@@ -702,10 +713,10 @@ import { AchievementName, ACHIEVEMENTS } from "./achievements";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { CROP_LIFECYCLE } from "features/island/plots/lib/plant";
 import {
-  FRUIT,
-  FRUIT_SEEDS,
   GREENHOUSE_FRUIT,
   GREENHOUSE_FRUIT_SEEDS,
+  PATCH_FRUIT,
+  PATCH_FRUIT_SEEDS,
 } from "./fruits";
 import { FLOWER_SEEDS, FLOWERS } from "./flowers";
 import { CONSUMABLES, COOKABLES } from "./consumables";
@@ -731,6 +742,8 @@ import { translate } from "lib/i18n/translate";
 import { BASIC_DECORATIONS } from "./decorations";
 import { SELLABLE_TREASURE } from "./treasure";
 import { TREASURE_COLLECTIBLE_ITEM } from "./collectibles";
+import { ANIMAL_FOODS } from "./animals";
+import { hasSeasonEnded } from "./seasons";
 
 export interface ItemDetails {
   description: string;
@@ -740,6 +753,7 @@ export interface ItemDetails {
   howToGetItem?: string[];
   // TODO: Extend this as the codex grows eg. Resource etc
   itemType?: "collectible";
+  availability?: string;
 }
 
 type Items = Record<InventoryItemName | AchievementName, ItemDetails>;
@@ -787,7 +801,7 @@ export const ITEM_DETAILS: Items = {
   },
   Radish: {
     image: CROP_LIFECYCLE.Radish.crop,
-    description: CROPS.Corn.description,
+    description: CROPS.Radish.description,
   },
   Wheat: {
     image: CROP_LIFECYCLE.Wheat.crop,
@@ -800,6 +814,10 @@ export const ITEM_DETAILS: Items = {
   Soybean: {
     image: CROP_LIFECYCLE.Soybean.crop,
     description: CROPS.Soybean.description,
+  },
+  Barley: {
+    image: CROP_LIFECYCLE.Barley.crop,
+    description: translate("description.barley"),
   },
   "Sunflower Seed": {
     image: CROP_LIFECYCLE.Sunflower.seed,
@@ -861,6 +879,10 @@ export const ITEM_DETAILS: Items = {
     secondaryImage: CROP_LIFECYCLE.Wheat.crop,
     description: CROP_SEEDS["Wheat Seed"].description,
   },
+  "Barley Seed": {
+    image: CROP_LIFECYCLE.Barley.seed,
+    description: translate("description.barley"),
+  },
   "Magic Bean": {
     image: SUNNYSIDE.crops.magicBean,
     description: BEANS()["Magic Bean"].description,
@@ -875,27 +897,27 @@ export const ITEM_DETAILS: Items = {
   },
   "Apple Seed": {
     image: appleSeed,
-    description: FRUIT_SEEDS()["Apple Seed"].description,
+    description: PATCH_FRUIT_SEEDS()["Apple Seed"].description,
   },
   "Blueberry Seed": {
     image: blueberrySeed,
-    description: FRUIT_SEEDS()["Blueberry Seed"].description,
+    description: PATCH_FRUIT_SEEDS()["Blueberry Seed"].description,
   },
   "Orange Seed": {
     image: orangeSeed,
-    description: FRUIT_SEEDS()["Orange Seed"].description,
+    description: PATCH_FRUIT_SEEDS()["Orange Seed"].description,
   },
   "Banana Plant": {
     image: bananaPlant,
-    description: FRUIT_SEEDS()["Banana Plant"].description,
+    description: PATCH_FRUIT_SEEDS()["Banana Plant"].description,
   },
   "Tomato Seed": {
     image: tomatoSeed,
-    description: FRUIT_SEEDS()["Tomato Seed"].description,
+    description: PATCH_FRUIT_SEEDS()["Tomato Seed"].description,
   },
   "Lemon Seed": {
     image: lemonSeed,
-    description: FRUIT_SEEDS()["Lemon Seed"].description,
+    description: PATCH_FRUIT_SEEDS()["Lemon Seed"].description,
   },
   "Sunpetal Seed": {
     image: sunpetalSeed,
@@ -955,27 +977,27 @@ export const ITEM_DETAILS: Items = {
   },
   Apple: {
     image: apple,
-    description: FRUIT().Apple.description,
+    description: PATCH_FRUIT().Apple.description,
   },
   Blueberry: {
     image: blueberry,
-    description: FRUIT().Blueberry.description,
+    description: PATCH_FRUIT().Blueberry.description,
   },
   Orange: {
     image: orange,
-    description: FRUIT().Orange.description,
+    description: PATCH_FRUIT().Orange.description,
   },
   Banana: {
     image: banana,
-    description: FRUIT().Orange.description,
+    description: PATCH_FRUIT().Banana.description,
   },
   Tomato: {
     image: tomato,
-    description: FRUIT().Tomato.description,
+    description: PATCH_FRUIT().Tomato.description,
   },
   Lemon: {
     image: lemon,
-    description: FRUIT().Lemon.description,
+    description: PATCH_FRUIT().Lemon.description,
   },
   Honey: {
     image: honey,
@@ -1070,11 +1092,11 @@ export const ITEM_DETAILS: Items = {
     description: ANIMALS.Chicken.description,
   },
   Cow: {
-    image: SUNNYSIDE.icons.expression_confused,
+    image: SUNNYSIDE.animals.cowIdle,
     description: ANIMALS.Cow.description,
   },
   Sheep: {
-    image: SUNNYSIDE.icons.expression_confused,
+    image: SUNNYSIDE.animals.sheepIdle,
     description: ANIMALS.Sheep.description,
   },
   Pig: {
@@ -1128,6 +1150,18 @@ export const ITEM_DETAILS: Items = {
   "Oil Drill": {
     image: oilDrill,
     description: TOOLS["Oil Drill"].description,
+  },
+  "Petting Hand": {
+    image: pettingHand,
+    description: "Petting Hand",
+  },
+  Brush: {
+    image: brush,
+    description: "Brush",
+  },
+  "Music Box": {
+    image: musicBox,
+    description: "Music Box",
   },
   "Block Buck": {
     image: blockBuck,
@@ -1712,6 +1746,10 @@ export const ITEM_DETAILS: Items = {
   "Hen House": {
     image: SUNNYSIDE.building.chickenHouse,
     description: translate("description.hen.house"),
+  },
+  Barn: {
+    image: SUNNYSIDE.building.barn,
+    description: translate("description.barn"),
   },
   Deli: {
     image: SUNNYSIDE.building.deli,
@@ -3031,48 +3069,58 @@ export const ITEM_DETAILS: Items = {
     howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
     description: translate("description.twilight.anglerfish"),
+    availability: translate("permanent"),
   },
   "Starlight Tuna": {
     image: startlightTuna,
     howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
     description: translate("description.starlight.tuna"),
+    availability: translate("permanent"),
   },
   "Radiant Ray": {
     image: radiantRay,
     howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
     description: translate("description.radiant.ray"),
+    availability: translate("permanent"),
   },
   "Phantom Barracuda": {
     image: phantomBarracuda,
     howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
     description: translate("description.phantom.barracuda"),
+    availability: translate("permanent"),
   },
   "Gilded Swordfish": {
     image: gildedSwordfish,
     howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
     description: translate("description.gilded.swordfish"),
+    availability: translate("permanent"),
   },
   "Crimson Carp": {
     image: crimsonCarp,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("howToGetThisItem.crimsonCarp")],
     itemType: "collectible",
     description: translate("description.crimson.carp"),
+    availability: translate("seasonal"),
   },
   "Battle Fish": {
     image: battleFish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("howToGetThisItem.battleFish")],
     itemType: "collectible",
     description: translate("description.battle.fish"),
+    availability: translate("seasonal"),
   },
   "Lemon Shark": {
     image: lemonShark,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: hasSeasonEnded("Pharaoh's Treasure")
+      ? [translate("howToGetThisItem.lemonShark")]
+      : [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
     description: translate("description.lemon.shark.boost"),
+    availability: translate("seasonal"),
   },
   "Kraken Tentacle": {
     image: krakenTentacle,
@@ -4069,5 +4117,65 @@ export const ITEM_DETAILS: Items = {
   Gem: {
     image: gem,
     description: translate("description.gem"),
+  },
+  Marty: {
+    image: marty,
+    description: translate("description.marty"),
+  },
+  Mog: {
+    image: mog,
+    description: translate("description.mog"),
+  },
+  Miffy: {
+    image: miffy,
+    description: translate("description.miffy"),
+  },
+  Morty: {
+    image: morty,
+    description: translate("description.morty"),
+  },
+  Leather: {
+    image: SUNNYSIDE.resource.leather,
+    description: "Resource you can collect from cows",
+  },
+  Wool: {
+    image: SUNNYSIDE.resource.wool,
+    description: "Resource you can collect from sheep",
+  },
+  "Merino Wool": {
+    image: SUNNYSIDE.resource.merino_wool,
+    description: "Rare resource you can collect from sheep",
+  },
+  Feather: {
+    image: SUNNYSIDE.resource.feather,
+    description: "Resource you can collect from chicken",
+  },
+  Milk: {
+    image: SUNNYSIDE.resource.milk,
+    description: "Resource you can collect from cows",
+  },
+  Hay: {
+    image: SUNNYSIDE.animalFoods.hay,
+    description: ANIMAL_FOODS.Hay.description,
+  },
+  "Kernel Blend": {
+    image: SUNNYSIDE.animalFoods.kernel_blend,
+    description: ANIMAL_FOODS["Kernel Blend"].description,
+  },
+  NutriBarley: {
+    image: SUNNYSIDE.animalFoods.nutribarley,
+    description: ANIMAL_FOODS.NutriBarley.description,
+  },
+  "Mixed Grain": {
+    image: SUNNYSIDE.animalFoods.mixed_grain,
+    description: ANIMAL_FOODS["Mixed Grain"].description,
+  },
+  "Crafting Box": {
+    image: craftingBox,
+    description: "A box for crafting various items",
+  },
+  "Barn Delight": {
+    image: SUNNYSIDE.animalFoods.barn_delight,
+    description: "A magical elixir that cures animal sickness.",
   },
 };

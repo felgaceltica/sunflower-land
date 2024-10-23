@@ -35,7 +35,7 @@ import { ZoomContext } from "components/ZoomProvider";
 import { InnerPanel } from "components/ui/Panel";
 import { RemoveKuebikoModal } from "./RemoveKuebikoModal";
 import { hasRemoveRestriction } from "features/game/types/removeables";
-import { CollectibleLocation } from "features/game/types/collectibles";
+import { PlaceableLocation } from "features/game/types/collectibles";
 import { RemoveHungryCaterpillarModal } from "./RemoveHungryCaterpillarModal";
 import { RemoveCropMachineModal } from "./RemoveCropMachineModal";
 
@@ -58,7 +58,7 @@ export const RESOURCE_MOVE_EVENTS: Record<
 };
 
 function getMoveAction(
-  name: InventoryItemName | "Bud"
+  name: InventoryItemName | "Bud",
 ): GameEventName<PlacementEvent> {
   if (name in BUILDINGS_DIMENSIONS) {
     return "building.moved";
@@ -84,7 +84,7 @@ function getMoveAction(
 }
 
 export function getRemoveAction(
-  name: InventoryItemName | "Bud"
+  name: InventoryItemName | "Bud",
 ): GameEventName<PlacementEvent> | null {
   if (
     name in BUILDINGS_DIMENSIONS &&
@@ -131,7 +131,7 @@ export interface MovableProps {
   index: number;
   x: number;
   y: number;
-  location?: CollectibleLocation;
+  location?: PlaceableLocation;
 }
 
 const getMovingItem = (state: MachineState) => state.context.moving;
@@ -167,7 +167,7 @@ export const MoveableComponent: React.FC<MovableProps> = ({
   const [isRestricted, restrictionReason] = hasRemoveRestriction(
     name,
     id,
-    gameService.state.context.state
+    gameService.state.context.state,
   );
 
   /**
