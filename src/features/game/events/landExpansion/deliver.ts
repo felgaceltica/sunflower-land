@@ -12,7 +12,7 @@ import { NPCName } from "lib/npcs";
 import { getSeasonChangeover } from "lib/utils/getSeasonWeek";
 import { isWearableActive } from "features/game/lib/wearables";
 import { FACTION_OUTFITS } from "features/game/lib/factions";
-import { FRUIT, FruitName } from "features/game/types/fruits";
+import { PATCH_FRUIT, PatchFruitName } from "features/game/types/fruits";
 import { produce } from "immer";
 
 export const TICKET_REWARDS: Record<QuestNPCName, number> = {
@@ -29,7 +29,7 @@ export const TICKET_REWARDS: Record<QuestNPCName, number> = {
   pharaoh: 5,
 };
 
-const isFruit = (name: FruitName) => name in FRUIT();
+const isFruit = (name: PatchFruitName) => name in PATCH_FRUIT();
 
 export function generateDeliveryTickets({
   game,
@@ -51,6 +51,17 @@ export function generateDeliveryTickets({
     !!game.inventory["Lifetime Farmer Banner"]
   ) {
     amount += 2;
+  }
+
+  const completedAt = game.npcs?.[npc]?.deliveryCompletedAt;
+
+  const hasClaimedBonus =
+    !!completedAt &&
+    new Date(completedAt).toISOString().substring(0, 10) ===
+      new Date().toISOString().substring(0, 10);
+  // Leave this at the end as it will multiply the whole amount by 2
+  if (game.delivery.doubleDelivery === true && !hasClaimedBonus) {
+    amount *= 2;
   }
 
   return amount;
@@ -202,7 +213,7 @@ export function getOrderSellPrice<T>(game: GameState, order: Order): T {
     order.from === "tango"
   ) {
     const items = getKeys(order.items);
-    if (items.some((name) => isFruit(name as FruitName))) {
+    if (items.some((name) => isFruit(name as PatchFruitName))) {
       mul += 0.5;
     }
   }
@@ -214,6 +225,14 @@ export function getOrderSellPrice<T>(game: GameState, order: Order): T {
     order.from === "corale"
   ) {
     mul += 0.5;
+  }
+
+  // Nom Nom - 5% bonus with food orders
+  if (game.bumpkin?.skills["Nom Nom"]) {
+    const items = getKeys(order.items);
+    if (items.some((name) => name in COOKABLE_CAKES)) {
+      mul += 0.05;
+    }
   }
 
   const items = getKeys(order.items);
@@ -231,6 +250,17 @@ export function getOrderSellPrice<T>(game: GameState, order: Order): T {
     isWearableActive({ game, name: FACTION_OUTFITS[factionName].crown })
   ) {
     mul += 0.25;
+  }
+
+  const completedAt = game.npcs?.[order.from]?.deliveryCompletedAt;
+
+  const hasClaimedBonus =
+    !!completedAt &&
+    new Date(completedAt).toISOString().substring(0, 10) ===
+      new Date().toISOString().substring(0, 10);
+  // Leave this at the end as it will multiply the whole amount by 2
+  if (game.delivery.doubleDelivery === true && !hasClaimedBonus) {
+    mul *= 2;
   }
 
   if (order.reward.sfl) {
@@ -371,7 +401,10 @@ export function deliverOrder({
 
     game.npcs = {
       ...npcs,
-      [order.from]: npc,
+      [order.from]: {
+        ...npc,
+        deliveryCompletedAt: createdAt,
+      },
     };
 
     // bumpkin.activity = trackActivity(`${order.from} Delivered`, 1);

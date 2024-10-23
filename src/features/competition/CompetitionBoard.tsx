@@ -64,12 +64,12 @@ export const CompetitionBoard: React.FC = () => {
     const expansionCount = inventory["Basic Land"]?.toNumber() ?? 0;
 
     if (expansionCount < 6) {
-      return { x: -6, y: -4.5 };
+      return { x: 2, y: -4.5 };
     }
     if (expansionCount >= 6 && expansionCount < 21) {
-      return { x: -6, y: -10.5 };
+      return { x: 2, y: -10.5 };
     } else {
-      return { x: -6, y: -16.5 };
+      return { x: 2, y: -16.5 };
     }
   };
 
@@ -90,7 +90,7 @@ export const CompetitionBoard: React.FC = () => {
       </MapPlacement>
       <Modal show={isOpen} onHide={() => setIsOpen(false)}>
         <CompetitionModal
-          competitionName="TESTING"
+          competitionName="FSL"
           onClose={() => setIsOpen(false)}
         />
       </Modal>
@@ -233,7 +233,7 @@ export const CompetitionModal: React.FC<{
                 window.open("https://id.fsl.com/login", "_blank")?.focus();
               }}
             >
-              {`FSL`}
+              {`FSL ID`}
               <img src={fslIcon} className="absolute right-1 -top-1 h-10" />
             </Button>
 
@@ -316,6 +316,17 @@ export const CompetitionModal: React.FC<{
                 ]}
               />
             </div>
+
+            <a
+              href={
+                "https://docs.sunflower-land.com/player-guides/special-events/fsl-id-farmer-competition#rewards"
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-xxs pb-1 pt-0.5 hover:text-blue-500 mb-1"
+            >
+              {t("read.more")}
+            </a>
           </InnerPanel>
         </>
       )}
@@ -395,7 +406,7 @@ export const CompetitionLeaderboard: React.FC<{ name: CompetitionName }> = ({
           <CompetitionTable items={leaderboard} />
 
           {/* Only show miniboard if player isn't in the main leaderboard */}
-          {player && !miniboard.find((m) => m.id !== player.id) && (
+          {player && !leaderboard.find((m) => m.id === player.id) && (
             <>
               <p className="text-center text-xs mb-2">{`...`}</p>
               <CompetitionTable items={miniboard} />

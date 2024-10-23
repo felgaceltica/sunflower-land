@@ -354,8 +354,63 @@ import {
   startCompetition,
   StartCompetitionAction,
 } from "./landExpansion/startCompetition";
+import {
+  shipmentRestock,
+  ShipmentRestockAction,
+} from "./landExpansion/shipmentRestocked";
+import {
+  speedUpRecipe,
+  InstantCookRecipe,
+} from "./landExpansion/speedUpRecipe";
+import {
+  speedUpExpansion,
+  InstantExpand,
+} from "./landExpansion/speedUpExpansion";
+import {
+  speedUpCollectible,
+  SpeedUpCollectible,
+} from "./landExpansion/speedUpCollectible";
+import {
+  speedUpBuilding,
+  SpeedUpBuilding,
+} from "./landExpansion/speedUpBuilding";
+import { buyAnimal, BuyAnimalAction } from "./landExpansion/buyAnimal";
+import { feedAnimal, FeedAnimalAction } from "./landExpansion/feedAnimal";
+import { loveAnimal, LoveAnimalAction } from "./landExpansion/loveAnimal";
+import { feedMixed, FeedMixedAction } from "features/feederMachine/feedMixed";
+import {
+  upgradeBuilding,
+  UpgradeBuildingAction,
+} from "./landExpansion/upgradeBuilding";
+import { sellAnimal, SellAnimalAction } from "./landExpansion/sellAnimal";
+import {
+  startCrafting,
+  StartCraftingAction,
+} from "./landExpansion/startCrafting";
+import {
+  collectCrafting,
+  CollectCraftingAction,
+} from "./landExpansion/collectCrafting";
+import {
+  completeNPCChore,
+  CompleteNPCChoreAction,
+} from "./landExpansion/completeNPCChore";
+import { claimProduce, ClaimProduceAction } from "./landExpansion/claimProduce";
+import { sellBounty, SellBountyAction } from "./landExpansion/sellBounty";
+import {
+  buySeasonalItem,
+  BuySeasonalItemAction,
+} from "./landExpansion/buySeasonalItem";
 
 export type PlayingEvent =
+  | SellAnimalAction
+  | SpeedUpBuilding
+  | SpeedUpCollectible
+  | SellBountyAction
+  | FeedMixedAction
+  | InstantExpand
+  | InstantCookRecipe
+  | ShipmentRestockAction
   | StartCompetitionAction
   | ClaimOfferAction
   | CompleteDailyChallengeAction
@@ -458,7 +513,16 @@ export type PlayingEvent =
   | ClaimFactionPrizeAction
   | FeedFactionPetAction
   | LeaveFactionAction
-  | BuyMoreDigsAction;
+  | BuyMoreDigsAction
+  | BuyAnimalAction
+  | FeedAnimalAction
+  | LoveAnimalAction
+  | UpgradeBuildingAction
+  | StartCraftingAction
+  | CollectCraftingAction
+  | CompleteNPCChoreAction
+  | ClaimProduceAction
+  | BuySeasonalItemAction;
 
 export type PlacementEvent =
   | ConstructBuildingAction
@@ -524,6 +588,12 @@ type Handlers<T> = {
 };
 
 export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
+  "animal.sold": sellAnimal,
+  "building.spedUp": speedUpBuilding,
+  "collectible.spedUp": speedUpCollectible,
+  "expansion.spedUp": speedUpExpansion,
+  "recipe.spedUp": speedUpRecipe,
+  "bounty.sold": sellBounty,
   "competition.started": startCompetition,
   "offer.claimed": claimOffer,
   "dailyChallenge.completed": completeDailyChallenge,
@@ -628,6 +698,17 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "factionShopItem.bought": buyFactionShopItem,
   "factionPet.fed": feedFactionPet,
   "desert.digsBought": buyMoreDigs,
+  "shipment.restocked": shipmentRestock,
+  "animal.bought": buyAnimal,
+  "animal.fed": feedAnimal,
+  "animal.loved": loveAnimal,
+  "feed.mixed": feedMixed,
+  "building.upgraded": upgradeBuilding,
+  "crafting.started": startCrafting,
+  "crafting.collected": collectCrafting,
+  "chore.fulfilled": completeNPCChore,
+  "produce.claimed": claimProduce,
+  "seasonalItem.bought": buySeasonalItem,
 };
 
 export const PLACEMENT_EVENTS: Handlers<PlacementEvent> = {
