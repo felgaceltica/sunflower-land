@@ -19,10 +19,7 @@ const betaTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
 };
 
 const periodBasedFeatureFlag = (startDate: Date, endDate: Date) => () => {
-  return (
-    testnetFeatureFlag() ||
-    (Date.now() > startDate.getTime() && Date.now() < endDate.getTime())
-  );
+  return Date.now() > startDate.getTime() && Date.now() < endDate.getTime();
 };
 
 // Used for testing production features
