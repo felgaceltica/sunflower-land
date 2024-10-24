@@ -53,7 +53,7 @@ const featureFlags = {
   FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2024-09-10T00:00:00Z")),
   FRUIT_DASH_HALLOWEEN: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
   FRUIT_DASH_HALLOWEEN_EVENT: periodBasedFeatureFlag(
-    new Date("2024-10-25T00:00:00Z"),
+    new Date("2024-10-30T00:00:00Z"),
     new Date("2024-11-01T00:00:00Z"),
   ),
   PORTALS: testnetFeatureFlag,
