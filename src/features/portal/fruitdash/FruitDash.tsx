@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { useSelector } from "@xstate/react";
 import { Modal } from "components/ui/Modal";
@@ -18,6 +18,11 @@ import { authorisePortal, claimPrize } from "../lib/portalUtil";
 import { FruitDashRulesPanel } from "./components/panels/FruitDashRulesPanel";
 import { FruitDashNoAttemptsPanel } from "./components/panels/FruitDashNoAttemptsPanel";
 import AchievementToastProvider from "./providers/AchievementToastProvider";
+import { SpeakingModal } from "features/game/components/SpeakingModal";
+import { translate } from "lib/i18n/translate";
+import { FRUIT_DASH_NPC_WEREABLES } from "./util/FruitDashConstants";
+import { hasFeatureAccess } from "lib/flags";
+import { OFFLINE_FARM } from "features/game/lib/landData";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
 const _isError = (state: PortalMachineState) => state.matches("error");
@@ -31,6 +36,20 @@ const _isIntroduction = (state: PortalMachineState) =>
 const _isLoser = (state: PortalMachineState) => state.matches("loser");
 const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
+const _isReadHalloweenEvent = hasReadFruitDashHalloweenEvent();
+
+export function hasReadFruitDashHalloweenEvent() {
+  if (hasFeatureAccess(OFFLINE_FARM, "FRUIT_DASH_HALLOWEEN_EVENT"))
+    return !!localStorage.getItem("fruitDash.halloweenevent");
+  else return true;
+}
+
+function acknowledgeFruitDashHalloweenEvent() {
+  return localStorage.setItem(
+    "fruitDash.halloweenevent",
+    new Date().toISOString(),
+  );
+}
 
 export const FruitDashApp: React.FC = () => {
   return (
@@ -45,7 +64,9 @@ export const FruitDashApp: React.FC = () => {
 export const FruitDash: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
-
+  const [isReadHalloweenEvent, setIsReadHalloweenEvent] = useState(
+    _isReadHalloweenEvent,
+  );
   const sflBalance = useSelector(portalService, _sflBalance);
   const isError = useSelector(portalService, _isError);
   const isUnauthorised = useSelector(portalService, _isUnauthorised);
@@ -56,6 +77,7 @@ export const FruitDash: React.FC = () => {
   const isLoser = useSelector(portalService, _isLoser);
   const isComplete = useSelector(portalService, _isComplete);
 
+  //const isReadHalloweenEvent = useSelector(portalService, _isReadHalloweenEvent);
   useEffect(() => {
     // If a player tries to quit while playing, mark it as an attempt
     const handleBeforeUnload = () => {
@@ -112,7 +134,6 @@ export const FruitDash: React.FC = () => {
       </Modal>
     );
   }
-
   return (
     <div>
       {isNoAttempts && (
@@ -120,8 +141,31 @@ export const FruitDash: React.FC = () => {
           <FruitDashNoAttemptsPanel />
         </Modal>
       )}
-
-      {isIntroduction && (
+      {isIntroduction && !isReadHalloweenEvent && (
+        <Modal show>
+          <SpeakingModal
+            bumpkinParts={FRUIT_DASH_NPC_WEREABLES["Felga"]}
+            message={[
+              {
+                text: translate("fruit-dash.halloweenEvent"),
+                actions: [
+                  {
+                    text: translate("ok"),
+                    cb: () => {
+                      setIsReadHalloweenEvent(true);
+                      acknowledgeFruitDashHalloweenEvent();
+                    },
+                  },
+                ],
+              },
+            ]}
+            onClose={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
+        </Modal>
+      )}
+      {isIntroduction && isReadHalloweenEvent && (
         <Modal show>
           <FruitDashRulesPanel
             mode={"introduction"}
