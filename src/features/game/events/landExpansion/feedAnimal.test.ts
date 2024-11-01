@@ -1,5 +1,5 @@
 import Decimal from "decimal.js-light";
-import { feedAnimal } from "./feedAnimal";
+import { ANIMAL_SLEEP_DURATION, feedAnimal } from "./feedAnimal";
 import { INITIAL_FARM } from "features/game/lib/constants";
 
 describe("feedAnimal", () => {
@@ -27,6 +27,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -66,6 +67,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -105,6 +107,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 20,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -144,6 +147,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -205,6 +209,7 @@ describe("feedAnimal", () => {
                 state: "idle",
                 experience: 0,
                 asleepAt: 0,
+                awakeAt: 0,
                 lovedAt: 0,
                 item: "Petting Hand",
               },
@@ -243,6 +248,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -283,6 +289,7 @@ describe("feedAnimal", () => {
                 state: "idle",
                 experience: 50,
                 asleepAt: now,
+                awakeAt: now + ANIMAL_SLEEP_DURATION,
                 lovedAt: 0,
                 item: "Petting Hand",
               },
@@ -320,6 +327,7 @@ describe("feedAnimal", () => {
                 state: "idle",
                 experience: 0,
                 asleepAt: 0,
+                awakeAt: 0,
                 lovedAt: 0,
                 item: "Petting Hand",
               },
@@ -368,6 +376,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -416,6 +425,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -466,6 +476,7 @@ describe("feedAnimal", () => {
                 experience: 50,
                 asleepAt: 0,
                 lovedAt: 0,
+                awakeAt: 0,
                 item: "Petting Hand",
               },
             },
@@ -503,6 +514,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 120,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -542,6 +554,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -581,6 +594,7 @@ describe("feedAnimal", () => {
               state: "idle",
               experience: 20,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -597,6 +611,7 @@ describe("feedAnimal", () => {
 
     expect(state.henHouse.animals[chickenId].state).toBe("ready");
   });
+
   it("cures a sick animal with Barn Delight", () => {
     const chickenId = "xyz";
 
@@ -619,6 +634,7 @@ describe("feedAnimal", () => {
               state: "sick",
               experience: 0,
               asleepAt: 0,
+              awakeAt: 0,
               lovedAt: 0,
               item: "Petting Hand",
             },
@@ -661,6 +677,7 @@ describe("feedAnimal", () => {
                 state: "idle",
                 experience: 0,
                 asleepAt: 0,
+                awakeAt: 0,
                 lovedAt: 0,
                 item: "Petting Hand",
               },
@@ -696,6 +713,7 @@ describe("feedAnimal", () => {
                 state: "sick",
                 experience: 0,
                 asleepAt: 0,
+                awakeAt: 0,
                 lovedAt: 0,
                 item: "Petting Hand",
               },
@@ -712,7 +730,6 @@ describe("feedAnimal", () => {
     ).toThrow("Not enough Barn Delight to cure the animal");
   });
 
-  // Update the existing test for feeding a sick animal
   it("throws if the animal is sick and not fed Barn Delight", () => {
     const chickenId = "xyz";
 
@@ -736,6 +753,7 @@ describe("feedAnimal", () => {
                 state: "sick",
                 experience: 0,
                 asleepAt: 0,
+                awakeAt: 0,
                 lovedAt: 0,
                 item: "Petting Hand",
               },
@@ -801,5 +819,162 @@ describe("feedAnimal", () => {
     });
 
     expect(state.bumpkin?.activity["Chicken Cured"]).toBe(1);
+  });
+
+  it("takes 10% less food to feed a chicken if a user has a Fat Chicken placed", () => {
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        inventory: {
+          "Fat Chicken": new Decimal(1),
+          Hay: new Decimal(1),
+        },
+        collectibles: {
+          "Fat Chicken": [
+            {
+              coordinates: { x: 0, y: 0 },
+              createdAt: 0,
+              id: "1",
+              readyAt: 0,
+            },
+          ],
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Chicken",
+        id: "0",
+        item: "Hay",
+      },
+    });
+
+    expect(state.inventory.Hay).toEqual(new Decimal(0.1));
+  });
+
+  it("takes 20% less food to feed a chicken if a user has a Cluckulator placed", () => {
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        inventory: {
+          Cluckulator: new Decimal(1),
+          "Kernel Blend": new Decimal(1),
+        },
+        collectibles: {
+          Cluckulator: [
+            {
+              coordinates: { x: 0, y: 0 },
+              createdAt: 0,
+              id: "1",
+              readyAt: 0,
+            },
+          ],
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Chicken",
+        id: "0",
+        item: "Kernel Blend",
+      },
+    });
+
+    expect(state.inventory["Kernel Blend"]).toEqual(new Decimal(0.2));
+  });
+
+  it("Applies Fat Chicken and Cluckulator boost", () => {
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        inventory: {
+          "Fat Chicken": new Decimal(1),
+          Cluckulator: new Decimal(1),
+          "Kernel Blend": new Decimal(1),
+        },
+        collectibles: {
+          Cluckulator: [
+            {
+              coordinates: { x: 0, y: 0 },
+              createdAt: 0,
+              id: "1",
+              readyAt: 0,
+            },
+          ],
+          "Fat Chicken": [
+            {
+              coordinates: { x: 5, y: 5 },
+              createdAt: 0,
+              id: "2",
+              readyAt: 0,
+            },
+          ],
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Chicken",
+        id: "0",
+        item: "Kernel Blend",
+      },
+    });
+    const result = new Decimal(1 - 1 * 0.8 * 0.9);
+
+    expect(state.inventory["Kernel Blend"]).toEqual(new Decimal(result));
+  });
+
+  it("takes 50% less food to feed a sheep if Infernal Bullwhip is worn", () => {
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin?.equipped,
+            tool: "Infernal Bullwhip",
+          },
+        },
+        inventory: {
+          "Kernel Blend": new Decimal(3),
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Sheep",
+        id: "0",
+        item: "Kernel Blend",
+      },
+    });
+
+    expect(state.inventory["Kernel Blend"]).toEqual(new Decimal(1.5));
+  });
+
+  it("takes 50% less food to feed a cow if Infernal Bullwhip is worn", () => {
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin?.equipped,
+            tool: "Infernal Bullwhip",
+          },
+        },
+        inventory: {
+          "Kernel Blend": new Decimal(5),
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Cow",
+        id: "0",
+        item: "Kernel Blend",
+      },
+    });
+
+    expect(state.inventory["Kernel Blend"]).toEqual(new Decimal(2.5));
   });
 });

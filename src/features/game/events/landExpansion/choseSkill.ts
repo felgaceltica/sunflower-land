@@ -23,7 +23,7 @@ export const getAvailableBumpkinSkillPoints = (bumpkin?: Bumpkin) => {
   const bumpkinLevel = getBumpkinLevel(bumpkin.experience); // 1 level = 1 skill point
   const allocatedSkillPoints = Object.values(bumpkin.skills).reduce(
     (acc, level) => acc + level,
-    0
+    0,
   );
 
   return bumpkinLevel - allocatedSkillPoints;
@@ -32,13 +32,14 @@ export const getAvailableBumpkinSkillPoints = (bumpkin?: Bumpkin) => {
 export function choseSkill({ state, action, createdAt = Date.now() }: Options) {
   const stateCopy = cloneDeep(state);
   const { bumpkin } = stateCopy;
+
   if (bumpkin == undefined) {
     throw new Error("You do not have a Bumpkin!");
   }
 
   const availableSkillPoints = getAvailableBumpkinSkillPoints(bumpkin);
   const claimedSkillsInTree = Object.keys(bumpkin.skills).filter((skill) =>
-    Object.keys(BUMPKIN_REVAMP_SKILL_TREE).includes(skill)
+    Object.keys(BUMPKIN_REVAMP_SKILL_TREE).includes(skill),
   ).length;
   const requirements = BUMPKIN_REVAMP_SKILL_TREE[action.skill].requirements;
   const bumpkinHasSkill = bumpkin.skills[action.skill];
@@ -55,6 +56,8 @@ export function choseSkill({ state, action, createdAt = Date.now() }: Options) {
     throw new Error("You already have this skill");
   }
 
+  // Add the selected skill to the bumpkin's skills
   bumpkin.skills = { ...bumpkin.skills, [action.skill]: 1 };
+
   return stateCopy;
 }
