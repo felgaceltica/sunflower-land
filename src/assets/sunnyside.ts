@@ -59,6 +59,7 @@ export const SUNNYSIDE = {
     desert_digging: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/desert.webp`,
     factions: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/factions.png`,
     desertSeason: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/desert_season.png`,
+    bullRunSeason: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/bull_run_season.png`,
     pharaohSeasonRares: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/pharaoh_seasonal_rares.png`,
   },
   //Badges(Pre-LandExpansion Skills)
@@ -254,6 +255,10 @@ export const SUNNYSIDE = {
     animal_house_inside_one: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_one.png`,
     animal_house_inside_two: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_two.png`,
     animal_house_inside_three: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_three.png`,
+
+    basic_building_bg: `${CONFIG.PROTECTED_IMAGE_URL}/land/basic_building_bg.png`,
+    spring_building_bg: `${CONFIG.PROTECTED_IMAGE_URL}/land/spring_building_bg.png`,
+    desert_building_bg: `${CONFIG.PROTECTED_IMAGE_URL}/land/desert_building_bg.png`,
   },
   //Soil
   soil: {
@@ -300,6 +305,19 @@ export const SUNNYSIDE = {
     mixed_grain: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/mixed_grain.webp`,
     fish_oil: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/fish_oil.webp`,
     barn_delight: `${CONFIG.PROTECTED_IMAGE_URL}/animals/foods/barn_delight.webp`,
+  },
+  crafting: {
+    cushion: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/cushion.webp`,
+    timber: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/timber.webp`,
+    beeBox: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/bee_box.webp`,
+    crimsteel: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/crimsteel.webp`,
+    merinoCushion: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/merino_cushion.webp`,
+    kelpFibre: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/kelp_fibre.webp`,
+    hardenedLeather: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/hardened_leather.webp`,
+    syntheticFabric: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/synthetic_fabric.webp`,
+    oceansTreasure: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/oceans_treasure_2.webp`,
+    royalBedding: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/royal_bedding.webp`,
+    royalOrnament: `${CONFIG.PROTECTED_IMAGE_URL}/crafting/royal_ornament.webp`,
   },
   //VFXs
   vfx: {
@@ -400,6 +418,7 @@ export const SUNNYSIDE = {
   },
   //Icons
   icons: {
+    upgrade_disc: `${CONFIG.PROTECTED_IMAGE_URL}/icons/upgrade_disc.webp`,
     angry: `${CONFIG.PROTECTED_IMAGE_URL}/icons/angry.png`,
     arrow_down: `${CONFIG.PROTECTED_IMAGE_URL}/icons/arrow_down.png`,
     arrow_left: `${CONFIG.PROTECTED_IMAGE_URL}/icons/arrow_left.png`,
@@ -495,6 +514,7 @@ export const SUNNYSIDE = {
   },
   //NPCs
   npcs: {
+    hank_swimming: `${CONFIG.PROTECTED_IMAGE_URL}/npcs/hank_swimming.webp`,
     betty: `${CONFIG.PROTECTED_IMAGE_URL}/npcs/betty.gif`,
     bumpkin: `${CONFIG.PROTECTED_IMAGE_URL}/npcs/idle.gif`,
     fisherman: `${CONFIG.PROTECTED_IMAGE_URL}/npcs/fisherman.gif`,
@@ -799,5 +819,6 @@ export const SUNNYSIDE = {
     farmHandImage: `${CONFIG.PROTECTED_IMAGE_URL}/tutorials/farmHands.png`,
     flowersTutorial: `${CONFIG.PROTECTED_IMAGE_URL}/tutorials/flowers.webp`,
     beeTutorial: `${CONFIG.PROTECTED_IMAGE_URL}/tutorials/bees.webp`,
+    craftingBox: `${CONFIG.PROTECTED_IMAGE_URL}/tutorials/crafting_box.webp`,
   },
 };
