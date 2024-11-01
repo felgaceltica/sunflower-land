@@ -34,6 +34,7 @@ import {
   MegaStoreCollectibleName,
   PotionHouseItemName,
   PurchasableItems,
+  SeasonalCollectibleName,
   SoldOutCollectibleName,
   TreasureCollectibleItem,
 } from "./collectibles";
@@ -321,6 +322,9 @@ export const COUPONS: Record<Coupons, { description: string }> = {
   Mark: {
     description: translate("description.faction.mark"),
   },
+  Horseshoe: {
+    description: translate("description.horseshoe"),
+  },
 };
 
 export type Purchase = {
@@ -449,7 +453,10 @@ export type InventoryItemName =
   | MutantFlowerName
   | AnimalFoodName
   | AnimalMedicineName
-  | LoveAnimalItem;
+  | LoveAnimalItem
+  | BedName
+  | RecipeCraftableName
+  | SeasonalCollectibleName;
 
 export type Inventory = Partial<Record<InventoryItemName, Decimal>>;
 
@@ -771,6 +778,29 @@ export type AnimalFoodName =
 
 export type AnimalMedicineName = "Barn Delight";
 
+export type BedName =
+  | "Basic Bed"
+  | "Sturdy Bed"
+  | "Floral Bed"
+  | "Fisher Bed"
+  | "Pirate Bed"
+  | "Cow Bed"
+  | "Desert Bed"
+  | "Royal Bed";
+
+export type RecipeCraftableName =
+  | "Cushion"
+  | "Timber"
+  | "Bee Box"
+  | "Crimsteel"
+  | "Merino Cushion"
+  | "Kelp Fibre"
+  | "Hardened Leather"
+  | "Synthetic Fabric"
+  | "Ocean's Treasure"
+  | "Royal Bedding"
+  | "Royal Ornament";
+
 export type Party = {
   fulfilledAt?: number;
   fulfilledCount?: number;
@@ -814,7 +844,7 @@ export type Delivery = {
     total: number;
     claimedAt?: number;
   };
-  doubleDelivery: boolean;
+  doubleDelivery?: string;
 };
 
 export type DailyRewards = {
@@ -1208,8 +1238,10 @@ export type Animal = {
   coordinates: Coordinates;
   experience: number;
   asleepAt: number;
+  awakeAt: number;
   lovedAt: number;
   item: LoveAnimalItem;
+  multiplier?: number;
 };
 
 export type AnimalBuilding = {

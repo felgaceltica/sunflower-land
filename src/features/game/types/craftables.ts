@@ -1,6 +1,6 @@
 import Decimal from "decimal.js-light";
 import { CropSeedName } from "./crops";
-import { FactionBanner, InventoryItemName, LanternName } from "./game";
+import { BedName, FactionBanner, InventoryItemName, LanternName } from "./game";
 import { Section } from "lib/utils/hooks/useScrollIntoView";
 import { Flag, FLAGS } from "./flags";
 import { LimitedItemType } from ".";
@@ -12,6 +12,7 @@ import {
   HeliosBlacksmithItem,
   MegaStoreCollectibleName,
   PotionHouseItemName,
+  SeasonalCollectibleName,
   SoldOutCollectibleName,
   TreasureCollectibleItem,
 } from "./collectibles";
@@ -21,6 +22,7 @@ import { SeasonalBanner } from "./seasons";
 import { EpicFlowerName, MutantFlowerName } from "./flowers";
 import { translate } from "lib/i18n/translate";
 import { FactionShopCollectibleName } from "./factionShop";
+import { BEDS } from "./beds";
 
 export { FLAGS };
 
@@ -217,7 +219,9 @@ export type CollectibleName =
   | "Lifetime Farmer Banner"
   | FactionShopCollectibleName
   | TreasureCollectibleItem
-  | MutantFlowerName;
+  | MutantFlowerName
+  | BedName
+  | SeasonalCollectibleName;
 
 export type ToolName =
   | "Axe"
@@ -1084,6 +1088,14 @@ const flagsDimension = getKeys(FLAGS).reduce(
   {} as Record<Flag, Dimensions>,
 );
 
+const bedsDimension = getKeys(BEDS).reduce(
+  (previous, bedName) => ({
+    ...previous,
+    [bedName]: { width: 1, height: 1 },
+  }),
+  {} as Record<BedName, Dimensions>,
+);
+
 export const COLLECTIBLES_DIMENSIONS: Record<CollectibleName, Dimensions> = {
   // Salesman Items
   "Wicker Man": { width: 1, height: 1 },
@@ -1091,6 +1103,7 @@ export const COLLECTIBLES_DIMENSIONS: Record<CollectibleName, Dimensions> = {
 
   // Flags
   ...flagsDimension,
+  ...bedsDimension,
 
   ...DECORATION_DIMENSIONS,
 
@@ -1204,6 +1217,7 @@ export const COLLECTIBLES_DIMENSIONS: Record<CollectibleName, Dimensions> = {
   "Witches' Eve Banner": { width: 1, height: 2 },
   "Dawn Breaker Banner": { width: 1, height: 2 },
   "Solar Flare Banner": { width: 1, height: 2 },
+  "Bull Run Banner": { width: 1, height: 2 },
   "Human War Banner": { width: 1, height: 2 },
   "Goblin War Banner": { width: 1, height: 2 },
   "Catch the Kraken Banner": { width: 1, height: 2 },
@@ -1262,6 +1276,7 @@ export const COLLECTIBLES_DIMENSIONS: Record<CollectibleName, Dimensions> = {
   "Crimson Carp": { width: 2, height: 1 },
   "Battle Fish": { width: 2, height: 1 },
   "Lemon Shark": { width: 2, height: 1 },
+  "Longhorn Cowfish": { width: 2, height: 1 },
 
   "Kraken Tentacle": { width: 1, height: 1 },
 
@@ -1359,6 +1374,7 @@ export const COLLECTIBLES_DIMENSIONS: Record<CollectibleName, Dimensions> = {
   "Goblin Faction Rug": { width: 3, height: 2 },
   "Bumpkin Faction Rug": { width: 3, height: 2 },
   "Desert Rose": { width: 1, height: 1 },
+  Chicory: { width: 1, height: 1 },
 
   "Hapy Jar": { width: 1, height: 2 },
   "Duamutef Jar": { width: 1, height: 2 },
@@ -1395,6 +1411,20 @@ export const COLLECTIBLES_DIMENSIONS: Record<CollectibleName, Dimensions> = {
   Squirrel: { width: 2, height: 1 },
   Macaw: { width: 1, height: 1 },
   Butterfly: { width: 1, height: 1 },
+
+  // Animal Season
+  "Cow Scratcher": { width: 1, height: 2 },
+  "Spinning Wheel": { width: 2, height: 2 },
+  "Sleepy Rug": { width: 3, height: 2 },
+  Meteorite: { width: 2, height: 2 },
+  "Sheaf of Plenty": { width: 1, height: 2 },
+  "Mechanical Bull": { width: 2, height: 2 },
+  "Moo-ver": { width: 2, height: 2 },
+  "Swiss Whiskers": { width: 1, height: 1 },
+  Cluckulator: { width: 1, height: 2 },
+  UFO: { width: 2, height: 2 },
+  Wagon: { width: 2, height: 2 },
+  "Black Sheep": { width: 2, height: 2 },
 };
 
 export const ANIMAL_DIMENSIONS: Record<"Chicken", Dimensions> = {

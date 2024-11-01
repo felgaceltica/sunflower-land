@@ -23,6 +23,8 @@ import {
 } from "features/game/types/resources";
 import { PlaceableLocation } from "features/game/types/collectibles";
 import { ANIMALS, AnimalType } from "features/game/types/animals";
+import { hasFeatureAccess } from "lib/flags";
+import { INITIAL_FARM } from "features/game/lib/constants";
 
 type BoundingBox = Position;
 
@@ -205,7 +207,7 @@ export const HOME_BOUNDS: Record<IslandType, BoundingBox> = {
   },
 };
 
-const ANIMAL_HOUSE_BOUNDS: Record<
+export const ANIMAL_HOUSE_BOUNDS: Record<
   AnimalBuildingKey,
   Record<number, BoundingBox>
 > = {
@@ -401,6 +403,21 @@ function detectMushroomCollision(state: GameState, boundingBox: BoundingBox) {
   );
 }
 
+function detectAirdropCollision(state: GameState, boundingBox: BoundingBox) {
+  const { airdrops } = state;
+  if (!airdrops) return false;
+
+  return airdrops.some(
+    (airdrop) =>
+      !!airdrop.coordinates &&
+      isOverlapping(boundingBox, {
+        ...airdrop.coordinates,
+        width: 1,
+        height: 1,
+      }),
+  );
+}
+
 enum Direction {
   Left,
   Right,
@@ -542,7 +559,8 @@ export function detectCollision({
     detectPlaceableCollision(state, position, item) ||
     detectLandCornerCollision(expansions, position) ||
     detectChickenCollision(state, position) ||
-    detectMushroomCollision(state, position)
+    detectMushroomCollision(state, position) ||
+    detectAirdropCollision(state, position)
   );
 }
 
@@ -633,13 +651,24 @@ export function isWithinAOE(
         (dxTurtle !== 0 || dyTurtle !== 0)
       );
     }
-    case "Sir Goldensnout":
-    case "Bale": {
+    case "Sir Goldensnout": {
       const dxRect = effectItem.x - x;
       const dyRect = effectItem.y - y;
       return (
         dxRect >= -1 && dxRect <= width && dyRect <= 1 && dyRect >= -height
       );
+    }
+
+    case "Bale": {
+      if (!hasFeatureAccess(INITIAL_FARM, "BALE_AOE_END")) {
+        const dxRect = effectItem.x - x;
+        const dyRect = effectItem.y - y;
+        return (
+          dxRect >= -1 && dxRect <= width && dyRect <= 1 && dyRect >= -height
+        );
+      }
+
+      return false;
     }
 
     case "Queen Cornelia": {

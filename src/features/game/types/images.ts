@@ -367,6 +367,7 @@ import victoriaSisters from "src/assets/sfts/victoria_sisters.gif";
 import snowglobe from "src/assets/decorations/snowglobe.gif";
 import shrub from "assets/decorations/shrub.png";
 import basicBear from "src/assets/sfts/bears/basic_bear.png";
+import kingOfBears from "src/assets/sfts/bears/king_of_bears.png";
 import chefBear from "src/assets/sfts/bears/chef_bear.png";
 import constructionBear from "src/assets/sfts/bears/construction_bear.png";
 import angelBear from "src/assets/sfts/bears/angel_bear.png";
@@ -408,10 +409,10 @@ import hideawayHerman from "src/assets/decorations/hideaway_herman.webp";
 import shiftySheldon from "src/assets/decorations/shifty_sheldon.webp";
 import tikiTorch from "src/assets/decorations/tiki_torch.webp";
 import beachUmbrella from "src/assets/decorations/beach_umbrella.webp";
-
 import fieldMaple from "src/assets/decorations/field_maple.webp";
 import redMaple from "src/assets/decorations/red_maple.webp";
 import goldenMaple from "src/assets/decorations/golden_maple.webp";
+import Wagon from "src/assets/decorations/wagon.webp";
 
 // Treasure
 import abandonedBear from "assets/sfts/bears/abandoned_bear.png";
@@ -541,6 +542,7 @@ import angelFish from "assets/fish/angel_fish.png";
 import parrotFish from "assets/fish/parrot_fish.png";
 import battleFish from "assets/fish/battle_fish.webp";
 import lemonShark from "assets/fish/lemon_shark.webp";
+import longhornCowfish from "assets/fish/cow_fish.webp";
 
 import festiveTree from "assets/sfts/festive_tree.png";
 import nutcracker from "assets/sfts/bumpkin_nutcracker.png";
@@ -703,6 +705,31 @@ import musicBox from "assets/animals/music_box.webp";
 
 import craftingBox from "assets/buildings/crafting_table.webp";
 
+import sturdyBed from "assets/bumpkins/sturdy_bed.webp";
+import desertBed from "assets/bumpkins/desert_bed.webp";
+import fisherBed from "assets/bumpkins/fisher_bed.webp";
+import floralBed from "assets/bumpkins/flower_bed.webp";
+import pirateBed from "assets/bumpkins/pirate_bed.webp";
+import royalBed from "assets/bumpkins/royal_bed.webp";
+import cowBed from "assets/bumpkins/cow_bed.webp";
+
+import horseshoe from "assets/icons/horseshoe.webp";
+import cowSkull from "assets/resources/cow_skull.png";
+import bullsRunBanner from "assets/decorations/banners/bull_run_banner.webp";
+
+import cowScratcher from "assets/sfts/cow_scratcher.webp";
+import spinningWheel from "assets/sfts/spinning_wheel.webp";
+import sleepyRug from "assets/sfts/sleepy_rug.webp";
+import meteorite from "assets/sfts/meteorite.webp";
+import sheafOfPlenty from "assets/sfts/sheaf_of_plenty.webp";
+import mechanicalBull from "assets/sfts/mecha_bull.webp";
+import mooVer from "assets/sfts/moo_ver.webp";
+import swissWhisker from "assets/sfts/swiss_whiskers.webp";
+import cluckulator from "assets/sfts/cluckulator.webp";
+import ufo from "assets/sfts/ufo.webp";
+import chicory from "assets/sfts/chicory.webp";
+import blackSheep from "assets/sfts/black_sheep.webp";
+
 import { COUPONS, EASTER_EGG, FERTILISERS, InventoryItemName } from "./game";
 
 import { CROPS, CROP_SEEDS, GREENHOUSE_CROPS, GREENHOUSE_SEEDS } from "./crops";
@@ -737,7 +764,7 @@ import {
   WAR_BANNERS,
   WAR_TENT_ITEMS,
 } from "./craftables";
-import { TREASURE_TOOLS } from "./tools";
+import { LOVE_ANIMAL_TOOLS, TREASURE_TOOLS } from "./tools";
 import { translate } from "lib/i18n/translate";
 import { BASIC_DECORATIONS } from "./decorations";
 import { SELLABLE_TREASURE } from "./treasure";
@@ -1153,15 +1180,15 @@ export const ITEM_DETAILS: Items = {
   },
   "Petting Hand": {
     image: pettingHand,
-    description: "Petting Hand",
+    description: LOVE_ANIMAL_TOOLS["Petting Hand"].description,
   },
   Brush: {
     image: brush,
-    description: "Brush",
+    description: LOVE_ANIMAL_TOOLS["Brush"].description,
   },
   "Music Box": {
     image: musicBox,
-    description: "Music Box",
+    description: LOVE_ANIMAL_TOOLS["Music Box"].description,
   },
   "Block Buck": {
     image: blockBuck,
@@ -3119,7 +3146,16 @@ export const ITEM_DETAILS: Items = {
       ? [translate("howToGetThisItem.lemonShark")]
       : [translate("ocean.fishing"), translate("beach.fishing")],
     itemType: "collectible",
-    description: translate("description.lemon.shark.boost"),
+    description: translate("description.lemon.shark"),
+    availability: translate("seasonal"),
+  },
+  "Longhorn Cowfish": {
+    image: longhornCowfish,
+    howToGetItem: hasSeasonEnded("Bull Run")
+      ? [translate("howToGetThisItem.longhornCowfish")]
+      : [translate("ocean.fishing"), translate("beach.fishing")],
+    itemType: "collectible",
+    description: translate("description.longhorn.cowfish"),
     availability: translate("seasonal"),
   },
   "Kraken Tentacle": {
@@ -4172,10 +4208,155 @@ export const ITEM_DETAILS: Items = {
   },
   "Crafting Box": {
     image: craftingBox,
-    description: "A box for crafting various items",
+    description: translate("description.craftingBox"),
+  },
+
+  "Basic Bed": {
+    image: SUNNYSIDE.decorations.bed,
+    description: translate("description.basicBed"),
+  },
+  "Sturdy Bed": {
+    image: sturdyBed,
+    description: translate("description.sturdyBed"),
+  },
+  "Floral Bed": {
+    image: floralBed,
+    description: translate("description.floralBed"),
+  },
+  "Fisher Bed": {
+    image: fisherBed,
+    description: translate("description.fisherBed"),
+  },
+  "Pirate Bed": {
+    image: pirateBed,
+    description: translate("description.pirateBed"),
+  },
+  "Cow Bed": {
+    image: cowBed,
+    description: translate("description.cowBed"),
+  },
+  "Desert Bed": {
+    image: desertBed,
+    description: translate("description.desertBed"),
+  },
+  "Royal Bed": {
+    image: royalBed,
+    description: translate("description.royalBed"),
   },
   "Barn Delight": {
     image: SUNNYSIDE.animalFoods.barn_delight,
     description: "A magical elixir that cures animal sickness.",
+  },
+  "Bull Run Banner": {
+    image: bullsRunBanner,
+    description: translate("description.bullRunBanner"),
+  },
+  "Cow Skull": {
+    image: cowSkull,
+    description: translate("description.cowSkull"),
+  },
+  Horseshoe: {
+    image: horseshoe,
+    description: translate("description.horseshoe"),
+  },
+  Cushion: {
+    image: SUNNYSIDE.crafting.cushion,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  Timber: {
+    image: SUNNYSIDE.crafting.timber,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Bee Box": {
+    image: SUNNYSIDE.crafting.beeBox,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  Crimsteel: {
+    image: SUNNYSIDE.crafting.crimsteel,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Merino Cushion": {
+    image: SUNNYSIDE.crafting.merinoCushion,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Ocean's Treasure": {
+    image: SUNNYSIDE.crafting.oceansTreasure,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Royal Bedding": {
+    image: SUNNYSIDE.crafting.royalBedding,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Royal Ornament": {
+    image: SUNNYSIDE.crafting.royalOrnament,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Kelp Fibre": {
+    image: SUNNYSIDE.crafting.kelpFibre,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Hardened Leather": {
+    image: SUNNYSIDE.crafting.hardenedLeather,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Synthetic Fabric": {
+    image: SUNNYSIDE.crafting.syntheticFabric,
+    description: translate("craftingBox.craftThisItem"),
+  },
+  "Cow Scratcher": {
+    image: cowScratcher,
+    description: translate("description.cowScratcher"),
+  },
+  "Spinning Wheel": {
+    image: spinningWheel,
+    description: translate("description.spinningWheel"),
+  },
+  "Sleepy Rug": {
+    image: sleepyRug,
+    description: translate("description.sleepyRug"),
+  },
+  Meteorite: {
+    image: meteorite,
+    description: translate("description.meteorite"),
+  },
+  "Sheaf of Plenty": {
+    image: sheafOfPlenty,
+    description: translate("description.sheafOfPlenty"),
+  },
+  "Mechanical Bull": {
+    image: mechanicalBull,
+    description: translate("description.mechanicalBull"),
+  },
+  "King of Bears": {
+    image: kingOfBears,
+    description: "?",
+  },
+  "Moo-ver": {
+    image: mooVer,
+    description: translate("description.mooVer"),
+  },
+  "Swiss Whiskers": {
+    image: swissWhisker,
+    description: translate("description.swissWhiskers"),
+  },
+  Cluckulator: {
+    image: cluckulator,
+    description: translate("description.cluckulator"),
+  },
+  UFO: {
+    image: ufo,
+    description: translate("description.ufo"),
+  },
+  Chicory: {
+    image: chicory,
+    description: translate("description.chicory"),
+  },
+  Wagon: {
+    image: Wagon,
+    description: "A perfect wagon for your bears to rest and relax.",
+  },
+  "Black Sheep": {
+    image: blackSheep,
+    description: translate("description.blackSheep"),
   },
 };
