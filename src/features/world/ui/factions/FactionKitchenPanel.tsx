@@ -32,13 +32,15 @@ import {
 } from "features/game/lib/factions";
 import { formatNumber } from "lib/utils/formatNumber";
 import { BoostInfoPanel } from "./BoostInfoPanel";
+import halloweenSelectboxTL from "assets/ui/halloweenSelectbox_tl.png";
+import halloweenSelectboxTR from "assets/ui/halloweenSelectbox_tr.png";
 
 interface Props {
   bumpkinParts: Equipped;
 }
 
 export const FACTION_KITCHEN_START_TIME = new Date(
-  "2024-07-08T00:00:00Z"
+  "2024-07-08T00:00:00Z",
 ).getTime();
 
 const _faction = (state: MachineState) =>
@@ -138,7 +140,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
 
                         const boost = getKingdomKitchenBoost(
                           gameService.state.context.state,
-                          points
+                          points,
                         )[0];
 
                         const boostedMarks = points + boost;
@@ -150,7 +152,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
                               "flex relative flex-col flex-1 items-center p-2 cursor-pointer hover:bg-brown-300",
                               {
                                 "img-highlight": selectedRequestIdx === idx,
-                              }
+                              },
                             )}
                             onClick={() => setSelectedRequestIdx(idx)}
                           >
@@ -177,10 +179,10 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
                               </Label>
                             </div>
                             {selectedRequestIdx === idx && (
-                              <div id="select-box">
+                              <div id="select-box" className="block">
                                 <img
                                   className="absolute pointer-events-none"
-                                  src={SUNNYSIDE.ui.selectBoxTL}
+                                  src={halloweenSelectboxTL}
                                   style={{
                                     top: `${PIXEL_SCALE * -3}px`,
                                     left: `${PIXEL_SCALE * -3}px`,
@@ -189,7 +191,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
                                 />
                                 <img
                                   className="absolute pointer-events-none"
-                                  src={SUNNYSIDE.ui.selectBoxTR}
+                                  src={halloweenSelectboxTR}
                                   style={{
                                     top: `${PIXEL_SCALE * -3}px`,
                                     right: `${PIXEL_SCALE * -3}px`,
@@ -238,7 +240,7 @@ export const FactionKitchenPanel: React.FC<Props> = ({ bumpkinParts }) => {
                           "flex justify-between items-center sm:justify-center",
                           {
                             "-mt-1": isMobile,
-                          }
+                          },
                         )}
                         showLabel={isMobile}
                         hideIcon={!isMobile}

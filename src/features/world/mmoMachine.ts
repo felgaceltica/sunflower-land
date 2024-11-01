@@ -33,6 +33,7 @@ export type Scenes = {
   goblin_invasion: Room<PlazaRoomState> | undefined;
   fruit_dash: Room<PlazaRoomState> | undefined;
   irrigate: Room<PlazaRoomState> | undefined;
+  halloween_island: Room<PlazaRoomState> | undefined;
 };
 
 export type SceneId = keyof Scenes;

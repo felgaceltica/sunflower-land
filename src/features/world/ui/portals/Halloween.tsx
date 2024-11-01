@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "components/ui/Button";
 import { useActor } from "@xstate/react";
 import { Context } from "features/game/GameProvider";
@@ -22,6 +22,15 @@ import { SpeakingText } from "features/game/components/SpeakingModal";
 import { getKeys } from "features/game/types/craftables";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { PortalLeaderboard } from "./PortalLeaderboard";
+// import { PortalLeaderboard } from "./PortalLeaderboard";
+
+export function hasReadHalloweenNotice() {
+  return !!localStorage.getItem("halloween.notice");
+}
+
+function acknowledgeIntro() {
+  return localStorage.setItem("halloween.notice", new Date().toISOString());
+}
 
 export const MinigamePrizeUI: React.FC<{
   prize?: MinigamePrize;
@@ -87,11 +96,11 @@ interface Props {
   onClose: () => void;
 }
 
-export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
+export const Halloween: React.FC<Props> = ({ onClose }) => {
   const { gameService } = useContext(Context);
   const [gameState] = useActor(gameService);
 
-  const minigame = gameState.context.state.minigames.games["chicken-rescue"];
+  const minigame = gameState.context.state.minigames.games["halloween"];
 
   const [showIntro, setShowIntro] = useState(!minigame?.history);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -99,6 +108,10 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
   const [page, setPage] = useState<"play" | "leaderboard">("play");
 
   const { t } = useAppTranslation();
+
+  useEffect(() => {
+    acknowledgeIntro();
+  }, []);
 
   if (showIntro) {
     return (
@@ -124,7 +137,7 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
     highscore: 0,
   };
 
-  const prize = gameState.context.state.minigames.prizes["chicken-rescue"];
+  const prize = gameState.context.state.minigames.prizes["halloween"];
 
   const playNow = () => {
     setIsPlaying(true);
@@ -133,14 +146,14 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
   if (isPlaying) {
     return (
       <div>
-        <Portal portalName="chicken-rescue" onClose={onClose} />
+        <Portal portalName="halloween" onClose={onClose} />
       </div>
     );
   }
 
   const onClaim = () => {
     gameService.send("minigame.prizeClaimed", {
-      id: "chicken-rescue",
+      id: "halloween",
     });
 
     onClose();
@@ -148,7 +161,7 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
 
   const isComplete = isMinigameComplete({
     game: gameState.context.state,
-    name: "chicken-rescue",
+    name: "halloween",
   });
 
   if (isComplete && !dailyAttempt.prizeClaimedAt && prize) {
@@ -156,11 +169,10 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
       <ClaimReward
         onClaim={onClaim}
         reward={{
-          message:
-            "Congratulations, you rescued the chickens! Here is your reward.",
+          message: t("halloween.portal.rewardMessage"),
           createdAt: Date.now(),
           factionPoints: 0,
-          id: "discord-bonus",
+          id: "halloween-rewards",
           items: prize.items,
           wearables: prize.wearables,
           sfl: 0,
@@ -172,10 +184,7 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
 
   if (page === "leaderboard") {
     return (
-      <PortalLeaderboard
-        onBack={() => setPage("play")}
-        name={"chicken-rescue"}
-      />
+      <PortalLeaderboard onBack={() => setPage("play")} name={"halloween"} />
     );
   }
 
@@ -184,15 +193,17 @@ export const ChickenRescue: React.FC<Props> = ({ onClose }) => {
       <div className="mb-1">
         <div className="p-2">
           <Label type="default" className="mb-1" icon={factions}>
-            {t("minigame.chickenRescue")}
+            {t("halloween.portal.title")}
           </Label>
-          <InlineDialogue message={t("minigame.chickenRescueHelp")} />
+          <InlineDialogue message={t("halloween.portal.description")} />
         </div>
 
         <MinigamePrizeUI
           prize={prize}
           history={dailyAttempt}
-          mission={`Mission: Rescue ${prize?.score} chickens`}
+          mission={t("halloween.portal.missionObjectives", {
+            targetScore: prize?.score ?? 0,
+          })}
         />
       </div>
       <div className="flex">

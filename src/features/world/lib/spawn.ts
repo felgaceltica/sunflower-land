@@ -189,4 +189,10 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 0,
     },
   },
+  halloween_island: {
+    default: {
+      x: 310 + randomXOffset / 2,
+      y: 1050 + randomYOffset / 2,
+    },
+  },
 });

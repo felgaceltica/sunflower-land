@@ -8,6 +8,7 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import { shortenCount } from "lib/utils/formatNumber";
 import {
   getCurrentSeason,
+  getSeasonalArtefact,
   getSeasonalTicket,
 } from "features/game/types/seasons";
 
@@ -16,10 +17,10 @@ import lightning from "assets/icons/lightning.png";
 import lock from "assets/icons/lock.png";
 
 import { ITEM_DETAILS } from "features/game/types/images";
-import { Currency, InventoryItemName } from "features/game/types/game";
+import { InventoryItemName, Keys } from "features/game/types/game";
 import { Context } from "features/game/GameProvider";
 import { MachineState } from "features/game/lib/gameMachine";
-import { useSelector } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import { BumpkinItem } from "features/game/types/bumpkin";
 import Decimal from "decimal.js-light";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
@@ -29,9 +30,15 @@ import {
   SeasonalStoreItem,
   SeasonalStoreWearable,
 } from "features/game/types/megastore";
-import { getKeys } from "features/game/types/craftables";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { ResizableBar } from "components/ui/ProgressBar";
+import { SFLDiscount } from "features/game/lib/SFLDiscount";
+import {
+  getSeasonalItemsCrafted,
+  getStore,
+  isKeyBoughtWithinSeason,
+} from "features/game/events/landExpansion/buySeasonalItem";
+import { ARTEFACT_SHOP_KEYS } from "features/game/types/collectibles";
 
 interface Props {
   itemsLabel?: string;
@@ -58,6 +65,12 @@ export const ItemsList: React.FC<Props> = ({
 
   const inventory = useSelector(gameService, _inventory);
   const wardrobe = useSelector(gameService, _wardrobe);
+  //For Discount
+  const [
+    {
+      context: { state },
+    },
+  ] = useActor(gameService);
 
   const getBalanceOfItem = (item: SeasonalStoreItem): number => {
     // Handling all types or specific ones if provided
@@ -106,13 +119,36 @@ export const ItemsList: React.FC<Props> = ({
       })
     : items; // If no type provided, show all items
 
-  const getCurrencyIcon = (currency: Currency) => {
-    if (currency === "SFL") return token;
+  const getCurrencyIcon = (item: SeasonalStoreItem) => {
+    if (item.cost.sfl !== 0) return token;
 
     const currencyItem =
-      currency === "Seasonal Ticket" ? getSeasonalTicket() : currency;
+      item.cost.sfl === 0 && (item.cost?.items[getSeasonalTicket()] ?? 0 > 0)
+        ? getSeasonalTicket()
+        : item.cost.sfl === 0 &&
+            (item.cost?.items[getSeasonalArtefact()] ?? 0 > 0)
+          ? getSeasonalArtefact()
+          : Object.keys(item.cost.items)[0];
 
     return ITEM_DETAILS[currencyItem as InventoryItemName].image;
+  };
+
+  const getCurrency = (item: SeasonalStoreItem) => {
+    if (item.cost.sfl !== 0)
+      return shortenCount(SFLDiscount(state, new Decimal(item.cost.sfl)));
+
+    const currency =
+      item.cost.sfl === 0 && (item.cost?.items[getSeasonalTicket()] ?? 0 > 0)
+        ? getSeasonalTicket()
+        : getSeasonalArtefact();
+    const currencyItem =
+      item.cost.sfl === 0 && (item.cost?.items[currency] ?? 0 > 0)
+        ? item.cost?.items[currency]
+        : item.cost?.items[
+            Object.keys(item.cost.items)[0] as InventoryItemName
+          ];
+
+    return currencyItem;
   };
   const createdAt = Date.now();
   const currentSeason = getCurrentSeason(new Date(createdAt));
@@ -125,46 +161,61 @@ export const ItemsList: React.FC<Props> = ({
         : tier === "rare"
           ? "rare"
           : "basic";
-  const tierItems =
-    tiers === "basic"
-      ? seasonalStore["basic"].items
-      : tiers === "rare"
-        ? seasonalStore["basic"].items
-        : tiers === "epic"
-          ? seasonalStore["rare"].items
-          : seasonalStore["basic"].items;
 
-  const seasonalCollectiblesCrafted = getKeys(inventory).filter((itemName) =>
-    tierItems.some((items: SeasonalStoreItem) =>
-      "collectible" in items ? items.collectible === itemName : false,
-    ),
-  ).length;
-  const seasonalWearablesCrafted = getKeys(wardrobe).filter((itemName) =>
-    tierItems.some((items: SeasonalStoreItem) =>
-      "wearable" in items ? items.wearable === itemName : false,
-    ),
-  ).length;
-
+  const seasonalCollectiblesCrafted = getSeasonalItemsCrafted(
+    state,
+    "inventory",
+    seasonalStore,
+    "collectible",
+    tier,
+    true,
+  );
+  const seasonalWearablesCrafted = getSeasonalItemsCrafted(
+    state,
+    "wardrobe",
+    seasonalStore,
+    "wearable",
+    tier,
+    true,
+  );
   const seasonalItemsCrafted =
     seasonalCollectiblesCrafted + seasonalWearablesCrafted;
 
+  // Type guard if the requirement exists
   const hasRequirement = (
     tier: any,
   ): tier is { items: SeasonalStoreItem[]; requirement: number } => {
     return "requirement" in tier;
   };
 
-  const tierData = seasonalStore[tier];
-  // Type guard if the requirement exists
+  const tierData = getStore(seasonalStore, tier);
+
+  const isKey = (name: InventoryItemName): name is Keys =>
+    name in ARTEFACT_SHOP_KEYS;
+
+  const isKeyCounted = isKeyBoughtWithinSeason(state, tiers) ? 0 : 1;
+  const isAllKeyBought =
+    isKeyBoughtWithinSeason(state, "basic") &&
+    isKeyBoughtWithinSeason(state, "rare") &&
+    isKeyBoughtWithinSeason(state, "epic");
+
+  const reduction = isKeyBoughtWithinSeason(state, tiers, true) ? 0 : 1;
+
   const requirements = hasRequirement(tierData) ? tierData.requirement : 0;
-  const isRareUnlocked = seasonalItemsCrafted >= seasonalStore.rare.requirement;
-  const isEpicUnlocked = seasonalItemsCrafted >= seasonalStore.epic.requirement;
-  const tierpercentage = seasonalItemsCrafted;
+
+  const isRareUnlocked =
+    tier === "rare" && seasonalItemsCrafted - reduction >= requirements;
+  const isEpicUnlocked =
+    tier === "epic" && seasonalItemsCrafted - reduction >= requirements;
+  const tierpercentage = seasonalItemsCrafted - reduction;
+
   const percentage = Math.round((tierpercentage / requirements) * 100);
 
   const sortedItems = filteredItems
     .slice()
-    .sort((a, b) => Number(a.cost.sfl - b.cost.sfl));
+    .sort((a, b) =>
+      Number((getCurrency(a) as number) - (getCurrency(b) as number)),
+    );
   const { t } = useAppTranslation();
 
   return (
@@ -229,6 +280,9 @@ export const ItemsList: React.FC<Props> = ({
         ) : (
           sortedItems.map((item) => {
             const buff = getItemBuffLabel(item);
+            const isItemKey = isKey(
+              getItemName(item) as unknown as InventoryItemName,
+            );
             const balanceOfItem = getBalanceOfItem(item);
 
             return (
@@ -256,7 +310,24 @@ export const ItemsList: React.FC<Props> = ({
                         alt="crop"
                       />
                     )}
+                    {/* Confirm Icon for non-key items */}
                     {balanceOfItem > 0 &&
+                      !isItemKey &&
+                      (tier === "basic" ||
+                        (tier === "rare" && isRareUnlocked) ||
+                        (tier === "epic" && isEpicUnlocked)) && (
+                        <img
+                          src={SUNNYSIDE.icons.confirm}
+                          className="absolute -right-2 -top-3"
+                          style={{
+                            width: `${PIXEL_SCALE * 9}px`,
+                          }}
+                          alt="crop"
+                        />
+                      )}
+
+                    {isItemKey &&
+                      isKeyCounted === 0 &&
                       (tier === "basic" ||
                         (tier === "rare" && isRareUnlocked) ||
                         (tier === "epic" && isEpicUnlocked)) && (
@@ -284,7 +355,7 @@ export const ItemsList: React.FC<Props> = ({
                     {/* Price */}
                     <div className="absolute px-4 bottom-3 -left-4 object-contain">
                       <Label
-                        icon={getCurrencyIcon("SFL")}
+                        icon={getCurrencyIcon(item)}
                         type="warning"
                         className={"text-xxs absolute center text-center p-1 "}
                         style={{
@@ -292,7 +363,7 @@ export const ItemsList: React.FC<Props> = ({
                           height: "24px",
                         }}
                       >
-                        {shortenCount(item.cost.sfl)}
+                        {getCurrency(item)}
                       </Label>
                     </div>
                   </div>
