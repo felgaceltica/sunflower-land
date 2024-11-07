@@ -498,6 +498,17 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/question_mark.png",
     name: "Mixed Grain",
   },
+  Omnifeed: {
+    name: "Omnifeed",
+    description: "Acts as the best feed for all animals.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/question_mark.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Feed" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
   "Barn Delight": {
     name: "Barn Delight",
     description: "A magical elixir that cures animal sickness.",
@@ -829,12 +840,17 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   "Farm Dog": {
     name: "Farm Dog",
     description:
-      "Sheep are no longer lazy when this farm dog is around. Increases wool production. Currently used for decoration purposes.\n\n~~You can craft a dog at the Goblin Farmer in the game.~~ **Sold out!**",
+      "Sheep are no longer lazy when this farm dog is around.\n\n~~You can craft a dog at the Goblin Farmer in the game.~~ **Sold out!**",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/406.gif",
     attributes: [
-      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Boost", value: "Animal" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Sheep Produce Time",
+        value: -25,
+      },
       { trait_type: "Tradable", value: "Yes" },
     ],
   },
@@ -889,7 +905,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   "Chicken Coop": {
     name: "Chicken Coop",
     description:
-      "A chicken coop that can be used to raise chickens. Increase egg production with this rare coop on your farm.\n\n~~You can craft a chicken coop at the Goblin Farmer in the game.~~ **Sold out!**",
+      "A chicken coop that can be used to raise chickens. Increase egg production with this rare coop.\n\n~~You can craft a chicken coop at the Goblin Farmer in the game.~~ **Sold out!**",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/408.png",
@@ -897,12 +913,17 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Boost", value: "Animal" },
       {
         display_type: "boost_number",
-        trait_type: "Increase Egg Production",
+        trait_type: "Increase Egg Yield",
         value: 1,
       },
       {
         display_type: "boost_number",
-        trait_type: "Increase Max Chickens per Hen House",
+        trait_type: "Increase Base Chickens",
+        value: 5,
+      },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Max Chickens per Hen House Upgrade",
         value: 5,
       },
       { trait_type: "Tradable", value: "Yes" },
@@ -919,7 +940,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Boost", value: "Animal" },
       {
         display_type: "boost_number",
-        trait_type: "Feed chickens without wheat",
+        trait_type: "Feed chickens without food",
         value: 1,
       },
       { trait_type: "Tradable", value: "Yes" },
@@ -1684,14 +1705,14 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   "Fat Chicken": {
     name: "Fat Chicken",
     description:
-      "A mutant chicken that can be found by chance when collecting an egg.\n\nThis mutant reduces the wheat required to feed a chicken by 10%.\n\nThere is a 1/1000 chance of producing a mutant chicken.",
+      "A mutant chicken that can be found by chance when collecting an egg.\n\nThis mutant reduces the food required to feed a chicken by 10%.\n\nThere is a 1/1000 chance of producing a mutant chicken.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/611.gif",
     attributes: [
       {
         display_type: "boost_percentage",
-        trait_type: "Amount of Wheat to Feed Chickens",
+        trait_type: "Chicken Feed Reduction",
         value: -10,
       },
       { trait_type: "Boost", value: "Animal" },
@@ -1701,7 +1722,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   "Rich Chicken": {
     name: "Rich Chicken",
     description:
-      "A mutant chicken that can be found by chance when collecting an egg.\n\nThis mutant adds a boost of 10% higher egg yield.\n\nThere is a 1/1000 chance of producing a mutant chicken.",
+      "A mutant chicken that can be found by chance when collecting an egg.\n\nThis mutant adds a boost of +0.1 egg yield.\n\nThere is a 1/1000 chance of producing a mutant chicken.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/612.gif",
@@ -1814,9 +1835,9 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Purpose", value: "Legacy" },
       { trait_type: "Tradable", value: "No" },
       {
-        display_type: "boost_percentage",
+        display_type: "boost_number",
         trait_type: "Increase Animal Yield",
-        value: 5,
+        value: 0.1,
       },
       {
         display_type: "boost_percentage",
@@ -3179,7 +3200,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   },
   "Undead Rooster": {
     name: "Undead Rooster",
-    description: "An unfortunate casualty of the war. 10% increased egg yield.",
+    description: "An unfortunate casualty of the war. +0.1 egg yield.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/1114.gif",
@@ -5376,16 +5397,10 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/465.png",
     attributes: [
       { trait_type: "Boost", value: "Animal" },
-      { trait_type: "Boost", value: "Area of Effect" },
       {
         display_type: "boost_number",
         trait_type: "Increase Egg Yield",
-        value: 0.2,
-      },
-      {
-        display_type: "boost_number",
-        trait_type: "Chickens Affected",
-        value: 12,
+        value: 0.1,
       },
       { trait_type: "Tradable", value: "No" },
     ],
@@ -6705,6 +6720,54 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       {
         display_type: "boost_number",
         trait_type: "Increase Crimstone yield",
+        value: 0.1,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+  },
+  "Alien Chicken": {
+    description:
+      "A peculiar chicken from another galaxy, here to boost your feather production!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2162.png",
+    attributes: [
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Feather Yield",
+        value: 0.1,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+  },
+  Mootant: {
+    description:
+      "This genetically enhanced bovine here to boost your leather production!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2163.png",
+    attributes: [
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Leather Yield",
+        value: 0.1,
+      },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+  },
+  "Toxic Tuft": {
+    description:
+      "A mutated sheep whose toxic fleece produces the finest merino wool in the land!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2164.png",
+    attributes: [
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Merino Wool Yield",
         value: 0.1,
       },
       { trait_type: "Tradable", value: "Yes" },
@@ -9732,13 +9795,13 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/2140.png",
     name: "Basic Bed",
   },
-  "Sturdy Bed": {
-    description: "A sturdy bed for your Bumpkin to rest.",
+  "Fisher Bed": {
+    description: "A fisherman's bed for your Bumpkin to rest.",
     decimals: 0,
     attributes: [{ trait_type: "Tradable", value: "No" }],
     external_url: "https://docs.sunflower-land.com/getting-started/about",
-    image: "../public/erc1155/images/2141.png",
-    name: "Sturdy Bed",
+    image: "../public/erc1155/images/2143.png",
+    name: "Fisher Bed",
   },
   "Floral Bed": {
     description: "A floral bed for your Bumpkin to rest.",
@@ -9748,21 +9811,21 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/2142.png",
     name: "Floral Bed",
   },
-  "Fisher Bed": {
-    description: "A fisherman's bed for your Bumpkin to rest.",
+  "Sturdy Bed": {
+    description: "A sturdy bed for your Bumpkin to rest.",
     decimals: 0,
     attributes: [{ trait_type: "Tradable", value: "No" }],
     external_url: "https://docs.sunflower-land.com/getting-started/about",
-    image: "../public/erc1155/images/2143.png",
-    name: "Fisher Bed",
+    image: "../public/erc1155/images/2141.png",
+    name: "Sturdy Bed",
   },
-  "Pirate Bed": {
-    description: "A pirate bed for your Bumpkin to rest.",
+  "Desert Bed": {
+    description: "A desert bed for your Bumpkin to rest.",
     decimals: 0,
     attributes: [{ trait_type: "Tradable", value: "No" }],
     external_url: "https://docs.sunflower-land.com/getting-started/about",
-    image: "../public/erc1155/images/2144.png",
-    name: "Pirate Bed",
+    image: "../public/erc1155/images/2146.png",
+    name: "Desert Bed",
   },
   "Cow Bed": {
     description: "A cow bed for your Bumpkin to rest.",
@@ -9772,13 +9835,13 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/2145.png",
     name: "Cow Bed",
   },
-  "Desert Bed": {
-    description: "A desert bed for your Bumpkin to rest.",
+  "Pirate Bed": {
+    description: "A pirate bed for your Bumpkin to rest.",
     decimals: 0,
     attributes: [{ trait_type: "Tradable", value: "No" }],
     external_url: "https://docs.sunflower-land.com/getting-started/about",
-    image: "../public/erc1155/images/2146.png",
-    name: "Desert Bed",
+    image: "../public/erc1155/images/2144.png",
+    name: "Pirate Bed",
   },
   "Royal Bed": {
     description: "A royal bed for your Bumpkin to rest.",
@@ -9989,6 +10052,15 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/2157.gif",
     name: "Cluckulator",
   },
+  "Crop Circle": {
+    description:
+      "A mysterious circle that appears on your farm...what could it mean?",
+    decimals: 0,
+    attributes: [{ trait_type: "Tradable", value: "Yes" }],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2165.png",
+    name: "Crop Circle",
+  },
   UFO: {
     description:
       "This extraterrestrial craft is said to emit a soft glow and hum, creating an aura of wonder and curiosity.  Keep your eyes on the skies—who knows what otherworldly secrets it might unveil!",
@@ -10013,6 +10085,156 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/2161.png",
     name: "Black Sheep",
+  },
+  Cheese: {
+    name: "Cheese",
+    description: "A delicious dairy delight made from fresh milk",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/578.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Pizza Margherita": {
+    name: "Pizza Margherita",
+    description: "A classic Italian pizza with tomatoes and cheese",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/579.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Blue Cheese": {
+    name: "Blue Cheese",
+    description: "A strong flavored cheese with blue mold",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/580.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Honey Cheddar": {
+    name: "Honey Cheddar",
+    description: "A sweet and savory cheese infused with honey",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/581.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Caprese Salad": {
+    name: "Caprese Salad",
+    description: "A fresh salad with cheese, tomatoes and kale",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/582.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Sour Shake": {
+    name: "Sour Shake",
+    description: "A tangy and refreshing lemon drink",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/583.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Spaghetti al Limone": {
+    name: "Spaghetti al Limone",
+    description: "A zesty pasta dish with lemon and cheese",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/584.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Lemon Cheesecake": {
+    name: "Lemon Cheesecake",
+    description: "A creamy cheesecake with a citrus twist",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/585.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Food" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "King of Bears": {
+    name: "King of Bears",
+    description:
+      "The king of all bears. It has the power to generate more honey for  its own consumption.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2154.png",
+    attributes: [
+      { trait_type: "Boost", value: "Resource" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Honey Yield per full beehive",
+        value: 0.25,
+      },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Halloween Scarecrow": {
+    name: "Halloween Scarecrow",
+    description: "A scary looking scarecrow",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2166.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Vampire Bear": {
+    name: "Vampire Bear",
+    description: "Don't put me under the sun!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2167.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Super Totem": {
+    name: "Super Totem",
+    description:
+      "2x speed for crops, trees, fruits, cooking & minerals. Lasts for 7 days",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2168.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Consumable" },
+      { trait_type: "Boost", value: "Other" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Cooking, Crop, Fruit, Tree and Mineral Time",
+        value: -50,
+      },
+      {
+        display_type: "boost_number",
+        trait_type: "Boost Duration (days)",
+        value: 7,
+      },
+      { trait_type: "Tradable", value: "No" },
+    ],
   },
 };
 
@@ -15148,7 +15370,7 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Cowboy Hat": {
     description:
-      "A classic wide-brimmed hat with a rugged charm, perfect for life on the open plains. Protects from the sun while adding a touch of cowboy style. +1 Horseshoe from Deliveries during Bull Run Season.",
+      "A classic wide-brimmed hat with a rugged charm, perfect for life on the open plains. Protects from the sun while adding a touch of cowboy style. +1 Horseshoe from Deliveries, Chores & Bounties during Bull Run Season.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Hat" },
@@ -15165,7 +15387,7 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Cowboy Shirt": {
     description:
-      "This durable, checked shirt is made for the hardworking cowpoke. +1 Horseshoe from Bounties during Bull Run Season.",
+      "This durable, checked shirt is made for the hardworking cowpoke. +1 Horseshoe from Deliveries, Chores & Bounties during Bull Run Season.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Shirt" },
@@ -15182,7 +15404,7 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Cowboy Trouser": {
     description:
-      "These sturdy trousers are built to withstand the wear and tear of ranch life, complete with a touch of style fit for a true cowboy.  +1 Horseshoe from Chores during Bull Run Season.",
+      "These sturdy trousers are built to withstand the wear and tear of ranch life, complete with a touch of style fit for a true cowboy.  +1 Horseshoe from Deliveries, Chores & Bounties during Bull Run Season.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Pants" },
@@ -15228,9 +15450,16 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     name: "Infernal Bullwhip",
   },
   "White Sheep Onesie": {
-    description: "",
+    description:
+      "Cozy up in this fluffy, woolly onesie—perfect for a snug night in or a playful day in the plaza! With its irresistible charm, you will be the cutest sheep in the herd. 0.25+ Wool",
     decimals: 0,
     attributes: [
+      { trait_type: "Boost", value: "Animal" },
+      {
+        display_type: "boost_number",
+        trait_type: "Increase Yield of Wool",
+        value: 0.25,
+      },
       { trait_type: "Part", value: "Onesie" },
       { trait_type: "Tradable", value: "No" },
     ],
@@ -15306,7 +15535,7 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Dream Scarf": {
     description:
-      "A soft, ethereal scarf that feels like a whisper in the wind. Wrap yourself in comfort and style with this dreamy accessory. 10% reduction in Sheep sleep time.",
+      "A soft, ethereal scarf that feels like a whisper in the wind. Wrap yourself in comfort and style with this dreamy accessory. 20% reduction in Sheep sleep time.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Necklace" },
@@ -15446,5 +15675,40 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/wearables/images/416.png",
     name: "Tomato Apron",
+  },
+  "Adventurer's Suit": {
+    description:
+      "The suit of an adventurer mysteriously found in the forest...",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Dress" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/417.png",
+    name: "Adventurer's Suit",
+  },
+  "Adventurer's Torch": {
+    description: "A torch of an adventurer mysteriously found in the forest.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/418.png",
+    name: "Adventurer's Torch",
+  },
+  "Pumpkin Head": {
+    description:
+      "A special hat for the bravest bumpkins that conquered the Halloween maze!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/419.png",
+    name: "Adventurer's Suit",
   },
 };
