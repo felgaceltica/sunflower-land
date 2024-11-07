@@ -22,16 +22,24 @@ import { Button } from "components/ui/Button";
 export const PortalLeaderboard: React.FC<{
   name: MinigameName;
   onBack: () => void;
-}> = ({ name, onBack }) => {
+  startDate?: Date;
+  endDate?: Date;
+  formatPoints?: (value: number) => string;
+  isAccumulator?: boolean;
+}> = ({ name, onBack, startDate, endDate, formatPoints, isAccumulator }) => {
   const { authService } = useContext(AuthProvider.Context);
   const { gameService } = useContext(Context);
   const [data, setData] = useState<CompetitionLeaderboardResponse>();
 
-  // 7 days ago
-  const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .substring(0, 10);
-  const to = new Date().toISOString().substring(0, 10);
+  const formatDate = (date: Date) => date.toISOString().substring(0, 10);
+
+  // Default 7 days ago
+  const from = startDate
+    ? formatDate(startDate)
+    : formatDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+  const to = endDate
+    ? formatDate(new Date(Math.min(Date.now(), endDate.getTime())))
+    : formatDate(new Date());
 
   const { t } = useAppTranslation();
   useEffect(() => {
@@ -52,25 +60,44 @@ export const PortalLeaderboard: React.FC<{
 
   if (!data) return <Loading />;
 
-  const { leaderboard, lastUpdated, miniboard, player } = data;
+  const {
+    leaderboard,
+    accumulators,
+    lastUpdated,
+    miniboard,
+    accumulatorMiniboard,
+    player,
+  } = data;
+  const items = (!!isAccumulator && accumulators?.slice(0, 10)) || leaderboard;
+  const title =
+    !!isAccumulator && accumulators?.length
+      ? t("competition.accumulator")
+      : t("competition.highscore");
+  const miniboardItems =
+    !!isAccumulator && accumulatorMiniboard?.length
+      ? accumulatorMiniboard
+      : miniboard;
   return (
     <>
       <div className="p-1">
         <div className="flex justify-between  items-center mb-2">
           <Label type="default" className="">
-            {t("competition.leaderboard")}
+            {`${t("competition.leaderboard")} - ${title}`}
           </Label>
         </div>
 
-        <p className="font-secondary text-xs my-2">{`${from} to ${to}`}</p>
+        <p className="font-secondary text-xs my-2">{`${from} to ${endDate ? endDate.toISOString().substring(0, 10) : to}`}</p>
 
-        <CompetitionTable items={leaderboard} />
+        <CompetitionTable items={items} formatPoints={formatPoints} />
 
         {/* Only show miniboard if player isn't in the main leaderboard */}
-        {player && !leaderboard.find((m) => m.id === player.id) && (
+        {player && !items.find((m) => m.id === player.id) && (
           <>
             <p className="text-center text-xs mb-2">{`...`}</p>
-            <CompetitionTable items={miniboard} />
+            <CompetitionTable
+              items={miniboardItems}
+              formatPoints={formatPoints}
+            />
           </>
         )}
       </div>
@@ -82,9 +109,10 @@ export const PortalLeaderboard: React.FC<{
   );
 };
 
-export const CompetitionTable: React.FC<{ items: CompetitionPlayer[] }> = ({
-  items,
-}) => {
+export const CompetitionTable: React.FC<{
+  items: CompetitionPlayer[];
+  formatPoints?: (value: number) => string;
+}> = ({ items, formatPoints }) => {
   const { t } = useAppTranslation();
   if (items.length === 0) {
     return <p className="text-sm">{t("leaderboard.empty")}</p>;
@@ -119,7 +147,7 @@ export const CompetitionTable: React.FC<{ items: CompetitionPlayer[] }> = ({
               style={{ border: "1px solid #b96f50" }}
               className="p-1.5 truncate text-center"
             >
-              {points}
+              {formatPoints?.(points) ?? points}
             </td>
           </tr>
         ))}

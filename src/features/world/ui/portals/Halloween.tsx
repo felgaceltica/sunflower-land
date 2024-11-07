@@ -15,14 +15,13 @@ import { Portal } from "./Portal";
 import { InlineDialogue } from "../TypingMessage";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { MinigameHistory, MinigamePrize } from "features/game/types/game";
-import { secondsToString } from "lib/utils/time";
+import { millisecondsToString, secondsToString } from "lib/utils/time";
 import { isMinigameComplete } from "features/game/events/minigames/claimMinigamePrize";
 import { ClaimReward } from "features/game/expansion/components/ClaimReward";
 import { SpeakingText } from "features/game/components/SpeakingModal";
 import { getKeys } from "features/game/types/craftables";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { PortalLeaderboard } from "./PortalLeaderboard";
-// import { PortalLeaderboard } from "./PortalLeaderboard";
 
 export function hasReadHalloweenNotice() {
   return !!localStorage.getItem("halloween.notice");
@@ -105,7 +104,9 @@ export const Halloween: React.FC<Props> = ({ onClose }) => {
   const [showIntro, setShowIntro] = useState(!minigame?.history);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
-  const [page, setPage] = useState<"play" | "leaderboard">("play");
+  const [page, setPage] = useState<"play" | "leaderboard" | "accumulator">(
+    "play",
+  );
 
   const { t } = useAppTranslation();
 
@@ -184,7 +185,30 @@ export const Halloween: React.FC<Props> = ({ onClose }) => {
 
   if (page === "leaderboard") {
     return (
-      <PortalLeaderboard onBack={() => setPage("play")} name={"halloween"} />
+      <PortalLeaderboard
+        onBack={() => setPage("play")}
+        name={"halloween"}
+        startDate={new Date(Date.UTC(2024, 10, 1))}
+        endDate={new Date(Date.UTC(2024, 10, 6))}
+        formatPoints={(points: number) =>
+          millisecondsToString(points, { length: "full" })
+        }
+      />
+    );
+  }
+
+  if (page === "accumulator") {
+    return (
+      <PortalLeaderboard
+        isAccumulator
+        onBack={() => setPage("play")}
+        name={"halloween"}
+        startDate={new Date(Date.UTC(2024, 10, 1))}
+        endDate={new Date(Date.UTC(2024, 10, 6))}
+        formatPoints={(points: number) =>
+          millisecondsToString(points, { length: "full" })
+        }
+      />
     );
   }
 
@@ -208,10 +232,13 @@ export const Halloween: React.FC<Props> = ({ onClose }) => {
       </div>
       <div className="flex">
         <Button className="mr-1" onClick={() => setPage("leaderboard")}>
-          {t("competition.leaderboard")}
+          {t("competition.highscore")}
         </Button>
-        <Button onClick={playNow}>{t("minigame.playNow")}</Button>
+        <Button className="mr-1" onClick={() => setPage("accumulator")}>
+          {t("competition.accumulator")}
+        </Button>
       </div>
+      <Button onClick={playNow}>{t("minigame.playNow")}</Button>
     </>
   );
 };

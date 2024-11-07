@@ -9,7 +9,6 @@ import { INITIAL_BUMPKIN } from "features/game/lib/constants";
 import { SPAWNS } from "./lib/spawn";
 import { Moderation } from "features/game/lib/gameMachine";
 import { MAX_PLAYERS } from "./lib/availableRooms";
-import { FarmerFootballRoomState } from "features/portal/farmerfootball/lib/FarmerFootballRoomState";
 
 export type Scenes = {
   plaza: Room<PlazaRoomState> | undefined;
@@ -21,7 +20,6 @@ export type Scenes = {
   beach: Room<PlazaRoomState> | undefined;
   crop_boom: Room<PlazaRoomState> | undefined;
   mushroom_forest: Room<PlazaRoomState> | undefined;
-  farmer_football: Room<FarmerFootballRoomState> | undefined;
   retreat: Room<PlazaRoomState> | undefined;
   kingdom: Room<PlazaRoomState> | undefined;
   faction_house: Room<PlazaRoomState> | undefined;
@@ -30,10 +28,6 @@ export type Scenes = {
   nightshade_house: Room<PlazaRoomState> | undefined;
   bumpkin_house: Room<PlazaRoomState> | undefined;
   portal_example: Room<PlazaRoomState> | undefined;
-  goblin_invasion: Room<PlazaRoomState> | undefined;
-  fruit_dash: Room<PlazaRoomState> | undefined;
-  irrigate: Room<PlazaRoomState> | undefined;
-  halloween_island: Room<PlazaRoomState> | undefined;
 };
 
 export type SceneId = keyof Scenes;

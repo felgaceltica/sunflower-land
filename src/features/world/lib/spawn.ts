@@ -165,34 +165,4 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 290,
     },
   },
-  farmer_football: {
-    default: {
-      x: 16 * 11 + randomXOffset,
-      y: 16 * 11 + randomYOffset,
-    },
-  },
-  goblin_invasion: {
-    default: {
-      x: 16 * 11 + randomXOffset,
-      y: 16 * 11 + randomYOffset,
-    },
-  },
-  fruit_dash: {
-    default: {
-      x: 0,
-      y: 0,
-    },
-  },
-  irrigate: {
-    default: {
-      x: 0,
-      y: 0,
-    },
-  },
-  halloween_island: {
-    default: {
-      x: 310 + randomXOffset / 2,
-      y: 1050 + randomYOffset / 2,
-    },
-  },
 });
