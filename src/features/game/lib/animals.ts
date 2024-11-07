@@ -20,6 +20,7 @@ import {
   GameState,
   InventoryItemName,
 } from "../types/game";
+import { getCurrentSeason } from "../types/seasons";
 import { isCollectibleBuilt } from "./collectibleBuilt";
 import { getBudYieldBoosts } from "./getBudYieldBoosts";
 import { isWearableActive } from "./wearables";
@@ -61,7 +62,7 @@ export function makeAnimalBuilding(
           state: "idle",
           coordinates: positions[index],
           asleepAt: 0,
-          experience: 0,
+          experience: animalType === "Chicken" ? 40 : 80,
           createdAt: Date.now(),
           item: "Petting Hand",
           lovedAt: 0,
@@ -77,7 +78,8 @@ export function makeAnimalBuilding(
 }
 
 export const isMaxLevel = (animal: AnimalType, level: AnimalLevel) => {
-  return level === Object.keys(ANIMAL_LEVELS[animal]).length;
+  const maxLevel = Math.max(...Object.keys(ANIMAL_LEVELS[animal]).map(Number));
+  return level === maxLevel;
 };
 
 export function getAnimalLevel(experience: number, animal: AnimalType) {
@@ -102,9 +104,9 @@ export function getAnimalFavoriteFood(type: AnimalType, animalXP: number) {
   const levelFood = ANIMAL_FOOD_EXPERIENCE[type][level];
   const maxXp = Math.max(...Object.values(levelFood));
 
-  const favouriteFoods = getKeys(levelFood).filter(
-    (foodName) => levelFood[foodName] === maxXp,
-  );
+  const favouriteFoods = getKeys(levelFood)
+    .filter((foodName) => levelFood[foodName] === maxXp)
+    .filter((food) => food !== "Omnifeed");
 
   if (favouriteFoods.length !== 1) throw new Error("No favourite food");
 
@@ -166,6 +168,10 @@ function getFeatherYieldBoosts(game: GameState) {
     boost += 1;
   }
 
+  if (isCollectibleBuilt({ name: "Alien Chicken", game })) {
+    boost += 0.1;
+  }
+
   return boost;
 }
 
@@ -186,6 +192,10 @@ function getMerinoWoolYieldBoosts(game: GameState) {
 
   if (isWearableActive({ name: "Merino Jumper", game })) {
     boost += 1;
+  }
+
+  if (isCollectibleBuilt({ name: "Toxic Tuft", game })) {
+    boost += 0.1;
   }
 
   return boost;
@@ -210,6 +220,10 @@ function getLeatherYieldBoosts(game: GameState) {
 
   if (isCollectibleBuilt({ name: "Moo-ver", game })) {
     boost += 0.25;
+  }
+
+  if (isCollectibleBuilt({ name: "Mootant", game })) {
+    boost += 0.1;
   }
 
   return boost;
@@ -310,6 +324,13 @@ export function getBoostedFoodQuantity({
     isWearableActive({ name: "Infernal Bullwhip", game })
   ) {
     foodQuantity *= 0.5;
+  }
+
+  if (
+    isCollectibleBuilt({ name: "Bull Run Banner", game }) &&
+    getCurrentSeason() === "Bull Run"
+  ) {
+    foodQuantity *= 0.9;
   }
 
   return foodQuantity;

@@ -10,6 +10,7 @@ import {
   SeasonalStore,
   SeasonalStoreCollectible,
   SeasonalStoreItem,
+  SeasonalStoreTier,
 } from "features/game/types/megastore";
 import { ARTEFACT_SHOP_KEYS } from "features/game/types/collectibles";
 import { SFLDiscount } from "features/game/lib/SFLDiscount";
@@ -23,7 +24,7 @@ export function isCollectible(
 export type BuySeasonalItemAction = {
   type: "seasonalItem.bought";
   name: BumpkinItem | InventoryItemName;
-  tier: keyof SeasonalStore;
+  tier: SeasonalStoreTier;
 };
 
 type Options = {
@@ -99,11 +100,18 @@ export function buySeasonalItem({
 
       if (
         tier === "epic" &&
-        seasonalItemsCrafted - reduction < seasonalStore.rare.requirement
+        seasonalItemsCrafted - reduction < seasonalStore.epic.requirement
       ) {
         throw new Error(
           "You need to buy more basic and rare items to unlock epic items",
         );
+      }
+
+      if (
+        tier === "mega" &&
+        seasonalItemsCrafted - reduction < seasonalStore.mega.requirement
+      ) {
+        throw new Error("You need to buy more epic items to unlock mega items");
       }
     }
 
@@ -181,24 +189,30 @@ export function isKeyBoughtWithinSeason(
       ? "Treasure Key"
       : isLowerTier && tier === "epic"
         ? "Rare Key"
-        : tier === "basic"
-          ? "Treasure Key"
-          : tier === "rare"
-            ? "Rare Key"
-            : "Luxury Key";
+        : isLowerTier && tier === "mega"
+          ? "Luxury Key"
+          : tier === "basic"
+            ? "Treasure Key"
+            : tier === "rare"
+              ? "Rare Key"
+              : "Luxury Key";
 
   const keyBoughtAt =
     game.pumpkinPlaza.keysBought?.megastore[tierKey as Keys]?.boughtAt;
   const seasonTime = SEASONS[getCurrentSeason()];
+  const currentKey = game.inventory[tierKey]; // used to check if player has key in inventory
+  //If player has no history of buying keys at megastore
+  if (!keyBoughtAt && isLowerTier && !currentKey) return true;
 
+  // Returns false if key is bought outside current season, otherwise, true
   if (keyBoughtAt) {
     const isWithinSeason =
       new Date(keyBoughtAt) >= seasonTime.startDate &&
       new Date(keyBoughtAt) <= seasonTime.endDate;
-
     return isWithinSeason;
   }
 
+  // This will only be triggered if isLowerTier is false
   return false;
 }
 
@@ -206,6 +220,7 @@ const tierMapping: Record<keyof SeasonalStore, keyof SeasonalStore> = {
   basic: "basic",
   rare: "basic",
   epic: "rare",
+  mega: "epic",
 };
 
 //Gets lower Tier

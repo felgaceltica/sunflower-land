@@ -61,6 +61,20 @@ export function generateDeliveryTickets({
     amount += 1;
   }
 
+  if (
+    getCurrentSeason() === "Bull Run" &&
+    isWearableActive({ game, name: "Cowboy Shirt" })
+  ) {
+    amount += 1;
+  }
+
+  if (
+    getCurrentSeason() === "Bull Run" &&
+    isWearableActive({ game, name: "Cowboy Trouser" })
+  ) {
+    amount += 1;
+  }
+
   const completedAt = game.npcs?.[npc]?.deliveryCompletedAt;
 
   const dateKey = new Date(now).toISOString().substring(0, 10);
@@ -289,7 +303,6 @@ export function deliverOrder({
   state,
   action,
   createdAt = Date.now(),
-  farmId = 0,
 }: Options): GameState {
   return produce(state, (game) => {
     const bumpkin = game.bumpkin;
@@ -420,10 +433,7 @@ export function deliverOrder({
 
     game.npcs = {
       ...npcs,
-      [order.from]: {
-        ...npc,
-        deliveryCompletedAt: createdAt,
-      },
+      [order.from]: npc,
     };
 
     // bumpkin.activity = trackActivity(`${order.from} Delivered`, 1);
