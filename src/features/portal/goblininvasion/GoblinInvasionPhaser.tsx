@@ -86,13 +86,13 @@ export const GoblinInvasionPhaser: React.FC = () => {
       {/* Comment out if you don't want to use our standard Bumpkin NPCs + click interactions */}
       <NPCModals
         id={portalState.context.id as number}
-        scene={"goblin_invasion"}
+        scene={"farmer_football"}
       />
 
       {/* Comment out if you don't want to use pop up modals from in game interactables */}
       <InteractableModals
         id={portalState.context.id as number}
-        scene="goblin_invasion"
+        scene="farmer_football"
       />
     </div>
   );

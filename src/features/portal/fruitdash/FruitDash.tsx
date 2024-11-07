@@ -21,8 +21,6 @@ import AchievementToastProvider from "./providers/AchievementToastProvider";
 import { SpeakingModal } from "features/game/components/SpeakingModal";
 import { translate } from "lib/i18n/translate";
 import { FRUIT_DASH_NPC_WEREABLES } from "./util/FruitDashConstants";
-import { hasFeatureAccess } from "lib/flags";
-import { OFFLINE_FARM } from "features/game/lib/landData";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
 const _isError = (state: PortalMachineState) => state.matches("error");
@@ -36,19 +34,18 @@ const _isIntroduction = (state: PortalMachineState) =>
 const _isLoser = (state: PortalMachineState) => state.matches("loser");
 const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
-const _isReadHalloweenEvent = hasReadFruitDashHalloweenEvent();
+const _EntranceMessageMaxDate = new Date("2024-11-10T00:00:00Z");
+const _EntranceMessage = "fruit-dash.entrancemessage_1";
+const _isReadEntranceMessage = hasReadFruitEntranceMessage();
 
-export function hasReadFruitDashHalloweenEvent() {
-  if (hasFeatureAccess(OFFLINE_FARM, "FRUIT_DASH_HALLOWEEN_EVENT"))
-    return !!localStorage.getItem("fruitDash.halloweenevent");
-  else return true;
+export function hasReadFruitEntranceMessage() {
+  if (Date.now() > _EntranceMessageMaxDate.getTime()) return true;
+
+  return !!localStorage.getItem(_EntranceMessage);
 }
 
-function acknowledgeFruitDashHalloweenEvent() {
-  return localStorage.setItem(
-    "fruitDash.halloweenevent",
-    new Date().toISOString(),
-  );
+function acknowledgeFruitEntranceMessage() {
+  return localStorage.setItem(_EntranceMessage, new Date().toISOString());
 }
 
 export const FruitDashApp: React.FC = () => {
@@ -64,8 +61,8 @@ export const FruitDashApp: React.FC = () => {
 export const FruitDash: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
-  const [isReadHalloweenEvent, setIsReadHalloweenEvent] = useState(
-    _isReadHalloweenEvent,
+  const [isReadEntranceMessage, setIsReadEntranceMessage] = useState(
+    _isReadEntranceMessage,
   );
   const sflBalance = useSelector(portalService, _sflBalance);
   const isError = useSelector(portalService, _isError);
@@ -141,19 +138,19 @@ export const FruitDash: React.FC = () => {
           <FruitDashNoAttemptsPanel />
         </Modal>
       )}
-      {isIntroduction && !isReadHalloweenEvent && (
+      {isIntroduction && !isReadEntranceMessage && (
         <Modal show>
           <SpeakingModal
             bumpkinParts={FRUIT_DASH_NPC_WEREABLES["Felga"]}
             message={[
               {
-                text: translate("fruit-dash.halloweenEvent"),
+                text: translate(_EntranceMessage),
                 actions: [
                   {
                     text: translate("ok"),
                     cb: () => {
-                      setIsReadHalloweenEvent(true);
-                      acknowledgeFruitDashHalloweenEvent();
+                      setIsReadEntranceMessage(true);
+                      acknowledgeFruitEntranceMessage();
                     },
                   },
                 ],
@@ -165,7 +162,7 @@ export const FruitDash: React.FC = () => {
           />
         </Modal>
       )}
-      {isIntroduction && isReadHalloweenEvent && (
+      {isIntroduction && isReadEntranceMessage && (
         <Modal show>
           <FruitDashRulesPanel
             mode={"introduction"}

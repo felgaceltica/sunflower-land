@@ -7,7 +7,7 @@ import defaultTilesetConfig from "assets/map/tileset.json";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
 import { GoblinInvasionEnemy } from "../../Enemies";
 export class GoblinInvasionLevel1 extends BaseScene {
-  sceneId: SceneId = "goblin_invasion";
+  sceneId: SceneId = "farmer_football";
   graphics: any;
   path: any;
   enemies: any[] = [];
@@ -15,7 +15,7 @@ export class GoblinInvasionLevel1 extends BaseScene {
   startTime = 15000;
   constructor() {
     super({
-      name: "goblin_invasion",
+      name: "farmer_football",
       map: {
         json: mapJsonBase,
       },
@@ -43,7 +43,7 @@ export class GoblinInvasionLevel1 extends BaseScene {
       16,
       16,
       1,
-      2
+      2,
     ) as Phaser.Tilemaps.Tileset;
     const map1 = this.make.tilemap({ key: "goblin_invasion_level" });
     map1.layers.forEach((layerData, idx) => {
@@ -51,7 +51,7 @@ export class GoblinInvasionLevel1 extends BaseScene {
         layerData.name,
         [tileset],
         SQUARE_WIDTH * 3,
-        SQUARE_WIDTH * 3
+        SQUARE_WIDTH * 3,
       );
       this.layers[layerData.name] = layer as Phaser.Tilemaps.TilemapLayer;
     });
@@ -68,7 +68,7 @@ export class GoblinInvasionLevel1 extends BaseScene {
       const nextEnemy = this.enemies.at(0);
       if (nextEnemy.time + this.startTime <= t) {
         this.enemies1.push(
-          new GoblinInvasionEnemy(this, nextEnemy.level, this.path)
+          new GoblinInvasionEnemy(this, nextEnemy.level, this.path),
         );
         this.enemies.shift();
       }

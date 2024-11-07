@@ -19,7 +19,6 @@ import sound_on from "assets/icons/sound_on.png";
 import sound_off from "assets/icons/sound_off.png";
 import { useIsAudioMuted } from "lib/utils/hooks/useIsAudioMuted";
 import { useIsHalloweenMode } from "../../util/useIsHalloweenMode";
-import { hasFeatureAccess } from "lib/flags";
 
 const buttonWidth = PIXEL_SCALE * 22;
 const buttonHeight = PIXEL_SCALE * 23;
@@ -159,10 +158,7 @@ export const FruitDashSettings: React.FC = () => {
     );
 
   // list of buttons to show in the HUD from right to left in order
-  const buttons = [gearButton, audioButton];
-  if (state ? hasFeatureAccess(state, "FRUIT_DASH_HALLOWEEN") : false)
-    buttons.push(halloweenModeButton);
-
+  const buttons = [gearButton, audioButton, halloweenModeButton];
   return (
     <div
       className="fixed z-50 flex flex-col justify-between"

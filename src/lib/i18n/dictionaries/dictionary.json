@@ -809,6 +809,7 @@
   "fruit-dash.targetScore": "Target Score: {{target}}",
   "fruit-dash.inventory": "inventory",
   "fruit-dash.halloweenEvent": "Welcome to the Halloween event of Fruit Dash. Don't forget to check the help section to see the bonuses and obstacles!",
+  "fruit-dash.entrancemessage_1": "The Halloween event has ended, but you can continue playing in dark mode by accessing the gear icon.",
   "irrigate.portal.title": "Minigame - Irrigate",
   "irrigate.portal.description": "Run through the farm, dodge obstacles, and collect delicious fruits.",
   "irrigate.portal.missionObjectives": "Mission: Reach {{targetScore}} points.",

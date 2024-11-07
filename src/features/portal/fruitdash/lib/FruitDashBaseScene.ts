@@ -127,7 +127,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.image("axebutton", "world/fruitdash/pickaxe.png");
     const url = getAnimationUrl(
       this.gameState.bumpkin?.equipped as BumpkinParts,
-      "death",
+      ["death"],
     );
     this.load.spritesheet("player_death", url, {
       frameWidth: 96,
