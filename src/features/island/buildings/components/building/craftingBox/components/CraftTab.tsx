@@ -26,44 +26,52 @@ import { BumpkinItem, ITEM_IDS } from "features/game/types/bumpkin";
 import { useSound } from "lib/utils/hooks/useSound";
 import { ModalOverlay } from "components/ui/ModalOverlay";
 import { ButtonPanel, InnerPanel } from "components/ui/Panel";
+import { CollectibleName, getKeys } from "features/game/types/craftables";
+import { availableWardrobe } from "features/game/events/landExpansion/equip";
 
 const VALID_CRAFTING_RESOURCES: InventoryItemName[] = [
-  "Wood",
-  "Stone",
-  "Wild Mushroom",
-  "White Pansy",
-  "Sunflower",
-  "Potato",
-  "Pumpkin",
-  "Wool",
-  "Iron",
-  "Feather",
-  "Carrot",
-  "Radish",
-  "Leather",
-  "Honey",
-  "Red Pansy",
-  "Blue Pansy",
-  "Yellow Pansy",
-  "Crimstone",
-  "Merino Wool",
-  "Seaweed",
-  "Oil",
-  "Coral",
-  "Pirate Bounty",
-  "Synthetic Fabric",
-  "Gold",
   "Basic Bed",
-  "Sturdy Bed",
-  "Prism Petal",
+  "Bee Box",
+  "Blue Pansy",
+  "Carrot",
   "Celestial Frostbloom",
-  "Primula Enigma",
+  "Coral",
   "Crimsteel",
+  "Crimstone",
+  "Cushion",
+  "Feather",
+  "Gold",
   "Hardened Leather",
-  "Vase",
+  "Honey",
+  "Iron",
+  "Kelp Fibre",
+  "Leather",
+  "Merino Cushion",
+  "Merino Wool",
   "Ocean's Treasure",
+  "Oil",
+  "Pearl",
+  "Pirate Bounty",
+  "Potato",
+  "Primula Enigma",
+  "Prism Petal",
+  "Pumpkin",
+  "Radish",
+  "Red Pansy",
   "Royal Bedding",
   "Royal Ornament",
+  "Seaweed",
+  "Stone",
+  "Sturdy Bed",
+  "Sunflower",
+  "Synthetic Fabric",
+  "Timber",
+  "Vase",
+  "White Pansy",
+  "Wild Mushroom",
+  "Wood",
+  "Wool",
+  "Yellow Pansy",
 ];
 
 const VALID_CRAFTING_WEARABLES: BumpkinItem[] = ["Basic Hair", "Farmer Pants"];
@@ -128,6 +136,22 @@ export const CraftTab: React.FC<Props> = ({
 
   const remainingInventory = useMemo(() => {
     const updatedInventory = { ...inventory };
+
+    // Removed placed items
+    getKeys(updatedInventory).forEach((itemName) => {
+      const placedCount =
+        (gameService.state.context.state.collectibles[
+          itemName as CollectibleName
+        ]?.length ?? 0) +
+        (gameService.state.context.state.home?.collectibles[
+          itemName as CollectibleName
+        ]?.length ?? 0);
+
+      updatedInventory[itemName] = (
+        updatedInventory[itemName] ?? new Decimal(0)
+      ).minus(placedCount);
+    });
+
     selectedItems.forEach((item) => {
       const collectible = item?.collectible;
       if (collectible && updatedInventory[collectible]) {
@@ -138,7 +162,8 @@ export const CraftTab: React.FC<Props> = ({
   }, [inventory, selectedItems]);
 
   const remainingWardrobe = useMemo(() => {
-    const updatedWardrobe = { ...wardrobe };
+    const updatedWardrobe = availableWardrobe(gameService.state.context.state);
+
     selectedItems.forEach((item) => {
       const wearable = item?.wearable;
       if (wearable && updatedWardrobe[wearable]) {
@@ -331,6 +356,8 @@ export const CraftTab: React.FC<Props> = ({
     setSelectedIngredient(null);
   };
 
+  const isDisabled = isPending || isCrafting || isCraftingBoxEmpty;
+
   return (
     <>
       <div className="flex pl-1 pt-1">
@@ -341,8 +368,8 @@ export const CraftTab: React.FC<Props> = ({
             isReady={isReady}
           />
           <ButtonPanel
-            disabled={isPending || isCrafting || isCraftingBoxEmpty}
-            onClick={handleClearIngredients}
+            disabled={isDisabled}
+            onClick={isDisabled ? undefined : handleClearIngredients}
           >
             <SquareIcon icon={SUNNYSIDE.icons.cancel} width={5} />
           </ButtonPanel>
@@ -418,10 +445,23 @@ export const CraftTab: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="flex flex-col max-h-72 overflow-y-auto scrollable">
-        <Label type="default" className="mb-1 ml-1">
-          {t("resources")}
-        </Label>
+      <div className="flex space-x-3 mb-1 ml-1 mr-2">
+        <Label type="default">{t("resources")}</Label>
+        {selectedIngredient && (
+          <Label
+            type="chill"
+            className=""
+            icon={
+              selectedIngredient.collectible
+                ? ITEM_DETAILS[selectedIngredient.collectible].image
+                : undefined
+            }
+          >
+            {selectedIngredient.collectible ?? selectedIngredient.wearable}
+          </Label>
+        )}
+      </div>
+      <div className="flex flex-col max-h-72 overflow-y-auto scrollable pr-1">
         <div className="flex flex-wrap">
           {VALID_CRAFTING_RESOURCES.map((itemName) => {
             const amount = remainingInventory[itemName] || new Decimal(0);
@@ -441,9 +481,7 @@ export const CraftTab: React.FC<Props> = ({
                   onClick={() =>
                     handleIngredientSelect({ collectible: itemName })
                   }
-                  disabled={
-                    isPending || isCrafting || amount.lessThanOrEqualTo(0)
-                  }
+                  disabled={isPending || isCrafting}
                 />
               </div>
             );
@@ -467,7 +505,7 @@ export const CraftTab: React.FC<Props> = ({
                   image={getImageUrl(ITEM_IDS[itemName])}
                   isSelected={selectedIngredient?.wearable === itemName}
                   onClick={() => handleIngredientSelect({ wearable: itemName })}
-                  disabled={isPending || isCrafting || amount <= 0}
+                  disabled={isPending || isCrafting}
                 />
               </div>
             );
@@ -654,8 +692,9 @@ const InProgressLabelContent: React.FC<{ remainingTime: number | null }> = ({
   return (
     <span>
       {secondsToString(remainingTime / 1000, {
-        length: "short",
+        length: "medium",
         isShortFormat: true,
+        removeTrailingZeros: true,
       })}
     </span>
   );

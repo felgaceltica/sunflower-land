@@ -306,6 +306,14 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Caponata: 575,
   "Glazed Carrots": 576,
   Paella: 577,
+  Cheese: 578,
+  "Pizza Margherita": 579,
+  "Blue Cheese": 580,
+  "Honey Cheddar": 581,
+  "Caprese Salad": 582,
+  "Sour Shake": 583,
+  "Spaghetti al Limone": 584,
+  "Lemon Cheesecake": 585,
 
   Wood: 601,
   Stone: 602,
@@ -368,6 +376,7 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Ocean's Treasure": 659,
   "Royal Bedding": 660,
   "Royal Ornament": 661,
+  Omnifeed: 662,
 
   "Green Thumb": 701,
   "Barn Manager": 702,
@@ -883,6 +892,13 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Chicory: 2159,
   Wagon: 2160,
   "Black Sheep": 2161,
+  "Alien Chicken": 2162,
+  Mootant: 2163,
+  "Toxic Tuft": 2164,
+  "Crop Circle": 2165,
+  "Halloween Scarecrow": 2166,
+  "Vampire Bear": 2167,
+  "Super Totem": 2168,
 };
 
 // The reverse of above

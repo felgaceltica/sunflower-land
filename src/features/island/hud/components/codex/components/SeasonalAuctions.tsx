@@ -75,10 +75,11 @@ function getSeasonalAuctions({
 
   // Filter out any not in this season
   details = getKeys(details).reduce((acc, name) => {
-    const hasNoSeasonAuctions = details[name].auctions.every((auction) => {
-      auction.startAt < startDate.getTime() ||
-        auction.startAt > endDate.getTime();
-    });
+    const hasNoSeasonAuctions = details[name].auctions.every(
+      (auction) =>
+        auction.startAt < startDate.getTime() ||
+        auction.startAt > endDate.getTime(),
+    );
 
     if (hasNoSeasonAuctions) {
       return acc;
@@ -127,10 +128,17 @@ const NextDrop: React.FC<{ auctions: AuctionItems }> = ({ auctions }) => {
           <Label className="-ml-1 mb-1" type="default">
             {t("season.codex.nextDrop")}
           </Label>
+          {nextDrop.sfl > 0 && (
+            <Label type="formula" icon={sfl} className="mb-1">
+              {t("season.codex.nextDrop.available", {
+                dropSupply: nextDrop.supply,
+              })}
+            </Label>
+          )}
           {getKeys(nextDrop.ingredients).map((name) => (
             <Label
               type="formula"
-              icon={nextDrop.sfl > 0 ? sfl : ITEM_DETAILS[name].image}
+              icon={ITEM_DETAILS[name].image}
               className="mb-1"
               key={name}
             >
@@ -159,7 +167,7 @@ const NextDrop: React.FC<{ auctions: AuctionItems }> = ({ auctions }) => {
                         type="vibrant"
                         icon={lightning}
                         style={{
-                          marginLeft: "4px",
+                          marginLeft: "3px",
                         }}
                       >
                         {nextDrop.type === "collectible"
@@ -172,7 +180,7 @@ const NextDrop: React.FC<{ auctions: AuctionItems }> = ({ auctions }) => {
                         icon={buffLabel.boostTypeIcon}
                         secondaryIcon={buffLabel.boostedItemIcon}
                         style={{
-                          marginLeft: "4px",
+                          marginLeft: "3px",
                         }}
                       >
                         {buffLabel.shortDescription}
@@ -185,7 +193,7 @@ const NextDrop: React.FC<{ auctions: AuctionItems }> = ({ auctions }) => {
                       type="default"
                       icon={SUNNYSIDE.icons.heart}
                       style={{
-                        marginLeft: "7px",
+                        marginLeft: "6px",
                       }}
                     >
                       {nextDrop.type === "collectible"
@@ -194,13 +202,23 @@ const NextDrop: React.FC<{ auctions: AuctionItems }> = ({ auctions }) => {
                     </Label>
                   </div>
                 )}
+                {isMobile && (
+                  <div className="flex flex-col text-start text-base">
+                    <TimerDisplay time={starts} />
+                    <span className="text-xs">
+                      {new Date(nextDrop.startAt).toLocaleString().slice(0, -3)}
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col text-center mt-0.5 text-base">
-                <TimerDisplay time={starts} />
-                <span className="text-xs">
-                  {new Date(nextDrop.startAt).toLocaleString().slice(0, -3)}
-                </span>
-              </div>
+              {!isMobile && (
+                <div className="flex flex-col text-end text-base">
+                  <TimerDisplay time={starts} />
+                  <span className="text-xs">
+                    {new Date(nextDrop.startAt).toLocaleString().slice(0, -3)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -17,7 +17,6 @@ import {
   LegacyItem,
   MOMEventItem,
   MarketItem,
-  MutantChicken,
   QuestItem,
   Shovel,
   ToolName,
@@ -36,6 +35,7 @@ import {
   InventoryItemName,
   LanternName,
   LoveAnimalItem,
+  MutantAnimal,
   Points,
   RecipeCraftableName,
   SpecialEvent,
@@ -100,6 +100,7 @@ const animalFood: Record<AnimalFoodName, () => boolean> = {
   "Kernel Blend": () => false,
   NutriBarley: () => false,
   "Mixed Grain": () => false,
+  Omnifeed: () => false,
 };
 
 const animalMedicine: Record<AnimalMedicineName, () => boolean> = {
@@ -333,7 +334,7 @@ const resources: Record<ResourceName, () => boolean> = {
   "Oil Reserve": () => false,
 };
 
-const mutantChickens: Record<MutantChicken, () => boolean> = {
+const mutantAnimals: Record<MutantAnimal, () => boolean> = {
   "Ayam Cemani": () => true,
   "Fat Chicken": () => true,
   "Rich Chicken": () => true,
@@ -342,8 +343,10 @@ const mutantChickens: Record<MutantChicken, () => boolean> = {
   "Banana Chicken": () => true,
   "Crim Peckster": () => true,
   "Knight Chicken": () => true,
-  "Pharaoh Chicken": () =>
-    canWithdrawTimebasedItem(SEASONS["Pharaoh's Treasure"].endDate),
+  "Pharaoh Chicken": () => true,
+  "Alien Chicken": () => hasSeasonEnded("Bull Run"),
+  "Toxic Tuft": () => hasSeasonEnded("Bull Run"),
+  Mootant: () => hasSeasonEnded("Bull Run"),
 };
 
 const flags: Record<Flag, () => boolean> = {
@@ -607,6 +610,14 @@ const consumables: Record<ConsumableName, () => boolean> = {
   "The Lot": () => false,
   "Tofu Scramble": () => false,
   Antipasto: () => false,
+  Cheese: () => false,
+  "Pizza Margherita": () => false,
+  "Blue Cheese": () => false,
+  "Honey Cheddar": () => false,
+  "Caprese Salad": () => false,
+  "Sour Shake": () => false,
+  "Spaghetti al Limone": () => false,
+  "Lemon Cheesecake": () => false,
 };
 
 const decorations: Record<ShopDecorationName, () => boolean> = {
@@ -911,6 +922,10 @@ const eventDecoration: Record<EventDecorationName, () => boolean> = {
   "Splendor Flag": () => true,
   "Jelly Lamp": () => true,
   "Paint Can": () => true,
+
+  "Halloween Scarecrow": () => true,
+  "Vampire Bear": () => true,
+  "Super Totem": () => false,
 };
 
 const lanterns: Record<LanternName, () => boolean> = {
@@ -1159,12 +1174,12 @@ const animalResources: Record<AnimalResource, () => boolean> = {
 
 const beds: Record<BedName, () => boolean> = {
   "Basic Bed": () => false,
-  "Sturdy Bed": () => false,
-  "Floral Bed": () => false,
   "Fisher Bed": () => false,
-  "Pirate Bed": () => false,
-  "Cow Bed": () => false,
+  "Floral Bed": () => false,
+  "Sturdy Bed": () => false,
   "Desert Bed": () => false,
+  "Cow Bed": () => false,
+  "Pirate Bed": () => false,
   "Royal Bed": () => false,
 };
 
@@ -1205,7 +1220,7 @@ export const WITHDRAWABLES: Record<InventoryItemName, () => boolean> = {
   ...warBanners,
   ...heliosBlacksmith,
   ...commodities,
-  ...mutantChickens,
+  ...mutantAnimals,
   ...flags,
   ...easterEggs,
   ...mutantCrop,
@@ -1744,4 +1759,7 @@ export const BUMPKIN_WITHDRAWABLES: Record<
   Sickle: () => false,
   "Speed Boots": () => false,
   "Tomato Apron": () => false,
+  "Adventurer's Suit": () => true,
+  "Adventurer's Torch": () => true,
+  "Pumpkin Head": () => true,
 };

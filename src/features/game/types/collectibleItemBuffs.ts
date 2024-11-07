@@ -291,9 +291,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
   // Animals
   "Fat Chicken": {
     shortDescription: translate("description.fat.chicken.boost"),
-    labelType: "info",
+    labelType: "success",
     boostTypeIcon: powerup,
-    boostedItemIcon: CROP_LIFECYCLE.Wheat.crop,
+    boostedItemIcon: SUNNYSIDE.animalFoods.kernel_blend,
   },
   "Rich Chicken": {
     shortDescription: translate("description.rich.chicken.boost"),
@@ -335,10 +335,17 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     labelType: "success",
     boostTypeIcon: powerup,
   },
+  "Farm Dog": {
+    shortDescription: translate("description.farm.dog.boost"),
+    labelType: "info",
+    boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+    boostedItemIcon: SUNNYSIDE.animals.sheepSleeping,
+  },
   "Gold Egg": {
     shortDescription: translate("description.gold.egg.boost"),
     labelType: "vibrant",
     boostTypeIcon: lightning,
+    boostedItemIcon: SUNNYSIDE.animalFoods.kernel_blend,
   },
   Bale: {
     shortDescription: translate("description.bale.boost"),
@@ -775,5 +782,34 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     labelType: "success",
     boostTypeIcon: powerup,
     boostedItemIcon: SUNNYSIDE.animalFoods.kernel_blend,
+  },
+  "Alien Chicken": {
+    shortDescription: translate("description.alien.chicken.boost"),
+    labelType: "success",
+    boostTypeIcon: powerup,
+    boostedItemIcon: SUNNYSIDE.resource.feather,
+  },
+  "Toxic Tuft": {
+    shortDescription: translate("description.toxic.tuft.boost"),
+    labelType: "success",
+    boostTypeIcon: powerup,
+    boostedItemIcon: SUNNYSIDE.resource.merino_wool,
+  },
+  Mootant: {
+    shortDescription: translate("description.mootant.boost"),
+    labelType: "success",
+    boostTypeIcon: powerup,
+    boostedItemIcon: SUNNYSIDE.resource.leather,
+  },
+  "King of Bears": {
+    shortDescription: translate("description.kingOfBears.boost"),
+    labelType: "success",
+    boostTypeIcon: powerup,
+    boostedItemIcon: ITEM_DETAILS.Honey.image,
+  },
+  "Super Totem": {
+    shortDescription: translate("description.superTotem.boost"),
+    labelType: "info",
+    boostTypeIcon: SUNNYSIDE.icons.stopwatch,
   },
 };
