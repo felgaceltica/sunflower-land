@@ -39,10 +39,12 @@ import { DynamicClouds } from "./components/DynamicClouds";
 import { StaticClouds } from "./components/StaticClouds";
 import { BackgroundIslands } from "./components/BackgroundIslands";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { Marketplace } from "features/marketplace/Marketplace";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { pickEmptyPosition } from "./placeable/lib/collisionDetection";
+import {
+  NON_COLLIDING_OBJECTS,
+  pickEmptyPosition,
+} from "./placeable/lib/collisionDetection";
 import { EXPANSION_ORIGINS, LAND_SIZE } from "./lib/constants";
 
 import Decimal from "decimal.js-light";
@@ -189,6 +191,7 @@ const getIslandElements = ({
               y={y}
               height={height}
               width={width}
+              z={1}
             >
               <Building
                 name={name}
@@ -227,6 +230,7 @@ const getIslandElements = ({
               y={y}
               height={height}
               width={width}
+              z={NON_COLLIDING_OBJECTS.includes(name) ? 0 : 1}
             >
               <Collectible
                 location="farm"
@@ -280,6 +284,7 @@ const getIslandElements = ({
           y={y}
           height={height}
           width={width}
+          z={1}
         >
           <Resource
             key={`tree-${id}`}
@@ -388,6 +393,7 @@ const getIslandElements = ({
           y={y}
           height={height}
           width={width}
+          z={1}
         >
           <Resource
             key={`crimstone-${id}`}
@@ -415,6 +421,7 @@ const getIslandElements = ({
           y={y}
           height={height}
           width={width}
+          z={1}
         >
           <Resource
             key={`ruby-${id}`}
@@ -442,6 +449,7 @@ const getIslandElements = ({
           y={y}
           height={height}
           width={width}
+          z={1}
         >
           <Resource
             name="Oil Reserve"
@@ -468,6 +476,7 @@ const getIslandElements = ({
           y={y}
           height={height}
           width={width}
+          z={1}
         >
           <Resource
             name="Fruit Patch"
@@ -679,14 +688,15 @@ const isVisiting = (state: MachineState) => state.matches("visiting");
 const isPaused = (state: MachineState) => !!state.context.paused;
 
 export const Land: React.FC = () => {
-  const { gameService, showAnimations, showTimers } = useContext(Context);
+  const { gameService, showTimers } = useContext(Context);
 
   const paused = useSelector(gameService, isPaused);
 
   const { pathname } = useLocation();
-  const showMarketplace = pathname.includes("marketplace");
-
   const state = useSelector(gameService, selectGameState);
+  const showMarketplace =
+    pathname.includes("marketplace") && hasFeatureAccess(state, "MARKETPLACE");
+
   const {
     expansionConstruction,
     buildings,
@@ -776,11 +786,7 @@ export const Land: React.FC = () => {
             <DirtRenderer island={island.type} grid={gameGrid} />
 
             {!landscaping && (
-              <Water
-                expansionCount={expansionCount}
-                townCenterBuilt={(buildings["Town Center"]?.length ?? 0) >= 1}
-                gameState={state}
-              />
+              <Water expansionCount={expansionCount} gameState={state} />
             )}
             {!landscaping && <UpcomingExpansion />}
 
@@ -869,7 +875,7 @@ export const Land: React.FC = () => {
               onTouchEnd={(e) => e.stopPropagation()}
               className="pointer-events-auto w-full h-full"
             >
-              <Marketplace />
+              <Outlet />
             </div>
           </div>,
           document.body,

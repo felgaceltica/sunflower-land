@@ -97,6 +97,7 @@ import {
 } from "../actions/effect";
 import { TRANSACTION_SIGNATURES, TransactionName } from "../types/transactions";
 import { getKeys } from "../types/decorations";
+import { preloadHotNow } from "features/marketplace/components/MarketplaceHotNow";
 
 // Run at startup in case removed from query params
 const portalName = new URLSearchParams(window.location.search).get("portal");
@@ -437,6 +438,7 @@ const EFFECT_STATES = Object.values(EFFECT_EVENTS).reduce(
     [`${stateName}Failure`]: {
       on: {
         CONTINUE: { target: "playing" },
+        REFRESH: { target: "playing" },
       },
     },
     [stateName]: {
@@ -530,6 +532,7 @@ export type BlockchainState = {
     | "buds"
     | "airdrop"
     | "offers"
+    | "marketplaceSale"
     | "coolingDown"
     | "buyingBlockBucks"
     | "auctionResults"
@@ -668,6 +671,7 @@ export function startGame(authContext: AuthContext) {
               }),
             },
           ],
+          entry: () => preloadHotNow(authContext.user.rawToken as string),
           invoke: {
             src: async (context) => {
               const fingerprint = "X";
@@ -899,6 +903,13 @@ export function startGame(authContext: AuthContext) {
                 ),
             },
             {
+              target: "marketplaceSale",
+              cond: (context: Context) =>
+                getKeys(context.state.trades.listings ?? {}).some(
+                  (id) => !!context.state.trades.listings![id].fulfilledAt,
+                ),
+            },
+            {
               target: "playing",
             },
           ],
@@ -964,6 +975,19 @@ export function startGame(authContext: AuthContext) {
         offers: {
           on: {
             "offer.claimed": (GAME_EVENT_HANDLERS as any)["offer.claimed"],
+            RESET: {
+              target: "refreshing",
+            },
+            CLOSE: {
+              target: "playing",
+            },
+          },
+        },
+        marketplaceSale: {
+          on: {
+            "purchase.claimed": (GAME_EVENT_HANDLERS as any)[
+              "purchase.claimed"
+            ],
             RESET: {
               target: "refreshing",
             },

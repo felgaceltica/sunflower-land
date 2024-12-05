@@ -23,6 +23,7 @@ import {
 import { getCurrentSeason } from "../types/seasons";
 import { isCollectibleBuilt } from "./collectibleBuilt";
 import { getBudYieldBoosts } from "./getBudYieldBoosts";
+import { hasVipAccess } from "./vipAccess";
 import { isWearableActive } from "./wearables";
 
 export const makeAnimalBuildingKey = (
@@ -212,6 +213,10 @@ function getMilkYieldBoosts(game: GameState) {
     boost += 2;
   }
 
+  if (isCollectibleBuilt({ name: "Longhorn Cowfish", game })) {
+    boost += 0.2;
+  }
+
   return boost;
 }
 
@@ -326,10 +331,7 @@ export function getBoostedFoodQuantity({
     foodQuantity *= 0.5;
   }
 
-  if (
-    isCollectibleBuilt({ name: "Bull Run Banner", game }) &&
-    getCurrentSeason() === "Bull Run"
-  ) {
+  if (hasVipAccess(game.inventory) && getCurrentSeason() === "Bull Run") {
     foodQuantity *= 0.9;
   }
 
