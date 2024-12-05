@@ -1,207 +1,301 @@
-import { ButtonPanel, InnerPanel } from "components/ui/Panel";
+import { InnerPanel } from "components/ui/Panel";
 import { ITEM_DETAILS } from "features/game/types/images";
-import React, { useState } from "react";
-
+import React, { useContext, useEffect, useState } from "react";
 import budIcon from "assets/icons/bud.png";
 import wearableIcon from "assets/icons/wearables.webp";
 import lightning from "assets/icons/lightning.png";
 import filterIcon from "assets/icons/filter_icon.webp";
+import tradeIcon from "assets/icons/trade.png";
+import trade_point from "src/assets/icons/trade_points_coupon.webp";
 
-import { CollectionName } from "features/game/types/marketplace";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Collection } from "./Collection";
+import {
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+import { Collection, preloadCollections } from "./Collection";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { TextInput } from "components/ui/TextInput";
-import { TranslationKeys } from "lib/i18n/dictionaries/types";
-import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { Label } from "components/ui/Label";
 import { SquareIcon } from "components/ui/SquareIcon";
-import { PIXEL_SCALE } from "features/game/lib/constants";
 import { Modal } from "components/ui/Modal";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
+import { MarketplaceProfile } from "./MarketplaceProfile";
+import { MyTrades } from "./profile/MyTrades";
+import { MarketplaceRewards } from "./MarketplaceRewards";
+import { Tradeable } from "./Tradeable";
+import classNames from "classnames";
+import { MarketplaceHotNow } from "./MarketplaceHotNow";
+import { CONFIG } from "lib/config";
+import { MarketplaceUser } from "./MarketplaceUser";
+import { hasFeatureAccess } from "lib/flags";
+import { Context } from "features/game/GameProvider";
+import * as Auth from "features/auth/lib/Provider";
+import { useActor } from "@xstate/react";
 
-type MarketplaceCollection = {
-  name: string;
-  icon: string;
-  route: string;
-};
-const COLLECTIONS: MarketplaceCollection[] = [
-  {
-    name: "Collectibles",
-    icon: ITEM_DETAILS["Grinx's Hammer"].image,
-    route: "/marketplace/collectibles",
-  },
-  {
-    name: "Wearables",
-    icon: wearableIcon,
-    route: "/marketplace/wearables",
-  },
-  {
-    name: "Buds",
-    icon: budIcon,
-    route: "/marketplace/buds",
-  },
-  {
-    name: "Resources",
-    icon: ITEM_DETAILS["Pumpkin"].image,
-    route: "/marketplace/resources",
-  },
-];
-
-export const MarketplaceHome: React.FC = () => {
-  const { collection } = useParams<{ collection: CollectionName }>();
+export const MarketplaceNavigation: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [purpose, setPurpose] = useState<MarketplacePurpose>("boost");
-
   const [showFilters, setShowFilters] = useState(false);
+
+  const { authService } = useContext(Auth.Context);
+  const [authState] = useActor(authService);
+
+  useEffect(() => {
+    const token = authState.context.user.rawToken as string;
+    preloadCollections(token);
+  }, []);
+
   return (
     <>
-      <div className="flex h-full">
-        <InnerPanel className="w-64 h-96 mr-1 hidden lg:block">
-          <Filters purpose={purpose} onPurposeChange={setPurpose} />
-        </InnerPanel>
-        <div className="flex-1 flex flex-col">
-          <InnerPanel className="w-full mb-1">
-            <div className="flex  items-center">
-              <TextInput
-                icon={SUNNYSIDE.icons.search}
-                value={search}
-                onValueChange={setSearch}
-              />
-              <img
-                src={filterIcon}
-                onClick={() => setShowFilters(true)}
-                className="h-8 mx-1 block lg:hidden cursor-pointer"
-              />
-            </div>
-          </InnerPanel>
-          <InnerPanel className="flex-1 w-full overflow-scroll scrollable pr-1 overflow-x-hidden">
-            <Collection
-              search={search}
-              key={collection}
-              purpose={purpose}
-              type={collection ?? "collectibles"}
-            />
-          </InnerPanel>
-        </div>
-      </div>
       <Modal show={showFilters} onHide={() => setShowFilters(false)}>
-        <CloseButtonPanel onClose={() => setShowFilters(false)}>
-          <Filters purpose={purpose} onPurposeChange={setPurpose} />
+        <CloseButtonPanel>
+          <Filters onClose={() => setShowFilters(false)} />
         </CloseButtonPanel>
       </Modal>
+
+      <div className="flex  items-center lg:hidden h-[50px]">
+        <TextInput
+          icon={SUNNYSIDE.icons.search}
+          value={search}
+          onValueChange={setSearch}
+        />
+        <img
+          src={filterIcon}
+          onClick={() => setShowFilters(true)}
+          className="h-8 mx-1 block cursor-pointer"
+        />
+      </div>
+
+      <div className="flex h-[calc(100%-50px)] lg:h-full">
+        <InnerPanel className="w-64 h-96 mr-1 hidden lg:flex  flex-col">
+          <div className="flex  items-center">
+            <TextInput
+              icon={SUNNYSIDE.icons.search}
+              value={search}
+              onValueChange={setSearch}
+              onCancel={() => setSearch("")}
+            />
+          </div>
+          <div className="flex-1">
+            <Filters onClose={() => setShowFilters(false)} />
+          </div>
+        </InnerPanel>
+
+        <div className="flex-1 flex flex-col w-full">
+          {search ? (
+            <Collection search={search} onNavigated={() => setSearch("")} />
+          ) : (
+            <Routes>
+              <Route path="/profile" element={<MarketplaceProfile />} />
+              <Route path="/hot" element={<MarketplaceHotNow />} />
+              <Route path="/trades" element={<MyTrades />} />
+              <Route path="/rewards" element={<MarketplaceRewards />} />
+              <Route path="/collection/*" element={<Collection />} />
+              <Route path="/:collection/:id" element={<Tradeable />} />
+              <Route path="/profile/:id" element={<MarketplaceUser />} />
+              {/* default to hot */}
+              <Route path="/" element={<MarketplaceHotNow />} />
+            </Routes>
+          )}
+        </div>
+      </div>
     </>
   );
 };
 
 export type MarketplacePurpose = "boost" | "decoration" | "resource";
 
-const COLLECTION_FILTERS: {
-  name: CollectionName;
+const Option: React.FC<{
   icon: string;
-  term: TranslationKeys;
-}[] = [
-  {
-    name: "collectibles",
-    term: "collectibles",
-    icon: ITEM_DETAILS["Gnome"].image,
-  },
-  {
-    name: "wearables",
-    term: "wearables",
-    icon: wearableIcon,
-  },
-  {
-    name: "buds",
-    term: "buds",
-    icon: budIcon,
-  },
-];
+  label: string;
+  onClick: () => void;
+  isActive?: boolean;
+  options?: {
+    icon: string;
+    label: string;
+    onClick: () => void;
+    isActive?: boolean;
+  }[];
+}> = ({ icon, label, onClick, options, isActive }) => {
+  return (
+    <div className="mb-1">
+      <div
+        className={classNames(
+          "flex justify-between items-center cursor-pointer mb-1 ",
+          { "bg-brown-100 px-2 -mx-2": isActive },
+        )}
+        onClick={onClick}
+      >
+        <div className="flex items-center">
+          <SquareIcon icon={icon} width={10} />
+          <span className="text-sm ml-2">{label}</span>
+        </div>
+        <img src={SUNNYSIDE.icons.chevron_right} className="w-4" />
+      </div>
 
-const PURPOSE_FILTERS: {
-  name: MarketplacePurpose;
-  icon: string;
-  term: TranslationKeys;
-}[] = [
-  {
-    name: "boost",
-    term: "marketplace.boost",
-    icon: lightning,
-  },
-  {
-    name: "decoration",
-    term: "decoration",
-    icon: SUNNYSIDE.icons.heart,
-  },
-  // {
-  //   name: "resource",
-  //   term: "resource",
-  //   icon: ITEM_DETAILS.Carrot.image,
-  // },
-];
+      {options?.map((option) => (
+        <div
+          key={option.label}
+          className={classNames(
+            "flex justify-between items-center cursor-pointer mb-1 ml-4",
+            { "bg-brown-100 px-2 -mr-2 ml-0": option.isActive },
+          )}
+          onClick={option.onClick}
+        >
+          <div className="flex items-center">
+            <SquareIcon icon={option.icon} width={10} />
+            <span className="text-sm ml-2">{option.label}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-const Filters: React.FC<{
-  purpose: MarketplacePurpose;
-  onPurposeChange: (purpose: MarketplacePurpose) => void;
-}> = ({ purpose, onPurposeChange }) => {
-  const { t } = useAppTranslation();
-
+const Filters: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [queryParams] = useSearchParams();
+  const filters = queryParams.get("filters");
+
+  const { gameService } = useContext(Context);
+
+  const isWorldRoute = pathname.includes("/world");
 
   return (
-    <div className="p-1">
-      <Label className="-ml-1 mb-2" type="default">
-        {t("marketplace.collection")}
-      </Label>
-      {COLLECTION_FILTERS.map((filter) => (
-        <div className="flex justify-between items-center" key={filter.name}>
-          <div className="flex items-center">
-            <SquareIcon icon={filter.icon} width={10} />
-            <span className="text-sm ml-1">{t(filter.term)}</span>
-          </div>
-          <ButtonPanel
+    <div className="p-1 h-full">
+      <div className="flex flex-col h-full">
+        <div>
+          <Option
+            icon={SUNNYSIDE.icons.expression_alerted}
+            label="Hot now"
             onClick={() => {
-              navigate(`/marketplace/${filter.name}`);
+              navigate(`${isWorldRoute ? "/world" : ""}/marketplace/hot`);
+              onClose();
             }}
-            className="relative"
-          >
-            <div className="h-2 w-2"></div>
-            {pathname.includes(filter.name) && (
-              <img
-                src={SUNNYSIDE.icons.confirm}
-                className="absolute top-0 right-0"
-                style={{
-                  width: `${PIXEL_SCALE * 14}px`,
-                }}
-              />
-            )}
-          </ButtonPanel>
+            isActive={
+              pathname === `${isWorldRoute ? "/world" : ""}/marketplace/hot`
+            }
+          />
+          <Option
+            icon={lightning}
+            label="Power ups"
+            onClick={() =>
+              navigate(
+                `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=collectibles,wearables,utility`,
+              )
+            }
+            isActive={filters === "collectibles,wearables,utility"}
+            options={
+              filters?.includes("utility")
+                ? [
+                    {
+                      icon: ITEM_DETAILS["Freya Fox"].image,
+                      label: "Collectibles",
+                      isActive: filters === "utility,collectibles",
+                      onClick: () => {
+                        navigate(
+                          `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=utility,collectibles`,
+                        );
+                        onClose();
+                      },
+                    },
+                    {
+                      icon: wearableIcon,
+                      label: "Wearables",
+                      isActive: filters === "utility,wearables",
+                      onClick: () => {
+                        navigate(
+                          `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=utility,wearables`,
+                        );
+                        onClose();
+                      },
+                    },
+                  ]
+                : undefined
+            }
+          />
+
+          <Option
+            icon={ITEM_DETAILS.Eggplant.image}
+            label="Resources"
+            onClick={() => {
+              navigate(
+                `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=resources`,
+              );
+              onClose();
+            }}
+            isActive={filters === "resources"}
+          />
+
+          {hasFeatureAccess(
+            gameService.getSnapshot().context.state,
+            "MARKETPLACE_ADMIN",
+          ) && (
+            <Option
+              icon={SUNNYSIDE.icons.stopwatch}
+              label="Limited"
+              onClick={() => {
+                navigate(`/marketplace/collection?filters=temporary`);
+                onClose();
+              }}
+              isActive={filters === "temporary"}
+            />
+          )}
+
+          <Option
+            icon={SUNNYSIDE.icons.heart}
+            label="Cosmetics"
+            onClick={() => {
+              navigate(
+                `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=collectibles,wearables,cosmetic`,
+              );
+              onClose();
+            }}
+            isActive={filters === "collectibles,wearables,cosmetic"}
+          />
+
+          {CONFIG.NETWORK !== "mainnet" && (
+            <Option
+              icon={budIcon}
+              label="Bud NFTs"
+              onClick={() => {
+                navigate(
+                  `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=buds`,
+                );
+                onClose();
+              }}
+              isActive={filters === "buds"}
+            />
+          )}
         </div>
-      ))}
-      <Label className="-ml-1 my-2" type="default">
-        {t("marketplace.purpose")}
-      </Label>
-      {PURPOSE_FILTERS.map((filter) => (
-        <div className="flex justify-between items-center" key={filter.name}>
-          <div className="flex items-center">
-            <SquareIcon icon={filter.icon} width={10} />
-            <span className="text-sm ml-1">{t(filter.term)}</span>
-          </div>
-          <ButtonPanel onClick={() => onPurposeChange(filter.name)}>
-            <div className="h-2 w-2"></div>
-            {purpose === filter.name && (
-              <img
-                src={SUNNYSIDE.icons.confirm}
-                className="absolute top-0 right-0"
-                style={{
-                  width: `${PIXEL_SCALE * 14}px`,
-                }}
-              />
-            )}
-          </ButtonPanel>
+
+        <div>
+          <Option
+            icon={tradeIcon}
+            label="My trades"
+            onClick={() => {
+              navigate(`${isWorldRoute ? "/world" : ""}/marketplace/trades`);
+              onClose();
+            }}
+            isActive={
+              pathname === `${isWorldRoute ? "/world" : ""}/marketplace/trades`
+            }
+          />
+          <Option
+            icon={trade_point}
+            label="My rewards"
+            onClick={() => {
+              navigate(`${isWorldRoute ? "/world" : ""}/marketplace/rewards`);
+              onClose();
+            }}
+            isActive={
+              pathname === `${isWorldRoute ? "/world" : ""}/marketplace/rewards`
+            }
+          />
         </div>
-      ))}
+      </div>
     </div>
   );
 };

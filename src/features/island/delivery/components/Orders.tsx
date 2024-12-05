@@ -16,11 +16,17 @@ import {
   QuestNPCName,
   TICKET_REWARDS,
   generateDeliveryTickets,
+  getCountAndTypeForDelivery,
   getOrderSellPrice,
 } from "features/game/events/landExpansion/deliver";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { getKeys } from "features/game/types/craftables";
-import { GameState, Inventory, Order } from "features/game/types/game";
+import {
+  GameState,
+  Inventory,
+  InventoryItemName,
+  Order,
+} from "features/game/types/game";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { NPCIcon } from "features/island/bumpkin/components/NPC";
 
@@ -53,7 +59,8 @@ import { SquareIcon } from "components/ui/SquareIcon";
 import { formatNumber } from "lib/utils/formatNumber";
 import { isMobile } from "mobile-device-detect";
 import { getImageUrl } from "lib/utils/getImageURLS";
-import { ITEM_IDS } from "features/game/types/bumpkin";
+import { BumpkinItem, ITEM_IDS } from "features/game/types/bumpkin";
+import { KNOWN_IDS } from "features/game/types";
 
 // Bumpkins
 export const BEACH_BUMPKINS: NPCName[] = [
@@ -91,7 +98,9 @@ export function hasOrderRequirements({
   sfl,
   coins,
   inventory,
+  state,
 }: {
+  state: GameState;
   sfl: Decimal;
   coins: number;
   inventory: Inventory;
@@ -104,7 +113,8 @@ export function hasOrderRequirements({
     if (name === "sfl") return sfl.gte(order.items[name] ?? 0);
 
     const amount = order.items[name] || new Decimal(0);
-    const count = inventory[name] || new Decimal(0);
+
+    const { count } = getCountAndTypeForDelivery(state, name);
 
     return count.gte(amount);
   });
@@ -153,7 +163,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({
         })}
         style={{ paddingBottom: "20px" }}
       >
-        {hasOrderRequirements({ order, coins, sfl, inventory }) &&
+        {hasOrderRequirements({ order, coins, sfl, inventory, state }) &&
           !order.completedAt && (
             <img
               src={SUNNYSIDE.icons.heart}
@@ -175,7 +185,13 @@ export const OrderCard: React.FC<OrderCardProps> = ({
                 } else if (name === "sfl") {
                   img = token;
                 } else {
-                  img = ITEM_DETAILS[name].image;
+                  if (name in KNOWN_IDS) {
+                    img = ITEM_DETAILS[name as InventoryItemName]?.image;
+                  } else {
+                    img =
+                      getImageUrl(ITEM_IDS[name as BumpkinItem]) ??
+                      SUNNYSIDE.icons.expression_confused;
+                  }
                 }
 
                 return (
@@ -735,7 +751,9 @@ export const DeliveryOrders: React.FC<Props> = ({
                       key={`${itemName}-${index}-items`}
                       type="item"
                       item={itemName}
-                      balance={inventory[itemName] ?? new Decimal(0)}
+                      balance={
+                        getCountAndTypeForDelivery(state, itemName).count
+                      }
                       showLabel
                       requirement={
                         new Decimal(previewOrder?.items[itemName] ?? 0)
@@ -797,6 +815,7 @@ export const DeliveryOrders: React.FC<Props> = ({
                     sfl,
                     coins,
                     inventory,
+                    state,
                   }) && (
                     <Button
                       className="!text-xs !mt-0 !-mb-1"

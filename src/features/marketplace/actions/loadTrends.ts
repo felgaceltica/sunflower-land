@@ -1,17 +1,15 @@
-import { Collection, CollectionName } from "features/game/types/marketplace";
+import { MarketplaceTrends } from "features/game/types/marketplace";
 import { CONFIG } from "lib/config";
 import { ERRORS } from "lib/errors";
 
 const API_URL = CONFIG.API_URL;
 
-export async function loadCollection({
-  type,
+export async function loadTrends({
   token,
 }: {
-  type: CollectionName;
   token: string;
-}): Promise<Collection> {
-  const url = new URL(`${API_URL}/collection/${type}`);
+}): Promise<MarketplaceTrends> {
+  const url = new URL(`${API_URL}/marketplace/trends`);
 
   const response = await window.fetch(url.toString(), {
     method: "GET",
