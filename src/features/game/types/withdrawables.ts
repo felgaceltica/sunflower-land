@@ -50,7 +50,6 @@ import {
   MegaStoreCollectibleName,
   PotionHouseItemName,
   PurchasableItems,
-  SeasonalCollectibleName,
   SoldOutCollectibleName,
   TreasureCollectibleItem,
 } from "./collectibles";
@@ -88,6 +87,7 @@ import {
 import { canWithdrawBoostedWearable } from "./wearableValidation";
 import { FlowerName, FlowerSeedName, MutantFlowerName } from "./flowers";
 import { FactionShopCollectibleName, FactionShopFoodName } from "./factionShop";
+import { SeasonalCollectibleName } from "./megastore";
 
 const canWithdrawTimebasedItem = (availableAt: Date) => {
   const now = new Date();
@@ -95,7 +95,7 @@ const canWithdrawTimebasedItem = (availableAt: Date) => {
   return now >= availableAt;
 };
 
-const animalFood: Record<AnimalFoodName, () => boolean> = {
+export const animalFood: Record<AnimalFoodName, () => boolean> = {
   Hay: () => false,
   "Kernel Blend": () => false,
   NutriBarley: () => false,
@@ -456,6 +456,7 @@ const coupons: Record<Coupons, () => boolean> = {
   "Sunflorian Emblem": () => false,
   Mark: () => false,
   Horseshoe: () => false,
+  "Trade Point": () => false,
 };
 
 const buildings: Record<BuildingName, () => boolean> = {
@@ -618,6 +619,7 @@ const consumables: Record<ConsumableName, () => boolean> = {
   "Sour Shake": () => false,
   "Spaghetti al Limone": () => false,
   "Lemon Cheesecake": () => false,
+  "Trade Cake": () => false,
 };
 
 const decorations: Record<ShopDecorationName, () => boolean> = {
@@ -804,11 +806,11 @@ const soldOut: Record<SoldOutCollectibleName, () => boolean> = {
   "Tomato Clown": () => canWithdrawTimebasedItem(new Date("2024-10-06")), // Last Auction 5th October
   Pyramid: () => true,
   Oasis: () => true,
-  "Moo-ver": () => false,
-  "Swiss Whiskers": () => false,
-  Cluckulator: () => false,
-  UFO: () => false,
-  "Black Sheep": () => false,
+  "Moo-ver": () => hasSeasonEnded("Bull Run"),
+  "Swiss Whiskers": () => hasSeasonEnded("Bull Run"),
+  Cluckulator: () => hasSeasonEnded("Bull Run"),
+  UFO: () => hasSeasonEnded("Bull Run"),
+  "Black Sheep": () => hasSeasonEnded("Bull Run"),
 };
 
 const achievementDecoration: Record<AchievementDecorationName, () => boolean> =
@@ -926,6 +928,13 @@ const eventDecoration: Record<EventDecorationName, () => boolean> = {
   "Halloween Scarecrow": () => true,
   "Vampire Bear": () => true,
   "Super Totem": () => false,
+
+  "Christmas Stocking": () => canWithdrawTimebasedItem(new Date("2025-01-01")),
+  "Golden Christmas Stocking": () =>
+    canWithdrawTimebasedItem(new Date("2025-01-01")),
+  "Cozy Fireplace": () => canWithdrawTimebasedItem(new Date("2025-01-01")),
+  "Christmas Rug": () => canWithdrawTimebasedItem(new Date("2025-01-01")),
+  "Christmas Candle": () => canWithdrawTimebasedItem(new Date("2025-01-01")),
 };
 
 const lanterns: Record<LanternName, () => boolean> = {
@@ -974,7 +983,7 @@ const exoticCrops: Record<ExoticCropName, () => boolean> = {
   Chiogga: () => false,
 };
 
-const bait: Record<FishingBait, () => boolean> = {
+export const bait: Record<FishingBait, () => boolean> = {
   Earthworm: () => false,
   Grub: () => false,
   "Red Wiggler": () => false,
@@ -1084,6 +1093,7 @@ const seasonalStore: Record<SeasonalCollectibleName, () => boolean> = {
   Meteorite: () => hasSeasonEnded("Bull Run"),
   "Sheaf of Plenty": () => hasSeasonEnded("Bull Run"),
   "Mechanical Bull": () => hasSeasonEnded("Bull Run"),
+  "Crop Circle": () => hasSeasonEnded("Bull Run"),
 };
 
 const greenHouseFruitSeed: Record<GreenHouseFruitSeedName, () => boolean> = {
@@ -1546,7 +1556,7 @@ export const BUMPKIN_WITHDRAWABLES: Record<
   "Seedling Hat": () => false,
   "Stormy Dumbo": () => false,
   "Ugly Christmas Sweater": () => true,
-  "Candy Cane": () => true,
+  "Candy Cane": () => canWithdrawTimebasedItem(new Date("2025-01-01")),
   "Elf Hat": () => true,
   "Elf Potion": () =>
     canWithdrawTimebasedItem(SEASONS["Pharaoh's Treasure"].endDate),
@@ -1751,7 +1761,7 @@ export const BUMPKIN_WITHDRAWABLES: Record<
   "Milk Apron": (state) =>
     canWithdrawBoostedWearable("Milk Apron", state) &&
     hasSeasonEnded("Bull Run"),
-  "Shepherd Staff": () => false,
+  "Shepherd Staff": () => hasSeasonEnded("Bull Run"),
   "Sol & Luna": () => false,
   "Fossil Armor": () => false,
   "Fossil Pants": () => false,
@@ -1762,4 +1772,5 @@ export const BUMPKIN_WITHDRAWABLES: Record<
   "Adventurer's Suit": () => true,
   "Adventurer's Torch": () => true,
   "Pumpkin Head": () => true,
+  "Gingerbread Onesie": () => canWithdrawTimebasedItem(new Date("2025-01-01")),
 };

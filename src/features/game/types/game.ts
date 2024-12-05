@@ -34,7 +34,6 @@ import {
   MegaStoreCollectibleName,
   PotionHouseItemName,
   PurchasableItems,
-  SeasonalCollectibleName,
   SoldOutCollectibleName,
   TreasureCollectibleItem,
 } from "./collectibles";
@@ -85,6 +84,8 @@ import {
   RecipeWearableName,
 } from "../lib/crafting";
 import { AnimalBuildingLevel } from "../events/landExpansion/upgradeBuilding";
+import { SeasonalCollectibleName } from "./megastore";
+import { TradeFood } from "../events/landExpansion/redeemTradeReward";
 
 export type Reward = {
   coins?: number;
@@ -221,6 +222,7 @@ export type Coupons =
   | "Farmhand"
   | "Prize Ticket"
   | "Mark"
+  | "Trade Point"
   | Keys
   | SeasonalTicket
   | FactionEmblem;
@@ -332,6 +334,9 @@ export const COUPONS: Record<Coupons, { description: string }> = {
   },
   Horseshoe: {
     description: translate("description.horseshoe"),
+  },
+  "Trade Point": {
+    description: translate("description.trade.points"),
   },
 };
 
@@ -464,7 +469,8 @@ export type InventoryItemName =
   | LoveAnimalItem
   | BedName
   | RecipeCraftableName
-  | SeasonalCollectibleName;
+  | SeasonalCollectibleName
+  | TradeFood;
 
 export type Inventory = Partial<Record<InventoryItemName, Decimal>>;
 
@@ -819,7 +825,9 @@ export type Party = {
 export type Order = {
   id: string;
   from: NPCName;
-  items: Partial<Record<InventoryItemName | "coins" | "sfl", number>>;
+  items: Partial<
+    Record<InventoryItemName | BumpkinItem | "coins" | "sfl", number>
+  >;
   reward: {
     sfl?: number;
     coins?: number;
@@ -1020,8 +1028,12 @@ export type TradeListing = {
   items: Partial<Record<MarketplaceTradeableName, number>>;
   sfl: number;
   createdAt: number;
+  collection: CollectionName;
   boughtAt?: number;
   buyerId?: number;
+  signature?: string;
+  fulfilledAt?: number;
+  fulfilledById?: number;
 };
 
 export type TradeOffer = {
@@ -1048,6 +1060,14 @@ export type Fishing = {
   dailyAttempts?: {
     [date: string]: number;
   };
+  extraReels?: ExtraReels;
+};
+
+export type ExtraReels = {
+  timesBought?: {
+    [date: string]: number;
+  };
+  count: number;
 };
 
 export type Christmas = {
@@ -1244,13 +1264,13 @@ export type Animal = {
   type: AnimalType;
   state: AnimalState;
   createdAt: number;
-  coordinates: Coordinates;
   experience: number;
   asleepAt: number;
   awakeAt: number;
   lovedAt: number;
   item: LoveAnimalItem;
   multiplier?: number;
+  reward?: Reward;
 };
 
 export type AnimalBuilding = {
@@ -1258,8 +1278,13 @@ export type AnimalBuilding = {
   animals: Record<string, Animal>;
 };
 
+export type Bank = {
+  taxFreeSFL: number;
+};
+
 export interface GameState {
   home: Home;
+  bank: Bank;
 
   rewards: Rewards;
 
@@ -1407,6 +1432,7 @@ export interface GameState {
   trades: {
     listings?: Record<string, TradeListing>;
     offers?: Record<string, TradeOffer>;
+    tradePoints?: number;
     dailyListings?: { date: number; count: number };
     dailyPurchases?: { date: number; count: number };
   };

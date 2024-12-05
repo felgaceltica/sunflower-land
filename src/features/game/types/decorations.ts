@@ -114,7 +114,12 @@ export type EventDecorationName =
   | "Earn Alliance Banner"
   | "Halloween Scarecrow"
   | "Vampire Bear"
-  | "Super Totem";
+  | "Super Totem"
+  | "Christmas Stocking"
+  | "Golden Christmas Stocking"
+  | "Cozy Fireplace"
+  | "Christmas Rug"
+  | "Christmas Candle";
 
 export type PotionHouseDecorationName =
   | "Giant Potato"
@@ -126,13 +131,6 @@ export type InteriorDecorationName = "Rug" | "Wardrobe";
 export type AnimalDecorationName = "Wagon";
 
 export const DECORATION_TEMPLATES = {
-  "Crop Circle": {
-    dimensions: {
-      width: 2,
-      height: 2,
-    },
-    isWithdrawable: () => false,
-  },
   "King of Bears": {
     dimensions: {
       width: 3,
@@ -727,6 +725,26 @@ export const DECORATION_DIMENSIONS: Record<DecorationName, Dimensions> = {
     height: 1,
   },
   "Super Totem": {
+    width: 1,
+    height: 1,
+  },
+  "Christmas Stocking": {
+    width: 1,
+    height: 1,
+  },
+  "Golden Christmas Stocking": {
+    width: 1,
+    height: 1,
+  },
+  "Cozy Fireplace": {
+    width: 2,
+    height: 1,
+  },
+  "Christmas Rug": {
+    width: 3,
+    height: 2,
+  },
+  "Christmas Candle": {
     width: 1,
     height: 1,
   },

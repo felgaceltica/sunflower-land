@@ -1275,7 +1275,7 @@ describe("deliver", () => {
     expect(state.coins).toEqual(100);
   });
 
-  it("gives 50% more Coins profit on completed fruit deliveries if player has Fruity Profit skill", () => {
+  it("gives 100% (x2) more Coins profit on completed fruit deliveries if player has Fruity Profit skill", () => {
     const state = deliverOrder({
       state: {
         ...TEST_FARM,
@@ -1313,7 +1313,7 @@ describe("deliver", () => {
       },
     });
 
-    expect(state.coins).toEqual(480);
+    expect(state.coins).toEqual(640);
   });
 
   it("does not give Fruity Profit bonus if item is not fruit", () => {
@@ -1535,5 +1535,44 @@ describe("deliver", () => {
     });
 
     expect(state.inventory[getSeasonalTicket()]).toEqual(new Decimal(10));
+  });
+
+  it("can deliver items from the wardrobe", () => {
+    const state = deliverOrder({
+      state: {
+        ...TEST_FARM,
+        coins: 6400,
+        bumpkin: {
+          ...INITIAL_BUMPKIN,
+          equipped: {
+            ...INITIAL_BUMPKIN.equipped,
+            hair: "Explorer Hair",
+          },
+        },
+        wardrobe: {
+          "Basic Hair": 1,
+        },
+        delivery: {
+          ...TEST_FARM.delivery,
+          orders: [
+            {
+              id: "123",
+              createdAt: 0,
+              readyAt: new Date("2024-09-10").getTime(),
+              from: "cornwell",
+              items: { "Basic Hair": 1 },
+              reward: {},
+            },
+          ],
+        },
+      },
+      action: {
+        id: "123",
+        type: "order.delivered",
+      },
+    });
+
+    expect(state.wardrobe["Basic Hair"]).toEqual(0);
+    expect(state.inventory[getSeasonalTicket()]).toEqual(new Decimal(4));
   });
 });
