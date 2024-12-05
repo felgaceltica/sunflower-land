@@ -5,7 +5,6 @@ import { Button } from "components/ui/Button";
 import { Context } from "features/game/GameProvider";
 import { getKeys } from "features/game/types/craftables";
 import {
-  FactionEmblem,
   GameState,
   Inventory,
   InventoryItemName,
@@ -30,7 +29,6 @@ import { ModalContext } from "features/game/components/modal/ModalProvider";
 import { VIPAccess } from "features/game/components/VipAccess";
 import { getDayOfYear } from "lib/utils/time";
 import { ListingCategoryCard } from "components/ui/ListingCategoryCard";
-import { FACTION_EMBLEMS } from "features/game/events/landExpansion/joinFaction";
 import { NumberInput } from "components/ui/NumberInput";
 import {
   TRADE_LIMITS,
@@ -479,9 +477,13 @@ export const Trade: React.FC<{
   );
 
   const resourceListings = getKeys(trades).filter((listingId) => {
-    const items = Object.keys(trades[listingId].items);
-    return !items.some((item) =>
-      Object.values(FACTION_EMBLEMS).includes(item as FactionEmblem),
+    const listing = trades[listingId];
+    const collection = listing.collection;
+    const item = getKeys(listing.items)[0];
+
+    return (
+      getKeys(TRADE_LIMITS).includes(item as InventoryItemName) &&
+      collection === "collectibles"
     );
   });
 
