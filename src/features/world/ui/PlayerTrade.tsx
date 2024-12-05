@@ -21,6 +21,7 @@ import token from "assets/icons/sfl.webp";
 import { AuthMachineState } from "features/auth/lib/authMachine";
 import { MachineState } from "features/game/lib/gameMachine";
 import { CannotTrade } from "./CannotTrade";
+import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
 
 const _rawToken = (state: AuthMachineState) => state.context.user.rawToken;
 
@@ -66,7 +67,20 @@ export const PlayerTrade: React.FC<Props> = ({ farmId, onClose }) => {
       const farm = await loadGameStateForVisit(farmId, rawToken);
 
       const listings = farm.state.trades?.listings;
-      setListings(listings);
+
+      // Filter out listings related to the marketplace
+      const filteredListings = Object.entries(listings ?? {}).filter(
+        ([_, listing]) => {
+          const item = getKeys(listing.items)[0];
+
+          return (
+            listing.collection === "collectibles" &&
+            getKeys(TRADE_LIMITS).includes(item as InventoryItemName)
+          );
+        },
+      );
+
+      setListings(Object.fromEntries(filteredListings));
 
       setIsLoading(false);
     };
