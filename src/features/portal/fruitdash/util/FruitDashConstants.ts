@@ -87,15 +87,7 @@ export const BONUS_SCORE_TABLE_CHRISTMAS: {
     description: "250 base points - Chance after 500 points",
   },
   1: {
-    item: "world/fruitdash/christmas/gift1.png",
-    description: "20 base points",
-  },
-  2: {
-    item: "world/fruitdash/christmas/gift2.png",
-    description: "20 base points",
-  },
-  3: {
-    item: "world/fruitdash/christmas/gift3.png",
+    item: "world/fruitdash/christmas/candy.png",
     description: "20 base points",
   },
 };

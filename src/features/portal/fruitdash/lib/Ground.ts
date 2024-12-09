@@ -107,9 +107,10 @@ export class FruitDashGroundFactory {
       "frozenduck",
       "world/fruitdash/christmas/frozenduck.png",
     );
-    this._scene.load.image("gift1", "world/fruitdash/christmas/gift1.png");
-    this._scene.load.image("gift2", "world/fruitdash/christmas/gift2.png");
-    this._scene.load.image("gift3", "world/fruitdash/christmas/gift3.png");
+    this._scene.load.image("candy", "world/fruitdash/christmas/candy.png");
+    // this._scene.load.image("gift1", "world/fruitdash/christmas/gift1.png");
+    // this._scene.load.image("gift2", "world/fruitdash/christmas/gift2.png");
+    // this._scene.load.image("gift3", "world/fruitdash/christmas/gift3.png");
     this._scene.load.image(
       "fence_halloween",
       "world/fruitdash/fence_halloween.png",
