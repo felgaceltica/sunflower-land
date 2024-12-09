@@ -13,6 +13,7 @@ import {
 import weightedRandom from "../util/Utils";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { getHalloweenModeSetting } from "../util/useIsHalloweenMode";
+import { getIsTimedEvent } from "../util/useIsTimedEvent";
 
 export class FruitDashDecorationFactory {
   private _scene: FruitDashBaseScene;
@@ -20,12 +21,16 @@ export class FruitDashDecorationFactory {
   private decorations: any = {};
   private decorationsLines: Phaser.GameObjects.Container[] = [];
   private IS_HALLOWEEN = false;
+  private IS_CHRISTMAS = false;
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
     this.IS_HALLOWEEN = getHalloweenModeSetting();
+    this.IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
     if (this.IS_HALLOWEEN) {
       this.decorations["tree"] = new HalloweenTreeDecoration(60);
+    } else if (this.IS_CHRISTMAS) {
+      this.decorations["tree"] = new ChristmasTreeDecoration(60);
     } else {
       this.decorations["tree"] = new TreeDecoration(60);
     }
@@ -96,6 +101,28 @@ abstract class FruitDashDecoration {
   abstract add(scene: Phaser.Scene): Phaser.GameObjects.Container;
   getWeight(): number {
     return this._weight;
+  }
+}
+class ChristmasTreeDecoration extends FruitDashDecoration {
+  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
+    const containerbase = scene.add.container(
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+    );
+    const baseX = getBaseXL(2);
+    const container = scene.add.container(baseX, 0);
+    const image = scene.add.image(0, 0, "christmas_tree");
+    image.setOrigin(0, 0);
+    container.add(image);
+    containerbase.add(container);
+
+    const baseX1 = getBaseXR(2);
+    const container1 = scene.add.container(baseX1, 0);
+    const image1 = scene.add.image(0, 0, "christmas_tree");
+    image1.setOrigin(0, 0);
+    container1.add(image1);
+    containerbase.add(container1);
+    return containerbase;
   }
 }
 class HalloweenTreeDecoration extends FruitDashDecoration {

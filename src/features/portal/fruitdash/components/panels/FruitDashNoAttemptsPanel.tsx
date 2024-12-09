@@ -10,6 +10,7 @@ import { PortalMachineState } from "../../lib/FruitDashMachine";
 import sfl from "assets/icons/sfl.webp";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import {
+  FRUIT_DASH_NPC_NAME,
   FRUIT_DASH_NPC_WEREABLES,
   RESTOCK_ATTEMPTS,
   RESTOCK_ATTEMPTS_SFL,
@@ -32,7 +33,9 @@ export const FruitDashNoAttemptsPanel: React.FC = () => {
   const sflBalance = useSelector(portalService, _sflBalance);
 
   return (
-    <CloseButtonPanel bumpkinParts={FRUIT_DASH_NPC_WEREABLES["Felga"]}>
+    <CloseButtonPanel
+      bumpkinParts={FRUIT_DASH_NPC_WEREABLES[FRUIT_DASH_NPC_NAME]}
+    >
       <div className="p-2">
         <div className="flex gap-1 justify-between items-center mb-2">
           <Label icon={SUNNYSIDE.icons.lock} type="danger">

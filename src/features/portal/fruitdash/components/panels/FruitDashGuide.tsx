@@ -7,14 +7,17 @@ import { ITEM_DETAILS } from "features/game/types/images";
 import { Label } from "components/ui/Label";
 import {
   BONUS_SCORE_TABLE,
+  BONUS_SCORE_TABLE_CHRISTMAS,
   BONUS_SCORE_TABLE_HALLOWEEN,
   OBSTACLES_SCORE_TABLE,
+  OBSTACLES_SCORE_TABLE_CHRISTMAS,
   OBSTACLES_SCORE_TABLE_HALLOWEEN,
   POWERUPS_SCORE_TABLE,
 } from "../../util/FruitDashConstants";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
 import { getHalloweenModeSetting } from "../../util/useIsHalloweenMode";
+import { getIsTimedEvent } from "../../util/useIsTimedEvent";
 
 type Props = {
   onBack: () => void;
@@ -24,7 +27,7 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
   const { t } = useAppTranslation();
   const button = useSound("button");
   const IS_HALLOWEEN = getHalloweenModeSetting();
-
+  const IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
   return (
     <div className="flex flex-col gap-1 max-h-[75vh]">
       {/* title */}
@@ -127,7 +130,11 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
         <table className="w-full text-xs table-fixed border-collapse">
           <tbody>
             {Object.values(
-              IS_HALLOWEEN ? BONUS_SCORE_TABLE_HALLOWEEN : BONUS_SCORE_TABLE,
+              IS_HALLOWEEN
+                ? BONUS_SCORE_TABLE_HALLOWEEN
+                : IS_CHRISTMAS
+                  ? BONUS_SCORE_TABLE_CHRISTMAS
+                  : BONUS_SCORE_TABLE,
             ).map(({ item, description }, index) => (
               <tr key={index}>
                 <td
@@ -157,7 +164,9 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
             {Object.values(
               IS_HALLOWEEN
                 ? OBSTACLES_SCORE_TABLE_HALLOWEEN
-                : OBSTACLES_SCORE_TABLE,
+                : IS_CHRISTMAS
+                  ? OBSTACLES_SCORE_TABLE_CHRISTMAS
+                  : OBSTACLES_SCORE_TABLE,
             ).map(({ item, description }, index) => (
               <tr key={index}>
                 <td

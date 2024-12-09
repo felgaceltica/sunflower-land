@@ -5,7 +5,10 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { FruitDashMission } from "./FruitDashMission";
 import { FruitDashDonations } from "./FruitDashDonations";
-import { FRUIT_DASH_NPC_WEREABLES } from "../../util/FruitDashConstants";
+import {
+  FRUIT_DASH_NPC_NAME,
+  FRUIT_DASH_NPC_WEREABLES,
+} from "../../util/FruitDashConstants";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -27,7 +30,7 @@ export const FruitDashRulesPanel: React.FC<Props> = ({
   return (
     <CloseButtonPanel
       className="overflow-y-hidden"
-      bumpkinParts={FRUIT_DASH_NPC_WEREABLES["Felga"]}
+      bumpkinParts={FRUIT_DASH_NPC_WEREABLES[FRUIT_DASH_NPC_NAME]}
       currentTab={tab}
       setCurrentTab={setTab}
       tabs={[

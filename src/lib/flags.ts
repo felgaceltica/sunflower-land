@@ -21,9 +21,13 @@ const betaTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
   return defaultFeatureFlag(game) || Date.now() > date.getTime();
 };
 
-const periodBasedFeatureFlag = (startDate: Date, endDate: Date) => () => {
-  return Date.now() > startDate.getTime() && Date.now() < endDate.getTime();
-};
+const periodBasedFeatureFlag =
+  (startDate: Date, endDate: Date) => (game: GameState) => {
+    return (
+      defaultFeatureFlag(game) ||
+      (Date.now() > startDate.getTime() && Date.now() < endDate.getTime())
+    );
+  };
 
 // Used for testing production features
 export const ADMIN_IDS = [1, 3, 51, 39488, 128727];
@@ -56,9 +60,9 @@ const featureFlags = {
   CROP_QUICK_SELECT: () => false,
   FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2024-09-10T00:00:00Z")),
   FRUIT_DASH_HALLOWEEN: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
-  FRUIT_DASH_HALLOWEEN_EVENT: periodBasedFeatureFlag(
-    new Date("2024-10-30T00:00:00Z"),
-    new Date("2024-11-05T00:00:00Z"),
+  FRUIT_DASH_TIMED_EVENT: periodBasedFeatureFlag(
+    new Date("2024-12-16T00:00:00Z"),
+    new Date("2024-12-26T00:00:00Z"),
   ),
   PORTALS: testnetFeatureFlag,
   JEST_TEST: defaultFeatureFlag,
@@ -76,6 +80,8 @@ const featureFlags = {
   BULL_RUN_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
   BALE_AOE_END: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
 } satisfies Record<string, FeatureFlag>;
+
+export const TIMED_EVENT_NAME = "CHRISTMAS";
 
 export type FeatureName = keyof typeof featureFlags;
 

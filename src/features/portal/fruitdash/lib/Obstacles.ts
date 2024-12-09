@@ -15,6 +15,7 @@ import { FruitDashBaseScene } from "./FruitDashBaseScene";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import { InventoryItemName } from "features/game/types/game";
 import { getHalloweenModeSetting } from "../util/useIsHalloweenMode";
+import { getIsTimedEvent } from "../util/useIsTimedEvent";
 
 export class FruitDashObstacleFactory {
   private _scene: FruitDashBaseScene;
@@ -23,11 +24,13 @@ export class FruitDashObstacleFactory {
   private obstaclesLines: Phaser.GameObjects.Container[] = [];
   private throwableLines: Phaser.GameObjects.Container[] = [];
   private IS_HALLOWEEN = false;
+  private IS_CHRISTMAS = false;
   private deadObstacles: number;
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
     this.deadObstacles = 0;
     this.IS_HALLOWEEN = getHalloweenModeSetting();
+    this.IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
     // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
     //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
@@ -49,6 +52,19 @@ export class FruitDashObstacleFactory {
       this.obstacles["gravestone"] = new GraveStoneObstacle(50, 2, "obstacle");
       //Points
       this.obstacles["fruit"] = new FruitHalloweenObstacle(50, 20, "bounty");
+    } else if (this.IS_CHRISTMAS) {
+      this.obstacles["oilpit"] = new OilPitCristmasObstacle(20, 5, "obstacle");
+      this.obstacles["rock"] = new RockObstacle(100, 2, "obstacle");
+      this.obstacles["largerock"] = new FrozenDuckChristmasObstacle(
+        20,
+        5,
+        "obstacle",
+      );
+      this.obstacles["crate"] = new CrateChristmasObstacle(40, 2, "obstacle");
+      this.obstacles["crate1"] = new Crate1ChristmasObstacle(40, 2, "obstacle");
+      this.obstacles["gravestone"] = new GraveStoneObstacle(20, 2, "obstacle");
+      //Points
+      this.obstacles["fruit"] = new FruitChristmasObstacle(50, 20, "bounty");
     } else {
       this.obstacles["oilpit"] = new OilPitObstacle(20, 5, "obstacle");
       this.obstacles["rock"] = new RockObstacle(100, 2, "obstacle");
@@ -691,6 +707,84 @@ class GraveStoneObstacle extends FruitDashObstacle {
   }
 }
 
+class CrateChristmasObstacle extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE_HALLOWEEN * 2,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "crate");
+    image.setScale((SQUARE_WIDTH_TEXTURE - 5) / SQUARE_WIDTH_TEXTURE_HALLOWEEN);
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Rectangle(
+      0,
+      2,
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE,
+    );
+    Phaser.Geom.Rectangle.Inflate(rect, -3, -3);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeRectShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionRect(rect);
+    return container;
+  }
+}
+
+class Crate1ChristmasObstacle extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE_HALLOWEEN * 2,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "crate1");
+    image.setScale((SQUARE_WIDTH_TEXTURE - 5) / SQUARE_WIDTH_TEXTURE_HALLOWEEN);
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const rect = new Phaser.Geom.Rectangle(
+      0,
+      1,
+      SQUARE_WIDTH_TEXTURE,
+      SQUARE_WIDTH_TEXTURE,
+    );
+    Phaser.Geom.Rectangle.Inflate(rect, -3, -3);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      //  Draw the now deflated rectangle in yellow
+      graphics.lineStyle(1, 0xffff00);
+      graphics.strokeRectShape(rect);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionRect(rect);
+    return container;
+  }
+}
+
 class GraveStoneHalloweenObstacle extends FruitDashObstacle {
   add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
     const container = new FruitDashObstacleContainer(
@@ -823,6 +917,43 @@ class StoneRockObstacle extends FruitDashObstacle {
   }
 }
 
+class FrozenDuckChristmasObstacle extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE_HALLOWEEN * 3,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "frozenduck");
+    image.scale = 1.2;
+    image.setOrigin(0, 0);
+    container.add(image);
+    const shape = new Phaser.Geom.Circle(
+      SQUARE_WIDTH_TEXTURE - 2,
+      SQUARE_WIDTH_TEXTURE - 5,
+      SQUARE_WIDTH_TEXTURE,
+    );
+    shape.radius = shape.radius * 0.7;
+    //Phaser.Geom.Rectangle.Inflate(rect, -7, -2);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      graphics.strokeCircleShape(shape);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    const baseX = getBaseX(shape.x, shape.radius);
+    container.setCollisionCircle(shape);
+    return container;
+  }
+}
+
 class StoneRockHalloweenObstacle extends FruitDashObstacle {
   add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
     const container = new FruitDashObstacleContainer(
@@ -885,6 +1016,42 @@ class OilPitObstacle extends FruitDashObstacle {
       "SunnySideSprites",
       3508,
     );
+    image.setOrigin(0, 0);
+    container.add(image);
+    const bounds = container.getBounds();
+    const shape = new Phaser.Geom.Circle(
+      bounds.width / 2,
+      bounds.height / 2,
+      bounds.width / 2,
+    );
+    shape.radius = shape.radius * 0.7;
+    //Phaser.Geom.Rectangle.Inflate(rect, -7, -2);
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      graphics.strokeCircleShape(shape);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionCircle(shape);
+    return container;
+  }
+}
+
+class OilPitCristmasObstacle extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const container = new FruitDashObstacleContainer(
+      scene,
+      PLAYER_MIN_X,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._type,
+      name,
+    );
+    const image = scene.add.image(0, 0, "oilpit_christmas");
     image.setOrigin(0, 0);
     container.add(image);
     const bounds = container.getBounds();
@@ -1233,6 +1400,43 @@ class FruitHalloweenObstacle extends FruitDashObstacle {
       SQUARE_WIDTH_TEXTURE / 2 - 1,
       SQUARE_WIDTH_TEXTURE / 2,
       SQUARE_WIDTH_TEXTURE / 2,
+    );
+    shape.radius = shape.radius * 0.8;
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      graphics.strokeCircleShape(shape);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionCircle(shape);
+    return container;
+  }
+}
+class FruitChristmasObstacle extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const fruits = ["gift1", "gift2", "gift3"];
+    const fruit = fruits[randomInt(0, fruits.length)];
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._type,
+      fruit,
+    );
+    const image = scene.add.image(0, 0, fruit);
+    //image.scale = 0.8;
+    image.setOrigin(0, 0.2);
+    container.add(image);
+    const bounds = container.getBounds();
+    const shape = new Phaser.Geom.Circle(
+      bounds.width / 2,
+      bounds.height / 2,
+      bounds.width / 2,
     );
     shape.radius = shape.radius * 0.8;
     if (scene.physics.world.drawDebug) {

@@ -2,6 +2,7 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { Equipped } from "features/game/types/bumpkin";
 import { ITEM_DETAILS } from "features/game/types/images";
 import fisherHourglassFull from "assets/factions/boosts/fish_boost_full.webp";
+import { getIsTimedEvent } from "../util/useIsTimedEvent";
 
 export const ZOOM = window.innerWidth < 500 ? 2 : 3;
 export const SQUARE_WIDTH_TEXTURE = 18;
@@ -75,6 +76,30 @@ export const BONUS_SCORE_TABLE_HALLOWEEN: {
   1: { item: "world/fruitdash/pumpkim.png", description: "20 base points" },
 };
 
+export const BONUS_SCORE_TABLE_CHRISTMAS: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: {
+    item: ITEM_DETAILS["Pirate Bounty"].image,
+    description: "250 base points - Chance after 500 points",
+  },
+  1: {
+    item: "world/fruitdash/christmas/gift1.png",
+    description: "20 base points",
+  },
+  2: {
+    item: "world/fruitdash/christmas/gift2.png",
+    description: "20 base points",
+  },
+  3: {
+    item: "world/fruitdash/christmas/gift3.png",
+    description: "20 base points",
+  },
+};
+
 export const OBSTACLES_SCORE_TABLE: {
   [key: number]: {
     item: string;
@@ -97,6 +122,22 @@ export const OBSTACLES_SCORE_TABLE_HALLOWEEN: {
   1: { item: "world/fruitdash/tree_halloween.png", description: "5 points" },
   2: { item: SUNNYSIDE.resource.stone_small, description: "2 points" },
   3: { item: "world/fruitdash/skullbox.png", description: "2 points" },
+  4: { item: SUNNYSIDE.decorations.bonniesTombstone, description: "2 points" },
+};
+
+export const OBSTACLES_SCORE_TABLE_CHRISTMAS: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: { item: "world/fruitdash/christmas/oilpit.png", description: "5 points" },
+  1: {
+    item: "world/fruitdash/christmas/frozenduck.png",
+    description: "5 points",
+  },
+  2: { item: SUNNYSIDE.resource.stone_small, description: "2 points" },
+  3: { item: "world/fruitdash/christmas/crate.png", description: "2 points" },
   4: { item: SUNNYSIDE.decorations.bonniesTombstone, description: "2 points" },
 };
 export const POWERUPS_SCORE_TABLE: {
@@ -134,7 +175,7 @@ export const INITIAL_WALK_SPEED = 100;
 export const MAX_WALK_SPEED = 170;
 export const WALK_SPEED_INCREMENT = 5;
 export const BACKGROUND_SPEED_RATIO = 2;
-export type FruitDashNPCName = "Felga";
+export type FruitDashNPCName = "Felga" | "Felga Christmas";
 export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
   Felga: {
     hair: "Basic Hair",
@@ -146,5 +187,19 @@ export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
     shoes: "Yellow Boots",
     tool: "Farmer Pitchfork",
   },
+  "Felga Christmas": {
+    hair: "Basic Hair",
+    shirt: "Skull Shirt",
+    pants: "Farmer Pants",
+    background: "Seashore Background",
+    hat: "Santa Hat",
+    body: "Beige Farmer Potion",
+    shoes: "Yellow Boots",
+    tool: "Farmer Pitchfork",
+  },
 };
+export const FRUIT_DASH_NPC_NAME = getIsTimedEvent("CHRISTMAS")
+  ? "Felga Christmas"
+  : "Felga";
+//https://opengameart.org/content/christmas-village-asset-pack
 export const SQUARE_WIDTH_TEXTURE_HALLOWEEN = 16;

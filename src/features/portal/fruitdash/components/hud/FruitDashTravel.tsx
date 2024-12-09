@@ -11,7 +11,10 @@ import { PortalMachineState } from "../../lib/FruitDashMachine";
 import { useSound } from "lib/utils/hooks/useSound";
 import classNames from "classnames";
 import { isTouchDevice } from "features/world/lib/device";
-import { FRUIT_DASH_NPC_WEREABLES } from "../../util/FruitDashConstants";
+import {
+  FRUIT_DASH_NPC_NAME,
+  FRUIT_DASH_NPC_WEREABLES,
+} from "../../util/FruitDashConstants";
 
 const _isPlaying = (state: PortalMachineState) => state.matches("playing");
 const _isJoystickActive = (state: PortalMachineState) =>
@@ -83,7 +86,7 @@ export const FruitDashTravel: React.FC = () => {
         </div>
       </div>
       <ConfirmationModal
-        bumpkinParts={FRUIT_DASH_NPC_WEREABLES["Felga"]}
+        bumpkinParts={FRUIT_DASH_NPC_WEREABLES[FRUIT_DASH_NPC_NAME]}
         show={showExitConfirmation}
         onHide={() => setShowExitConfirmation(false)}
         messages={[t("fruit-dash.endGameConfirmation")]}

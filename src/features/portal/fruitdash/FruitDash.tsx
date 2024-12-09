@@ -20,7 +20,13 @@ import { FruitDashNoAttemptsPanel } from "./components/panels/FruitDashNoAttempt
 import AchievementToastProvider from "./providers/AchievementToastProvider";
 import { SpeakingModal } from "features/game/components/SpeakingModal";
 import { translate } from "lib/i18n/translate";
-import { FRUIT_DASH_NPC_WEREABLES } from "./util/FruitDashConstants";
+import {
+  FRUIT_DASH_NPC_NAME,
+  FRUIT_DASH_NPC_WEREABLES,
+} from "./util/FruitDashConstants";
+import { hasFeatureAccess } from "lib/flags";
+import { OFFLINE_FARM } from "features/game/lib/landData";
+import { useIsHalloweenMode } from "./util/useIsHalloweenMode";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
 const _isError = (state: PortalMachineState) => state.matches("error");
@@ -36,8 +42,15 @@ const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
 const _EntranceMessageMaxDate = new Date("2024-11-10T00:00:00Z");
 const _EntranceMessage = "fruit-dash.entrancemessage_1";
+const _timedEventName = "fruit-dash.christmasEvent";
 const _isReadEntranceMessage = hasReadFruitEntranceMessage();
+const _isReadTimedEventMessage = hasReadFruitDashTimedEventMessage();
 
+export function hasReadFruitDashTimedEventMessage() {
+  if (hasFeatureAccess(OFFLINE_FARM, "FRUIT_DASH_TIMED_EVENT"))
+    return !!localStorage.getItem(_timedEventName);
+  else return true;
+}
 export function hasReadFruitEntranceMessage() {
   if (Date.now() > _EntranceMessageMaxDate.getTime()) return true;
 
@@ -46,6 +59,10 @@ export function hasReadFruitEntranceMessage() {
 
 function acknowledgeFruitEntranceMessage() {
   return localStorage.setItem(_EntranceMessage, new Date().toISOString());
+}
+
+function acknowledgeFruitDashTimedEventMessage() {
+  return localStorage.setItem(_timedEventName, new Date().toISOString());
 }
 
 export const FruitDashApp: React.FC = () => {
@@ -57,12 +74,18 @@ export const FruitDashApp: React.FC = () => {
     </WalletProvider>
   );
 };
+const _state = (state: PortalMachineState) => state.context.state;
 
 export const FruitDash: React.FC = () => {
   const { portalService } = useContext(PortalContext);
+  const state = useSelector(portalService, _state);
+  const { changeHalloweenMode } = useIsHalloweenMode();
   const { t } = useAppTranslation();
   const [isReadEntranceMessage, setIsReadEntranceMessage] = useState(
     _isReadEntranceMessage,
+  );
+  const [isReadTimedEventMessage, setIsReadTimedEventMessage] = useState(
+    _isReadTimedEventMessage,
   );
   const sflBalance = useSelector(portalService, _sflBalance);
   const isError = useSelector(portalService, _isError);
@@ -141,7 +164,7 @@ export const FruitDash: React.FC = () => {
       {isIntroduction && !isReadEntranceMessage && (
         <Modal show>
           <SpeakingModal
-            bumpkinParts={FRUIT_DASH_NPC_WEREABLES["Felga"]}
+            bumpkinParts={FRUIT_DASH_NPC_WEREABLES[FRUIT_DASH_NPC_NAME]}
             message={[
               {
                 text: translate(_EntranceMessage),
@@ -162,7 +185,33 @@ export const FruitDash: React.FC = () => {
           />
         </Modal>
       )}
-      {isIntroduction && isReadEntranceMessage && (
+      {isIntroduction && !isReadTimedEventMessage && (
+        <Modal show>
+          <SpeakingModal
+            bumpkinParts={FRUIT_DASH_NPC_WEREABLES[FRUIT_DASH_NPC_NAME]}
+            message={[
+              {
+                text: translate(_timedEventName),
+                actions: [
+                  {
+                    text: translate("ok"),
+                    cb: () => {
+                      changeHalloweenMode(false);
+                      setIsReadTimedEventMessage(true);
+                      acknowledgeFruitDashTimedEventMessage();
+                      PubSub.publish("restartScene");
+                    },
+                  },
+                ],
+              },
+            ]}
+            onClose={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
+        </Modal>
+      )}
+      {isIntroduction && isReadEntranceMessage && isReadTimedEventMessage && (
         <Modal show>
           <FruitDashRulesPanel
             mode={"introduction"}
