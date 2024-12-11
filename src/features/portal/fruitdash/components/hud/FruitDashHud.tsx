@@ -50,7 +50,7 @@ export const FruitDashHud: React.FC = () => {
   }, [achievements]);
 
   return (
-    <HudContainer zIndex={99999}>
+    <HudContainer zIndex={"99999"}>
       <div>
         <div
           className="absolute"
