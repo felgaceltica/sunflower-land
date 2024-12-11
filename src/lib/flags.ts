@@ -57,6 +57,7 @@ const featureFlags = {
   SEASONAL_TIERS: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
   MARKETPLACE: defaultFeatureFlag,
   MARKETPLACE_ADMIN: adminFeatureFlag,
+  MARKETPLACE_REWARDS: adminFeatureFlag,
   CROP_QUICK_SELECT: () => false,
   FRUIT_DASH: betaTimeBasedFeatureFlag(new Date("2024-09-10T00:00:00Z")),
   FRUIT_DASH_HALLOWEEN: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
@@ -79,6 +80,18 @@ const featureFlags = {
   BEDS: timeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
   BULL_RUN_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
   BALE_AOE_END: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
+  HALLOWEEN_2024: defaultFeatureFlag,
+  CHRISTMAS_2024: (game: GameState) => {
+    if (Date.now() > new Date("2024-12-28").getTime()) {
+      return false;
+    }
+
+    if (Date.now() > new Date("2024-12-12").getTime()) {
+      return true;
+    }
+
+    return defaultFeatureFlag(game);
+  },
 } satisfies Record<string, FeatureFlag>;
 
 export const TIMED_EVENT_NAME = "CHRISTMAS";
