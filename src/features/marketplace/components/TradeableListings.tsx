@@ -23,8 +23,8 @@ import {
 import { useOnMachineTransition } from "lib/utils/hooks/useOnMachineTransition";
 import confetti from "canvas-confetti";
 import { ResourceTable } from "./ResourceTable";
-import { formatNumber, shortenCount } from "lib/utils/formatNumber";
-import { useParams } from "react-router-dom";
+import { formatNumber } from "lib/utils/formatNumber";
+import { useParams } from "react-router";
 import { PurchaseModalContent } from "./PurchaseModalContent";
 import { TradeableDisplay } from "../lib/tradeables";
 import { KNOWN_ITEMS } from "features/game/types";
@@ -78,9 +78,6 @@ export const TradeableListings: React.FC<TradeableListingsProps> = ({
     gameService,
     "marketplaceListing",
     "marketplaceListingSuccess",
-    () => {
-      if (showAnimations) confetti();
-    },
   );
 
   useOnMachineTransition<ContextType, BlockchainEvent>(
@@ -97,10 +94,7 @@ export const TradeableListings: React.FC<TradeableListingsProps> = ({
     gameService,
     "marketplaceListingCancellingSuccess",
     "playing",
-    () => {
-      reload();
-      if (showAnimations) confetti();
-    },
+    reload,
   );
 
   const handleSelectListing = (id: string) => {
@@ -152,11 +146,6 @@ export const TradeableListings: React.FC<TradeableListingsProps> = ({
             <Label icon={tradeIcon} type="default" className="mb-2">
               {t("marketplace.listings")}
             </Label>
-            <Label type="default" className="mb-2">
-              {t("marketplace.availableListings", {
-                count: shortenCount(tradeable?.listings.length ?? 0),
-              })}
-            </Label>
           </div>
           <div className="mb-2">
             {loading && <Loading />}
@@ -166,8 +155,9 @@ export const TradeableListings: React.FC<TradeableListingsProps> = ({
             {!!tradeable?.listings.length &&
               (isResource ? (
                 <ResourceTable
+                  isResource={isResource}
                   balance={balance}
-                  itemName={KNOWN_ITEMS[Number(params.id)]}
+                  details={display}
                   items={tradeable?.listings.map((listing) => ({
                     id: listing.id,
                     price: listing.sfl,
@@ -190,8 +180,8 @@ export const TradeableListings: React.FC<TradeableListingsProps> = ({
               ) : (
                 <ListingTable
                   listings={tradeable?.listings}
-                  collection={tradeable?.collection}
                   details={display}
+                  isResource={isResource}
                 />
               ))}
           </div>

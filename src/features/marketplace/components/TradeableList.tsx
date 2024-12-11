@@ -1,9 +1,12 @@
 import React, { useContext, useState } from "react";
-import { useActor } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import { Box } from "components/ui/Box";
 import { Label } from "components/ui/Label";
 import { Context } from "features/game/GameProvider";
-import { MARKETPLACE_TAX } from "features/game/types/marketplace";
+import {
+  CollectionName,
+  MARKETPLACE_TAX,
+} from "features/game/types/marketplace";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { signTypedData } from "@wagmi/core";
 import { config } from "features/wallet/WalletProvider";
@@ -38,6 +41,17 @@ import {
   getKeys,
 } from "features/game/types/craftables";
 import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
+import { ITEM_DETAILS } from "features/game/types/images";
+import { calculateTradePoints } from "features/game/events/landExpansion/addTradePoints";
+import { VIPAccess } from "features/game/components/VipAccess";
+import { hasVipAccess } from "features/game/lib/vipAccess";
+import { MachineState } from "features/game/lib/gameMachine";
+import { getDayOfYear } from "lib/utils/time";
+import { ModalContext } from "features/game/components/modal/ModalProvider";
+import { StoreOnChain } from "./StoreOnChain";
+
+const _isVIP = (state: MachineState) =>
+  hasVipAccess(state.context.state.inventory);
 
 type TradeableListItemProps = {
   authToken: string;
@@ -63,8 +77,27 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
   const [showItemInUseWarning, setShowItemInUseWarning] = useState(false);
   const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState(0);
+  const [needsSync, setNeedsSync] = useState(false);
+
+  const { openModal } = useContext(ModalContext);
+
+  const isVIP = useSelector(gameService, _isVIP);
 
   const { state } = gameState.context;
+
+  const getDailyListings = () => {
+    const today = getDayOfYear(new Date());
+    const dailyListings = gameState.context.state.trades.dailyListings ?? {
+      date: 0,
+      count: 0,
+    };
+
+    return dailyListings.date === today ? dailyListings.count : 0;
+  };
+
+  const dailyListings = getDailyListings();
+
+  const hasAccess = isVIP || dailyListings < 1;
 
   const tradeType = getTradeType({
     collection: display.type,
@@ -122,6 +155,25 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
     }
   };
 
+  const getOnChainStatus = (name: string, collection: CollectionName) => {
+    if (collection === "wearables") {
+      const prevBalance = state.previousWardrobe[name as BumpkinItem] ?? 0;
+
+      return prevBalance >= Math.max(1, quantity);
+    }
+
+    if (collection === "collectibles") {
+      const prevBalance =
+        state.previousInventory[name as InventoryItemName] ?? new Decimal(0);
+
+      return prevBalance.gte(Math.max(1, quantity));
+    }
+
+    if (collection === "buds") return true;
+
+    return false;
+  };
+
   // Otherwise show the list item UI
   const submitListing = () => {
     if (count > 0 && available === 0) {
@@ -130,6 +182,13 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
     }
 
     if (tradeType === "onchain") {
+      const isItemOnChain = getOnChainStatus(display.name, display.type);
+
+      if (!isItemOnChain) {
+        setNeedsSync(true);
+        return;
+      }
+
       setIsSigning(true);
       return;
     }
@@ -209,6 +268,24 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
     );
   }
 
+  if (needsSync) {
+    return (
+      <StoreOnChain
+        onClose={onClose}
+        itemName={display.name}
+        actionType="listing"
+      />
+    );
+  }
+
+  const estTradePoints =
+    price === 0
+      ? 0
+      : calculateTradePoints({
+          sfl: price,
+          points: tradeType === "instant" ? 1 : 5,
+        }).multipliedPoints;
+
   if (showConfirmation) {
     return (
       <>
@@ -221,6 +298,7 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
             display={display}
             sfl={price}
             quantity={Math.max(1, quantity)}
+            estTradePoints={estTradePoints}
           />
         </div>
 
@@ -247,6 +325,7 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
               display={display}
               sfl={price}
               quantity={Math.max(1, quantity)}
+              estTradePoints={estTradePoints}
             />
           </div>
 
@@ -278,6 +357,8 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
     );
   }
 
+  const usd = gameService.getSnapshot().context.prices.sfl?.usd ?? 0.0;
+
   return (
     <div className="flex flex-col">
       <div className="flex justify-between">
@@ -290,6 +371,17 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
           <Label type="formula" icon={walletIcon} className="my-1 mr-0.5">
             {t("marketplace.walletRequired")}
           </Label>
+        )}
+
+        {!hasAccess && (
+          <VIPAccess
+            isVIP={isVIP}
+            onUpgrade={() => {
+              openModal("BUY_BANNER");
+            }}
+            text={t("marketplace.unlockSelling")}
+            labelType={!isVIP && dailyListings >= 1 ? "danger" : undefined}
+          />
         )}
       </div>
       <div className="flex justify-between">
@@ -321,6 +413,9 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
                 maxDecimalPlaces={2}
                 icon={sflIcon}
               />
+              <p className="text-xxs ml-2">
+                {`$${new Decimal(usd).mul(price).toFixed(2)}`}
+              </p>
             </div>
             <div
               className="flex justify-between"
@@ -351,6 +446,7 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
             <div
               className="flex justify-between"
               style={{
+                borderBottom: "1px solid #ead4aa",
                 padding: "5px 5px 5px 2px",
               }}
             >
@@ -364,6 +460,24 @@ export const TradeableListItem: React.FC<TradeableListItemProps> = ({
                   showTrailingZeros: false,
                 },
               )} SFL`}</p>
+            </div>
+            <div
+              className="flex justify-between"
+              style={{
+                padding: "5px 5px 5px 2px",
+              }}
+            >
+              <span className="text-xs">{`Trade Points earned`}</span>
+              <div className="flex flex-row">
+                <p className="text-xs font-secondary mr-1">{`${formatNumber(
+                  new Decimal(estTradePoints),
+                  {
+                    decimalPlaces: 2,
+                    showTrailingZeros: false,
+                  },
+                )}`}</p>
+                <img src={ITEM_DETAILS["Trade Point"].image} />
+              </div>
             </div>
             <Label type="default" icon={lockIcon} className="my-1 -ml-0.5">
               {t("marketplace.itemSecured")}
