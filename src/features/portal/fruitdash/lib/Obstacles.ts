@@ -448,6 +448,7 @@ export class FruitDashObstacleFactory {
    * Kills the player
    */
   private killPlayer = () => {
+    this._scene.portalService?.send("GAME_OVER");
     if (!this._scene.currentPlayer?.body || !this._scene.isGamePlaying) {
       return;
     }
@@ -474,7 +475,6 @@ export class FruitDashObstacleFactory {
 
     playerDeath.on("animationcomplete", async () => {
       if (playerDeath.active) playerDeath.destroy();
-      this._scene.portalService?.send("GAME_OVER");
     });
   };
 }
