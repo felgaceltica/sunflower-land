@@ -448,13 +448,12 @@ export class FruitDashObstacleFactory {
    * Kills the player
    */
   private killPlayer = () => {
-    this._scene.portalService?.send("GAME_OVER");
-    if (!this._scene.currentPlayer?.body || !this._scene.isGamePlaying) {
+    if (!this._scene.currentPlayer || !this._scene.isGamePlaying) {
       return;
     }
-
+    this._scene.portalService?.send("GAME_OVER");
     // freeze player
-    this._scene.currentPlayer.setVisible(false);
+    this._scene.currentPlayer?.setVisible(false);
     if (!getAudioMutedSetting())
       this._scene.gameOverSound?.play({ volume: 0.15 });
 
@@ -466,7 +465,8 @@ export class FruitDashObstacleFactory {
       this._scene.currentPlayer.y - 1,
       spriteName,
     );
-    playerDeath.setDepth(this._scene.currentPlayer.body.position.y);
+    if (this._scene.currentPlayer?.body)
+      playerDeath.setDepth(this._scene.currentPlayer.body.position.y);
     playerDeath.play({ key: spriteKey });
     this._scene.speed = 0;
     if (this._scene.currentPlayer.directionFacing === "left") {
