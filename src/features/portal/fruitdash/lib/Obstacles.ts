@@ -457,25 +457,26 @@ export class FruitDashObstacleFactory {
     if (!getAudioMutedSetting())
       this._scene.gameOverSound?.play({ volume: 0.15 });
 
-    const spriteName = "player_death";
-    const spriteKey = "player_death_anim";
+    if (this._scene.currentPlayer?.body) {
+      const spriteName = "player_death";
+      const spriteKey = "player_death_anim";
 
-    const playerDeath = this._scene.add.sprite(
-      this._scene.currentPlayer.x,
-      this._scene.currentPlayer.y - 1,
-      spriteName,
-    );
-    if (this._scene.currentPlayer?.body)
+      const playerDeath = this._scene.add.sprite(
+        this._scene.currentPlayer.x,
+        this._scene.currentPlayer.y - 1,
+        spriteName,
+      );
       playerDeath.setDepth(this._scene.currentPlayer.body.position.y);
-    playerDeath.play({ key: spriteKey });
-    this._scene.speed = 0;
-    if (this._scene.currentPlayer.directionFacing === "left") {
-      playerDeath.setFlipX(true);
-    }
+      playerDeath.play({ key: spriteKey });
+      this._scene.speed = 0;
+      if (this._scene.currentPlayer.directionFacing === "left") {
+        playerDeath.setFlipX(true);
+      }
 
-    playerDeath.on("animationcomplete", async () => {
-      if (playerDeath.active) playerDeath.destroy();
-    });
+      playerDeath.on("animationcomplete", async () => {
+        if (playerDeath.active) playerDeath.destroy();
+      });
+    }
   };
 }
 class FruitDashObstacleContainer extends Phaser.GameObjects.Container {
