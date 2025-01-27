@@ -55,7 +55,7 @@ import { PlaceableLocation } from "../types/collectibles";
 import {
   getGameRulesLastRead,
   getIntroductionRead,
-  getSeasonPassRead,
+  getVipRead,
 } from "features/announcements/announcementsStorage";
 import { depositToFarm } from "lib/blockchain/Deposit";
 import Decimal from "decimal.js-light";
@@ -98,6 +98,11 @@ import {
 import { TRANSACTION_SIGNATURES, TransactionName } from "../types/transactions";
 import { getKeys } from "../types/decorations";
 import { preloadHotNow } from "features/marketplace/components/MarketplaceHotNow";
+import { hasFeatureAccess } from "lib/flags";
+import { getBumpkinLevel } from "./level";
+import { getLastTemperateSeasonStartedAt } from "./temperateSeason";
+import { hasVipAccess } from "./vipAccess";
+import { getActiveCalendarEvent, SeasonalEventName } from "../types/calendar";
 
 // Run at startup in case removed from query params
 const portalName = new URLSearchParams(window.location.search).get("portal");
@@ -118,6 +123,8 @@ export type PastAction = GameEvent & {
   createdAt: Date;
 };
 
+export type MaxedItem = InventoryItemName | BumpkinItem | "SFL";
+
 export interface Context {
   farmId: number;
   state: GameState;
@@ -127,7 +134,7 @@ export interface Context {
   errorCode?: ErrorCode;
   transactionId?: string;
   fingerprint?: string;
-  maxedItem?: InventoryItemName | "SFL";
+  maxedItem?: MaxedItem;
   goblinSwarm?: Date;
   deviceTrackerId?: string;
   revealed?: {
@@ -280,9 +287,7 @@ type TransactEvent = {
 };
 
 export type BlockchainEvent =
-  | {
-      type: "SAVE";
-    }
+  | { type: "SAVE" }
   | TransactEvent
   | WalletUpdatedEvent
   | CommunityEvent
@@ -290,48 +295,20 @@ export type BlockchainEvent =
   | DeleteTradeListingEvent
   | FulfillTradeListingEvent
   | SellMarketResourceEvent
-  | {
-      type: "REFRESH";
-    }
-  | {
-      type: "ACKNOWLEDGE";
-    }
-  | {
-      type: "EXPIRED";
-    }
-  | {
-      type: "CONTINUE";
-      id?: string;
-    }
-  | {
-      type: "RESET";
-    }
-  | {
-      type: "DEPOSIT";
-    }
-  | {
-      type: "PAUSE";
-    }
-  | {
-      type: "PLAY";
-    }
-  | {
-      type: "REVEAL";
-    }
-  | {
-      type: "SKIP_MIGRATION";
-    }
+  | { type: "REFRESH" }
+  | { type: "ACKNOWLEDGE" }
+  | { type: "EXPIRED" }
+  | { type: "CONTINUE"; id?: string }
+  | { type: "RESET" }
+  | { type: "DEPOSIT" }
+  | { type: "PAUSE" }
+  | { type: "PLAY" }
+  | { type: "REVEAL" }
+  | { type: "SKIP_MIGRATION" }
   | { type: "END_VISIT" }
-  | {
-      type: "PROVE_PERSONHOOD";
-    }
-  | {
-      type: "PERSONHOOD_FINISHED";
-      verified: boolean;
-    }
-  | {
-      type: "PERSONHOOD_CANCELLED";
-    }
+  | { type: "PROVE_PERSONHOOD" }
+  | { type: "PERSONHOOD_FINISHED"; verified: boolean }
+  | { type: "PERSONHOOD_CANCELLED" }
   | GameEvent
   | LandscapeEvent
   | VisitEvent
@@ -477,6 +454,19 @@ const EFFECT_STATES = Object.values(EFFECT_EVENTS).reduce(
         onDone: [
           {
             target: `${stateName}Success`,
+            cond: (_: Context, event: DoneInvokeEvent<any>) =>
+              !event.data.state.transaction,
+            actions: [
+              assign((_, event: DoneInvokeEvent<any>) => ({
+                actions: [],
+                state: event.data.state,
+              })),
+            ],
+          },
+          // If there is a transaction on the gameState move into playing so that
+          // the transaction flow can handle the rest of the flow
+          {
+            target: `playing`,
             actions: [
               assign((_, event: DoneInvokeEvent<any>) => ({
                 actions: [],
@@ -508,6 +498,7 @@ export type BlockchainState = {
     | "playing"
     | "autosaving"
     | "buyingSFL"
+    | "calendarEvent"
     | "revealing"
     | "revealed"
     | "genieRevealed"
@@ -523,7 +514,7 @@ export type BlockchainState = {
     | "transacting"
     | "depositing"
     | "landscaping"
-    | "specialOffer"
+    | "vip"
     | "promo"
     | "trading"
     | "listing"
@@ -547,7 +538,9 @@ export type BlockchainState = {
     | "blacklisted"
     | "provingPersonhood"
     | "somethingArrived"
+    | "seasonChanged"
     | "randomising"
+    | "competition"
     | StateName
     | StateNameWithStatus; // TEST ONLY
   context: Context;
@@ -872,16 +865,88 @@ export function startGame(authContext: AuthContext) {
               cond: () => isSwarming(),
             },
             {
-              target: "specialOffer",
-              cond: (context) =>
-                (context.state.bumpkin?.experience ?? 0) > 100 &&
-                !context.state.collectibles["Bull Run Banner"] &&
-                !getSeasonPassRead(),
+              target: "vip",
+              cond: (context) => {
+                const isNew = context.state.bumpkin.experience < 100;
+
+                // Don't show for new players
+                if (isNew) return false;
+
+                // Wow, they haven't seen the VIP promo in 1 month
+                const readAt = getVipRead();
+                if (
+                  !hasVipAccess({ game: context.state }) &&
+                  (!readAt ||
+                    readAt.getTime() <
+                      Date.now() - 1 * 31 * 24 * 60 * 60 * 1000)
+                ) {
+                  return true;
+                }
+
+                const vip = context.state.vip;
+
+                // Show them a reminder if it is expiring in 3 days
+                const isExpiring =
+                  vip &&
+                  vip.expiresAt &&
+                  vip.expiresAt < Date.now() + 3 * 24 * 60 * 60 * 1000 &&
+                  // Haven't read since expiry approached
+                  (readAt?.getTime() ?? 0) <
+                    vip.expiresAt - 3 * 24 * 60 * 60 * 1000;
+
+                if (isExpiring) return true;
+
+                const hasExpired =
+                  vip &&
+                  vip.expiresAt &&
+                  vip.expiresAt < Date.now() &&
+                  // Hasn't read since expired
+                  (readAt?.getTime() ?? 0) < vip.expiresAt;
+
+                if (hasExpired) return true;
+
+                return false;
+              },
             },
             {
               target: "somethingArrived",
               cond: (context) => !!context.revealed,
             },
+
+            {
+              target: "seasonChanged",
+              cond: (context) => {
+                return (
+                  hasFeatureAccess(context.state, "TEMPERATE_SEASON") &&
+                  context.state.season.startedAt !==
+                    getLastTemperateSeasonStartedAt()
+                );
+              },
+            },
+
+            {
+              target: "calendarEvent",
+              cond: (context) => {
+                if (!hasFeatureAccess(context.state, "WEATHER_SHOP")) {
+                  return false;
+                }
+
+                const game = context.state;
+
+                const activeEvent = getActiveCalendarEvent({
+                  game,
+                });
+
+                if (!activeEvent) return false;
+
+                const isAcknowledged =
+                  game?.calendar[activeEvent as SeasonalEventName]
+                    ?.acknowledgedAt;
+
+                return !isAcknowledged;
+              },
+            },
+
             // EVENTS THAT TARGET NOTIFYING OR LOADING MUST GO ABOVE THIS LINE
 
             // EVENTS THAT TARGET PLAYING MUST GO BELOW THIS LINE
@@ -926,15 +991,31 @@ export function startGame(authContext: AuthContext) {
                 ),
             },
             {
+              target: "competition",
+              cond: (context: Context) => {
+                if (!hasFeatureAccess(context.state, "ANIMAL_COMPETITION"))
+                  return false;
+
+                const level = getBumpkinLevel(
+                  context.state.bumpkin?.experience ?? 0,
+                );
+
+                if (level <= 5) return false;
+
+                const competition = context.state.competitions.progress.ANIMALS;
+
+                // Show the competition introduction if they have not started it yet
+                return !competition;
+              },
+            },
+            {
               target: "playing",
             },
           ],
         },
-        specialOffer: {
+        vip: {
           on: {
-            "banner.purchased": (GAME_EVENT_HANDLERS as any)[
-              "banner.purchased"
-            ],
+            "vip.purchased": (GAME_EVENT_HANDLERS as any)["vip.purchased"],
             ACKNOWLEDGE: {
               target: "notifying",
             },
@@ -944,9 +1025,30 @@ export function startGame(authContext: AuthContext) {
           on: {
             ACKNOWLEDGE: {
               target: "notifying",
-              actions: assign((context: Context) => ({
+              actions: assign((_) => ({
                 revealed: undefined,
               })),
+            },
+          },
+        },
+        seasonChanged: {
+          on: {
+            ACKNOWLEDGE: {
+              target: "notifying",
+            },
+          },
+        },
+        calendarEvent: {
+          on: {
+            "daily.reset": (GAME_EVENT_HANDLERS as any)["daily.reset"],
+            "calendarEvent.acknowledged": (GAME_EVENT_HANDLERS as any)[
+              "calendarEvent.acknowledged"
+            ],
+            ACKNOWLEDGE: {
+              target: "notifying",
+            },
+            CONTINUE: {
+              target: "autosaving",
             },
           },
         },
@@ -1241,6 +1343,46 @@ export function startGame(authContext: AuthContext) {
                 target: "autosaving",
                 // If a SAVE was queued up, go back into saving
                 cond: (c) => c.saveQueued,
+                actions: assign((context: Context, event) =>
+                  handleSuccessfulSave(context, event),
+                ),
+              },
+              {
+                target: "seasonChanged",
+                cond: (context, event) => {
+                  if (!hasFeatureAccess(context.state, "TEMPERATE_SEASON")) {
+                    return false;
+                  }
+
+                  return (
+                    event.data.farm.season.startedAt !==
+                    getLastTemperateSeasonStartedAt()
+                  );
+                },
+                actions: assign((context: Context, event) =>
+                  handleSuccessfulSave(context, event),
+                ),
+              },
+              {
+                target: "calendarEvent",
+                cond: (_, event) => {
+                  if (!hasFeatureAccess(event.data.farm, "WEATHER_SHOP")) {
+                    return false;
+                  }
+
+                  const game = event.data.farm;
+
+                  const activeEvent = getActiveCalendarEvent({
+                    game,
+                  });
+
+                  if (!activeEvent) return false;
+
+                  const isAcknowledged =
+                    game.calendar[activeEvent].acknowledgedAt;
+
+                  return !isAcknowledged;
+                },
                 actions: assign((context: Context, event) =>
                   handleSuccessfulSave(context, event),
                 ),
@@ -1945,9 +2087,17 @@ export function startGame(authContext: AuthContext) {
             ACKNOWLEDGE: {
               target: "notifying",
             },
+          },
+        },
+
+        competition: {
+          on: {
             "competition.started": (GAME_EVENT_HANDLERS as any)[
               "competition.started"
             ],
+            ACKNOWLEDGE: {
+              target: "notifying",
+            },
           },
         },
 

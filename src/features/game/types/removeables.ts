@@ -315,7 +315,7 @@ export function areFlowersGrowing(game: GameState): Restriction {
 
       return (
         flower.plantedAt +
-          FLOWER_SEEDS()[FLOWERS[flower.name].seed].plantSeconds * 1000 >=
+          FLOWER_SEEDS[FLOWERS[flower.name].seed].plantSeconds * 1000 >=
         Date.now()
       );
     },
@@ -555,6 +555,7 @@ export const REMOVAL_RESTRICTIONS: Partial<
 
     return [!canRemove, translate("restrictionReason.recentlyUsed")];
   },
+  "Golden Cow": (game) => areAnyCowsSleeping(game),
 
   // Fishing Boosts
   Alba: (game) => hasFishedToday(game),

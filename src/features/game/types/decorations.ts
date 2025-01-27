@@ -119,7 +119,13 @@ export type EventDecorationName =
   | "Golden Christmas Stocking"
   | "Cozy Fireplace"
   | "Christmas Rug"
-  | "Christmas Candle";
+  | "Christmas Candle"
+  | "Santa Penguin"
+  | "Penguin Pool"
+  | "Snowman"
+  | "Festive Toy Train"
+  | "Golden Cow"
+  | "Volcano Gnome";
 
 export type PotionHouseDecorationName =
   | "Giant Potato"
@@ -131,6 +137,34 @@ export type InteriorDecorationName = "Rug" | "Wardrobe";
 export type AnimalDecorationName = "Wagon";
 
 export const DECORATION_TEMPLATES = {
+  "Thermal Stone": {
+    dimensions: {
+      width: 1,
+      height: 1,
+    },
+    isWithdrawable: () => false,
+  },
+  "Protective Pesticide": {
+    dimensions: {
+      width: 2,
+      height: 2,
+    },
+    isWithdrawable: () => false,
+  },
+  "Tornado Pinwheel": {
+    dimensions: {
+      width: 1,
+      height: 1,
+    },
+    isWithdrawable: () => false,
+  },
+  Mangrove: {
+    dimensions: {
+      width: 1,
+      height: 1,
+    },
+    isWithdrawable: () => false,
+  },
   "King of Bears": {
     dimensions: {
       width: 3,
@@ -353,6 +387,10 @@ export const DECORATION_DIMENSIONS: Record<DecorationName, Dimensions> = {
     height: 1,
   },
   "Desert Gnome": {
+    width: 1,
+    height: 1,
+  },
+  "Volcano Gnome": {
     width: 1,
     height: 1,
   },
@@ -747,6 +785,26 @@ export const DECORATION_DIMENSIONS: Record<DecorationName, Dimensions> = {
   "Christmas Candle": {
     width: 1,
     height: 1,
+  },
+  "Santa Penguin": {
+    width: 1,
+    height: 1,
+  },
+  "Penguin Pool": {
+    width: 2,
+    height: 2,
+  },
+  Snowman: {
+    width: 1,
+    height: 1,
+  },
+  "Festive Toy Train": {
+    width: 2,
+    height: 2,
+  },
+  "Golden Cow": {
+    width: 2,
+    height: 2,
   },
 };
 

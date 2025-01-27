@@ -7,7 +7,7 @@ import {
   InventoryItemName,
 } from "features/game/types/game";
 import { COMMODITIES } from "features/game/types/resources";
-import { WITHDRAWABLES } from "features/game/types/withdrawables";
+import { INVENTORY_RELEASES } from "features/game/types/withdrawables";
 import {
   getBasketItems,
   getChestItems,
@@ -22,13 +22,15 @@ export function getDeliverableItems({ state }: { state: GameState }) {
     (acc, itemName) => {
       const isDeliverable =
         itemName in CROPS ||
-        itemName in PATCH_FRUIT() ||
+        itemName in PATCH_FRUIT ||
         (itemName in COMMODITIES &&
           itemName !== "Chicken" &&
           itemName !== "Crimstone" &&
           itemName !== "Sunstone");
 
-      if (isDeliverable && WITHDRAWABLES[itemName]()) {
+      const withdrawAt = INVENTORY_RELEASES[itemName]?.withdrawAt;
+      const canWithdraw = !!withdrawAt && withdrawAt <= new Date();
+      if (isDeliverable && canWithdraw) {
         const previousAmount = previousInventory[itemName] ?? new Decimal(0);
         const currentAmount = inventory[itemName] ?? new Decimal(0);
 
@@ -58,7 +60,7 @@ export function getBankItems(game: GameState) {
     (acc, itemName) => {
       if (
         itemName in CROPS ||
-        itemName in PATCH_FRUIT() ||
+        itemName in PATCH_FRUIT ||
         (itemName in COMMODITIES && itemName !== "Chicken")
       ) {
         return acc;

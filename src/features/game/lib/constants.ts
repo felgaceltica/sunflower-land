@@ -89,6 +89,11 @@ export type StockableName = Extract<
   | "Blueberry Seed"
   | "Orange Seed"
   | "Apple Seed"
+  | "Rhubarb Seed"
+  | "Zucchini Seed"
+  | "Yam Seed"
+  | "Broccoli Seed"
+  | "Pepper Seed"
   | "Banana Plant"
   | "Lemon Seed"
   | "Sunpetal Seed"
@@ -133,18 +138,26 @@ export const INITIAL_STOCK = (
   const seeds: Record<SeedName, Decimal> = {
     "Sunflower Seed": new Decimal(400),
     "Potato Seed": new Decimal(200),
+    "Rhubarb Seed": new Decimal(200),
+    "Zucchini Seed": new Decimal(200),
     "Pumpkin Seed": new Decimal(150),
     "Carrot Seed": new Decimal(100),
     "Cabbage Seed": new Decimal(90),
+    "Yam Seed": new Decimal(90),
     "Soybean Seed": new Decimal(90),
+    "Broccoli Seed": new Decimal(90),
     "Beetroot Seed": new Decimal(80),
+    "Pepper Seed": new Decimal(80),
     "Cauliflower Seed": new Decimal(80),
     "Parsnip Seed": new Decimal(60),
     "Eggplant Seed": new Decimal(50),
     "Corn Seed": new Decimal(50),
+    "Onion Seed": new Decimal(50),
+    "Turnip Seed": new Decimal(40),
     "Radish Seed": new Decimal(40),
     "Wheat Seed": new Decimal(40),
     "Kale Seed": new Decimal(30),
+    "Artichoke Seed": new Decimal(30),
     "Barley Seed": new Decimal(30),
 
     "Grape Seed": new Decimal(10),
@@ -161,6 +174,10 @@ export const INITIAL_STOCK = (
     "Sunpetal Seed": new Decimal(16),
     "Bloom Seed": new Decimal(8),
     "Lily Seed": new Decimal(4),
+
+    "Duskberry Seed": new Decimal(0),
+    "Lunara Seed": new Decimal(0),
+    "Celestine Seed": new Decimal(0),
   };
 
   if (
@@ -189,13 +206,21 @@ export const INVENTORY_LIMIT = (state?: GameState): Inventory => {
   const seeds: Record<SeedName, Decimal> = {
     "Sunflower Seed": new Decimal(1000),
     "Potato Seed": new Decimal(500),
+    "Rhubarb Seed": new Decimal(500),
     "Pumpkin Seed": new Decimal(400),
     "Carrot Seed": new Decimal(250),
+    "Zucchini Seed": new Decimal(200),
     "Cabbage Seed": new Decimal(240),
     "Soybean Seed": new Decimal(240),
     "Beetroot Seed": new Decimal(220),
+    "Yam Seed": new Decimal(200),
     "Cauliflower Seed": new Decimal(200),
     "Parsnip Seed": new Decimal(150),
+    "Broccoli Seed": new Decimal(150),
+    "Pepper Seed": new Decimal(150),
+    "Onion Seed": new Decimal(150),
+    "Turnip Seed": new Decimal(150),
+    "Artichoke Seed": new Decimal(120),
     "Eggplant Seed": new Decimal(120),
     "Corn Seed": new Decimal(120),
     "Radish Seed": new Decimal(100),
@@ -217,6 +242,10 @@ export const INVENTORY_LIMIT = (state?: GameState): Inventory => {
     "Sunpetal Seed": new Decimal(40),
     "Bloom Seed": new Decimal(20),
     "Lily Seed": new Decimal(10),
+
+    "Duskberry Seed": new Decimal(10),
+    "Lunara Seed": new Decimal(10),
+    "Celestine Seed": new Decimal(10),
   };
 
   if (
@@ -366,7 +395,7 @@ export const INITIAL_RESOURCES: Pick<
 
 export const INITIAL_EXPANSIONS = 3;
 
-const INITIAL_EQUIPMENT: BumpkinParts = {
+export const INITIAL_EQUIPMENT: BumpkinParts = {
   background: "Farm Background",
   body: "Beige Farmer Potion",
   hair: "Basic Hair",
@@ -438,6 +467,10 @@ export const INITIAL_FARM: GameState = {
   wardrobe: {},
   previousWardrobe: {},
   bank: { taxFreeSFL: 0 },
+
+  calendar: {
+    dates: [],
+  },
 
   choreBoard: INITIAL_CHORE_BOARD,
 
@@ -701,6 +734,11 @@ export const INITIAL_FARM: GameState = {
     readyAt: 0,
     recipes: {},
   },
+  season: {
+    season: "spring",
+    startedAt: 0,
+  },
+  lavaPits: {},
 };
 
 export const TEST_FARM: GameState = {
@@ -726,6 +764,9 @@ export const TEST_FARM: GameState = {
     "Boiled Eggs": new Decimal(3),
     "Sunflower Cake": new Decimal(1),
     "Basic Land": new Decimal(3),
+  },
+  calendar: {
+    dates: [],
   },
   previousInventory: {},
   bounties: {
@@ -1017,6 +1058,11 @@ export const TEST_FARM: GameState = {
     readyAt: 0,
     recipes: {},
   },
+  season: {
+    season: "spring",
+    startedAt: 0,
+  },
+  lavaPits: {},
 };
 
 export const INITIAL_EQUIPPED: Equipped = {
@@ -1045,6 +1091,9 @@ export const EMPTY: GameState = {
     completed: [],
     requests: [],
   },
+  calendar: {
+    dates: [],
+  },
   rewards: INITIAL_REWARDS,
   bank: { taxFreeSFL: 0 },
   experiments: [],
@@ -1054,6 +1103,7 @@ export const EMPTY: GameState = {
   },
   shipments: {},
   gems: {},
+
   previousInventory: {},
   chickens: {},
   choreBoard: INITIAL_CHORE_BOARD,
@@ -1151,4 +1201,9 @@ export const EMPTY: GameState = {
     readyAt: 0,
     recipes: {},
   },
+  season: {
+    season: "spring",
+    startedAt: 0,
+  },
+  lavaPits: {},
 };

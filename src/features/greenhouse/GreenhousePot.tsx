@@ -30,7 +30,7 @@ import { getReadyAt } from "features/game/events/landExpansion/harvestGreenHouse
 import { ITEM_DETAILS } from "features/game/types/images";
 import { GreenhousePlant } from "features/game/types/game";
 import {
-  OIL_USAGE,
+  getOilUsage,
   SEED_TO_PLANT,
 } from "features/game/events/landExpansion/plantGreenhouse";
 import { QuickSelect } from "./QuickSelect";
@@ -69,12 +69,16 @@ interface Props {
   id: number;
 }
 
-const selectPots = (state: MachineState) => state.context.state.greenhouse.pots;
-const selectInventory = (state: MachineState) => state.context.state.inventory;
+const _state = (state: MachineState) => state.context.state;
 
 export const GreenhousePot: React.FC<Props> = ({ id }) => {
-  const { gameService, selectedItem, showAnimations, showTimers } =
-    useContext(Context);
+  const {
+    gameService,
+    selectedItem,
+    showAnimations,
+    enableQuickSelect,
+    showTimers,
+  } = useContext(Context);
 
   const { t } = useAppTranslation();
   const [_, setRender] = useState<number>(0);
@@ -84,10 +88,16 @@ export const GreenhousePot: React.FC<Props> = ({ id }) => {
   const [showOilWarning, setShowOilWarning] = useState(false);
   const harvested = useRef<GreenhousePlant>();
 
-  const pots = useSelector(gameService, selectPots);
-  const inventory = useSelector(gameService, selectInventory);
+  const state = useSelector(gameService, _state);
+  const { inventory, greenhouse } = state;
+  const { pots } = greenhouse;
 
   const pot = pots[id];
+
+  const oilRequired = getOilUsage({
+    seed: selectedItem as GreenHouseCropSeedName,
+    game: state,
+  });
 
   const plant = async (
     seed: GreenHouseCropSeedName = selectedItem as GreenHouseCropSeedName,
@@ -97,14 +107,13 @@ export const GreenhousePot: React.FC<Props> = ({ id }) => {
       !SEED_TO_PLANT[seed as GreenHouseCropSeedName] ||
       !inventory[seed]?.gte(1)
     ) {
-      setShowQuickSelect(true);
+      if (enableQuickSelect) {
+        setShowQuickSelect(true);
+      }
       return;
     }
 
-    if (
-      OIL_USAGE[seed as GreenHouseCropSeedName] >
-      gameService.state.context.state.greenhouse.oil
-    ) {
+    if (oilRequired > gameService.state.context.state.greenhouse.oil) {
       setShowOilWarning(true);
       await new Promise((res) => setTimeout(res, 2000));
       setShowOilWarning(false);
@@ -173,6 +182,7 @@ export const GreenhousePot: React.FC<Props> = ({ id }) => {
               setShowQuickSelect(false);
             }}
             type={t("quickSelect.greenhouseSeeds")}
+            showExpanded
           />
         </Transition>
 
@@ -186,12 +196,10 @@ export const GreenhousePot: React.FC<Props> = ({ id }) => {
           leave="transition-opacity duration-100"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
-          className="flex -top-4 left-[80%] absolute z-40 shadow-md w-60"
+          className="flex -top-4 left-[80%] absolute z-40 shadow-md w-auto"
         >
-          <Label type="danger" icon={barrelIcon}>
-            {`${OIL_USAGE[selectedItem as GreenHouseCropSeedName]} ${t(
-              "greenhouse.oilRequired",
-            )}`}
+          <Label type="danger" icon={barrelIcon} className="whitespace-nowrap">
+            {`${oilRequired} ${t("greenhouse.oilRequired")}`}
           </Label>
         </Transition>
 

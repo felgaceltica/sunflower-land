@@ -86,6 +86,8 @@ import {
 import { AnimalBuildingLevel } from "../events/landExpansion/upgradeBuilding";
 import { SeasonalCollectibleName } from "./megastore";
 import { TradeFood } from "../events/landExpansion/redeemTradeReward";
+import { CalendarEvent, CalendarEventName } from "./calendar";
+import { VipBundle } from "../lib/vipAccess";
 
 export type Reward = {
   coins?: number;
@@ -1035,6 +1037,7 @@ export type TradeListing = {
   signature?: string;
   fulfilledAt?: number;
   fulfilledById?: number;
+  initiatedAt?: number;
 };
 
 export type TradeOffer = {
@@ -1045,6 +1048,7 @@ export type TradeOffer = {
   fulfilledAt?: number;
   fulfilledById?: number;
   signature?: string;
+  initiatedAt?: number;
 };
 
 type FishingSpot = {
@@ -1124,7 +1128,7 @@ export type MegaStore = {
   collectibles: CollectiblesItem[];
 };
 
-export type IslandType = "basic" | "spring" | "desert";
+export type IslandType = "basic" | "spring" | "desert" | "volcano";
 
 /**
  * The order of the islands is important as it determines the levels of the islands.
@@ -1283,6 +1287,52 @@ export type Bank = {
   taxFreeSFL: number;
 };
 
+export type TemperateSeasonName = "spring" | "summer" | "autumn" | "winter";
+
+export type Season = {
+  startedAt: number;
+  season: TemperateSeasonName;
+};
+
+type BaseCalendarEventDetails = {
+  date: string;
+  weather?: boolean;
+};
+
+type CalendarScheduledEvent = BaseCalendarEventDetails & {
+  name: "calendar";
+  title: string;
+  description: string;
+};
+
+type OtherCalendarEvent = BaseCalendarEventDetails & {
+  name: Exclude<CalendarEventName, "calendar">;
+};
+
+export type CalendarEventDetails = CalendarScheduledEvent | OtherCalendarEvent;
+
+export type Calendar = {
+  dates: CalendarEventDetails[];
+  tornado?: CalendarEvent;
+  tsunami?: CalendarEvent;
+  fullMoon?: CalendarEvent;
+  greatFreeze?: CalendarEvent;
+  doubleDelivery?: CalendarEvent;
+  bountifulHarvest?: CalendarEvent;
+  insectPlague?: CalendarEvent;
+  sunshower?: CalendarEvent;
+};
+
+export type LavaPit = {
+  createdAt: number;
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  startedAt?: number;
+  collectedAt?: number;
+};
+
 export interface GameState {
   home: Home;
   bank: Bank;
@@ -1295,9 +1345,16 @@ export interface GameState {
     progress: Partial<Record<CompetitionName, CompetitionProgress>>;
   };
 
+  calendar: Calendar;
+  vip?: {
+    bundles: { name: VipBundle; boughtAt: number }[];
+    expiresAt: number;
+  };
   shipments: {
     restockedAt?: number;
   };
+
+  verified?: boolean;
 
   gems: {
     history?: Record<string, { spent: number }>;
@@ -1480,6 +1537,8 @@ export interface GameState {
     readyAt: number;
     recipes: Partial<Recipes>;
   };
+  season: Season;
+  lavaPits: Record<string, LavaPit>;
 }
 
 export interface Context {

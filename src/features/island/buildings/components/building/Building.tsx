@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 
 import { BuildingName } from "features/game/types/buildings";
 import { Bar, ResizableBar } from "components/ui/ProgressBar";
@@ -7,13 +7,12 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSelector } from "@xstate/react";
 import { MoveableComponent } from "features/island/collectibles/MovableComponent";
 import { MachineState } from "features/game/lib/gameMachine";
-import { Context } from "features/game/GameProvider";
+import { Context, useGame } from "features/game/GameProvider";
 import { BUILDING_COMPONENTS, READONLY_BUILDINGS } from "./BuildingComponents";
 import { CookableName } from "features/game/types/consumables";
 import { GameState, IslandType } from "features/game/types/game";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { useCountdown } from "lib/utils/hooks/useCountdown";
-import { hasFeatureAccess } from "lib/flags";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Label } from "components/ui/Label";
 import { TimerDisplay } from "features/retreat/components/auctioneer/AuctionDetails";
@@ -24,6 +23,13 @@ import { Modal } from "components/ui/Modal";
 import confetti from "canvas-confetti";
 import { getInstantGems } from "features/game/events/landExpansion/speedUpRecipe";
 import { gameAnalytics } from "lib/gameAnalytics";
+import tornadoIcon from "assets/icons/tornado.webp";
+import tsunamiIcon from "assets/icons/tsunami.webp";
+import { secondsToString } from "lib/utils/time";
+import {
+  getActiveCalendarEvent,
+  SeasonalEventName,
+} from "features/game/types/calendar";
 
 interface Prop {
   name: BuildingName;
@@ -135,6 +141,141 @@ const InProgressBuilding: React.FC<Prop> = ({
   );
 };
 
+type DestructiveEvent = Exclude<
+  SeasonalEventName,
+  | "fullMoon"
+  | "greatFreeze"
+  | "doubleDelivery"
+  | "bountifulHarvest"
+  | "insectPlague"
+  | "sunshower"
+>;
+
+const DESTROYED_BUILDING_ICONS: Record<DestructiveEvent, string> = {
+  tornado: tornadoIcon,
+  tsunami: tsunamiIcon,
+};
+
+const DestroyedBuilding: React.FC<
+  Prop & {
+    calendarEvent: DestructiveEvent;
+  }
+> = ({
+  name,
+  id,
+  index,
+  readyAt,
+  createdAt,
+  showTimers,
+  island,
+  calendarEvent,
+}) => {
+  const { gameService, showAnimations } = useContext(Context);
+
+  const BuildingPlaced = BUILDING_COMPONENTS[name];
+
+  const { t } = useAppTranslation();
+
+  const [showModal, setShowModal] = useState(false);
+
+  const totalSeconds = (readyAt - createdAt) / 1000;
+  const secondsLeft = (readyAt - Date.now()) / 1000;
+
+  const game = gameService.getSnapshot().context.state;
+
+  return (
+    <>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <CloseButtonPanel onClose={() => setShowModal(false)}>
+          <div className="p-2">
+            <Label
+              icon={DESTROYED_BUILDING_ICONS[calendarEvent]}
+              type="danger"
+              className="mb-1 -ml-1"
+            >
+              {t(calendarEvent)}
+            </Label>
+            <p className="text-sm">
+              {t(`${calendarEvent}.building.destroyed.description`)}
+            </p>
+            <Label
+              icon={SUNNYSIDE.icons.stopwatch}
+              type="transparent"
+              className="mt-2 ml-1"
+            >
+              {`Ready in: ${secondsToString(
+                24 * 60 * 60 -
+                  (Date.now() - game.calendar[calendarEvent]!.startedAt) / 1000,
+                {
+                  length: "medium",
+                },
+              )}`}
+            </Label>
+          </div>
+        </CloseButtonPanel>
+      </Modal>
+
+      <div
+        className="w-full h-full cursor-pointer"
+        onClick={() => setShowModal(true)}
+      >
+        <div className="w-full h-full pointer-events-none">
+          <BuildingPlaced
+            buildingId={id}
+            buildingIndex={index}
+            island={island}
+          />
+        </div>
+        <img
+          src={DESTROYED_BUILDING_ICONS[calendarEvent]}
+          alt={calendarEvent}
+          className="absolute  right-0 pointer-events-none"
+          style={{
+            width: `${PIXEL_SCALE * 12}px`,
+            top: `${PIXEL_SCALE * -4}px`,
+          }}
+        />
+      </div>
+    </>
+  );
+};
+
+const DESTROYED_BUILDINGS: BuildingName[] = [
+  "Kitchen",
+  "Barn",
+  "Greenhouse",
+  "Crop Machine",
+  "Deli",
+];
+
+function isBuildingDestroyed({
+  name,
+  game,
+}: {
+  name: BuildingName;
+  game: GameState;
+}): DestructiveEvent | false {
+  const calendarEvent = getActiveCalendarEvent({ game });
+
+  if (!calendarEvent) {
+    return false;
+  }
+
+  if (calendarEvent === "tornado") {
+    if (game.calendar.tornado?.protected) {
+      return false;
+    }
+  }
+
+  if (calendarEvent === "tsunami") {
+    if (game.calendar.tsunami?.protected) {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 const BuildingComponent: React.FC<Prop> = ({
   name,
   id,
@@ -148,11 +289,35 @@ const BuildingComponent: React.FC<Prop> = ({
   y,
   island,
 }) => {
+  const { gameState } = useGame();
   const BuildingPlaced = BUILDING_COMPONENTS[name];
 
   const inProgress = readyAt > Date.now();
 
+  const destroyedBy = useMemo(
+    () => isBuildingDestroyed({ name, game: gameState.context.state }),
+    [gameState.context.state.calendar],
+  );
+
   useUiRefresher({ active: inProgress });
+
+  if (destroyedBy) {
+    return (
+      <DestroyedBuilding
+        key={id}
+        name={name}
+        id={id}
+        index={index}
+        readyAt={readyAt}
+        createdAt={createdAt}
+        showTimers={showTimers}
+        x={x}
+        y={y}
+        island={island}
+        calendarEvent={destroyedBy}
+      />
+    );
+  }
 
   return (
     <>
@@ -248,8 +413,6 @@ export const Constructing: React.FC<{
     return () => clearInterval(interval);
   }, []);
 
-  const speedUpAccess = hasFeatureAccess(state, "GEM_BOOSTS");
-
   return (
     <>
       <div className="p-1 ">
@@ -277,22 +440,20 @@ export const Constructing: React.FC<{
         <Button className="mr-1" onClick={onClose}>
           {t("close")}
         </Button>
-        {speedUpAccess && (
-          <Button
-            disabled={!state.inventory.Gem?.gte(gems)}
-            className="relative ml-1"
-            onClick={() => onInstantBuilt(gems)}
+        <Button
+          disabled={!state.inventory.Gem?.gte(gems)}
+          className="relative ml-1"
+          onClick={() => onInstantBuilt(gems)}
+        >
+          {t("gems.speedUp")}
+          <Label
+            type={state.inventory.Gem?.gte(gems) ? "default" : "danger"}
+            icon={ITEM_DETAILS.Gem.image}
+            className="flex absolute right-0 top-0.5"
           >
-            {t("gems.speedUp")}
-            <Label
-              type={state.inventory.Gem?.gte(gems) ? "default" : "danger"}
-              icon={ITEM_DETAILS.Gem.image}
-              className="flex absolute right-0 top-0.5"
-            >
-              {gems}
-            </Label>
-          </Button>
-        )}
+            {gems}
+          </Label>
+        </Button>
       </div>
     </>
   );

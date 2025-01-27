@@ -16,12 +16,12 @@ import {
   getAnimalLevel,
   getBoostedFoodQuantity,
   isAnimalFood,
+  isAnimalMedicine,
 } from "features/game/lib/animals";
 import classNames from "classnames";
 import { LevelProgress } from "features/game/expansion/components/animals/LevelProgress";
 import { RequestBubble } from "features/game/expansion/components/animals/RequestBubble";
 import { Transition } from "@headlessui/react";
-import { ANIMAL_FOOD_EXPERIENCE } from "features/game/types/animals";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import {
   AnimalFoodName,
@@ -35,8 +35,10 @@ import { useSound } from "lib/utils/hooks/useSound";
 import { WakesIn } from "features/game/expansion/components/animals/WakesIn";
 import { InfoPopover } from "features/island/common/InfoPopover";
 import Decimal from "decimal.js-light";
-import { REQUIRED_FOOD_QTY } from "features/game/events/landExpansion/feedAnimal";
-import { formatNumber } from "lib/utils/formatNumber";
+import {
+  handleFoodXP,
+  REQUIRED_FOOD_QTY,
+} from "features/game/events/landExpansion/feedAnimal";
 import { getAnimalXP } from "features/game/events/landExpansion/loveAnimal";
 import { isCollectibleBuilt } from "features/game/lib/collectibleBuilt";
 import { MutantAnimalModal } from "features/farming/animals/components/MutantAnimalModal";
@@ -85,7 +87,6 @@ const _chicken = (id: string) => (state: MachineState) =>
   state.context.state.henHouse.animals[id];
 const _game = (state: MachineState) => state.context.state;
 const _inventory = (state: MachineState) => state.context.state.inventory;
-const _animalItem = (state: AnimalMachineState) => state.context.animal?.item;
 
 export const getMedicineOption = (): {
   name: InventoryItemName;
@@ -116,6 +117,20 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
   const chickenMachineState = useSelector(chickenService, _animalState);
 
   useEffect(() => {
+    if (
+      chicken.state === "ready" &&
+      chicken.awakeAt < Date.now() &&
+      chickenMachineState !== "ready"
+    ) {
+      chickenService.send({
+        type: "INSTANT_LEVEL_UP",
+        animal: chicken,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chicken.state]);
+
+  useEffect(() => {
     if (chicken.state === "sick" && chickenMachineState !== "sick") {
       chickenService.send({
         type: "SICK",
@@ -141,6 +156,10 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
   const ready = chickenMachineState === "ready";
   const idle = chickenMachineState === "idle";
   const sick = chickenMachineState === "sick";
+  const sleepingAndSick =
+    chickenMachineState === "sleeping" && chicken.state === "sick";
+  const needsLoveAndSick =
+    chickenMachineState === "needsLove" && chicken.state === "sick";
 
   // Sounds
   const { play: playFeedAnimal } = useSound("feed_animal");
@@ -252,7 +271,6 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
     const hasEnoughMedicine = medicineCount.gte(1);
 
     if (hasEnoughMedicine) {
-      shortcutItem("Barn Delight");
       playCureAnimal();
       cureChicken("Barn Delight");
       return;
@@ -290,8 +308,11 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
 
     if (needsLove) return onLoveClick();
 
-    if (sick) return onSickClick();
+    const medicineSelected = selectedItem && isAnimalMedicine(selectedItem);
 
+    if (sick || (sleepingAndSick && medicineSelected)) {
+      return onSickClick();
+    }
     if (sleeping) {
       setShowWakesIn((prev) => !prev);
       return;
@@ -339,13 +360,14 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
   };
 
   const getAnimalXPEarned = () => {
-    if (hasGoldEgg) {
-      return ANIMAL_FOOD_EXPERIENCE.Chicken[level][favFood];
-    }
+    const { foodXp } = handleFoodXP({
+      state: game,
+      animal: "Chicken",
+      level,
+      food: hasGoldEgg ? favFood : (selectedItem as AnimalFoodName),
+    });
 
-    return ANIMAL_FOOD_EXPERIENCE.Chicken[level][
-      selectedItem as AnimalFoodName
-    ];
+    return foodXp;
   };
 
   const animalImageInfo = () => {
@@ -455,7 +477,7 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
                 top: CHICKEN_EMOTION_ICONS[chickenMachineState].top,
                 right: CHICKEN_EMOTION_ICONS[chickenMachineState].right,
               }}
-              className="absolute"
+              className="absolute pointer-events-none"
             />
           )}
           {/* Request */}
@@ -467,6 +489,13 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
             />
           )}
           {sick && (
+            <RequestBubble
+              top={PIXEL_SCALE * -3.5}
+              left={PIXEL_SCALE * 20}
+              request="Barn Delight"
+            />
+          )}
+          {sleepingAndSick && (
             <RequestBubble
               top={PIXEL_SCALE * -3.5}
               left={PIXEL_SCALE * 20}
@@ -525,7 +554,9 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
           style={{
             color: xpIndicatorColor,
           }}
-        >{`+${formatNumber(xpIndicatorAmount)}`}</span>
+        >
+          {`+${xpIndicatorAmount}`}
+        </span>
       </Transition>
       <Transition
         appear={true}
@@ -544,7 +575,9 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
           style={{
             color: "#ffffff",
           }}
-        >{`+${animalXP}`}</span>
+        >
+          {`+${animalXP}`}
+        </span>
       </Transition>
     </>
   );

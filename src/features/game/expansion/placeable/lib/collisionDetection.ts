@@ -109,6 +109,7 @@ function detectPlaceableCollision(
     gold,
     iron,
     crimstones,
+    lavaPits,
     sunstones,
     fruitPatches,
     buds,
@@ -149,6 +150,7 @@ function detectPlaceableCollision(
     ...Object.values(gold),
     ...Object.values(crimstones),
     ...Object.values(sunstones),
+    ...Object.values(lavaPits),
     ...Object.values(crops),
     ...Object.values(fruitPatches),
     ...Object.values(beehives),
@@ -203,6 +205,12 @@ export const HOME_BOUNDS: Record<IslandType, BoundingBox> = {
     width: 16,
     x: -8,
     y: -8,
+  },
+  volcano: {
+    height: 20,
+    width: 20,
+    x: -10,
+    y: -10,
   },
 };
 

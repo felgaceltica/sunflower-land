@@ -155,14 +155,6 @@ function getEggYieldBoosts(game: GameState) {
     boost += 0.2;
   }
 
-  if (isCollectibleBuilt({ name: "Bale", game })) {
-    if (game.bumpkin.skills["Double Bale"]) {
-      boost += 0.2;
-    } else {
-      boost += 0.1;
-    }
-  }
-
   if (game.bumpkin.skills["Abundant Harvest"]) {
     boost += 0.2;
   }
@@ -313,6 +305,31 @@ export function getResourceDropAmount({
     amount += 0.25;
   }
 
+  // Add centralized Bale boost logic here
+  if (isCollectibleBuilt({ name: "Bale", game })) {
+    const baleBoost = 0.1;
+    // For Chickens (Eggs) - always applies
+    if (isChicken && resource === "Egg") {
+      if (bumpkin.skills["Double Bale"]) {
+        amount += baleBoost * 2;
+      } else {
+        amount += baleBoost;
+      }
+    }
+
+    // For Sheep (Wool) and Cows (Milk) - only if Bale Economy skill is present
+    if (
+      bumpkin.skills["Bale Economy"] &&
+      ((isSheep && resource === "Wool") || (isCow && resource === "Milk"))
+    ) {
+      if (bumpkin.skills["Double Bale"]) {
+        amount += baleBoost * 2;
+      } else {
+        amount += baleBoost;
+      }
+    }
+  }
+
   // Barn Manager boosts all produce
   if (game.inventory["Barn Manager"]?.gt(0)) {
     amount += 0.1;
@@ -360,7 +377,7 @@ export function getBoostedFoodQuantity({
     foodQuantity *= 0.5;
   }
 
-  if (hasVipAccess(game.inventory) && getCurrentSeason() === "Bull Run") {
+  if (hasVipAccess({ game }) && getCurrentSeason() === "Bull Run") {
     foodQuantity *= 0.9;
   }
 
@@ -390,6 +407,10 @@ export function getBoostedFoodQuantity({
     } else {
       foodQuantity *= 1.5;
     }
+  }
+
+  if (game.bumpkin.skills["Chonky Feed"]) {
+    foodQuantity *= 1.5;
   }
 
   return foodQuantity;
@@ -444,7 +465,7 @@ export function getBoostedAwakeAt({
   }
 
   if (bumpkin.skills["Restless Animals"]) {
-    totalDuration *= 0.95;
+    totalDuration *= 0.9;
   }
 
   // Add the boosted duration to the created time

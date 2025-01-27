@@ -23,6 +23,7 @@ import { CookableName } from "features/game/types/consumables";
 import { Composter } from "./composters/Composter";
 import { House } from "./house/House";
 import { Manor } from "./manor/Manor";
+import { Mansion } from "./mansion/Mansion";
 import { GameState, IslandType } from "features/game/types/game";
 import {
   BAKERY_VARIANTS,
@@ -63,6 +64,7 @@ export const BUILDING_COMPONENTS: Record<
   }: BuildingProps) => (
     <WithCraftingMachine
       buildingId={buildingId}
+      buildingName="Fire Pit"
       buildingIndex={buildingIndex}
       craftingItemName={craftingItemName}
       craftingReadyAt={craftingReadyAt}
@@ -88,6 +90,7 @@ export const BUILDING_COMPONENTS: Record<
     <WithCraftingMachine
       buildingId={buildingId}
       buildingIndex={buildingIndex}
+      buildingName="Bakery"
       craftingItemName={craftingItemName}
       craftingReadyAt={craftingReadyAt}
       island={island}
@@ -123,6 +126,7 @@ export const BUILDING_COMPONENTS: Record<
       craftingItemName={craftingItemName}
       craftingReadyAt={craftingReadyAt}
       island={island}
+      buildingName="Kitchen"
     >
       <Kitchen
         buildingId={buildingId}
@@ -146,6 +150,7 @@ export const BUILDING_COMPONENTS: Record<
       craftingItemName={craftingItemName}
       craftingReadyAt={craftingReadyAt}
       island={island}
+      buildingName="Deli"
     >
       <Deli
         buildingId={buildingId}
@@ -169,6 +174,7 @@ export const BUILDING_COMPONENTS: Record<
       craftingItemName={craftingItemName}
       craftingReadyAt={craftingReadyAt}
       island={island}
+      buildingName="Smoothie Shack"
     >
       <SmoothieShack
         buildingId={buildingId}
@@ -182,6 +188,7 @@ export const BUILDING_COMPONENTS: Record<
   "Turbo Composter": () => <Composter name="Turbo Composter" />,
   "Premium Composter": () => <Composter name="Premium Composter" />,
   Manor: Manor,
+  Mansion: Mansion,
   Greenhouse: Greenhouse,
   "Crop Machine": ({ buildingId }: Pick<BuildingProps, "buildingId">) => (
     <CropMachine id={buildingId} />
