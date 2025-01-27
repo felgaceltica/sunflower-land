@@ -1798,6 +1798,18 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Tradable", value: "No" },
     ],
   },
+  Obsidian: {
+    name: "Obsidian",
+    description:
+      "A resource collected by mining obsidian mines.\n\nIt is used in a range of different crafting recipes.",
+    decimals: 18,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/663.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Resource" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
   "Green Thumb": {
     name: "Green Thumb",
     description:
@@ -4765,6 +4777,16 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Tradable", value: "No" },
     ],
   },
+  "Lava Pit": {
+    description: "A source of obsidian",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/664.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Resource Node" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
   Boulder: {
     description: "???",
     decimals: 0,
@@ -7015,6 +7037,16 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Tradable", value: "No" },
     ],
   },
+  Mansion: {
+    description: "?",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1017.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Building" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
   "Crop Machine": {
     description:
       "Technology arrives at the farm! Crop Machine is here to help!",
@@ -7573,6 +7605,24 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       },
     ],
   },
+  "Volcano Gnome": {
+    name: "Volcano Gnome",
+    description:
+      "A mineral obsessed gnome that can survive the harshest of conditions.",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2018.png",
+    attributes: [
+      { trait_type: "Tradable", value: "No" },
+      { trait_type: "Boost", value: "Minerals" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Mineral Production",
+        value: 0.1,
+      },
+    ],
+  },
+
   "Red Daffodil": {
     name: "Red Daffodil",
     description: "A flower",
@@ -7697,7 +7747,8 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   },
   "Treasure Key": {
     name: "Treasure Key",
-    description: "A magic key that can unlock rewards in the plaza",
+    description:
+      "A magic key that can unlock the basic chest located in the plaza near Tywin.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/931.png",
@@ -7708,7 +7759,8 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
   },
   "Luxury Key": {
     name: "Luxury Key",
-    description: "A magic key that can unlock rewards in the plaza",
+    description:
+      "A magic key that can unlock the luxury chest located in the plaza near Bert.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/932.png",
@@ -7720,7 +7772,8 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
 
   "Rare Key": {
     name: "Rare Key",
-    description: "A magic key that can unlock rewards in the beach",
+    description:
+      "A magic key that can unlock the rare chest located in the south of the beach.",
     decimals: 0,
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/erc1155/images/933.png",
@@ -10316,6 +10369,391 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/2173.png",
     attributes: [
       { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Santa Penguin": {
+    name: "Santa Penguin",
+    description: "A penguin thats always ready for the festive season!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2174.gif",
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Penguin Pool": {
+    name: "Penguin Pool",
+    description:
+      "Keep your eyes on these penguins or they will cause chaos on your island!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2175.gif",
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Snowman: {
+    name: "Snowman",
+    description: "A special snowman that for some reason never melts!?",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2176.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Festive Toy Train": {
+    name: "Festive Toy Train",
+    description: "A special snowman that for some reason never melts!?",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2177.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Decoration" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Golden Cow": {
+    description: "Feed cows for free!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Tradable", value: "Yes" },
+      { trait_type: "Boost", value: "Animal" },
+      {
+        display_type: "boost_percentage",
+        trait_type: "Feed Reduction",
+        value: 100,
+      },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2178.png",
+    name: "Golden Cow",
+  },
+
+  "Rhubarb Seed": {
+    description: "A seed that grows into a tart, pink vegetable stalk.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/rhubarb_seed.png",
+    name: "Rhubarb Seed",
+  },
+  "Zucchini Seed": {
+    description: "A seed that grows into a versatile summer squash.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/Zucchini_seed.png",
+    name: "Zucchini Seed",
+  },
+  "Yam Seed": {
+    description: "A seed that grows into a nutritious root vegetable.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/yam_seed.png",
+    name: "Yam Seed",
+  },
+  "Broccoli Seed": {
+    description: "A seed that grows into a healthy green vegetable.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/Broccoli_seed.png",
+    name: "Broccoli Seed",
+  },
+  "Pepper Seed": {
+    description: "A seed that grows into a spicy capsicum.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/pepper_seed.png",
+    name: "Pepper Seed",
+  },
+  "Onion Seed": {
+    description: "A seed that grows into a flavorful bulb vegetable.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/onion_seed.png",
+    name: "Onion Seed",
+  },
+  "Turnip Seed": {
+    description: "A seed that grows into a hardy root vegetable.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/turnip_seed.png",
+    name: "Turnip Seed",
+  },
+  "Artichoke Seed": {
+    description: "A seed that grows into a unique edible flower bud.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/seeds/artichoke_seed.png",
+    name: "Artichoke Seed",
+  },
+  Rhubarb: {
+    description: "A tart, pink vegetable stalk perfect for pies and jams.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/rhubarb.png",
+    name: "Rhubarb",
+  },
+  Zucchini: {
+    description: "A versatile summer squash that can be used in many dishes.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/Zucchini.png",
+    name: "Zucchini",
+  },
+  Yam: {
+    description: "A nutritious root vegetable rich in vitamins and minerals.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/yam.png",
+    name: "Yam",
+  },
+  Broccoli: {
+    description: "A healthy green vegetable packed with nutrients.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/Broccoli.png",
+    name: "Broccoli",
+  },
+  Pepper: {
+    description: "A spicy capsicum that adds flavor to any dish.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/pepper.png",
+    name: "Pepper",
+  },
+  Onion: {
+    description: "A flavorful bulb vegetable essential for cooking.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/onion.png",
+    name: "Onion",
+  },
+  Turnip: {
+    description: "A hardy root vegetable perfect for soups and stews.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/turnip.png",
+    name: "Turnip",
+  },
+  Artichoke: {
+    description: "A unique edible flower bud with a delicate flavor.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/crops/artichoke.png",
+    name: "Artichoke",
+  },
+  "Duskberry Seed": {
+    description: "A duskberry seed.",
+    decimals: 18,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/139.png",
+    name: "Duskberry Seed",
+  },
+  "Lunara Seed": {
+    description: "A Lunara seed.",
+    decimals: 18,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/140.png",
+    name: "Lunara Seed",
+  },
+  "Celestine Seed": {
+    description: "A Celestine seed.",
+    decimals: 18,
+    attributes: [
+      { trait_type: "Purpose", value: "Seed" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/141.png",
+    name: "Celestine Seed",
+  },
+  Duskberry: {
+    description: "A rare berry that grows in the dark.",
+    decimals: 18,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/266.png",
+    name: "Duskberry",
+  },
+  Lunara: {
+    description: "A mysterious root that grows in the darkest of places.",
+    decimals: 18,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/267.png",
+    name: "Lunara",
+  },
+  Celestine: {
+    description: "A rare plant that grows in the darkest of places.",
+    decimals: 18,
+    attributes: [
+      { trait_type: "Purpose", value: "Crop" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/268.png",
+    name: "Celestine",
+  },
+
+  Porgy: {
+    description: "A beautiful porgy!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1541.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Muskellunge: {
+    description: "A beautiful muskellunge!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1542.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Trout: {
+    description: "A beautiful trout!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1543.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Walleye: {
+    description: "A beautiful walleye!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1544.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Weakfish: {
+    description: "A beautiful weakfish!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1545.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  "Rock Blackfish": {
+    description: "A beautiful rock blackfish!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1546.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Cobia: {
+    description: "A beautiful cobia!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1547.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+  },
+  Tilapia: {
+    description: "A beautiful tilapia!",
+    decimals: 0,
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/1548.png",
+    attributes: [
+      { trait_type: "Purpose", value: "Fish" },
       { trait_type: "Tradable", value: "No" },
     ],
   },
@@ -15805,5 +16243,16 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/wearables/images/420.png",
     name: "Gingerbread Onesie",
+  },
+  "New Years Crown": {
+    description: "Wow, it looks like someone started 2025 with a bang!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "Yes" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/421.png",
+    name: "New Years Crown",
   },
 };
