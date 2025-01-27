@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
 import { ButtonPanel } from "components/ui/Panel";
+import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { SpeakingModal } from "features/game/components/SpeakingModal";
 import {
   generateBountyCoins,
@@ -14,7 +15,7 @@ import { weekResetsAt } from "features/game/lib/factions";
 import { MachineState } from "features/game/lib/gameMachine";
 import { getKeys } from "features/game/types/decorations";
 import { FLOWERS } from "features/game/types/flowers";
-import { BountyRequest } from "features/game/types/game";
+import { BountyRequest, GameState } from "features/game/types/game";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { getSeasonalTicket } from "features/game/types/seasons";
 import { TimerDisplay } from "features/retreat/components/auctioneer/AuctionDetails";
@@ -23,10 +24,9 @@ import { NPC_WEARABLES } from "lib/npcs";
 import { useCountdown } from "lib/utils/hooks/useCountdown";
 import React, { useContext, useState } from "react";
 
-const _exchange = (state: MachineState) => state.context.state.bounties;
-
 interface Props {
   readonly?: boolean;
+  onClose: () => void;
 }
 
 function acknowledgeIntro() {
@@ -40,20 +40,14 @@ function hasReadIntro() {
   return !!localStorage.getItem("flower.bounties.acknowledged");
 }
 
-export const FlowerBounties: React.FC<Props> = ({ readonly }) => {
-  const { gameService } = useContext(Context);
-  const exchange = useSelector(gameService, _exchange);
+const _state = (state: MachineState) => state.context.state;
 
+export const FlowerBounties: React.FC<Props> = ({ readonly, onClose }) => {
   const { t } = useAppTranslation();
+  const { gameService } = useContext(Context);
+  const state = useSelector(gameService, _state);
 
   const [showIntro, setShowIntro] = useState(!hasReadIntro());
-  const [deal, setDeal] = useState<BountyRequest>();
-
-  const state = gameService.getSnapshot().context.state;
-
-  const deals = exchange.requests.filter((deal) => deal.name in FLOWERS);
-
-  const expiresAt = useCountdown(weekResetsAt());
 
   if (showIntro && !readonly) {
     return (
@@ -75,12 +69,31 @@ export const FlowerBounties: React.FC<Props> = ({ readonly }) => {
     );
   }
 
+  return (
+    <CloseButtonPanel bumpkinParts={NPC_WEARABLES.poppy} onClose={onClose}>
+      <FlowerBountiesModal readonly={readonly} state={state} />
+    </CloseButtonPanel>
+  );
+};
+
+export const FlowerBountiesModal: React.FC<{
+  readonly?: boolean;
+  state: GameState;
+}> = ({ readonly, state }) => {
+  const { t } = useAppTranslation();
+  const expiresAt = useCountdown(weekResetsAt());
+  const [deal, setDeal] = useState<BountyRequest>();
+  const { bounties: exchange, inventory } = state;
+
+  const deals = exchange.requests.filter((deal) => deal.name in FLOWERS);
+
   if (deal) {
     return (
       <Deal
         deal={deal}
         onClose={() => setDeal(undefined)}
         onSold={() => setDeal(undefined)}
+        state={state}
       />
     );
   }
@@ -104,12 +117,15 @@ export const FlowerBounties: React.FC<Props> = ({ readonly }) => {
           <p className="text-sm">{t("bounties.board.empty")}</p>
         )}
         {deals.map((deal) => {
-          const isSold = !!state.bounties.completed.find(
+          const isSold = !!exchange.completed.find(
             (request) => request.id === deal.id,
           );
 
-          const isDisabled = !state.inventory[deal.name]?.gt(0);
-          const { coins } = generateBountyCoins({ game: state, bounty: deal });
+          const isDisabled = !inventory[deal.name]?.gt(0);
+          const { coins } = generateBountyCoins({
+            game: state,
+            bounty: deal,
+          });
 
           return (
             <div
@@ -182,10 +198,9 @@ const Deal: React.FC<{
   deal: BountyRequest;
   onClose: () => void;
   onSold: () => void;
-}> = ({ deal, onClose, onSold }) => {
+  state: GameState;
+}> = ({ deal, onClose, onSold, state }) => {
   const { gameService } = useContext(Context);
-  const state = gameService.getSnapshot().context.state;
-
   const { t } = useAppTranslation();
   const sell = () => {
     gameService.send("bounty.sold", {

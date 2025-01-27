@@ -68,7 +68,7 @@ export const BuyPanel: React.FC<
     },
   ] = useActor(gameService);
 
-  const isVIP = hasVipAccess(state.inventory);
+  const isVIP = hasVipAccess({ game: state });
   const dailyPurchases = state.trades.dailyPurchases ?? { count: 0, date: 0 };
   const remainingFreePurchases = getRemainingFreePurchases(dailyPurchases);
   const hasPurchasesRemaining = isVIP || remainingFreePurchases > 0;
@@ -235,8 +235,10 @@ const ListView: React.FC<ListViewProps> = ({
     );
 
     const hasMaxedOut = hasMaxItems({
-      current: updatedInventory,
-      old: state.previousInventory,
+      currentInventory: updatedInventory,
+      oldInventory: state.previousInventory,
+      currentWardrobe: state.wardrobe,
+      oldWardrobe: state.previousWardrobe,
     });
 
     if (hasMaxedOut) {

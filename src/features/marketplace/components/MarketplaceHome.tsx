@@ -9,6 +9,7 @@ import tradeIcon from "assets/icons/trade.png";
 import trade_point from "src/assets/icons/trade_points_coupon.webp";
 import sflIcon from "assets/icons/sfl.webp";
 import crownIcon from "assets/icons/vip.webp";
+
 import {
   Route,
   Routes,
@@ -30,7 +31,6 @@ import classNames from "classnames";
 import { MarketplaceHotNow } from "./MarketplaceHotNow";
 import { CONFIG } from "lib/config";
 import { MarketplaceUser } from "./MarketplaceUser";
-import { hasFeatureAccess } from "lib/flags";
 import { Context } from "features/game/GameProvider";
 import * as Auth from "features/auth/lib/Provider";
 import { useActor, useSelector } from "@xstate/react";
@@ -38,11 +38,18 @@ import { useTranslation } from "react-i18next";
 import { Label } from "components/ui/Label";
 import { Button } from "components/ui/Button";
 import { MachineState } from "features/game/lib/gameMachine";
-import { hasVipAccess } from "features/game/lib/vipAccess";
 import { ModalContext } from "features/game/components/modal/ModalProvider";
+import {
+  getRemainingTrades,
+  hasReputation,
+  Reputation,
+} from "features/game/lib/reputation";
 
-const _isVIP = (state: MachineState) =>
-  hasVipAccess(state.context.state.inventory);
+const _hasTradeReputation = (state: MachineState) =>
+  hasReputation({
+    game: state.context.state,
+    reputation: Reputation.Cropkeeper,
+  });
 
 export const MarketplaceNavigation: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -62,14 +69,15 @@ export const MarketplaceNavigation: React.FC = () => {
 
   const { gameService } = useContext(Context);
   const price = gameService.getSnapshot().context.prices.sfl?.usd ?? 0.0;
+  const { farmId } = gameService.getSnapshot().context;
 
-  const isVIP = useSelector(gameService, _isVIP);
+  const hasTradeReputation = useSelector(gameService, _hasTradeReputation);
 
   return (
     <>
       <Modal show={showFilters} onHide={() => setShowFilters(false)}>
         <CloseButtonPanel>
-          <Filters onClose={() => setShowFilters(false)} />
+          <Filters onClose={() => setShowFilters(false)} farmId={farmId} />
           <EstimatedPrice
             price={price}
             onClick={() => setShowQuickswap(true)}
@@ -101,7 +109,7 @@ export const MarketplaceNavigation: React.FC = () => {
         </CloseButtonPanel>
       </Modal>
 
-      <div className="flex  items-center lg:hidden h-[50px]">
+      <div className="flex items-center lg:hidden h-[50px]">
         <TextInput
           icon={SUNNYSIDE.icons.search}
           value={search}
@@ -126,7 +134,7 @@ export const MarketplaceNavigation: React.FC = () => {
               />
             </div>
             <div className="flex-1">
-              <Filters onClose={() => setShowFilters(false)} />
+              <Filters onClose={() => setShowFilters(false)} farmId={farmId} />
             </div>
           </InnerPanel>
 
@@ -135,20 +143,20 @@ export const MarketplaceNavigation: React.FC = () => {
             onClick={() => setShowQuickswap(true)}
           />
 
-          {!isVIP && (
+          {!hasTradeReputation && (
             <InnerPanel
-              className="p-2 cursor-pointer"
-              onClick={() => {
-                openModal("VIP_ITEMS");
-              }}
+              className="cursor-pointer"
+              onClick={() => openModal("REPUTATION")}
             >
-              <div className="flex items-center justify-between mb-1">
-                <Label icon={crownIcon} type="danger" className="ml-1">
-                  {t("vipAccess")}
-                </Label>
-                <p className="text-xxs underline">{t("readMore")}</p>
+              <div className="flex flex-col p-1">
+                <div className="flex justify-between items-center">
+                  <Label type="danger" icon={crownIcon}>
+                    {`${getRemainingTrades({ game: gameService.getSnapshot().context.state })} Trades left`}
+                  </Label>
+                  <p className="text-xxs underline">{t("read.more")}</p>
+                </div>
+                <p className="text-xs">{t("reputation.marketplace.trades")}</p>
               </div>
-              <p className="text-xxs">{t("marketplace.wantToUnlock")}</p>
             </InnerPanel>
           )}
         </div>
@@ -160,11 +168,11 @@ export const MarketplaceNavigation: React.FC = () => {
             <Routes>
               <Route path="/profile" element={<MarketplaceProfile />} />
               <Route path="/hot" element={<MarketplaceHotNow />} />
-              <Route path="/trades" element={<MyTrades />} />
-              <Route path="/rewards" element={<MarketplaceRewards />} />
               <Route path="/collection/*" element={<Collection />} />
               <Route path="/:collection/:id" element={<Tradeable />} />
               <Route path="/profile/:id" element={<MarketplaceUser />} />
+              <Route path="/profile/:id/trades" element={<MyTrades />} />
+              <Route path="/profile/rewards" element={<MarketplaceRewards />} />
               {/* default to hot */}
               <Route path="/" element={<MarketplaceHotNow />} />
             </Routes>
@@ -177,18 +185,21 @@ export const MarketplaceNavigation: React.FC = () => {
 
 export type MarketplacePurpose = "boost" | "decoration" | "resource";
 
-const Option: React.FC<{
+interface OptionProps {
   icon: string;
   label: string;
   onClick: () => void;
   isActive?: boolean;
-  options?: {
-    icon: string;
-    label: string;
-    onClick: () => void;
-    isActive?: boolean;
-  }[];
-}> = ({ icon, label, onClick, options, isActive }) => {
+  options?: OptionProps[];
+}
+
+const Option: React.FC<OptionProps> = ({
+  icon,
+  label,
+  onClick,
+  options,
+  isActive,
+}) => {
   return (
     <div className="mb-1">
       <div
@@ -202,7 +213,14 @@ const Option: React.FC<{
           <SquareIcon icon={icon} width={10} />
           <span className="text-sm ml-2">{label}</span>
         </div>
-        <img src={SUNNYSIDE.icons.chevron_right} className="w-4" />
+        <img
+          src={
+            options
+              ? SUNNYSIDE.icons.chevron_down
+              : SUNNYSIDE.icons.chevron_right
+          }
+          className={options ? "w-6" : "w-[18px]"}
+        />
       </div>
 
       {options?.map((option) => (
@@ -218,21 +236,42 @@ const Option: React.FC<{
             <SquareIcon icon={option.icon} width={10} />
             <span className="text-sm ml-2">{option.label}</span>
           </div>
+          <img
+            src={SUNNYSIDE.icons.chevron_right}
+            className={"w-[18px] mr-5"}
+          />
         </div>
       ))}
     </div>
   );
 };
 
-const Filters: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const Filters: React.FC<{ onClose: () => void; farmId: number }> = ({
+  onClose,
+  farmId,
+}) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [queryParams] = useSearchParams();
   const filters = queryParams.get("filters");
-
-  const { gameService } = useContext(Context);
-
+  const { t } = useTranslation();
   const isWorldRoute = pathname.includes("/world");
+
+  const baseUrl = `${isWorldRoute ? "/world" : ""}/marketplace`;
+  const navigateTo = ({
+    path,
+    filterParams,
+  }: {
+    path: string;
+    filterParams?: string;
+  }) => {
+    const url = filterParams
+      ? `${baseUrl}/collection?filters=${filterParams}`
+      : `${baseUrl}/${path}`;
+
+    navigate(url);
+    onClose();
+  };
 
   return (
     <div className="p-1 h-full">
@@ -240,22 +279,18 @@ const Filters: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div>
           <Option
             icon={SUNNYSIDE.icons.expression_alerted}
-            label="Hot now"
-            onClick={() => {
-              navigate(`${isWorldRoute ? "/world" : ""}/marketplace/hot`);
-              onClose();
-            }}
-            isActive={
-              pathname === `${isWorldRoute ? "/world" : ""}/marketplace/hot`
-            }
+            label={t("marketplace.trending")}
+            onClick={() => navigateTo({ path: "hot" })}
+            isActive={pathname === `${baseUrl}/hot`}
           />
           <Option
             icon={lightning}
-            label="Power ups"
+            label={t("marketplace.powerUps")}
             onClick={() =>
-              navigate(
-                `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=collectibles,wearables,utility`,
-              )
+              navigateTo({
+                path: "collection",
+                filterParams: "collectibles,wearables,utility",
+              })
             }
             isActive={filters === "collectibles,wearables,utility"}
             options={
@@ -263,106 +298,116 @@ const Filters: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 ? [
                     {
                       icon: ITEM_DETAILS["Freya Fox"].image,
-                      label: "Collectibles",
+                      label: t("marketplace.collectibles"),
                       isActive: filters === "utility,collectibles",
-                      onClick: () => {
-                        navigate(
-                          `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=utility,collectibles`,
-                        );
-                        onClose();
-                      },
+                      onClick: () =>
+                        navigateTo({
+                          path: "collection",
+                          filterParams: "utility,collectibles",
+                        }),
                     },
                     {
                       icon: wearableIcon,
-                      label: "Wearables",
+                      label: t("marketplace.wearables"),
                       isActive: filters === "utility,wearables",
-                      onClick: () => {
-                        navigate(
-                          `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=utility,wearables`,
-                        );
-                        onClose();
-                      },
+                      onClick: () =>
+                        navigateTo({
+                          path: "collection",
+                          filterParams: "utility,wearables",
+                        }),
                     },
                   ]
                 : undefined
             }
           />
-
           <Option
             icon={ITEM_DETAILS.Eggplant.image}
-            label="Resources"
-            onClick={() => {
-              navigate(
-                `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=resources`,
-              );
-              onClose();
-            }}
+            label={t("marketplace.resources")}
+            onClick={() =>
+              navigateTo({
+                path: "collection",
+                filterParams: "resources",
+              })
+            }
             isActive={filters === "resources"}
           />
-
-          {hasFeatureAccess(
-            gameService.getSnapshot().context.state,
-            "MARKETPLACE_ADMIN",
-          ) && (
-            <Option
-              icon={SUNNYSIDE.icons.stopwatch}
-              label="Limited"
-              onClick={() => {
-                navigate(`/marketplace/collection?filters=temporary`);
-                onClose();
-              }}
-              isActive={filters === "temporary"}
-            />
-          )}
-
+          <Option
+            icon={SUNNYSIDE.icons.stopwatch}
+            label={t("marketplace.limited")}
+            onClick={() =>
+              navigateTo({
+                path: "collection",
+                filterParams: "temporary",
+              })
+            }
+            isActive={filters === "temporary"}
+          />
           <Option
             icon={SUNNYSIDE.icons.heart}
-            label="Cosmetics"
-            onClick={() => {
-              navigate(
-                `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=collectibles,wearables,cosmetic`,
-              );
-              onClose();
-            }}
+            label={t("marketplace.cosmetics")}
+            onClick={() =>
+              navigateTo({
+                path: "collection",
+                filterParams: "collectibles,wearables,cosmetic",
+              })
+            }
             isActive={filters === "collectibles,wearables,cosmetic"}
           />
-
-          {CONFIG.NETWORK !== "mainnet" && (
-            <Option
-              icon={budIcon}
-              label="Bud NFTs"
-              onClick={() => {
-                navigate(
-                  `${isWorldRoute ? "/world" : ""}/marketplace/collection?filters=buds`,
-                );
-                onClose();
-              }}
-              isActive={filters === "buds"}
-            />
-          )}
+          <Option
+            icon={budIcon}
+            label={t("marketplace.budNfts")}
+            onClick={() =>
+              navigateTo({
+                path: "collection",
+                filterParams: "buds",
+              })
+            }
+            isActive={filters === "buds"}
+          />
         </div>
 
         <div>
           <Option
-            icon={tradeIcon}
-            label="My trades"
-            onClick={() => {
-              navigate(`${isWorldRoute ? "/world" : ""}/marketplace/trades`);
-              onClose();
-            }}
-            isActive={
-              pathname === `${isWorldRoute ? "/world" : ""}/marketplace/trades`
+            icon={SUNNYSIDE.icons.player}
+            label={t("marketplace.myProfile")}
+            onClick={() =>
+              navigateTo({
+                path: `profile/${farmId}`,
+              })
             }
-          />
-          <Option
-            icon={trade_point}
-            label="My rewards"
-            onClick={() => {
-              navigate(`${isWorldRoute ? "/world" : ""}/marketplace/rewards`);
-              onClose();
-            }}
-            isActive={
-              pathname === `${isWorldRoute ? "/world" : ""}/marketplace/rewards`
+            options={
+              pathname.includes("profile")
+                ? [
+                    {
+                      icon: SUNNYSIDE.icons.lightning,
+                      label: t("marketplace.stats"),
+                      onClick: () =>
+                        navigateTo({
+                          path: `profile/${farmId}`,
+                        }),
+                      isActive: pathname === `${baseUrl}/profile/${farmId}`,
+                    },
+                    {
+                      icon: tradeIcon,
+                      label: t("marketplace.trades"),
+                      onClick: () =>
+                        navigateTo({
+                          path: `profile/${farmId}/trades`,
+                        }),
+                      isActive:
+                        pathname === `${baseUrl}/profile/${farmId}/trades`,
+                    },
+                    {
+                      icon: trade_point,
+                      label: t("marketplace.rewards"),
+                      onClick: () =>
+                        navigateTo({
+                          path: "profile/rewards",
+                        }),
+                      isActive: pathname === `${baseUrl}/profile/rewards`,
+                    },
+                  ]
+                : undefined
             }
           />
         </div>
@@ -381,7 +426,7 @@ const EstimatedPrice: React.FC<{ price: number; onClick: () => void }> = ({
       <div className="flex justify-between items-center pr-1">
         <div className="flex items-center">
           <img src={sflIcon} className="w-6" />
-          <span className="text-sm ml-2">{`$${price.toFixed(2)}`}</span>
+          <span className="text-sm ml-2">{`$${price.toFixed(4)}`}</span>
         </div>
         <p className="text-xxs underline">{t("marketplace.quickswap")}</p>
       </div>

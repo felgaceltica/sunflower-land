@@ -24,6 +24,7 @@ import { BUMPKIN_ITEM_BUFF_LABELS } from "features/game/types/bumpkinItemBuffs";
 import { COLLECTIBLE_BUFF_LABELS } from "features/game/types/collectibleItemBuffs";
 import { FACTION_SHOP_KEYS } from "features/game/types/factionShop";
 import { OPEN_SEA_COLLECTIBLES, OPEN_SEA_WEARABLES } from "metadata/metadata";
+import { GameState } from "features/game/types/game";
 
 // type guard for WearablesItem | CollectiblesItem
 export const isWearablesItem = (
@@ -50,14 +51,15 @@ export const getItemImage = (item: SeasonalStoreItem | null): string => {
 
 export const getItemBuffLabel = (
   item: SeasonalStoreItem | null,
-): BuffLabel | undefined => {
+  state: GameState,
+): BuffLabel[] | undefined => {
   if (!item) return;
 
   if (isWearablesItem(item)) {
     return BUMPKIN_ITEM_BUFF_LABELS[item.wearable];
   }
 
-  return COLLECTIBLE_BUFF_LABELS[item.collectible];
+  return COLLECTIBLE_BUFF_LABELS(state)[item.collectible];
 };
 export const getItemDescription = (item: SeasonalStoreItem | null): string => {
   if (!item) return "";
@@ -71,12 +73,12 @@ export const getItemDescription = (item: SeasonalStoreItem | null): string => {
 
 export const SeasonalStore: React.FC<{
   readonly?: boolean;
-}> = ({ readonly }) => {
+  state: GameState;
+}> = ({ readonly, state }) => {
   const [selectedItem, setSelectedItem] = useState<SeasonalStoreItem | null>(
     null,
   );
   const [selectedTier, setSelectedTier] = useState<SeasonalStoreTier>();
-
   const [isVisible, setIsVisible] = useState(false);
   const createdAt = Date.now();
 
@@ -124,7 +126,7 @@ export const SeasonalStore: React.FC<{
           item={selectedItem}
           tier={selectedTier}
           image={getItemImage(selectedItem)}
-          buff={getItemBuffLabel(selectedItem)}
+          buff={getItemBuffLabel(selectedItem, state)}
           isWearable={selectedItem ? isWearablesItem(selectedItem) : false}
           onClose={() => {
             setSelectedItem(null);

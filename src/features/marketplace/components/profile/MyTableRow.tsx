@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { getTradeableDisplay } from "features/marketplace/lib/tradeables";
 import { Button } from "components/ui/Button";
 import classNames from "classnames";
@@ -7,6 +7,10 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { CollectionName } from "features/game/types/marketplace";
 
 import sflIcon from "assets/icons/sfl.webp";
+import { Context } from "features/game/GameProvider";
+import { useSelector } from "@xstate/react";
+import { MachineState } from "features/game/lib/gameMachine";
+import { formatNumber } from "lib/utils/formatNumber";
 
 type MyTableRowProps = {
   index: number;
@@ -25,7 +29,7 @@ type MyTableRowProps = {
   onClaim: (id: string) => void;
   onRowClick: () => void;
 };
-
+const _state = (state: MachineState) => state.context.state;
 export const MyTableRow: React.FC<MyTableRowProps> = ({
   id,
   index,
@@ -43,9 +47,12 @@ export const MyTableRow: React.FC<MyTableRowProps> = ({
   onClaim,
 }) => {
   const { t } = useAppTranslation();
+  const { gameService } = useContext(Context);
+  const state = useSelector(gameService, _state);
   const details = getTradeableDisplay({
     id: itemId,
     type: collection,
+    state,
   });
 
   return (
@@ -79,16 +86,16 @@ export const MyTableRow: React.FC<MyTableRowProps> = ({
           <div className="flex items-center justify-start space-x-1">
             <img src={sflIcon} className="h-6" />
             <div>
-              <span className="sm:text-sm">{`${price.toFixed(2)} SFL`}</span>
+              <span className="text-xs sm:text-sm">{`${formatNumber(price, { decimalPlaces: 4 })} SFL`}</span>
               {!isResource && (
                 <p className="text-xxs">
                   {`$${new Decimal(usdPrice).mul(price).toFixed(2)} USD`}
                 </p>
               )}
               {isResource && (
-                <div className="text-xxs w-full">
+                <div className="text-[16px] sm:text-xxs w-full">
                   {t("bumpkinTrade.price/unit", {
-                    price: unitPrice.toFixed(4),
+                    price: formatNumber(unitPrice, { decimalPlaces: 4 }),
                   })}
                 </div>
               )}

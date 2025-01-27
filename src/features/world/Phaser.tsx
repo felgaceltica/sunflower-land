@@ -63,9 +63,6 @@ import { ToastContext } from "features/game/toast/ToastProvider";
 import { AuthMachineState } from "features/auth/lib/authMachine";
 import worldIcon from "assets/icons/world.png";
 
-import { ChristmasScene } from "./scenes/ChristmasScene";
-import { hasFeatureAccess } from "lib/flags";
-
 const _roomState = (state: MachineState) => state.value;
 const _scene = (state: MachineState) => state.context.sceneId;
 
@@ -141,9 +138,7 @@ export const PhaserComponent: React.FC<Props> = ({
     Preloader,
     new WoodlandsScene({ gameState: gameService.state.context.state }),
     BeachScene,
-    ...(hasFeatureAccess(gameService.state.context.state, "CHRISTMAS_2024")
-      ? [ChristmasScene]
-      : [new PlazaScene({ gameState: gameService.state.context.state })]),
+    new PlazaScene({ gameState: gameService.state.context.state }),
     RetreatScene,
     KingdomScene,
     GoblinHouseScene,
@@ -270,14 +265,14 @@ export const PhaserComponent: React.FC<Props> = ({
 
   // When route changes, switch scene
   useEffect(() => {
-    if (!loaded || !route || mmoService.state.context.sceneId === route) return;
+    if (!loaded || !route) return;
 
     const activeScene = game.current?.scene
       .getScenes(false)
       // Corn maze pauses when game is over so we need to filter for active and paused scenes.
       .filter((s) => s.scene.isActive() || s.scene.isPaused())[0];
 
-    if (activeScene) {
+    if (activeScene && activeScene.scene.key !== route) {
       activeScene.scene.start(route);
       mmoService.send("SWITCH_SCENE", { sceneId: route });
       mmoService.send("UPDATE_PREVIOUS_SCENE", {

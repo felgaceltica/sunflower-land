@@ -9,13 +9,14 @@ import {
   SaleHistory,
 } from "features/game/types/marketplace";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
+import { formatNumber } from "lib/utils/formatNumber";
 
 interface Props {
-  price: number;
+  marketPrice: number;
   history?: SaleHistory;
 }
 
-export const TradeableStats: React.FC<Props> = ({ history, price }) => {
+export const TradeableStats: React.FC<Props> = ({ history, marketPrice }) => {
   const { t } = useAppTranslation();
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +30,7 @@ export const TradeableStats: React.FC<Props> = ({ history, price }) => {
     ? getPriceHistory({
         history: history.history,
         from: new Date(Date.now() - 1000 * 60 * 60 * 24 * 31).getTime(), // 31 days ago
-        price,
+        price: marketPrice,
       })
     : {
         dates: [],
@@ -39,6 +40,9 @@ export const TradeableStats: React.FC<Props> = ({ history, price }) => {
         oneDayPriceChange: 0,
         sevenDayPriceChange: 0,
         thirtyDayPriceChange: 0,
+        oneDayPrice: 0,
+        sevenDayPrice: 0,
+        thirtyDayPrice: 0,
       };
 
   return (
@@ -57,15 +61,15 @@ export const TradeableStats: React.FC<Props> = ({ history, price }) => {
                 className="whitespace-nowrap"
                 icon={prices.oneDayChange > 0 ? increaseArrow : decreaseArrow}
               >
-                <span className="text-xxs sm:text-xs">{`${prices.oneDayChange.toFixed(2)}%`}</span>
+                <span className="text-xxs sm:text-xs">{`${formatNumber(prices.oneDayChange)}%`}</span>
               </Label>
             )}
           </div>
           <p className="text-xxs pl-0.5 sm:text-xs sm:p-1">
             {loading ? (
-              <span className="loading-fade-pulse">{`0.00 SFL`}</span>
+              <span className="loading-fade-pulse">{`${formatNumber(0, { decimalPlaces: 4 })} SFL`}</span>
             ) : (
-              `${prices.oneDayPriceChange.toFixed(2)} SFL`
+              `${formatNumber(prices.oneDayPrice, { decimalPlaces: 4 })} SFL > ${formatNumber(marketPrice, { decimalPlaces: 4 })} SFL`
             )}
           </p>
         </InnerPanel>
@@ -84,15 +88,15 @@ export const TradeableStats: React.FC<Props> = ({ history, price }) => {
                 className="whitespace-nowrap"
                 icon={prices.sevenDayChange > 0 ? increaseArrow : decreaseArrow}
               >
-                <span className="text-xxs sm:text-xs">{`${prices.sevenDayChange.toFixed(2)}%`}</span>
+                <span className="text-xxs sm:text-xs">{`${formatNumber(prices.sevenDayChange)}%`}</span>
               </Label>
             )}
           </div>
           <p className="text-xxs pl-0.5 sm:text-xs sm:p-1">
             {loading ? (
-              <span className="loading-fade-pulse">{`0.00 SFL`}</span>
+              <span className="loading-fade-pulse">{`${formatNumber(0, { decimalPlaces: 4 })} SFL`}</span>
             ) : (
-              `${prices.sevenDayPriceChange.toFixed(2)} SFL`
+              `${formatNumber(prices.sevenDayPrice, { decimalPlaces: 4 })} SFL > ${formatNumber(marketPrice, { decimalPlaces: 4 })} SFL`
             )}
           </p>
         </InnerPanel>

@@ -7,7 +7,11 @@ import { NPC_WEARABLES } from "lib/npcs";
 
 import { COLLECTIBLE_BUFF_LABELS } from "features/game/types/collectibleItemBuffs";
 import { BuffLabel } from "features/game/types";
-import { WearablesItem, CollectiblesItem } from "features/game/types/game";
+import {
+  WearablesItem,
+  CollectiblesItem,
+  GameState,
+} from "features/game/types/game";
 
 import lightning from "assets/icons/lightning.png";
 import shopIcon from "assets/icons/shop.png";
@@ -19,6 +23,7 @@ import { MachineState } from "features/game/lib/gameMachine";
 import { SeasonalStore } from "./SeasonalStore";
 import { hasFeatureAccess } from "lib/flags";
 import { Context } from "features/game/GameProvider";
+import { useSelector } from "@xstate/react";
 
 interface Props {
   onClose: () => void;
@@ -45,28 +50,29 @@ export const getItemImage = (
 
 export const getItemBuffLabel = (
   item: WearablesItem | CollectiblesItem | null,
-): BuffLabel | undefined => {
+  state: GameState,
+): BuffLabel[] | undefined => {
   if (!item) return;
 
   if (isWearablesItem(item)) {
     return BUMPKIN_ITEM_BUFF_LABELS[item.name];
   }
 
-  return COLLECTIBLE_BUFF_LABELS[item.name];
+  return COLLECTIBLE_BUFF_LABELS(state)[item.name];
 };
 
 export const _megastore = (state: MachineState) =>
   state.context.state.megastore;
+const _state = (state: MachineState) => state.context.state;
 
 export const MegaStore: React.FC<Props> = ({ onClose }) => {
   const { gameService } = useContext(Context);
   const { t } = useAppTranslation();
   const [tab, setTab] = useState(0);
+  const state = useSelector(gameService, _state);
 
   // Update logic after release
-  if (
-    hasFeatureAccess(gameService.getSnapshot().context.state, "SEASONAL_TIERS")
-  ) {
+  if (hasFeatureAccess(state, "SEASONAL_TIERS")) {
     return (
       <CloseButtonPanel
         bumpkinParts={NPC_WEARABLES.stella}
@@ -75,7 +81,7 @@ export const MegaStore: React.FC<Props> = ({ onClose }) => {
         currentTab={tab}
         setCurrentTab={setTab}
       >
-        {tab === 0 && <SeasonalStore />}
+        {tab === 0 && <SeasonalStore state={state} />}
       </CloseButtonPanel>
     );
   }
