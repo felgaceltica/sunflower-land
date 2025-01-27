@@ -457,7 +457,10 @@ export class FruitDashObstacleFactory {
     if (!getAudioMutedSetting())
       this._scene.gameOverSound?.play({ volume: 0.15 });
 
-    if (this._scene.currentPlayer?.body) {
+    if (
+      this._scene.currentPlayer?.body &&
+      this._scene.anims.exists("player_death_anim")
+    ) {
       const spriteName = "player_death";
       const spriteKey = "player_death_anim";
 
@@ -466,16 +469,19 @@ export class FruitDashObstacleFactory {
         this._scene.currentPlayer.y - 1,
         spriteName,
       );
+      if (playerDeath.texture.key === "__MISSING") {
+        playerDeath.destroy();
+        return;
+      }
       playerDeath.setDepth(this._scene.currentPlayer.body.position.y);
-      playerDeath.play({ key: spriteKey });
+      playerDeath.on("animationcomplete", async () => {
+        if (playerDeath.active) playerDeath.destroy();
+      });
       this._scene.speed = 0;
       if (this._scene.currentPlayer.directionFacing === "left") {
         playerDeath.setFlipX(true);
       }
-
-      playerDeath.on("animationcomplete", async () => {
-        if (playerDeath.active) playerDeath.destroy();
-      });
+      playerDeath.play({ key: spriteKey });
     }
   };
 }
