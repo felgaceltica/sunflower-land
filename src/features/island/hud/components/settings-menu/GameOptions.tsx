@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal } from "components/ui/Modal";
 import clipboard from "clipboard";
 import { CONFIG } from "lib/config";
@@ -40,8 +40,6 @@ import { DeveloperOptions } from "./developer-options/DeveloperOptions";
 import { Discord } from "./general-settings/DiscordModal";
 import { DepositWrapper } from "features/goblins/bank/components/Deposit";
 import { useSound } from "lib/utils/hooks/useSound";
-import { AppearanceSettings } from "./general-settings/AppearanceSettings";
-import { FontSettings } from "./general-settings/FontSettings";
 import { ConfirmationModal } from "components/ui/ConfirmationModal";
 import ticket from "assets/icons/ticket.png";
 import lockIcon from "assets/icons/lock.png";
@@ -50,11 +48,31 @@ import { WalletAddressLabel } from "components/ui/WalletAddressLabel";
 import { PickServer } from "./plaza-settings/PickServer";
 import { PlazaShaderSettings } from "./plaza-settings/PlazaShaderSettings";
 import { AdminSettings } from "./general-settings/AdminSettings";
+import AppearanceAndBehaviour from "./general-settings/AppearanceBehaviour";
+import { Notifications } from "./general-settings/Notifications";
+import { AuthMachineState } from "features/auth/lib/authMachine";
+import { hasFeatureAccess } from "lib/flags";
+import {
+  getSubscriptionsForFarmId,
+  Subscriptions,
+} from "features/game/actions/subscriptions";
+import { preload } from "swr";
+import { useSelector } from "@xstate/react";
+import { MachineState } from "features/game/lib/gameMachine";
+import { isSupported } from "firebase/messaging";
 
 export interface ContentComponentProps {
   onSubMenuClick: (id: SettingMenuId) => void;
   onClose: () => void;
 }
+
+export const subscriptionsFetcher = ([, token, farmId]: [
+  string,
+  string,
+  number,
+]): Promise<Subscriptions> => {
+  return getSubscriptionsForFarmId(farmId, token);
+};
 
 const GameOptions: React.FC<ContentComponentProps> = ({
   onSubMenuClick,
@@ -69,13 +87,20 @@ const GameOptions: React.FC<ContentComponentProps> = ({
   const [isConfirmLogoutModalOpen, showConfirmLogoutModal] = useState(false);
   const [showFarm, setShowFarm] = useState(false);
   const [showNftId, setShowNftId] = useState(false);
+  const [notificationsSupported, setNotificationsSupported] = useState(false);
 
   const copypaste = useSound("copypaste");
-  const button = useSound("button");
 
   const isPWA = useIsPWA();
   const isWeb3MobileBrowser = isMobile && !!window.ethereum;
   const pwaInstall = usePWAInstall();
+
+  useEffect(() => {
+    const checkNotificationsSupported = async () => {
+      setNotificationsSupported(await isSupported());
+    };
+    checkNotificationsSupported();
+  }, []);
 
   const handleInstallApp = () => {
     if (isMobile && !isWeb3MobileBrowser) {
@@ -166,6 +191,38 @@ const GameOptions: React.FC<ContentComponentProps> = ({
           <span>{t("install.app")}</span>
         </Button>
       )}
+      {hasFeatureAccess(
+        gameService.state.context.state,
+        "SEASONAL_EVENTS_NOTIFICATIONS",
+      ) && (
+        <Button
+          onClick={() => onSubMenuClick("notifications")}
+          className="mb-1 relative"
+          // Not available in players browser
+          disabled={
+            !(
+              "serviceWorker" in navigator &&
+              "PushManager" in window &&
+              notificationsSupported
+            )
+          }
+        >
+          <div className="flex items-center space-x-1">
+            <span>{t("gameOptions.notifications")}</span>
+            {!(
+              "serviceWorker" in navigator &&
+              "PushManager" in window &&
+              notificationsSupported
+            ) && (
+              <Label type="info" className="mt-0.5">
+                <span className=" text-xxs sm:text-xs">
+                  {t("gameOptions.notifications.notSupported")}
+                </span>
+              </Label>
+            )}
+          </div>
+        </Button>
+      )}
       <Button
         disabled={!canRefresh}
         className="p-1 mb-1 relative"
@@ -223,14 +280,37 @@ interface GameOptionsModalProps {
   onClose: () => void;
 }
 
+const _token = (state: AuthMachineState) =>
+  state.context.user.rawToken as string;
+
+const _farmId = (state: MachineState) => state.context.farmId;
+
+const preloadSubscriptions = async (token: string, farmId: number) => {
+  preload(
+    ["/notifications/subscriptions", token, farmId],
+    subscriptionsFetcher,
+  );
+};
+
 export const GameOptionsModal: React.FC<GameOptionsModalProps> = ({
   show,
   onClose,
 }) => {
+  const { authService } = useContext(Auth.Context);
+
+  const token = useSelector(authService, _token);
+  const { gameService } = useContext(GameContext);
+  const farmId = useSelector(gameService, _farmId);
   const [selected, setSelected] = useState<SettingMenuId>("main");
 
-  const onHide = () => {
+  useEffect(() => {
+    if (farmId) preloadSubscriptions(token, farmId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [farmId]);
+
+  const onHide = async () => {
     onClose();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setSelected("main");
   };
 
@@ -273,12 +353,12 @@ export type SettingMenuId =
   | "discord"
   | "changeLanguage"
   | "share"
-  | "appearance"
-  | "font"
+  | "appearance&behaviour"
 
+  // Push Notifications
+  | "notifications"
   // Amoy Testnet Actions
   | "hoardingCheck"
-
   // Plaza Settings
   | "pickServer"
   | "shader";
@@ -321,6 +401,11 @@ export const settingMenus: Record<SettingMenuId, SettingMenu> = {
     parent: "main",
     content: PlazaSettings,
   },
+  notifications: {
+    title: translate("gameOptions.notifications"),
+    parent: "main",
+    content: (props) => <Notifications {...props} />,
+  },
 
   // Blockchain Settings
   deposit: {
@@ -360,15 +445,10 @@ export const settingMenus: Record<SettingMenuId, SettingMenu> = {
     parent: "general",
     content: Share,
   },
-  appearance: {
-    title: translate("gameOptions.generalSettings.appearance"),
+  "appearance&behaviour": {
+    title: translate("gameOptions.generalSettings.appearance&behaviour"),
     parent: "general",
-    content: AppearanceSettings,
-  },
-  font: {
-    title: translate("gameOptions.generalSettings.font"),
-    parent: "appearance",
-    content: FontSettings,
+    content: AppearanceAndBehaviour,
   },
 
   // Developer Options
@@ -378,7 +458,7 @@ export const settingMenus: Record<SettingMenuId, SettingMenu> = {
     content: AdminSettings,
   },
   hoardingCheck: {
-    title: "Hoarding Check (Amoy)",
+    title: "Hoarding Check (DEV)",
     parent: "amoy",
     content: (props) => <DEV_HoarderCheck {...props} />,
   },

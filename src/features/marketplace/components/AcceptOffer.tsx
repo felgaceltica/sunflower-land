@@ -16,7 +16,7 @@ import {
   getChestItems,
 } from "features/island/hud/components/inventory/utils/inventory";
 import { KNOWN_ITEMS } from "features/game/types";
-import { ITEM_NAMES } from "features/game/types/bumpkin";
+import { BumpkinItem, ITEM_NAMES } from "features/game/types/bumpkin";
 import { availableWardrobe } from "features/game/events/landExpansion/equip";
 import {
   BlockchainEvent,
@@ -32,8 +32,6 @@ import Decimal from "decimal.js-light";
 import { StoreOnChain } from "./StoreOnChain";
 
 const _state = (state: MachineState) => state.context.state;
-const _previousInventory = (state: MachineState) =>
-  state.context.state.previousInventory;
 
 const AcceptOfferContent: React.FC<{
   onClose: () => void;
@@ -47,8 +45,8 @@ const AcceptOfferContent: React.FC<{
 
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
-  const previousInventory = useSelector(gameService, _previousInventory);
   const [needsSync, setNeedsSync] = useState(false);
+  const { previousInventory, previousWardrobe, bertObsession, npcs } = state;
 
   useOnMachineTransition<ContextType, BlockchainEvent>(
     gameService,
@@ -66,12 +64,26 @@ const AcceptOfferContent: React.FC<{
 
   const confirm = async () => {
     if (offer.type === "onchain") {
-      const prevBal =
-        previousInventory[display.name as InventoryItemName] ?? new Decimal(0);
+      if (display.type === "collectibles") {
+        const prevBal =
+          previousInventory[display.name as InventoryItemName] ??
+          new Decimal(0);
 
-      if (prevBal.lt(offer.quantity)) {
-        setNeedsSync(true);
-        return;
+        if (prevBal.lt(offer.quantity)) {
+          setNeedsSync(true);
+          return;
+        }
+      }
+
+      if (display.type === "wearables") {
+        const prevBal = new Decimal(
+          previousWardrobe[display.name as BumpkinItem] ?? 0,
+        );
+
+        if (prevBal.lt(offer.quantity)) {
+          setNeedsSync(true);
+          return;
+        }
       }
     }
 
@@ -109,17 +121,12 @@ const AcceptOfferContent: React.FC<{
     hasItem = !!getChestBuds(state)[itemId];
   }
 
-  if (display.type === "resources") {
-    const name = KNOWN_ITEMS[itemId];
-    hasItem = !!getBasketItems(state.inventory)[name]?.gte(offer.quantity);
-  }
-
   const estTradePoints =
     offer.sfl === 0
       ? 0
       : calculateTradePoints({
           sfl: offer.sfl,
-          points: offer.type === "instant" ? 1 : 5,
+          points: offer.type === "instant" ? 1 : 3,
         }).multipliedPoints;
 
   if (needsSync) {
@@ -131,6 +138,17 @@ const AcceptOfferContent: React.FC<{
       />
     );
   }
+
+  // Check if the item is a bert obsession and whether the bert obsession is completed
+  const isItemBertObsession = bertObsession?.name === display.name;
+  const obsessionCompletedAt = npcs?.bert?.questCompletedAt;
+  const isBertsObesessionCompleted =
+    !!obsessionCompletedAt &&
+    bertObsession &&
+    obsessionCompletedAt >= bertObsession.startDate &&
+    obsessionCompletedAt <= bertObsession.endDate;
+
+  const isResource = display.type === "resources";
 
   return (
     <>
@@ -154,10 +172,9 @@ const AcceptOfferContent: React.FC<{
       </div>
 
       {!hasItem && (
-        <Label
-          type="danger"
-          className="my-2"
-        >{`You do not have ${display.name}`}</Label>
+        <Label type="danger" className="my-2">
+          {`You do not have ${display.name}`}
+        </Label>
       )}
 
       <div className="flex">
@@ -165,7 +182,10 @@ const AcceptOfferContent: React.FC<{
           {t("cancel")}
         </Button>
         <Button
-          disabled={!hasItem}
+          disabled={
+            !hasItem ||
+            (isItemBertObsession && isBertsObesessionCompleted && !isResource)
+          }
           onClick={() => confirm()}
           className="relative"
         >
