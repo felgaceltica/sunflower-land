@@ -1,4 +1,8 @@
-import { Inventory, InventoryItemName } from "features/game/types/game";
+import {
+  Inventory,
+  InventoryItemName,
+  TemperateSeasonName,
+} from "features/game/types/game";
 import { ITEM_DETAILS } from "features/game/types/images";
 import React from "react";
 import { RequirementLabel } from "../RequirementsLabel";
@@ -7,15 +11,23 @@ import Decimal from "decimal.js-light";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { formatDateRange } from "lib/utils/time";
 import { Label } from "../Label";
+import { BumpkinItem, ITEM_IDS } from "features/game/types/bumpkin";
+import { BUMPKIN_ITEM_BUFF_LABELS } from "features/game/types/bumpkinItemBuffs";
+import { isCollectible } from "features/game/events/landExpansion/garbageSold";
+import { SEASON_ICONS } from "features/island/buildings/components/building/market/SeasonalSeeds";
+import { isFullMoonBerry } from "features/game/events/landExpansion/seedBought";
+import { SeedName } from "features/game/types/seeds";
+import fullMoon from "assets/icons/full_moon.png";
 
 /**
  * The props for the details for items.
  * @param item The item.
  */
 interface ItemDetailsProps {
-  item: InventoryItemName;
+  item: InventoryItemName | BumpkinItem;
   from?: Date;
   to?: Date;
+  seasons?: TemperateSeasonName[];
 }
 
 /**
@@ -45,6 +57,7 @@ interface Props {
  * The view for displaying item name, details, properties and action.
  * @props The component props.
  */
+
 export const ShopSellDetails: React.FC<Props> = ({
   details,
   properties,
@@ -71,24 +84,40 @@ export const ShopSellDetails: React.FC<Props> = ({
 };
 
 const ItemDetails: React.FC<ItemDetailsProps> = (details) => {
-  const item = ITEM_DETAILS[details.item];
-  const icon = item.image;
-  const title = details.item;
-  const description = item.description;
+  const { item, seasons } = details;
+  const image = isCollectible(item)
+    ? ITEM_DETAILS[item].image
+    : new URL(`/src/assets/wearables/${ITEM_IDS[item]}.webp`, import.meta.url)
+        .href;
+  const description = isCollectible(item)
+    ? ITEM_DETAILS[item].description
+    : BUMPKIN_ITEM_BUFF_LABELS[item]?.map((b) => b.shortDescription).join(", ");
 
   return (
     <>
       <div className="flex space-x-2 justify-start items-center sm:flex-col-reverse md:space-x-0">
-        {icon && (
+        {image && (
           <div className="sm:mt-2">
-            <SquareIcon icon={icon} width={14} />
+            <SquareIcon icon={image} width={14} />
           </div>
         )}
-        <span className="sm:text-center">{title}</span>
+        <span className="sm:text-center">{item}</span>
       </div>
-      <span className="text-xs mb-2 sm:mt-1 whitespace-pre-line sm:text-center">
-        {description}
-      </span>
+      {description && (
+        <span className="text-xs mb-2 sm:mt-1 whitespace-pre-line sm:text-center">
+          {description}
+        </span>
+      )}
+      {seasons && (
+        <div className="flex items-center justify-center mb-2">
+          {seasons.map((season) => (
+            <img key={season} src={SEASON_ICONS[season]} className="w-5 ml-1" />
+          ))}
+          {isFullMoonBerry(`${item} Seed` as SeedName) && (
+            <img src={fullMoon} className="w-6 ml-1" />
+          )}
+        </div>
+      )}
     </>
   );
 };

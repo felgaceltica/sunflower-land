@@ -16,13 +16,15 @@ import { wallet } from "lib/blockchain/wallet";
 import { getKeys } from "features/game/types/craftables";
 import { getBankItems } from "features/goblins/storageHouse/lib/storageItems";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { WITHDRAWABLES } from "features/game/types/withdrawables";
+import { INVENTORY_RELEASES } from "features/game/types/withdrawables";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Context } from "features/game/GameProvider";
 import { Label } from "components/ui/Label";
 import { WalletAddressLabel } from "components/ui/WalletAddressLabel";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { MachineState } from "features/game/lib/gameMachine";
+import { hasReputation, Reputation } from "features/game/lib/reputation";
+import { RequiredReputation } from "features/island/hud/components/reputation/Reputation";
 
 interface Props {
   onWithdraw: (ids: number[], amounts: string[]) => void;
@@ -121,14 +123,28 @@ export const WithdrawItems: React.FC<Props> = ({
   };
 
   const withdrawableItems = getKeys(inventory)
-    .filter(
-      (itemName) => WITHDRAWABLES[itemName]() && !isCurrentObsession(itemName),
-    )
+    .filter((itemName) => {
+      const withdrawAt = INVENTORY_RELEASES[itemName]?.withdrawAt;
+      return (
+        !!withdrawAt &&
+        withdrawAt <= new Date() &&
+        !isCurrentObsession(itemName)
+      );
+    })
     .sort((a, b) => KNOWN_IDS[a] - KNOWN_IDS[b]);
 
   const selectedItems = getKeys(selected)
     .filter((item) => selected[item]?.gt(0))
     .sort((a, b) => KNOWN_IDS[a] - KNOWN_IDS[b]);
+
+  const hasAccess = hasReputation({
+    game: state,
+    reputation: Reputation.Seedling,
+  });
+
+  if (!hasAccess) {
+    return <RequiredReputation reputation={Reputation.Seedling} />;
+  }
 
   return (
     <>

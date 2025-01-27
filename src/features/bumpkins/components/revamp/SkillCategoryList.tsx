@@ -26,12 +26,12 @@ import { ISLAND_EXPANSIONS } from "features/game/types/game";
 import { hasRequiredIslandExpansion } from "features/game/lib/hasRequiredIslandExpansion";
 import classNames from "classnames";
 
-const iconList: Record<BumpkinRevampSkillTree, string> = {
+export const SKILL_TREE_ICONS: Record<BumpkinRevampSkillTree, string> = {
   Crops: SUNNYSIDE.skills.crops,
   Trees: SUNNYSIDE.skills.trees,
   Cooking: SUNNYSIDE.skills.cooking,
-  Animals: SUNNYSIDE.skills.animals,
-  Fruit: ITEM_DETAILS.Apple.image,
+  Animals: SUNNYSIDE.animals.chickenIdle,
+  "Fruit Patch": ITEM_DETAILS.Apple.image,
   Fishing: SUNNYSIDE.icons.fish,
   Greenhouse: ITEM_DETAILS.Greenhouse.image,
   Mining: SUNNYSIDE.tools.stone_pickaxe,
@@ -126,7 +126,7 @@ export const SkillCategoryList = ({
               {getRevampSkillTreeCategoriesByIsland(islandType).map(
                 (category) => {
                   const skills = getRevampSkills(category);
-                  const icon = iconList[skills[0].tree];
+                  const icon = SKILL_TREE_ICONS[skills[0].tree];
                   const skillsAcquiredInCategoryCount = getKeys({
                     ...bumpkin?.skills,
                   }).filter((acquiredSkillName) =>
@@ -151,7 +151,7 @@ export const SkillCategoryList = ({
                           type="default"
                           className="px-1 text-xxs absolute -top-3 -right-1"
                         >
-                          {`${skillsAcquiredInCategoryCount}/${skills.length}`}
+                          {`${skillsAcquiredInCategoryCount}/${skills.filter((skill) => !skill.disabled).length}`}
                         </Label>
                         <div className="flex justify-center items-center">
                           <img

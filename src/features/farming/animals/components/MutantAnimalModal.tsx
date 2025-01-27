@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Modal } from "components/ui/Modal";
 import { Panel } from "components/ui/Panel";
 import { MutantAnimal } from "features/game/types/game";
@@ -11,16 +11,21 @@ import { Label } from "components/ui/Label";
 import chest from "assets/icons/chest.png";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { SUNNYSIDE } from "assets/sunnyside";
+import { Context } from "features/game/GameProvider";
+import { MachineState } from "features/game/lib/gameMachine";
+import { useSelector } from "@xstate/react";
 
 interface Props {
   mutant: MutantAnimal;
   show: boolean;
   onContinue: () => void;
 }
-
+const _state = (state: MachineState) => state.context.state;
 export const MutantAnimalModal = ({ mutant, show, onContinue }: Props) => {
   const { t } = useAppTranslation();
-  const boost = COLLECTIBLE_BUFF_LABELS[mutant];
+  const { gameService } = useContext(Context);
+  const state = useSelector(gameService, _state);
+  const boost = COLLECTIBLE_BUFF_LABELS(state)[mutant];
 
   return (
     <Modal show={show} dialogClassName="max-w-[480px]">
@@ -46,14 +51,29 @@ export const MutantAnimalModal = ({ mutant, show, onContinue }: Props) => {
             {ITEM_DETAILS[mutant]?.description}
           </span>
           {boost && (
-            <Label
-              className="my-1"
-              type={boost.labelType}
-              icon={boost.boostTypeIcon}
-              secondaryIcon={boost?.boostedItemIcon}
-            >
-              {boost.shortDescription}
-            </Label>
+            <div className="flex flex-row flex-wrap items-center">
+              {boost.map(
+                (
+                  {
+                    labelType,
+                    boostTypeIcon,
+                    boostedItemIcon,
+                    shortDescription,
+                  },
+                  index,
+                ) => (
+                  <Label
+                    key={index}
+                    type={labelType}
+                    icon={boostTypeIcon}
+                    secondaryIcon={boostedItemIcon}
+                    className="mb-1"
+                  >
+                    {shortDescription}
+                  </Label>
+                ),
+              )}
+            </div>
           )}
         </div>
         <Button onClick={onContinue}>{t("continue")}</Button>

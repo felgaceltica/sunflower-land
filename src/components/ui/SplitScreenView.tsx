@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 /**
  * The props for the component.
- * @param divRef The parent div reference. It is used to link up the parentDivRef prop of the the <Box/> component.
+ * @param divRef The parent div reference. It is used to link up the parentDivRef prop of the <Box/> component.
  * @param tallMobileContent true if the content is taller for small screen views, else false. Usually set to true if the parent panel has no bumpkin parts. Defaults to false.
  * @param wideModal true if the panel modal is using a wider variant, else false. Defaults to false.
  * @param showPanel Whether to show the top or right panel view or not.
@@ -16,6 +16,7 @@ import classNames from "classnames";
 interface Props {
   divRef?: React.RefObject<HTMLDivElement>;
   tallMobileContent?: boolean;
+  tallDesktopContent?: boolean;
   wideModal?: boolean;
   showPanel?: boolean;
   contentScrollable?: boolean;
@@ -37,6 +38,7 @@ export const SplitScreenView: React.FC<Props> = ({
   mobileReversePanelOrder = false,
   panel: header,
   content,
+  tallDesktopContent = false,
 }: Props) => {
   return (
     <div
@@ -46,7 +48,9 @@ export const SplitScreenView: React.FC<Props> = ({
       })}
     >
       <InnerPanel
-        className={classNames("w-full sm:w-3/5 h-fit sm:max-h-96 p-1 flex", {
+        className={classNames("w-full sm:w-3/5 h-fit p-1 flex", {
+          "sm:max-h-96": !tallDesktopContent,
+          "sm:max-h-[30rem]": tallDesktopContent,
           "max-h-80": tallMobileContent,
           "max-h-56": !tallMobileContent,
           "lg:w-3/4": wideModal,

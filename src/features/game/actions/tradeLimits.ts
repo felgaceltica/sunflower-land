@@ -1,5 +1,12 @@
 import { FactionEmblem, InventoryItemName } from "../types/game";
 
+export const EMBLEM_TRADE_LIMITS: Record<FactionEmblem, number> = {
+  "Goblin Emblem": 200,
+  "Sunflorian Emblem": 200,
+  "Bumpkin Emblem": 200,
+  "Nightshade Emblem": 200,
+};
+
 export const TRADE_LIMITS: Partial<Record<InventoryItemName, number>> = {
   // Crops
   Sunflower: 2000,
@@ -40,19 +47,14 @@ export const TRADE_LIMITS: Partial<Record<InventoryItemName, number>> = {
 
   // Animal Produce
   Egg: 500,
-  Feather: 100,
+  Feather: 1000,
   Honey: 100,
   Milk: 100,
   Leather: 100,
   Wool: 100,
   "Merino Wool": 100,
-};
 
-export const EMBLEM_TRADE_LIMITS: Record<FactionEmblem, number> = {
-  "Goblin Emblem": 200,
-  "Sunflorian Emblem": 200,
-  "Bumpkin Emblem": 200,
-  "Nightshade Emblem": 200,
+  ...EMBLEM_TRADE_LIMITS,
 };
 
 export const TRADE_MINIMUMS: Partial<Record<InventoryItemName, number>> = {

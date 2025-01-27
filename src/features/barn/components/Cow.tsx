@@ -15,6 +15,7 @@ import {
   getAnimalLevel,
   getBoostedFoodQuantity,
   isAnimalFood,
+  isAnimalMedicine,
 } from "features/game/lib/animals";
 import { SUNNYSIDE } from "assets/sunnyside";
 import classNames from "classnames";
@@ -29,16 +30,18 @@ import {
   MutantAnimal,
 } from "features/game/types/game";
 import { Transition } from "@headlessui/react";
-import { ANIMAL_FOOD_EXPERIENCE } from "features/game/types/animals";
 import { useTranslation } from "react-i18next";
 import { useSound } from "lib/utils/hooks/useSound";
 import { WakesIn } from "features/game/expansion/components/animals/WakesIn";
 import Decimal from "decimal.js-light";
 import { InfoPopover } from "features/island/common/InfoPopover";
-import { REQUIRED_FOOD_QTY } from "features/game/events/landExpansion/feedAnimal";
-import { formatNumber } from "lib/utils/formatNumber";
+import {
+  handleFoodXP,
+  REQUIRED_FOOD_QTY,
+} from "features/game/events/landExpansion/feedAnimal";
 import { getAnimalXP } from "features/game/events/landExpansion/loveAnimal";
 import { MutantAnimalModal } from "features/farming/animals/components/MutantAnimalModal";
+import { isCollectibleBuilt } from "features/game/lib/collectibleBuilt";
 
 export const ANIMAL_EMOTION_ICONS: Record<
   Exclude<TState["value"], "idle" | "needsLove" | "initial" | "sick">,
@@ -106,6 +109,20 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
   const [showMutantAnimalModal, setShowMutantAnimalModal] = useState(false);
 
   useEffect(() => {
+    if (
+      cow.state === "ready" &&
+      cow.awakeAt < Date.now() &&
+      cowMachineState !== "ready"
+    ) {
+      cowService.send({
+        type: "INSTANT_LEVEL_UP",
+        animal: cow,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cow.state]);
+
+  useEffect(() => {
     if (cow.state === "sick" && cowMachineState !== "sick") {
       cowService.send({
         type: "SICK",
@@ -124,8 +141,8 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
   const [showNotEnoughFood, setShowNotEnoughFood] = useState(false);
   const [showNoMedicine, setShowNoMedicine] = useState(false);
   // Sounds
-  const { play: playFeedAnimal } = useSound("feed_animal", true);
-  const { play: playCowCollect } = useSound("cow_collect", true);
+  const { play: playFeedAnimal } = useSound("feed_animal");
+  const { play: playCowCollect } = useSound("cow_collect");
   const { play: playProduceDrop } = useSound("produce_drop");
   const { play: playLevelUp } = useSound("level_up");
   const { play: playCureAnimal } = useSound("cure_animal");
@@ -136,10 +153,16 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
   const ready = cowMachineState === "ready";
   const idle = cowMachineState === "idle";
   const sick = cowMachineState === "sick";
+  const sickAndSleeping = sleeping && cow.state === "sick";
 
   const requiredFoodQty = getBoostedFoodQuantity({
     animalType: "Cow",
     foodQuantity: REQUIRED_FOOD_QTY.Cow,
+    game,
+  });
+
+  const hasGoldenCow = isCollectibleBuilt({
+    name: "Golden Cow",
     game,
   });
 
@@ -235,7 +258,6 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
     const hasEnoughMedicine = medicineCount.gte(1);
 
     if (hasEnoughMedicine) {
-      shortcutItem("Barn Delight");
       playCureAnimal();
       cureCow("Barn Delight");
       return;
@@ -273,7 +295,9 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
 
     if (needsLove) return onLoveClick();
 
-    if (sick) return onSickClick();
+    const medicineSelected = selectedItem && isAnimalMedicine(selectedItem);
+
+    if (sick || (sickAndSleeping && medicineSelected)) return onSickClick();
 
     if (sleeping) {
       setShowWakesIn((prev) => !prev);
@@ -287,6 +311,11 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
     }
 
     const hasFoodSelected = selectedItem && isAnimalFood(selectedItem);
+
+    if (hasGoldenCow) {
+      feedCow();
+      return;
+    }
 
     if (hasFoodSelected) {
       const foodCount =
@@ -313,6 +342,17 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
     if (showNoMedicine) return t("animal.noMedicine");
     if (showNotEnoughFood)
       return t("animal.notEnoughFood", { amount: requiredFoodQty });
+  };
+
+  const getAnimalXPEarned = () => {
+    const { foodXp } = handleFoodXP({
+      state: game,
+      animal: "Cow",
+      level,
+      food: hasGoldenCow ? favFood : (selectedItem as AnimalFoodName),
+    });
+
+    return foodXp;
   };
 
   const animalImageInfo = () => {
@@ -346,6 +386,11 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
   if (cowMachineState === "initial") return null;
 
   const level = getAnimalLevel(cow.experience, "Cow");
+  const xpIndicatorColor =
+    favFood === selectedItem || selectedItem === "Omnifeed" || hasGoldenCow
+      ? "#71e358"
+      : "#fff";
+  const xpIndicatorAmount = getAnimalXPEarned();
 
   const { animalXP } = getAnimalXP({ state: game, name: showLoveItem! });
 
@@ -400,7 +445,7 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
                 top: ANIMAL_EMOTION_ICONS[cowMachineState].top,
                 right: ANIMAL_EMOTION_ICONS[cowMachineState].right,
               }}
-              className="absolute"
+              className="absolute pointer-events-none"
             />
           )}
           {/* Request */}
@@ -410,7 +455,14 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
               top={PIXEL_SCALE * 1}
               left={PIXEL_SCALE * 23}
               request={favFood}
-              quantity={requiredFoodQty}
+              quantity={!hasGoldenCow ? requiredFoodQty : undefined}
+            />
+          )}
+          {sickAndSleeping && (
+            <RequestBubble
+              top={PIXEL_SCALE * 2}
+              left={PIXEL_SCALE * 23}
+              request="Barn Delight"
             />
           )}
           {sick && (
@@ -469,12 +521,11 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
           <span
             className="text-sm yield-text"
             style={{
-              color:
-                favFood === selectedItem || selectedItem === "Omnifeed"
-                  ? "#71e358"
-                  : "#fff",
+              color: xpIndicatorColor,
             }}
-          >{`+${formatNumber(ANIMAL_FOOD_EXPERIENCE.Cow[level][selectedItem as AnimalFoodName])}`}</span>
+          >
+            {`+${xpIndicatorAmount}`}
+          </span>
         </Transition>
         <Transition
           appear={true}
@@ -493,7 +544,9 @@ export const Cow: React.FC<{ id: string; disabled: boolean }> = ({
             style={{
               color: "#ffffff",
             }}
-          >{`+${animalXP}`}</span>
+          >
+            {`+${animalXP}`}
+          </span>
         </Transition>
       </div>
     </>
