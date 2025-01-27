@@ -17,6 +17,8 @@ import { getTradeableDisplay } from "features/marketplace/lib/tradeables";
 import Decimal from "decimal.js-light";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { calculateTradePoints } from "features/game/events/landExpansion/addTradePoints";
+import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
+import { KNOWN_ITEMS } from "features/game/types";
 
 /**
  * Display listings that have been fulfilled
@@ -63,13 +65,18 @@ export const OffersAcceptedPopup: React.FC = () => {
           const details = getTradeableDisplay({
             id: itemId,
             type: offer.collection,
+            state: state.context.state,
           });
           const amount = offer.items[itemName as InventoryItemName];
           const sfl = new Decimal(offer.sfl);
           const estTradePoints = calculateTradePoints({
             sfl: offer.sfl,
-            points: !offer.signature ? 2 : 10,
+            points: !offer.signature ? 2 : 4,
           }).multipliedPoints;
+          const isResource = getKeys(TRADE_LIMITS).includes(
+            KNOWN_ITEMS[Number(itemId)],
+          );
+
           return (
             <div className="flex flex-col space-y-1" key={listingId}>
               <div className="flex items-center justify-between">
@@ -85,18 +92,19 @@ export const OffersAcceptedPopup: React.FC = () => {
                       })} SFL`}</p>
                       <img src={token} className="w-4" />
                     </div>
-                    <div className="flex items-center">
-                      <span className="text-xs">
-                        {`${formatNumber(estTradePoints, {
-                          decimalPlaces: 2,
-                          showTrailingZeros: false,
-                        })} Trade Points`}
-                      </span>
-                      <img
-                        src={ITEM_DETAILS["Trade Point"].image}
-                        className="h-6 ml-1"
-                      />
-                    </div>
+                    {!isResource && (
+                      <div className="flex items-center">
+                        <span className="text-xs">
+                          {`${formatNumber(estTradePoints, {
+                            decimalPlaces: 2,
+                          })} Trade Points`}
+                        </span>
+                        <img
+                          src={ITEM_DETAILS["Trade Point"].image}
+                          className="h-6 ml-1"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -104,7 +112,14 @@ export const OffersAcceptedPopup: React.FC = () => {
           );
         })}
       </div>
-      <Button onClick={() => claimAll()}>{t("claim")}</Button>
+      <div className="flex space-x-1">
+        <Button className="w-full" onClick={() => gameService.send("CLOSE")}>
+          {t("close")}
+        </Button>
+        <Button className="w-full" onClick={() => claimAll()}>
+          {t("claim")}
+        </Button>
+      </div>
     </>
   );
 };

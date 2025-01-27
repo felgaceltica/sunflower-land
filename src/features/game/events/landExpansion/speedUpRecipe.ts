@@ -1,8 +1,10 @@
 import Decimal from "decimal.js-light";
 import { BuildingName } from "features/game/types/buildings";
+import { trackActivity } from "features/game/types/bumpkinActivity";
 import { getKeys } from "features/game/types/decorations";
 import { GameState } from "features/game/types/game";
 import { produce } from "immer";
+import { hasFeatureAccess } from "lib/flags";
 
 export type InstantCookRecipe = {
   type: "recipe.spedUp";
@@ -106,6 +108,12 @@ export function speedUpRecipe({
       throw new Error("Nothing is cooking");
     }
 
+    if (
+      recipe.name === "Pizza Margherita" &&
+      hasFeatureAccess(game, "PIZZA_SPEED_UP_RESTRICTION")
+    ) {
+      throw new Error("You can't speed up the pizza recipe");
+    }
     if (createdAt > recipe.readyAt) {
       throw new Error("Already cooked");
     }
@@ -124,11 +132,16 @@ export function speedUpRecipe({
 
     game.inventory[recipe.name] = (
       game.inventory[recipe.name] ?? new Decimal(0)
-    ).add(1);
+    ).add(recipe.amount ?? 1);
 
     delete building.crafting;
 
     game = makeGemHistory({ game, amount: gems });
+
+    game.bumpkin.activity = trackActivity(
+      `${recipe.name} Cooked`,
+      game.bumpkin.activity,
+    );
 
     return game;
   });

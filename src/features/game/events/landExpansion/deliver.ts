@@ -12,7 +12,6 @@ import {
 import { BUMPKIN_GIFTS } from "features/game/types/gifts";
 import {
   getCurrentSeason,
-  getSeasonalBanner,
   getSeasonalTicket,
 } from "features/game/types/seasons";
 import { NPCName } from "lib/npcs";
@@ -26,6 +25,7 @@ import { KNOWN_IDS } from "features/game/types";
 import { BumpkinItem } from "features/game/types/bumpkin";
 import { availableWardrobe } from "./equip";
 import { FISH } from "features/game/types/fishing";
+import { hasVipAccess } from "features/game/lib/vipAccess";
 
 export const TICKET_REWARDS: Record<QuestNPCName, number> = {
   "pumpkin' pete": 1,
@@ -41,7 +41,7 @@ export const TICKET_REWARDS: Record<QuestNPCName, number> = {
   pharaoh: 5,
 };
 
-const isFruit = (name: PatchFruitName) => name in PATCH_FRUIT();
+const isFruit = (name: PatchFruitName) => name in PATCH_FRUIT;
 
 export function generateDeliveryTickets({
   game,
@@ -58,10 +58,7 @@ export function generateDeliveryTickets({
     return 0;
   }
 
-  if (
-    !!game.inventory[getSeasonalBanner(now)] ||
-    !!game.inventory["Lifetime Farmer Banner"]
-  ) {
+  if (hasVipAccess({ game, now: now.getTime() })) {
     amount += 2;
   }
 
@@ -98,6 +95,14 @@ export function generateDeliveryTickets({
   if (game.delivery.doubleDelivery === dateKey && !hasClaimedBonus) {
     amount *= 2;
   }
+
+  // TODO: replace the above with the following after feature release
+  // if (
+  //   getActiveCalendarEvent({ game }) === "doubleDelivery" &&
+  //   !hasClaimedBonus
+  // ) {
+  //   amount *= 2;
+  // }
 
   return amount;
 }
@@ -293,7 +298,7 @@ export function getOrderSellPrice<T>(
     order.reward.coins &&
     order.from === "corale"
   ) {
-    mul += 0.5;
+    mul += 1;
   }
 
   // Nom Nom - 10% bonus with food orders
@@ -332,6 +337,14 @@ export function getOrderSellPrice<T>(
   if (game.delivery.doubleDelivery === dateKey && !hasClaimedBonus) {
     mul *= 2;
   }
+
+  // TODO: replace the above with the following after feature release
+  // if (
+  //   getActiveCalendarEvent({ game }) === "doubleDelivery" &&
+  //   !hasClaimedBonus
+  // ) {
+  //   mul *= 2;
+  // }
 
   if (order.reward.sfl) {
     return new Decimal(order.reward.sfl ?? 0).mul(mul) as T;

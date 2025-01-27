@@ -81,6 +81,7 @@ type IslandElementArgs = {
   buds: GameState["buds"];
   beehives: GameState["beehives"];
   oilReserves: GameState["oilReserves"];
+  lavaPits: GameState["lavaPits"];
 };
 
 const getRecipeLocation = (game: GameState, level: number) => {
@@ -172,6 +173,7 @@ const getIslandElements = ({
   airdrops,
   beehives,
   oilReserves,
+  lavaPits,
 }: IslandElementArgs) => {
   const mapPlacements: Array<JSX.Element> = [];
 
@@ -462,6 +464,32 @@ const getIslandElements = ({
   );
 
   mapPlacements.push(
+    ...getKeys(lavaPits).map((id, index) => {
+      const { x, y, width, height } = lavaPits[id];
+
+      return (
+        <MapPlacement
+          key={`oil-reserve-${id}`}
+          x={x}
+          y={y}
+          height={height}
+          width={width}
+        >
+          <Resource
+            name="Lava Pit"
+            createdAt={0}
+            readyAt={0}
+            id={id}
+            index={index}
+            x={x}
+            y={y}
+          />
+        </MapPlacement>
+      );
+    }),
+  );
+
+  mapPlacements.push(
     ...getKeys(fruitPatches).map((id, index) => {
       const { x, y, width, height } = fruitPatches[id];
 
@@ -689,8 +717,7 @@ export const Land: React.FC = () => {
 
   const { pathname } = useLocation();
   const state = useSelector(gameService, selectGameState);
-  const showMarketplace =
-    pathname.includes("marketplace") && hasFeatureAccess(state, "MARKETPLACE");
+  const showMarketplace = pathname.includes("marketplace");
 
   const {
     expansionConstruction,
@@ -713,6 +740,7 @@ export const Land: React.FC = () => {
     beehives,
     oilReserves,
     island,
+    lavaPits,
   } = state;
 
   const landscaping = useSelector(gameService, isLandscaping);
@@ -826,6 +854,7 @@ export const Land: React.FC = () => {
                 airdrops,
                 beehives,
                 oilReserves,
+                lavaPits,
               }).sort((a, b) => {
                 if (a.props.canCollide === false) {
                   return -1;
@@ -876,7 +905,7 @@ export const Land: React.FC = () => {
             aria-label="Hud"
             className="fixed inset-safe-area pointer-events-none z-10"
           >
-            <div // Prevent click through
+            <div
               onMouseDown={(e) => e.stopPropagation()}
               onMouseUp={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}

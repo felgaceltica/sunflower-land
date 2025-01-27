@@ -19,7 +19,7 @@ import {
   isCollectibleBuilt,
 } from "features/game/lib/collectibleBuilt";
 import { setPrecision } from "lib/utils/formatNumber";
-import { SEEDS } from "features/game/types/seeds";
+import { SEASONAL_SEEDS, SeedName, SEEDS } from "features/game/types/seeds";
 import { BuildingName } from "features/game/types/buildings";
 import { isWithinAOE } from "features/game/expansion/placeable/lib/collisionDetection";
 import {
@@ -41,8 +41,11 @@ import { isWearableActive } from "features/game/lib/wearables";
 import { isGreenhouseCrop } from "./plantGreenhouse";
 import { FACTION_ITEMS } from "features/game/lib/factions";
 import { produce } from "immer";
-import { randomInt } from "lib/utils/random";
 import { hasFeatureAccess } from "lib/flags";
+import {
+  CalendarEventName,
+  getActiveCalendarEvent,
+} from "features/game/types/calendar";
 
 export type LandExpansionPlantAction = {
   type: "seed.planted";
@@ -95,6 +98,16 @@ export const getEnabledWellCount = (
   return enabledWells;
 };
 
+function isCropDestroyed({ id, game }: { id: string; game: GameState }) {
+  // Sort oldest to newest
+  const crops = getKeys(game.crops).sort((a, b) =>
+    game.crops[b].createdAt > game.crops[a].createdAt ? -1 : 1,
+  );
+  const cropsToRemove = crops.slice(0, Math.floor(crops.length / 2));
+
+  return cropsToRemove.includes(id);
+}
+
 export function isPlotFertile({
   plotIndex,
   crops,
@@ -116,6 +129,42 @@ export function isPlotFertile({
       .findIndex((plotId) => plotId === plotIndex) + 1;
 
   return cropPosition <= cropsWellCanWater;
+}
+
+export function getAffectedWeather({
+  id,
+  game,
+}: {
+  id: string;
+  game: GameState;
+}): CalendarEventName | undefined {
+  const weather = getActiveCalendarEvent({ game });
+
+  if (
+    weather === "tornado" &&
+    !game.calendar.tornado?.protected &&
+    isCropDestroyed({ id, game })
+  ) {
+    return "tornado";
+  }
+
+  if (
+    game.calendar.tsunami?.triggeredAt &&
+    !game.calendar.tsunami?.protected &&
+    isCropDestroyed({ id, game })
+  ) {
+    return "tsunami";
+  }
+
+  if (
+    game.calendar.greatFreeze?.triggeredAt &&
+    !game.calendar.greatFreeze?.protected &&
+    isCropDestroyed({ id, game })
+  ) {
+    return "greatFreeze";
+  }
+
+  return undefined;
 }
 
 /**
@@ -172,6 +221,10 @@ export function getCropTime({
 
   if (skills["Strong Roots"] && isAdvancedCrop(crop)) {
     seconds = seconds * 0.9;
+  }
+
+  if (isGreenhouseCrop(crop) && skills["Rice and Shine"]) {
+    seconds = seconds * 0.95;
   }
 
   // Olive Express: 10% reduction
@@ -281,11 +334,21 @@ export const getCropPlotTime = ({
         game.bumpkin.skills,
       )
     ) {
-      seconds = seconds * 0.8;
+      if (game.bumpkin.skills["Chonky Scarecrow"]) {
+        seconds = seconds * 0.7;
+      } else {
+        seconds = seconds * 0.8;
+      }
     }
   }
 
   if (fertiliser === "Rapid Root") {
+    seconds = seconds * 0.5;
+  }
+
+  const isSunshower = getActiveCalendarEvent({ game }) === "sunshower";
+
+  if (isSunshower) {
     seconds = seconds * 0.5;
   }
 
@@ -495,7 +558,11 @@ export function getCropYieldAmount({
       isCollectibleBuilt({ name: "Scary Mike", game }) &&
       isWithinAOE("Scary Mike", scarecrowPosition, plotPosition, bumpkin.skills)
     ) {
-      amount = amount + 0.2;
+      if (game.bumpkin.skills["Horror Mike"]) {
+        amount = amount + 0.3;
+      } else {
+        amount = amount + 0.2;
+      }
     }
   }
 
@@ -554,7 +621,11 @@ export function getCropYieldAmount({
         bumpkin.skills,
       )
     ) {
-      amount = amount + 0.2;
+      if (game.bumpkin.skills["Laurie's Gains"]) {
+        amount = amount + 0.3;
+      } else {
+        amount = amount + 0.2;
+      }
     }
   }
 
@@ -638,23 +709,6 @@ export function getCropYieldAmount({
     amount += 1;
   }
 
-  // Olive Garden +0.2 yield
-  if (crop === "Olive" && skills["Olive Garden"]) {
-    amount += 0.2;
-  }
-
-  // Rice and Shine +0.2 yield
-  if (crop === "Rice" && skills["Rice and Shine"]) {
-    amount += 0.2;
-  }
-
-  // Greenhouse Gamble 5% chance of +1 yield
-  if (isGreenhouseCrop(crop) && bumpkin.skills["Greenhouse Gamble"]) {
-    if (randomInt(0, 20) === 1) {
-      amount += 1;
-    }
-  }
-
   if (
     crop === "Olive" &&
     isWearableActive({ game, name: "Olive Royalty Shirt" })
@@ -667,6 +721,18 @@ export function getCropYieldAmount({
     isCollectibleBuilt({ name: "Pharaoh Gnome", game })
   ) {
     amount += 2;
+  }
+
+  if (isGreenhouseCrop(crop) && skills["Glass Room"]) {
+    amount += 0.1;
+  }
+
+  if (isGreenhouseCrop(crop) && skills["Seeded Bounty"]) {
+    amount += 0.5;
+  }
+
+  if (isGreenhouseCrop(crop) && skills["Greasy Plants"]) {
+    amount += 1;
   }
 
   if (skills["Young Farmer"] && isBasicCrop(crop)) {
@@ -705,6 +771,18 @@ export function getCropYieldAmount({
     amount += 1;
   }
 
+  if (getActiveCalendarEvent({ game }) === "bountifulHarvest") {
+    amount += 1;
+  }
+
+  const isInsectPlagueActive =
+    getActiveCalendarEvent({ game }) === "insectPlague";
+  const isProtected = game.calendar.insectPlague?.protected;
+
+  if (isInsectPlagueActive && !isProtected) {
+    amount = amount * 0.5;
+  }
+
   return Number(setPrecision(amount));
 }
 
@@ -739,7 +817,7 @@ export function plant({
       throw new Error("No seed selected");
     }
 
-    if (!(action.item in SEEDS())) {
+    if (!(action.item in SEEDS)) {
       throw new Error("Not a seed");
     }
 
@@ -747,6 +825,13 @@ export function plant({
 
     if (seedCount.lessThan(1)) {
       throw new Error("Not enough seeds");
+    }
+
+    if (
+      hasFeatureAccess(stateCopy, "SEASONAL_SEEDS") &&
+      !SEASONAL_SEEDS[stateCopy.season.season].includes(action.item as SeedName)
+    ) {
+      throw new Error("This seed is not available in this season");
     }
 
     const cropName = action.item.split(" ")[0] as CropName;

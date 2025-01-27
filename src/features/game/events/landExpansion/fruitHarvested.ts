@@ -24,7 +24,7 @@ import { isWearableActive } from "features/game/lib/wearables";
 import { isGreenhouseFruit } from "./plantGreenhouse";
 import { FACTION_ITEMS } from "features/game/lib/factions";
 import { produce } from "immer";
-import { randomInt } from "lib/utils/random";
+import { getActiveCalendarEvent } from "features/game/types/calendar";
 
 export type HarvestFruitAction = {
   type: "fruit.harvested";
@@ -42,8 +42,8 @@ export const isFruitReadyToHarvest = (
   plantedFruit: PlantedFruit,
   fruitDetails: PatchFruit,
 ) => {
-  const { seed } = PATCH_FRUIT()[fruitDetails.name];
-  const { plantSeconds } = PATCH_FRUIT_SEEDS()[seed];
+  const { seed } = PATCH_FRUIT[fruitDetails.name];
+  const { plantSeconds } = PATCH_FRUIT_SEEDS[seed];
 
   return (
     createdAt -
@@ -67,8 +67,8 @@ export function isFruitGrowing(patch: FruitPatch) {
   const { name, harvestsLeft, harvestedAt, plantedAt } = fruit;
   if (!harvestsLeft) return false;
 
-  const { seed } = PATCH_FRUIT()[name];
-  const { plantSeconds } = PATCH_FRUIT_SEEDS()[seed];
+  const { seed } = PATCH_FRUIT[name];
+  const { plantSeconds } = PATCH_FRUIT_SEEDS[seed];
 
   if (harvestedAt) {
     const replenishingTimeLeft = getTimeLeft(harvestedAt, plantSeconds);
@@ -80,7 +80,7 @@ export function isFruitGrowing(patch: FruitPatch) {
 }
 
 const isFruit = (resource: Resource): resource is PatchFruitName => {
-  return resource in PATCH_FRUIT();
+  return resource in PATCH_FRUIT;
 };
 
 // Basic = Blueberry & Orange - Skill
@@ -135,9 +135,16 @@ export function getFruitYield({ name, game, fertiliser }: FruitYield) {
     amount += 0.1;
   }
 
-  // Grape Escape +0.2 yield
-  if (name === "Grape" && bumpkin.skills["Grape Escape"]) {
-    amount += 0.2;
+  if (name === "Grape" && bumpkin.skills["Glass Room"]) {
+    amount += 0.1;
+  }
+
+  if (name === "Grape" && bumpkin.skills["Seeded Bounty"]) {
+    amount += 0.5;
+  }
+
+  if (name === "Grape" && bumpkin.skills["Greasy Plants"]) {
+    amount += 1;
   }
 
   //Faction Quiver
@@ -153,7 +160,12 @@ export function getFruitYield({ name, game, fertiliser }: FruitYield) {
   }
 
   if (fertiliser === "Fruitful Blend") {
-    amount += 0.1;
+    const fruitfulBlendBuff = 0.1;
+    if (bumpkin.skills["Fruitful Bounty"]) {
+      amount += fruitfulBlendBuff * 2;
+    } else {
+      amount += fruitfulBlendBuff;
+    }
   }
 
   if (name === "Banana" && isWearableActive({ name: "Banana Amulet", game })) {
@@ -218,11 +230,8 @@ export function getFruitYield({ name, game, fertiliser }: FruitYield) {
     }
   }
 
-  // Greenhouse Gamble 5% chance of +1 yield
-  if (isGreenhouseFruit(name) && bumpkin.skills["Greenhouse Gamble"]) {
-    if (randomInt(0, 20) === 1) {
-      amount += 1;
-    }
+  if (getActiveCalendarEvent({ game }) === "bountifulHarvest") {
+    amount += 1;
   }
 
   amount += getBudYieldBoosts(game.buds ?? {}, name);
@@ -254,8 +263,8 @@ export function harvestFruit({
 
     const { name, plantedAt, harvestsLeft, harvestedAt, amount } = patch.fruit;
 
-    const { seed } = PATCH_FRUIT()[name];
-    const { plantSeconds } = PATCH_FRUIT_SEEDS()[seed];
+    const { seed } = PATCH_FRUIT[name];
+    const { plantSeconds } = PATCH_FRUIT_SEEDS[seed];
 
     if (createdAt - plantedAt < plantSeconds * 1000) {
       throw new Error("Not ready");

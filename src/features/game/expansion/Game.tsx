@@ -74,6 +74,10 @@ import { GameState } from "../types/game";
 import { Ocean } from "features/world/ui/Ocean";
 import { OffersAcceptedPopup } from "./components/OffersAcceptedPopup";
 import { Marketplace } from "features/marketplace/Marketplace";
+import { CompetitionModal } from "features/competition/CompetitionBoard";
+import { SeasonChanged } from "./components/temperateSeason/SeasonChanged";
+import { CalendarEvent } from "./components/temperateSeason/CalendarEvent";
+import { DailyReset } from "../components/DailyReset";
 
 function camelToDotCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, "$1.$2").toLowerCase() as string;
@@ -119,7 +123,7 @@ const SHOW_MODAL: Record<StateValues, boolean> = {
   buyingSFL: true,
   depositing: true,
   introduction: false,
-  specialOffer: true,
+  vip: true,
   transacting: true,
   auctionResults: false,
   claimAuction: false,
@@ -144,6 +148,7 @@ const SHOW_MODAL: Record<StateValues, boolean> = {
   provingPersonhood: false,
   sellMarketResource: false,
   somethingArrived: true,
+  seasonChanged: false,
 };
 
 // State change selectors
@@ -196,7 +201,7 @@ const isPromoing = (state: MachineState) => state.matches("promo");
 const isBlacklisted = (state: MachineState) => state.matches("blacklisted");
 const hasAirdrop = (state: MachineState) => state.matches("airdrop");
 const hasFulfilledOffers = (state: MachineState) => state.matches("offers");
-const hasSpecialOffer = (state: MachineState) => state.matches("specialOffer");
+const hasVipNotification = (state: MachineState) => state.matches("vip");
 const isPlaying = (state: MachineState) => state.matches("playing");
 const somethingArrived = (state: MachineState) =>
   state.matches("somethingArrived");
@@ -214,6 +219,9 @@ const isEffectFailure = (state: MachineState) =>
   );
 const hasMarketplaceSales = (state: MachineState) =>
   state.matches("marketplaceSale");
+const isCompetition = (state: MachineState) => state.matches("competition");
+const isSeasonChanged = (state: MachineState) => state.matches("seasonChanged");
+const isCalendarEvent = (state: MachineState) => state.matches("calendarEvent");
 
 const GameContent: React.FC = () => {
   const { gameService } = useContext(Context);
@@ -368,7 +376,7 @@ export const GameWrapper: React.FC = ({ children }) => {
   const blacklisted = useSelector(gameService, isBlacklisted);
   const airdrop = useSelector(gameService, hasAirdrop);
   const showOffers = useSelector(gameService, hasFulfilledOffers);
-  const specialOffer = useSelector(gameService, hasSpecialOffer);
+  const vip = useSelector(gameService, hasVipNotification);
   const playing = useSelector(gameService, isPlaying);
   const hasSomethingArrived = useSelector(gameService, somethingArrived);
   const hasBBs = useSelector(gameService, showGems);
@@ -376,6 +384,9 @@ export const GameWrapper: React.FC = ({ children }) => {
   const effectSuccess = useSelector(gameService, isEffectSuccess);
   const effectFailure = useSelector(gameService, isEffectFailure);
   const showSales = useSelector(gameService, hasMarketplaceSales);
+  const competition = useSelector(gameService, isCompetition);
+  const seasonChanged = useSelector(gameService, isSeasonChanged);
+  const calendarEvent = useSelector(gameService, isCalendarEvent);
 
   const showPWAInstallPrompt = useSelector(authService, _showPWAInstallPrompt);
 
@@ -580,7 +591,7 @@ export const GameWrapper: React.FC = ({ children }) => {
             {airdrop && <AirdropPopup />}
             {showOffers && <OffersAcceptedPopup />}
             {showSales && <MarketplaceSalesPopup />}
-            {specialOffer && <VIPOffer />}
+            {vip && <VIPOffer />}
             {hasSomethingArrived && <SomethingArrived />}
             {hasBBs && <Gems />}
           </Panel>
@@ -588,6 +599,17 @@ export const GameWrapper: React.FC = ({ children }) => {
 
         {claimingAuction && <ClaimAuction />}
         {refundAuction && <RefundAuction />}
+        {seasonChanged && <SeasonChanged />}
+        {calendarEvent && <CalendarEvent />}
+
+        {competition && (
+          <Modal show onHide={() => gameService.send("ACKNOWLEDGE")}>
+            <CompetitionModal
+              competitionName="ANIMALS"
+              onClose={() => gameService.send("ACKNOWLEDGE")}
+            />
+          </Modal>
+        )}
 
         <Introduction />
         <NewMail />
@@ -605,6 +627,8 @@ export const GameWrapper: React.FC = ({ children }) => {
 
         {children}
       </ToastProvider>
+      {/* Handles daily reset */}
+      <DailyReset />
     </>
   );
 };
