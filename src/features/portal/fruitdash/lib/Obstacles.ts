@@ -451,7 +451,8 @@ export class FruitDashObstacleFactory {
     if (!this._scene.currentPlayer || !this._scene.isGamePlaying) {
       return;
     }
-    this._scene.portalService?.send("GAME_OVER");
+    this._scene.speed = 0;
+
     // freeze player
     this._scene.currentPlayer?.setVisible(false);
     if (!getAudioMutedSetting())
@@ -470,18 +471,22 @@ export class FruitDashObstacleFactory {
         spriteName,
       );
       if (playerDeath.texture.key === "__MISSING") {
+        this._scene.portalService?.send("GAME_OVER");
         playerDeath.destroy();
         return;
       }
       playerDeath.setDepth(this._scene.currentPlayer.body.position.y);
       playerDeath.on("animationcomplete", async () => {
+        this._scene.portalService?.send("GAME_OVER");
         if (playerDeath.active) playerDeath.destroy();
       });
-      this._scene.speed = 0;
+
       if (this._scene.currentPlayer.directionFacing === "left") {
         playerDeath.setFlipX(true);
       }
       playerDeath.play({ key: spriteKey });
+    } else {
+      this._scene.portalService?.send("GAME_OVER");
     }
   };
 }
