@@ -343,6 +343,8 @@ import { AlienChicken } from "./components/AlienChicken";
 import { ToxicTuft } from "./components/ToxicTuft";
 import { Mootant } from "./components/Mootants";
 import { SuperTotem } from "./components/SuperTotem";
+import { GoldenCow } from "./components/GoldenCow";
+import { VolcanoGnome } from "./components/VolcanoGnome";
 
 export const COLLECTIBLE_COMPONENTS: Record<
   CollectibleName | "Bud",
@@ -570,7 +572,7 @@ export const COLLECTIBLE_COMPONENTS: Record<
   Cobalt: Cobalt,
   Blossombeard: Blossombeard,
   "Desert Gnome": DesertGnome,
-
+  "Volcano Gnome": VolcanoGnome,
   // Dawn Breaker items
   "Mushroom House": MushroomHouse,
   "Purple Trail": PurpleTrail,
@@ -753,6 +755,7 @@ export const COLLECTIBLE_COMPONENTS: Record<
   "Toxic Tuft": ToxicTuft,
   Mootant: Mootant,
   Chicory: Chicory,
+  "Golden Cow": GoldenCow,
   "Adrift Ark": (props: CollectibleProps) => (
     <ImageStyle
       {...props}
@@ -1546,6 +1549,66 @@ export const COLLECTIBLE_COMPONENTS: Record<
       alt="Christmas Candle"
     />
   ),
+  "Santa Penguin": (props: CollectibleProps) => (
+    <ImageStyle
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 18}px`,
+        bottom: `${PIXEL_SCALE * 2}px`,
+        left: `${PIXEL_SCALE * -1}px`,
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 18}px`,
+      }}
+      image={ITEM_DETAILS["Santa Penguin"].image}
+      alt="Santa Penguin"
+    />
+  ),
+  "Penguin Pool": (props: CollectibleProps) => (
+    <ImageStyle
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 32}px`,
+        bottom: `${PIXEL_SCALE * 0}px`,
+        left: `${PIXEL_SCALE * 0}px`,
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 32}px`,
+      }}
+      image={ITEM_DETAILS["Penguin Pool"].image}
+      alt="Penguin Pool"
+    />
+  ),
+  Snowman: (props: CollectibleProps) => (
+    <ImageStyle
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 16}px`,
+        bottom: `${PIXEL_SCALE * 1}px`,
+        left: `${PIXEL_SCALE * 0}px`,
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 16}px`,
+      }}
+      image={ITEM_DETAILS["Snowman"].image}
+      alt="Snowman"
+    />
+  ),
+  "Festive Toy Train": (props: CollectibleProps) => (
+    <ImageStyle
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 32}px`,
+        bottom: `${PIXEL_SCALE * 0}px`,
+        left: `${PIXEL_SCALE * 0}px`,
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 32}px`,
+      }}
+      image={ITEM_DETAILS["Festive Toy Train"].image}
+      alt="Festive Toy Train"
+    />
+  ),
 };
 // Need readonly versions for some troublesome components while in design mode
 
@@ -1871,11 +1934,12 @@ export const READONLY_COLLECTIBLES: Record<
     />
   ),
   "Rock Golem": () => (
-    <img
-      src={ITEM_DETAILS["Rock Golem"].image}
+    <div
       className="absolute bottom-0"
-      style={{ width: `${PIXEL_SCALE * 34}px` }}
-    />
+      style={{ left: `${PIXEL_SCALE * -2}px`, width: `${PIXEL_SCALE * 34}px` }}
+    >
+      <img src={ITEM_DETAILS["Rock Golem"].image} className="w-full" />
+    </div>
   ),
   "Wicker Man": () => (
     <div

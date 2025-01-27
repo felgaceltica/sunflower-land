@@ -1,4 +1,4 @@
-import { getAvailableBumpkinSkillPoints } from "features/game/events/landExpansion/choseSkill";
+import { getAvailableBumpkinOldSkillPoints } from "features/game/events/landExpansion/pickSkill";
 import { Bumpkin } from "features/game/types/game";
 
 export function getAcknowledgedSkillPoints() {
@@ -16,9 +16,9 @@ export function getAcknowledgedSkillPointsForBumpkin(id: number) {
 export function hasUnacknowledgedSkillPoints(bumpkin?: Bumpkin) {
   if (!bumpkin) return false;
 
-  const availableSkillPoints = getAvailableBumpkinSkillPoints(bumpkin);
+  const availableSkillPoints = getAvailableBumpkinOldSkillPoints(bumpkin);
   const acknowledgedSkillPoints = getAcknowledgedSkillPointsForBumpkin(
-    bumpkin.id
+    bumpkin.id,
   );
 
   return availableSkillPoints > Number(acknowledgedSkillPoints);
@@ -27,7 +27,7 @@ export function hasUnacknowledgedSkillPoints(bumpkin?: Bumpkin) {
 export function acknowledgeSkillPoints(bumpkin?: Bumpkin) {
   if (!bumpkin) return;
 
-  const availableSkillPoints = getAvailableBumpkinSkillPoints(bumpkin);
+  const availableSkillPoints = getAvailableBumpkinOldSkillPoints(bumpkin);
   const currentAcknowledgedSkillPoints = getAcknowledgedSkillPoints();
 
   const newValue = {
@@ -37,6 +37,6 @@ export function acknowledgeSkillPoints(bumpkin?: Bumpkin) {
 
   return localStorage.setItem(
     "acknowledgedSkillPoints",
-    JSON.stringify(newValue)
+    JSON.stringify(newValue),
   );
 }

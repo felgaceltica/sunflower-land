@@ -2,9 +2,6 @@ import React, { useContext, useState } from "react";
 import { SimpleBox } from "../SimpleBox";
 import { Label } from "components/ui/Label";
 import { getKeys } from "features/game/types/craftables";
-import { MachineState } from "features/game/lib/gameMachine";
-import { useSelector } from "@xstate/react";
-import { Context } from "features/game/GameProvider";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { MilestonePanel } from "../components/Milestone";
 import { MilestoneTracker } from "../components/MilestoneTracker";
@@ -16,23 +13,29 @@ import {
 } from "features/game/types/milestones";
 import { getFishByType } from "../lib/utils";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { FISH, FishName, MarineMarvelName } from "features/game/types/fishing";
+import {
+  FISH,
+  FishName,
+  MarineMarvelName,
+  WINDS_OF_CHANGE_FISH,
+} from "features/game/types/fishing";
 import { Detail } from "../components/Detail";
 import { GameState } from "features/game/types/game";
-import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { ButtonPanel, InnerPanel } from "components/ui/Panel";
 import classNames from "classnames";
 
 import giftIcon from "assets/icons/gift.png";
 import { ResizableBar } from "components/ui/ProgressBar";
-
-const _farmActivity = (state: MachineState) => state.context.state.farmActivity;
-const _milestones = (state: MachineState) => state.context.state.milestones;
+import { Context } from "features/game/GameProvider";
+import { SEASON_ICONS } from "features/island/buildings/components/building/market/SeasonalSeeds";
+import { useAppTranslation } from "lib/i18n/useAppTranslations";
+import { hasFeatureAccess } from "lib/flags";
 
 const FISH_BY_TYPE = getFishByType();
 
 type Props = {
   onMilestoneReached: (milestoneName: MilestoneName) => void;
+  state: GameState;
 };
 
 function getTotalFishCaught(farmActivity: GameState["farmActivity"]) {
@@ -41,18 +44,17 @@ function getTotalFishCaught(farmActivity: GameState["farmActivity"]) {
   }, 0);
 }
 
-export const Fish: React.FC<Props> = ({ onMilestoneReached }) => {
-  const { t } = useAppTranslation();
+export const Fish: React.FC<Props> = ({ onMilestoneReached, state }) => {
   const { gameService } = useContext(Context);
   const [expandedIndex, setExpandedIndex] = useState<number>();
   const [selectedFish, setSelectedFish] = useState<
     FishName | MarineMarvelName
   >();
 
+  const { t } = useAppTranslation();
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneName>();
 
-  const farmActivity = useSelector(gameService, _farmActivity);
-  const milestones = useSelector(gameService, _milestones);
+  const { farmActivity, milestones } = state;
 
   const [caughtFishCount] = useState<number>(() =>
     getTotalFishCaught(farmActivity),
@@ -85,32 +87,70 @@ export const Fish: React.FC<Props> = ({ onMilestoneReached }) => {
   );
 
   if (selectedFish) {
+    const hasCaught = (farmActivity[`${selectedFish} Caught`] ?? 0) > 0;
+    const hasSeasonAccess = hasFeatureAccess(state, "SEASONAL_FISH");
+
     return (
       <Detail
         name={selectedFish}
-        caught={(farmActivity[`${selectedFish} Caught`] ?? 0) > 0}
+        caught={hasCaught}
         onBack={() => setSelectedFish(undefined)}
         additionalLabels={
-          <>
-            <Label
-              type="default"
-              className="px-0.5 text-xxs"
-              icon={SUNNYSIDE.tools.fishing_rod}
-            >
-              {`${farmActivity[`${selectedFish} Caught`] ?? 0} Caught`}
-            </Label>
-            {FISH[selectedFish].baits.map((bait) => (
+          <div>
+            {hasSeasonAccess && (
+              <div className="flex flex-wrap">
+                {FISH[selectedFish].seasons.map((season) => (
+                  <Label
+                    key={`${selectedFish}-${season}`}
+                    type="vibrant"
+                    className="px-0.5 mr-4 text-xxs whitespace-nowrap  mb-1"
+                    icon={SEASON_ICONS[season]}
+                  >
+                    {t(`season.${season}`)}
+                  </Label>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center">
+              {FISH[selectedFish].baits.map((bait) => (
+                <Label
+                  key={`${selectedFish}-${bait}`}
+                  type="chill"
+                  className="px-0.5 text-xxs whitespace-nowrap mr-4 mb-1"
+                  icon={ITEM_DETAILS[bait].image}
+                  secondaryIcon={SUNNYSIDE.icons.heart}
+                >
+                  {bait}
+                </Label>
+              ))}
+              {hasCaught && hasSeasonAccess && (
+                <>
+                  {FISH[selectedFish].likes.map((chum) => (
+                    <Label
+                      key={`${selectedFish}-${chum}`}
+                      type="chill"
+                      className="px-0.5 text-xxs whitespace-nowrap mr-4  mb-1"
+                      icon={ITEM_DETAILS[chum].image}
+                      secondaryIcon={SUNNYSIDE.icons.heart}
+                    >
+                      {chum}
+                    </Label>
+                  ))}
+                </>
+              )}
+
               <Label
-                key={`${selectedFish}-${bait}`}
-                type="chill"
-                className="px-0.5 text-xxs whitespace-nowrap"
-                icon={ITEM_DETAILS[bait].image}
+                type="default"
+                className="px-0.5 text-xxs   mb-1"
+                icon={SUNNYSIDE.tools.fishing_rod}
               >
-                {bait}
+                {`${farmActivity[`${selectedFish} Caught`] ?? 0} Caught`}
               </Label>
-            ))}
-          </>
+            </div>
+          </div>
         }
+        state={state}
       />
     );
   }
@@ -143,9 +183,7 @@ export const Fish: React.FC<Props> = ({ onMilestoneReached }) => {
             >{`Fishing`}</Label>
             <MilestoneTracker
               milestones={milestoneNames}
-              experienceLabelText={`${experienceLevel} Angler`}
-              labelType="default"
-              labelIcon={SUNNYSIDE.tools.fishing_rod}
+              claimedMilestones={milestones}
             />
           </div>
 
@@ -210,14 +248,20 @@ export const Fish: React.FC<Props> = ({ onMilestoneReached }) => {
                   {type !== "marine marvel" ? `${type} Fish` : "Marine Marvels"}
                 </Label>
                 <div className="flex flex-wrap">
-                  {FISH_BY_TYPE[type].map((name) => (
-                    <SimpleBox
-                      silhouette={!farmActivity[`${name} Caught`]}
-                      onClick={() => setSelectedFish(name)}
-                      key={name}
-                      image={ITEM_DETAILS[name].image}
-                    />
-                  ))}
+                  {FISH_BY_TYPE[type]
+                    .filter(
+                      (name) =>
+                        hasFeatureAccess(state, "SEASONAL_FISH") ||
+                        !WINDS_OF_CHANGE_FISH.includes(name as FishName),
+                    )
+                    .map((name) => (
+                      <SimpleBox
+                        silhouette={!farmActivity[`${name} Caught`]}
+                        onClick={() => setSelectedFish(name)}
+                        key={name}
+                        image={ITEM_DETAILS[name].image}
+                      />
+                    ))}
                 </div>
               </div>
             );

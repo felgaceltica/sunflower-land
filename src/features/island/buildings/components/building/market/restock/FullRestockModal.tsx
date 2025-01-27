@@ -24,13 +24,11 @@ interface RestockModalProps {
     minutes: number;
     seconds: number;
   };
-  hasGemExperiment: boolean;
 }
 
 export const FullRestockModal: React.FC<RestockModalProps> = ({
   onClose,
   shipmentTime,
-  hasGemExperiment,
 }) => {
   const { t } = useAppTranslation();
   const { openModal } = useContext(ModalContext);
@@ -68,7 +66,7 @@ export const FullRestockModal: React.FC<RestockModalProps> = ({
   );
 
   const restockSeeds = Object.entries(INITIAL_STOCK(state)).filter(
-    (item) => item[0] in SEEDS(),
+    (item) => item[0] in SEEDS,
   );
 
   return (
@@ -119,7 +117,7 @@ export const FullRestockModal: React.FC<RestockModalProps> = ({
         </div>
       </div>
       <p className="text-xs p-1 pb-1.5 italic">{t("gems.restockToMaxStock")}</p>{" "}
-      {hasGemExperiment && shipmentTime && (
+      {shipmentTime && (
         <div className="px-1 text-xs flex flex-wrap mb-2">
           <span className="mr-2">{t("gems.nextFreeShipment")}</span>
           <TimerDisplay time={shipmentTime} />

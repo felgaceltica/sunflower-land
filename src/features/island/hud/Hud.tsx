@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 import React, { useContext, useState } from "react";
 import { Balances } from "components/Balances";
 import { useActor, useSelector } from "@xstate/react";
@@ -23,7 +24,6 @@ import { MachineState } from "features/game/lib/gameMachine";
 import { useSound } from "lib/utils/hooks/useSound";
 import { SpecialEventCountdown } from "./SpecialEventCountdown";
 import { SeasonBannerCountdown } from "./SeasonBannerCountdown";
-import { hasFeatureAccess } from "lib/flags";
 import { TransactionCountdown } from "./Transaction";
 import { MarketplaceButton } from "./components/MarketplaceButton";
 import { PowerSkillsButton } from "./components/PowerSkillsButton";
@@ -31,10 +31,10 @@ import {
   BumpkinRevampSkillName,
   getPowerSkills,
 } from "features/game/types/bumpkinSkills";
+import { GameCalendar } from "features/game/expansion/components/temperateSeason/GameCalendar";
+import { hasFeatureAccess } from "lib/flags";
 
 const _farmAddress = (state: MachineState) => state.context.farmAddress;
-const _showMarketplace = (state: MachineState) =>
-  hasFeatureAccess(state.context.state, "MARKETPLACE");
 
 /**
  * Heads up display - a concept used in games for the small overlaid display of information.
@@ -49,7 +49,6 @@ const HudComponent: React.FC<{
   const [gameState] = useActor(gameService);
 
   const farmAddress = useSelector(gameService, _farmAddress);
-  const hasMarketplaceAccess = useSelector(gameService, _showMarketplace);
 
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showBuyCurrencies, setShowBuyCurrencies] = useState(false);
@@ -74,7 +73,7 @@ const HudComponent: React.FC<{
   const powerSkills = getPowerSkills();
   const { skills } = gameState.context.state.bumpkin;
   const hasPowerSkills = powerSkills.some(
-    (skill) => (skills[skill.name as BumpkinRevampSkillName] ?? 0) > 0,
+    (skill) => !!skills[skill.name as BumpkinRevampSkillName],
   );
 
   return (
@@ -90,7 +89,7 @@ const HudComponent: React.FC<{
                 }
               }}
               className={classNames(
-                "absolute flex z-50 cursor-pointer hover:img-highlight",
+                "absolute flex z-50 cursor-pointer hover:img-highlight group",
                 {
                   "opacity-50 cursor-not-allowed": !isFarming,
                 },
@@ -104,15 +103,22 @@ const HudComponent: React.FC<{
               }}
             >
               <img
-                src={SUNNYSIDE.ui.round_button}
+                src={SUNNYSIDE.ui.round_button_pressed}
                 className="absolute"
                 style={{
                   width: `${PIXEL_SCALE * 22}px`,
                 }}
               />
               <img
+                src={SUNNYSIDE.ui.round_button}
+                className="absolute group-active:hidden"
+                style={{
+                  width: `${PIXEL_SCALE * 22}px`,
+                }}
+              />
+              <img
                 src={SUNNYSIDE.icons.drag}
-                className={"absolute"}
+                className={"absolute group-active:translate-y-[2px]"}
                 style={{
                   top: `${PIXEL_SCALE * 4}px`,
                   left: `${PIXEL_SCALE * 4}px`,
@@ -163,7 +169,7 @@ const HudComponent: React.FC<{
           }}
         >
           {hasPowerSkills && <PowerSkillsButton />}
-          {hasMarketplaceAccess && <MarketplaceButton />}
+          <MarketplaceButton />
           <CodexButton />
           <TravelButton />
         </div>
@@ -193,6 +199,9 @@ const HudComponent: React.FC<{
           <Settings isFarming={isFarming} />
         </div>
         <BumpkinProfile isFullUser={isFullUser} />
+        {hasFeatureAccess(gameState.context.state, "TEMPERATE_SEASON") && (
+          <GameCalendar />
+        )}
 
         <DepositModal
           farmAddress={farmAddress ?? ""}

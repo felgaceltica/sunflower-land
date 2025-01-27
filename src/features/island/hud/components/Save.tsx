@@ -4,19 +4,24 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import saveIcon from "assets/icons/save.webp";
 import loadingIcon from "assets/icons/timer.gif";
 import { Context } from "features/game/GameProvider";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import classNames from "classnames";
 import { SUNNYSIDE } from "assets/sunnyside";
+import { MachineState } from "features/game/lib/gameMachine";
 
 type ButtonState = "unsaved" | "inProgress" | "saved";
 
+const _playing = (state: MachineState) => state.matches("playing");
+const _autosaving = (state: MachineState) => state.matches("autosaving");
+const _hasUnsavedProgress = (state: MachineState) =>
+  state.context.actions.length > 0;
+
 export const Save: React.FC = () => {
   const { gameService } = useContext(Context);
-  const [gameState] = useActor(gameService);
 
-  const playing = gameState.matches("playing");
-  const autoSaving = gameState.matches("autosaving");
-  const hasUnsavedProgress = gameState.context.actions.length > 0;
+  const playing = useSelector(gameService, _playing);
+  const autoSaving = useSelector(gameService, _autosaving);
+  const hasUnsavedProgress = useSelector(gameService, _hasUnsavedProgress);
   const savedWithoutError = playing && !hasUnsavedProgress;
 
   const [enableButton, setEnableButton] = useState<boolean>(false);
@@ -31,7 +36,7 @@ export const Save: React.FC = () => {
       : "unsaved";
 
   useEffect(() => {
-    // show button when there are unsaved progress
+    // enable button when there are unsaved progress
     if (hasUnsavedProgress) {
       setEnableButton(true);
       setDisableSaveButtonTimer(
@@ -39,7 +44,7 @@ export const Save: React.FC = () => {
       );
     }
 
-    // hide button after 2 seconds when changes are saved
+    // disable button after 2 seconds when changes are saved
     if (showSaved) {
       setDisableSaveButtonTimer(
         window.setTimeout(() => setEnableButton(false), 2000),
@@ -47,7 +52,7 @@ export const Save: React.FC = () => {
     }
 
     return () => clearTimeout(disableSaveButtonTimer);
-  }, [playing && !hasUnsavedProgress]);
+  }, [hasUnsavedProgress, savedWithoutError]);
 
   const save = () => {
     gameService.send("SAVE");
@@ -57,7 +62,7 @@ export const Save: React.FC = () => {
     <div
       onClick={enableButton ? save : undefined}
       className={classNames({
-        "cursor-pointer hover:img-highlight":
+        "cursor-pointer hover:img-highlight group":
           enableButton && buttonState === "unsaved",
       })}
       style={{
@@ -67,8 +72,15 @@ export const Save: React.FC = () => {
       }}
     >
       <img
-        src={SUNNYSIDE.ui.round_button}
+        src={SUNNYSIDE.ui.round_button_pressed}
         className="absolute"
+        style={{
+          width: `${PIXEL_SCALE * 22}px`,
+        }}
+      />
+      <img
+        src={SUNNYSIDE.ui.round_button}
+        className="absolute group-active:hidden"
         style={{
           width: `${PIXEL_SCALE * 22}px`,
         }}
@@ -77,7 +89,7 @@ export const Save: React.FC = () => {
       {buttonState === "unsaved" && (
         <img
           src={saveIcon}
-          className="absolute"
+          className="absolute group-active:translate-y-[2px]"
           style={{
             top: `${PIXEL_SCALE * 4}px`,
             left: `${PIXEL_SCALE * 5}px`,
@@ -88,7 +100,7 @@ export const Save: React.FC = () => {
       {buttonState === "inProgress" && (
         <img
           src={loadingIcon}
-          className="absolute"
+          className="absolute group-active:translate-y-[2px]"
           style={{
             top: `${PIXEL_SCALE * 5}px`,
             left: `${PIXEL_SCALE * 7}px`,
@@ -99,7 +111,7 @@ export const Save: React.FC = () => {
       {buttonState === "saved" && (
         <img
           src={SUNNYSIDE.icons.confirm}
-          className="absolute"
+          className="absolute group-active:translate-y-[2px]"
           style={{
             top: `${PIXEL_SCALE * 5}px`,
             left: `${PIXEL_SCALE * 5}px`,

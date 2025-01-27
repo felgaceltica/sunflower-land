@@ -4,46 +4,31 @@ import { Box } from "components/ui/Box";
 import { Button } from "components/ui/Button";
 import { Context } from "features/game/GameProvider";
 import {
+  ALL_PRODUCE,
   Crop,
-  CropName,
   CROPS,
-  GREENHOUSE_CROPS,
   GreenHouseCrop,
+  ProduceName,
 } from "features/game/types/crops";
 import { useActor } from "@xstate/react";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { getSellPrice } from "features/game/expansion/lib/boosts";
 import { setPrecision } from "lib/utils/formatNumber";
-import {
-  GREENHOUSE_FRUIT,
-  GreenHouseFruit,
-  PATCH_FRUIT,
-  PatchFruit,
-} from "features/game/types/fruits";
+import { GreenHouseFruit, PatchFruit } from "features/game/types/fruits";
 import { SplitScreenView } from "components/ui/SplitScreenView";
 import { ShopSellDetails } from "components/ui/layouts/ShopSellDetails";
-import lightning from "assets/icons/lightning.png";
-import orange from "assets/resources/orange.png";
-import {
-  EXOTIC_CROPS,
-  ExoticCrop,
-  ExoticCropName,
-} from "features/game/types/beans";
+import { EXOTIC_CROPS, ExoticCrop } from "features/game/types/beans";
 import { getKeys } from "features/game/types/craftables";
 import { gameAnalytics } from "lib/gameAnalytics";
 import { Label } from "components/ui/Label";
-import { CROP_LIFECYCLE } from "features/island/plots/lib/plant";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { ConfirmationModal } from "components/ui/ConfirmationModal";
 import { NPC_WEARABLES } from "lib/npcs";
 import { BulkSellModal } from "components/ui/BulkSellModal";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { hasFeatureAccess } from "lib/flags";
-import {
-  isAdvancedCrop,
-  isBasicCrop,
-  isMediumCrop,
-} from "features/game/events/landExpansion/harvest";
+
+import { SEASONAL_SEEDS, SEEDS } from "features/game/types/seeds";
+import { SEASON_ICONS } from "./SeasonalSeeds";
 
 export const isExoticCrop = (
   item: Crop | PatchFruit | ExoticCrop | GreenHouseFruit | GreenHouseCrop,
@@ -51,7 +36,7 @@ export const isExoticCrop = (
   return item.name in EXOTIC_CROPS;
 };
 
-export const Crops: React.FC = () => {
+export const SeasonalCrops: React.FC = () => {
   const [selected, setSelected] = useState<
     Crop | PatchFruit | ExoticCrop | GreenHouseFruit | GreenHouseCrop
   >(CROPS.Sunflower);
@@ -130,24 +115,15 @@ export const Crops: React.FC = () => {
     setCustomAmount(new Decimal(0));
   };
 
-  const exotics = getKeys(EXOTIC_CROPS)
-    // sort by sell price
-    .sort((a, b) => EXOTIC_CROPS[a].sellPrice - EXOTIC_CROPS[b].sellPrice)
-    .reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: EXOTIC_CROPS[key],
-      }),
-      {} as Record<ExoticCropName, ExoticCrop>,
-    );
+  const crops = ALL_PRODUCE;
 
-  const cropsAndFruits = Object.values({
-    ...CROPS,
-    ...PATCH_FRUIT,
-    ...exotics,
-    ...GREENHOUSE_FRUIT,
-    ...GREENHOUSE_CROPS,
-  });
+  const seasonal = SEASONAL_SEEDS[state.season.season]
+    .map((name) => SEEDS[name].yield)
+    .filter(Boolean) as ProduceName[];
+
+  const seasons = getKeys(SEASONAL_SEEDS).filter((season) =>
+    SEASONAL_SEEDS[season].find((seed) => SEEDS[seed].yield === selected.name),
+  );
 
   return (
     <>
@@ -158,6 +134,7 @@ export const Crops: React.FC = () => {
             <ShopSellDetails
               details={{
                 item: selected.name,
+                seasons: seasons,
               }}
               properties={{
                 coins: displaySellPrice(selected),
@@ -222,166 +199,51 @@ export const Crops: React.FC = () => {
           <div className="pl-1">
             <div className="flex">
               <Label
-                className="mr-3 ml-2 mb-1"
-                icon={CROP_LIFECYCLE.Sunflower.crop}
+                className="mr-3 ml-2 mb-1 capitalize"
+                icon={SEASON_ICONS[state.season.season]}
                 type="default"
               >
-                {`Basic Crops`}
+                {state.season.season}
               </Label>
             </div>
             <div className="flex flex-wrap mb-2">
-              {cropsAndFruits
-                .filter((crop) => !!crop.sellPrice && crop.name in CROPS)
-                .filter((crop) => isBasicCrop(crop.name as CropName))
-                .map((item) => (
+              {seasonal
+                .filter((name) => !!crops[name].sellPrice)
+                .map((name) => (
                   <Box
-                    isSelected={selected.name === item.name}
-                    key={item.name}
-                    onClick={() => setSelected(item)}
-                    image={ITEM_DETAILS[item.name].image}
-                    count={inventory[item.name]}
+                    isSelected={selected.name === name}
+                    key={name}
+                    onClick={() => setSelected(crops[name])}
+                    image={ITEM_DETAILS[name].image}
+                    count={inventory[name]}
                     parentDivRef={divRef}
                   />
                 ))}
             </div>
             <div className="flex">
               <Label
-                className="mr-3 ml-2 mb-1"
-                icon={CROP_LIFECYCLE.Carrot.crop}
+                className="mr-3 ml-2 mb-1 capitalize"
+                icon={SUNNYSIDE.icons.seedling}
                 type="default"
               >
-                {`Medium Crops`}
+                {t("cropGuide.otherProduce")}
               </Label>
             </div>
             <div className="flex flex-wrap mb-2">
-              {cropsAndFruits
-                .filter((crop) => !!crop.sellPrice && crop.name in CROPS)
-                .filter((crop) => isMediumCrop(crop.name as CropName))
-                .map((item) => (
+              {getKeys(crops)
+                .filter((name) => !seasonal.includes(name))
+                .filter((name) => !!crops[name].sellPrice)
+                .map((name) => (
                   <Box
-                    isSelected={selected.name === item.name}
-                    key={item.name}
-                    onClick={() => setSelected(item)}
-                    image={ITEM_DETAILS[item.name].image}
-                    count={inventory[item.name]}
+                    isSelected={selected.name === name}
+                    key={name}
+                    onClick={() => setSelected(crops[name])}
+                    image={ITEM_DETAILS[name].image}
+                    count={inventory[name]}
                     parentDivRef={divRef}
                   />
                 ))}
             </div>
-            <div className="flex">
-              <Label
-                className="mr-3 ml-2 mb-1"
-                icon={CROP_LIFECYCLE.Kale.crop}
-                type="default"
-              >
-                {`Advanced Crops`}
-              </Label>
-            </div>
-            <div className="flex flex-wrap mb-2">
-              {cropsAndFruits
-                .filter((crop) => !!crop.sellPrice && crop.name in CROPS)
-                .filter((crop) => isAdvancedCrop(crop.name as CropName))
-                .filter(
-                  (crop) =>
-                    crop.name !== "Barley" || hasFeatureAccess(state, "BARLEY"),
-                )
-                .map((item) => (
-                  <Box
-                    isSelected={selected.name === item.name}
-                    key={item.name}
-                    onClick={() => setSelected(item)}
-                    image={ITEM_DETAILS[item.name].image}
-                    count={inventory[item.name]}
-                    parentDivRef={divRef}
-                  />
-                ))}
-            </div>
-            <div className="flex">
-              <Label className="mr-3 ml-2 mb-1" icon={orange} type="default">
-                {t("fruits")}
-              </Label>
-            </div>
-            <div className="flex flex-wrap mb-2">
-              {cropsAndFruits
-                .filter(
-                  (fruit) => !!fruit.sellPrice && fruit.name in PATCH_FRUIT,
-                )
-                .filter(
-                  (crop) =>
-                    crop.name !== "Lunara" ||
-                    hasFeatureAccess(state, "WEATHER_SHOP"),
-                )
-                .filter(
-                  (crop) =>
-                    crop.name !== "Celestine" ||
-                    hasFeatureAccess(state, "WEATHER_SHOP"),
-                )
-                .filter(
-                  (crop) =>
-                    crop.name !== "Duskberry" ||
-                    hasFeatureAccess(state, "WEATHER_SHOP"),
-                )
-                .map((item) => (
-                  <Box
-                    isSelected={selected.name === item.name}
-                    key={item.name}
-                    onClick={() => setSelected(item)}
-                    image={ITEM_DETAILS[item.name].image}
-                    count={inventory[item.name]}
-                    parentDivRef={divRef}
-                  />
-                ))}
-            </div>
-            <div className="flex">
-              <Label className="mr-3 ml-2 mb-1" icon={lightning} type="default">
-                {t("exotics")}
-              </Label>
-            </div>
-            <div className="flex flex-wrap mb-2">
-              {cropsAndFruits
-                .filter((crop) => !!crop.sellPrice && crop.name in EXOTIC_CROPS)
-                .map((item) => (
-                  <Box
-                    isSelected={selected.name === item.name}
-                    key={item.name}
-                    onClick={() => setSelected(item)}
-                    image={ITEM_DETAILS[item.name].image}
-                    count={inventory[item.name]}
-                    parentDivRef={divRef}
-                  />
-                ))}
-            </div>
-
-            <>
-              <div className="flex">
-                <Label
-                  className="mr-3 ml-2 mb-1"
-                  icon={SUNNYSIDE.icons.greenhouseIcon}
-                  type="default"
-                >
-                  {t("greenhouse")}
-                </Label>
-              </div>
-              <div className="flex flex-wrap mb-2">
-                {cropsAndFruits
-                  .filter(
-                    (crop) =>
-                      !!crop.sellPrice &&
-                      (crop.name in GREENHOUSE_CROPS ||
-                        crop.name in GREENHOUSE_FRUIT),
-                  )
-                  .map((item) => (
-                    <Box
-                      isSelected={selected.name === item.name}
-                      key={item.name}
-                      onClick={() => setSelected(item)}
-                      image={ITEM_DETAILS[item.name].image}
-                      count={inventory[item.name]}
-                      parentDivRef={divRef}
-                    />
-                  ))}
-              </div>
-            </>
           </div>
         }
       />

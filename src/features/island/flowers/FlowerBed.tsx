@@ -36,6 +36,7 @@ const LIFECYCLE_VARIANTS: Record<IslandType, typeof FLOWER_LIFECYCLE> = {
   basic: FLOWER_LIFECYCLE,
   spring: FLOWER_LIFECYCLE,
   desert: DESERT_FLOWER_LIFECYCLE,
+  volcano: DESERT_FLOWER_LIFECYCLE,
 };
 
 interface Props {
@@ -126,8 +127,7 @@ export const FlowerBed: React.FC<Props> = ({ id }) => {
 
   const flower = flowerBed.flower;
 
-  const growTime =
-    FLOWER_SEEDS()[FLOWERS[flower.name].seed].plantSeconds * 1000;
+  const growTime = FLOWER_SEEDS[FLOWERS[flower.name].seed].plantSeconds * 1000;
   const timeLeft = (flowerBed.flower?.plantedAt ?? 0) + growTime - Date.now();
   const timeLeftSeconds = timeLeft / 1000;
 
@@ -261,7 +261,7 @@ export const FlowerBed: React.FC<Props> = ({ id }) => {
                     {t("reward")}
                   </Label>
                   {(reward.items ?? []).map((item) => {
-                    const boost = COLLECTIBLE_BUFF_LABELS[item.name];
+                    const boost = COLLECTIBLE_BUFF_LABELS(state)[item.name];
 
                     return (
                       <>
@@ -274,14 +274,29 @@ export const FlowerBed: React.FC<Props> = ({ id }) => {
                           {ITEM_DETAILS[item.name].description}
                         </span>
                         {boost && (
-                          <Label
-                            type={boost.labelType}
-                            icon={boost.boostTypeIcon}
-                            secondaryIcon={boost.boostedItemIcon}
-                            className="my-1"
-                          >
-                            {boost.shortDescription}
-                          </Label>
+                          <div className="flex flex-col gap-1">
+                            {boost.map(
+                              (
+                                {
+                                  labelType,
+                                  boostTypeIcon,
+                                  boostedItemIcon,
+                                  shortDescription,
+                                },
+                                index,
+                              ) => (
+                                <Label
+                                  key={index}
+                                  type={labelType}
+                                  icon={boostTypeIcon}
+                                  secondaryIcon={boostedItemIcon}
+                                  className="mb-1"
+                                >
+                                  {shortDescription}
+                                </Label>
+                              ),
+                            )}
+                          </div>
                         )}
                       </>
                     );
