@@ -152,6 +152,18 @@ interface HarvestsProps {
 }
 
 /**
+ * The props for skill points requirement label.
+ * @param type The type is skill points.
+ * @param points The skill points balance of the player.
+ * @param requirement The skill points requirement.
+ */
+interface SkillPointsProps {
+  type: "skillPoints";
+  points: number;
+  requirement: number;
+}
+
+/**
  * The default props.
  * @param className The class name for the label.
  */
@@ -174,6 +186,7 @@ type Props = (
   | XPProps
   | LevelProps
   | HarvestsProps
+  | SkillPointsProps
 ) &
   defaultProps;
 
@@ -249,10 +262,21 @@ export const RequirementLabel: React.FC<Props> = (props) => {
         return `${t("level.number", { level: props.requirement })}`;
       }
       case "harvests": {
-        return `${t("harvest.number", {
-          minHarvest: props.minHarvest,
-          maxHarvest: props.maxHarvest,
-        })}`;
+        return `${
+          props.minHarvest === props.maxHarvest
+            ? t("harvest.number", {
+                noOfHarvests: props.minHarvest,
+              })
+            : t("harvest.numbers", {
+                minHarvest: props.minHarvest,
+                maxHarvest: props.maxHarvest,
+              })
+        }`;
+      }
+      case "skillPoints": {
+        const roundedDownPoints = formatNumber(props.points);
+        const roundedDownRequirement = formatNumber(props.requirement);
+        return `${t("skillPts")} ${roundedDownPoints}/${roundedDownRequirement}`;
       }
     }
   };
@@ -262,13 +286,17 @@ export const RequirementLabel: React.FC<Props> = (props) => {
       case "coins":
         return props.balance >= props.requirement;
       case "sfl":
-        return props.balance.greaterThanOrEqualTo(props.requirement);
+        return props.balance.gte(props.requirement);
       case "item":
-        return props.balance.greaterThanOrEqualTo(props.requirement);
+        return (
+          !props.requirement.lte(0) && props.balance.gte(props.requirement)
+        );
       case "wearable":
         return props.balance > 0;
       case "level":
         return props.currentLevel >= props.requirement;
+      case "skillPoints":
+        return props.points >= props.requirement;
       case "sellForSfl":
       case "sellForCoins":
       case "sellForGems":
@@ -282,14 +310,14 @@ export const RequirementLabel: React.FC<Props> = (props) => {
   const requirementMet = isRequirementMet();
 
   const labelType = () => {
-    if (props.type === "wearable") {
-      if (requirementMet) {
-        return "success";
-      }
-      return "danger";
+    switch (props.type) {
+      case "wearable":
+        return requirementMet ? "success" : "danger";
+      case "skillPoints":
+        return requirementMet ? "default" : "danger";
+      default:
+        return requirementMet ? "transparent" : "danger";
     }
-
-    return requirementMet ? "transparent" : "danger";
   };
 
   return (

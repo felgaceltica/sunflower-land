@@ -54,6 +54,7 @@ export const SUNNYSIDE = {
 
   //Announcement
   announcement: {
+    tornado: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/tornado.png`,
     springPrestige: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/spring_prestige.png`,
     desertPrestige: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/desert_prestige.png`,
     desert_digging: `${CONFIG.PROTECTED_IMAGE_URL}/announcements/desert.webp`,
@@ -87,6 +88,10 @@ export const SUNNYSIDE = {
     magicBeanplanted: `${CONFIG.PROTECTED_IMAGE_URL}/crops/bean_planted.png`,
     magicBeanready: `${CONFIG.PROTECTED_IMAGE_URL}/crops/bean_ready.png`,
     magicBeangrowing: `${CONFIG.PROTECTED_IMAGE_URL}/crops/bean_growing.png`,
+    sprout: `${CONFIG.PROTECTED_IMAGE_URL}/crops/sprout.webp`,
+    seedling: `${CONFIG.PROTECTED_IMAGE_URL}/crops/seedling.webp`,
+    grower: `${CONFIG.PROTECTED_IMAGE_URL}/crops/grower.webp`,
+    cropKeeper: `${CONFIG.PROTECTED_IMAGE_URL}/crops/crop_keeper.webp`,
   },
   //Captcha
   captcha: {
@@ -255,6 +260,7 @@ export const SUNNYSIDE = {
     tent_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/tent_inside.png`,
     house_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/house_inside.png`,
     manor_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/manor_inside.png`,
+    mansion_inside: `${CONFIG.PROTECTED_IMAGE_URL}/land/mansion_inside.png`,
     animal_house_inside_one: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_one.png`,
     animal_house_inside_two: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_two.png`,
     animal_house_inside_three: `${CONFIG.PROTECTED_IMAGE_URL}/land/animal_house_three.png`,
@@ -342,6 +348,9 @@ export const SUNNYSIDE = {
     harvestedBush: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/harvested_bush.png`,
     deadTree: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/dead_tree.webp`,
     bushShrub: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/bush_shrub.png`,
+    celestineTree: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/celestine/celestine_bush.webp`,
+    lunaraTree: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/lunara/lunara_bush.webp`,
+    duskberryTree: `${CONFIG.PROTECTED_IMAGE_URL}/fruit/duskberry/duskberry_bush.webp`,
   },
   //Brand
   brand: {
@@ -428,6 +437,7 @@ export const SUNNYSIDE = {
     //Bumpkin Houses
     house: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/house.png`,
     manor: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/manor.png`,
+    mansion: `${CONFIG.PROTECTED_IMAGE_URL}/buildings/mansion.png`,
   },
   //Icons
   icons: {
@@ -478,6 +488,7 @@ export const SUNNYSIDE = {
     plus: `${CONFIG.PROTECTED_IMAGE_URL}/icons/plus.png`,
     minus: `${CONFIG.PROTECTED_IMAGE_URL}/icons/minus.png`,
     wardrobe: `${CONFIG.PROTECTED_IMAGE_URL}/icons/wardrobe.png`,
+    chevron_down: `${CONFIG.PROTECTED_IMAGE_URL}/icons/chevron_down.png`,
     chevron_right: `${CONFIG.PROTECTED_IMAGE_URL}/icons/chevron_right.png`,
     dig_icon: `${CONFIG.PROTECTED_IMAGE_URL}/icons/dig_icon.png`,
     plant_icon: `${CONFIG.PROTECTED_IMAGE_URL}/icons/plant_icon.png`,
@@ -672,6 +683,7 @@ export const SUNNYSIDE = {
     add_button: `${CONFIG.PROTECTED_IMAGE_URL}/ui/add-button.png`,
     cursor: `${CONFIG.PROTECTED_IMAGE_URL}/ui/cursor.png`,
     round_button: `${CONFIG.PROTECTED_IMAGE_URL}/ui/round_button.png`,
+    round_button_pressed: `${CONFIG.PROTECTED_IMAGE_URL}/ui/round_button_pressed.png`,
     select_box: `${CONFIG.PROTECTED_IMAGE_URL}/ui/select_box.png`,
     green_bar_0: `${CONFIG.PROTECTED_IMAGE_URL}/ui/greenbar_00.png`,
     green_bar_1: `${CONFIG.PROTECTED_IMAGE_URL}/ui/greenbar_01.png`,
@@ -682,6 +694,7 @@ export const SUNNYSIDE = {
     green_bar_6: `${CONFIG.PROTECTED_IMAGE_URL}/ui/greenbar_06.png`,
     dot: `${CONFIG.PROTECTED_IMAGE_URL}/ui/select_dots.png`,
     primaryButton: `${CONFIG.PROTECTED_IMAGE_URL}/ui/light_button.png`,
+    primaryButtonPressed: `${CONFIG.PROTECTED_IMAGE_URL}/ui/light_button_pressed.png`,
     greyButton: `${CONFIG.PROTECTED_IMAGE_URL}/ui/grey_button.png`,
     site_bg: `${CONFIG.PROTECTED_IMAGE_URL}/ui/site_bg.png`,
     more: `${CONFIG.PROTECTED_IMAGE_URL}/ui/more.png`,
@@ -727,6 +740,9 @@ export const SUNNYSIDE = {
     progressBarBorder: `${CONFIG.PROTECTED_IMAGE_URL}/ui/progress/progress_bar_border.png`,
     transparentBarEdge: `${CONFIG.PROTECTED_IMAGE_URL}/ui/progress/transparent_bar_edge.png`,
     transparentBarLong: `${CONFIG.PROTECTED_IMAGE_URL}/ui/progress/transparent_bar_long.png`,
+    // Toggle
+    turn_off: `${CONFIG.PROTECTED_IMAGE_URL}/ui/toggle/turn_off.png`,
+    turn_on: `${CONFIG.PROTECTED_IMAGE_URL}/ui/toggle/turn_on.png`,
   },
   //Decorations
   decorations: {
