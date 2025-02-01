@@ -40,7 +40,7 @@ import {
 import { TreasureToolName, WorkbenchToolName } from "./tools";
 import { ConversationName } from "./announcements";
 import { NPCName } from "lib/npcs";
-import { SeasonalTicket } from "./seasons";
+import { SeasonalBanner, SeasonalTicket } from "./seasons";
 import { Bud } from "./buds";
 import {
   CompostName,
@@ -86,7 +86,11 @@ import {
 import { AnimalBuildingLevel } from "../events/landExpansion/upgradeBuilding";
 import { SeasonalCollectibleName } from "./megastore";
 import { TradeFood } from "../events/landExpansion/redeemTradeReward";
-import { CalendarEvent, CalendarEventName } from "./calendar";
+import {
+  CalendarEvent,
+  CalendarEventName,
+  SeasonalEventName,
+} from "./calendar";
 import { VipBundle } from "../lib/vipAccess";
 
 export type Reward = {
@@ -193,11 +197,12 @@ export type MutantChicken =
   | "Crim Peckster"
   | "Knight Chicken"
   | "Pharaoh Chicken"
-  | "Alien Chicken";
+  | "Alien Chicken"
+  | "Summer Chicken";
 
-export type MutantCow = "Mootant";
+export type MutantCow = "Mootant" | "Frozen Cow";
 
-export type MutantSheep = "Toxic Tuft";
+export type MutantSheep = "Toxic Tuft" | "Frozen Sheep";
 
 export type MutantAnimal = MutantChicken | MutantCow | MutantSheep;
 
@@ -340,6 +345,9 @@ export const COUPONS: Record<Coupons, { description: string }> = {
   "Trade Point": {
     description: translate("description.trade.points"),
   },
+  Timeshard: {
+    description: "",
+  },
 };
 
 export type Purchase = {
@@ -404,7 +412,12 @@ export type FlowerBounty = Bounty & {
   name: FlowerName;
 };
 
-export type BountyRequest = AnimalBounty | FlowerBounty;
+export type SFLBounty = Bounty & {
+  name: "Obsidian";
+  sfl: number;
+};
+
+export type BountyRequest = AnimalBounty | FlowerBounty | SFLBounty;
 
 export type Bounties = {
   requests: BountyRequest[];
@@ -473,7 +486,8 @@ export type InventoryItemName =
   | BedName
   | RecipeCraftableName
   | SeasonalCollectibleName
-  | TradeFood;
+  | TradeFood
+  | SeasonalBanner;
 
 export type Inventory = Partial<Record<InventoryItemName, Decimal>>;
 
@@ -1134,7 +1148,12 @@ export type IslandType = "basic" | "spring" | "desert" | "volcano";
  * The order of the islands is important as it determines the levels of the islands.
  * Each new island should be added to the end of the array.
  */
-export const ISLAND_EXPANSIONS: IslandType[] = ["basic", "spring", "desert"];
+export const ISLAND_EXPANSIONS: IslandType[] = [
+  "basic",
+  "spring",
+  "desert",
+  "volcano",
+];
 
 export type Home = {
   collectibles: Collectibles;
@@ -1311,16 +1330,8 @@ type OtherCalendarEvent = BaseCalendarEventDetails & {
 
 export type CalendarEventDetails = CalendarScheduledEvent | OtherCalendarEvent;
 
-export type Calendar = {
+export type Calendar = Partial<Record<SeasonalEventName, CalendarEvent>> & {
   dates: CalendarEventDetails[];
-  tornado?: CalendarEvent;
-  tsunami?: CalendarEvent;
-  fullMoon?: CalendarEvent;
-  greatFreeze?: CalendarEvent;
-  doubleDelivery?: CalendarEvent;
-  bountifulHarvest?: CalendarEvent;
-  insectPlague?: CalendarEvent;
-  sunshower?: CalendarEvent;
 };
 
 export type LavaPit = {
