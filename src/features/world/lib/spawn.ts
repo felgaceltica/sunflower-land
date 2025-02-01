@@ -28,6 +28,12 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 450 - randomYOffset,
     },
   },
+  infernos: {
+    default: {
+      x: 318,
+      y: 412,
+    },
+  },
   portal_example: {
     default: {
       x: 400 + randomXOffset,
