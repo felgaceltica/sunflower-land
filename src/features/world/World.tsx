@@ -27,6 +27,7 @@ import { WorldHud } from "features/island/hud/WorldHud";
 import { Loading } from "features/auth/components";
 import { GameState } from "features/game/types/game";
 import { Forbidden } from "features/auth/components/Forbidden";
+import { getBumpkinLevel } from "features/game/lib/level";
 
 interface Props {
   isCommunity?: boolean;
@@ -70,16 +71,12 @@ export const World: React.FC<Props> = ({ isCommunity = false }) => {
 const _isLoading = (state: MachineState) => state.matches("loading");
 
 // MMO Machine
-const _isConnecting = (state: MMOMachineState) => state.matches("connecting");
 const _isConnected = (state: MMOMachineState) => state.matches("connected");
-const _isJoining = (state: MMOMachineState) => state.matches("joining");
 const _isKicked = (state: MMOMachineState) => state.matches("kicked");
 const _isMMOInitialising = (state: MMOMachineState) =>
   state.matches("initialising");
 const _isIntroducing = (state: MMOMachineState) =>
   state.matches("introduction");
-const _isChoosingUsername = (state: MMOMachineState) =>
-  state.matches("chooseUsername");
 
 type MMOProps = { isCommunity: boolean };
 
@@ -88,6 +85,30 @@ const SCENE_ACCESS: Partial<Record<SceneId, (game: GameState) => boolean>> = {
   sunflorian_house: (game) => game.faction?.name === "sunflorians",
   bumpkin_house: (game) => game.faction?.name === "bumpkins",
   nightshade_house: (game) => game.faction?.name === "nightshades",
+  infernos: (game) => {
+    const level = getBumpkinLevel(game.bumpkin?.experience ?? 0);
+    return level >= 30;
+  },
+  plaza: (game) => {
+    const level = getBumpkinLevel(game.bumpkin?.experience ?? 0);
+    return level >= 2;
+  },
+  kingdom: (game) => {
+    const level = getBumpkinLevel(game.bumpkin?.experience ?? 0);
+    return level >= 7;
+  },
+  beach: (game) => {
+    const level = getBumpkinLevel(game.bumpkin?.experience ?? 0);
+    return level >= 4;
+  },
+  woodlands: (game) => {
+    const level = getBumpkinLevel(game.bumpkin?.experience ?? 0);
+    return level >= 6;
+  },
+  retreat: (game) => {
+    const level = getBumpkinLevel(game.bumpkin?.experience ?? 0);
+    return level >= 5;
+  },
 };
 
 export const MMO: React.FC<MMOProps> = ({ isCommunity }) => {
@@ -141,14 +162,10 @@ export const MMO: React.FC<MMOProps> = ({ isCommunity }) => {
   }, []);
 
   const isInitialising = useSelector(mmoService, _isMMOInitialising);
-  const isConnecting = useSelector(mmoService, _isConnecting);
-  const isJoining = useSelector(mmoService, _isJoining);
   const isKicked = useSelector(mmoService, _isKicked);
   const isConnected = useSelector(mmoService, _isConnected);
   const isIntroducing = useSelector(mmoService, _isIntroducing);
-  const isChoosingUsername = useSelector(mmoService, _isChoosingUsername);
-  const isTraveling =
-    isInitialising || isConnecting || isConnected || isKicked || isJoining;
+  const isTraveling = isInitialising || isConnected || isKicked;
 
   if (isTraveling) {
     return <TravelScreen mmoService={mmoService} />;
@@ -176,6 +193,8 @@ export const MMO: React.FC<MMOProps> = ({ isCommunity }) => {
   // Otherwise if connected, return Plaza Screen
   return (
     <>
+      <WorldHud />
+
       <PhaserComponent
         mmoService={mmoService}
         isCommunity={isCommunity}
@@ -192,9 +211,6 @@ export const MMO: React.FC<MMOProps> = ({ isCommunity }) => {
           }}
         />
       </Modal>
-
-      {/* <Modal show={isChoosingUsername}></Modal> */}
-      <WorldHud />
     </>
   );
 };

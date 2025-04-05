@@ -3,7 +3,7 @@ import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
-import sflIcon from "assets/icons/sfl.webp";
+import sflIcon from "assets/icons/flower_token.webp";
 import { Context } from "features/game/GameProvider";
 import { MachineState } from "features/game/lib/gameMachine";
 import { useSelector } from "@xstate/react";
@@ -68,7 +68,7 @@ export const JoinFaction: React.FC<Props> = ({ faction, onClose }) => {
         setIsLoading(false);
       }
 
-      // Error occured - let them join for 10
+      // Error occurred - let them join for 10
       if (!champions) {
         setCost(10);
         setIsLoading(false);
@@ -161,7 +161,7 @@ export const JoinFaction: React.FC<Props> = ({ faction, onClose }) => {
             <div className="flex justify-between">
               <Label type="default">{capitalize(faction)}</Label>
               <Label type={hasSFL ? "warning" : "danger"} icon={sflIcon}>
-                {`${cost} SFL`}
+                {`${cost} FLOWER`}
               </Label>
             </div>
             <span className="text-xs sm:text-sm mb-2">

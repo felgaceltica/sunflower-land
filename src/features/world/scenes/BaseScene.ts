@@ -20,7 +20,6 @@ import {
   SceneId,
 } from "../mmoMachine";
 import { Player, PlazaRoomState } from "../types/Room";
-import { playerModalManager } from "../ui/PlayerModals";
 import { FactionName, GameState } from "features/game/types/game";
 import { translate } from "lib/i18n/translate";
 import { Room } from "colyseus.js";
@@ -41,6 +40,9 @@ import {
   PlazaShaders,
   getPlazaShaderSetting,
 } from "lib/utils/hooks/usePlazaShader";
+import { playerSelectionListManager } from "../ui/PlayerSelectionList";
+import { playerModalManager } from "../ui/player/PlayerModals";
+import { STREAM_REWARD_COOLDOWN } from "../ui/player/StreamReward";
 
 export type NPCBumpkin = {
   x: number;
@@ -96,6 +98,7 @@ export const FACTION_NAME_COLORS: Record<FactionName, string> = {
 export abstract class BaseScene extends Phaser.Scene {
   abstract sceneId: SceneId;
   eventListener?: (event: EventObject) => void;
+  private lastModalOpenTime = 0;
 
   public joystick?: VirtualJoystick;
   private switchToScene?: SceneId;
@@ -327,11 +330,85 @@ export abstract class BaseScene extends Phaser.Scene {
           ...(this.gameState.bumpkin?.equipped as BumpkinParts),
           updatedAt: 0,
         },
-        experience: 0,
-        sessionId: this.mmoServer?.sessionId ?? "",
+        experience: this.gameState.bumpkin?.experience ?? 0,
       });
 
       this.initialiseCamera();
+
+      // handles player modal
+      // get all player under the pointer click
+      this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+        // ignore click if the joystick is active
+        if (this.joystick?.pointer) return;
+
+        const clickedObjects = this.input.hitTestPointer(pointer);
+
+        // filter other players
+        const clickedBumpkins = clickedObjects.filter((clickedObject) => {
+          const isBumpkinContainer = clickedObject instanceof BumpkinContainer;
+          if (!isBumpkinContainer) return false;
+
+          const bumpkinContainer = clickedObject as BumpkinContainer;
+          return (
+            (bumpkinContainer.farmId !== this.id ||
+              (bumpkinContainer.farmId === this.id &&
+                this.gameState.bumpkin.equipped.shirt === "Gift Giver")) &&
+            bumpkinContainer.farmId !== undefined
+          );
+        }) as BumpkinContainer[];
+
+        if (clickedBumpkins.length === 0) return;
+
+        const players = clickedBumpkins.map((clickedBumpkin) => {
+          const { farmId, clothing, experience, username } = clickedBumpkin;
+          return {
+            id: farmId!,
+            clothing,
+            experience: experience ?? 0,
+            username,
+          };
+        });
+
+        if (clickedBumpkins.length === 1) {
+          const distance = Phaser.Math.Distance.BetweenPoints(
+            this.currentPlayer as BumpkinContainer,
+            clickedBumpkins[0],
+          );
+
+          if (distance > 50) {
+            this.currentPlayer?.speak(translate("base.far.away"));
+            return;
+          }
+
+          playerModalManager.open(players[0]);
+          return;
+        }
+
+        // Check distance for all clicked bumpkins
+        const closestBumpkin = clickedBumpkins.reduce((closest, current) => {
+          const closestDistance = Phaser.Math.Distance.BetweenPoints(
+            this.currentPlayer as BumpkinContainer,
+            closest,
+          );
+          const currentDistance = Phaser.Math.Distance.BetweenPoints(
+            this.currentPlayer as BumpkinContainer,
+            current,
+          );
+          return currentDistance < closestDistance ? current : closest;
+        });
+
+        const closestDistance = Phaser.Math.Distance.BetweenPoints(
+          this.currentPlayer as BumpkinContainer,
+          closestBumpkin,
+        );
+
+        if (closestDistance > 50) {
+          this.currentPlayer?.speak(translate("base.far.away"));
+          return;
+        }
+
+        playerSelectionListManager.open(players);
+      });
 
       // this.physics.world.fixedStep = false; // activates sync
       // this.physics.world.fixedStep = true; // deactivates sync (default)
@@ -572,6 +649,7 @@ export abstract class BaseScene extends Phaser.Scene {
       removeReactionListener();
 
       window.removeEventListener(AUDIO_MUTED_EVENT as any, this.onAudioMuted);
+      this.input.off("pointerdown"); // clean up pointerdown event listener
     });
   }
 
@@ -667,8 +745,7 @@ export abstract class BaseScene extends Phaser.Scene {
     isCurrentPlayer,
     clothing,
     npc,
-    experience = 0,
-    sessionId,
+    experience,
   }: {
     isCurrentPlayer: boolean;
     x: number;
@@ -679,7 +756,6 @@ export abstract class BaseScene extends Phaser.Scene {
     clothing: Player["clothing"];
     npc?: NPCName;
     experience?: number;
-    sessionId: string;
   }): BumpkinContainer {
     const defaultClick = () => {
       const distance = Phaser.Math.Distance.BetweenPoints(
@@ -687,25 +763,14 @@ export abstract class BaseScene extends Phaser.Scene {
         this.currentPlayer as BumpkinContainer,
       );
 
+      if (!npc) return;
+
       if (distance > 50) {
         entity.speak(translate("base.far.away"));
         return;
       }
 
-      if (npc) {
-        npcModalManager.open(npc);
-      } else {
-        if (farmId !== this.id) {
-          playerModalManager.open({
-            id: farmId,
-            // Always get the latest clothing
-            clothing: this.playerEntities[sessionId]?.clothing ?? clothing,
-            experience,
-          });
-        }
-      }
-
-      // TODO - open player modals
+      npcModalManager.open(npc);
     };
 
     const entity = new BumpkinContainer({
@@ -714,6 +779,9 @@ export abstract class BaseScene extends Phaser.Scene {
       y,
       clothing,
       name: npc,
+      username,
+      experience,
+      farmId,
       faction,
       onClick: defaultClick,
     });
@@ -831,6 +899,12 @@ export abstract class BaseScene extends Phaser.Scene {
   destroyPlayer(sessionId: string) {
     const entity = this.playerEntities[sessionId];
     if (entity) {
+      // Dispatch player leave event
+      const event = new CustomEvent("player_leave", {
+        detail: { playerId: entity.farmId },
+      });
+      window.dispatchEvent(event);
+
       entity.disappear();
       delete this.playerEntities[sessionId];
     }
@@ -1026,7 +1100,6 @@ export abstract class BaseScene extends Phaser.Scene {
           isCurrentPlayer: sessionId === server.sessionId,
           npc: player.npc,
           experience: player.experience,
-          sessionId,
         });
       }
     });
@@ -1149,6 +1222,31 @@ export abstract class BaseScene extends Phaser.Scene {
       // Check if player is in area as well
       if (hidden === entity.visible) {
         entity.setVisible(!hidden);
+      }
+
+      // Check for streamer hat
+      if (player.clothing?.hat === "Streamer Hat") {
+        const distance = Phaser.Math.Distance.BetweenPoints(
+          this.currentPlayer as BumpkinContainer,
+          entity,
+        );
+        const now = Date.now();
+        const streamerHatLastClaimedAt =
+          this.gameService.state.context.state.pumpkinPlaza.streamerHat
+            ?.openedAt ?? 0;
+
+        if (
+          now - this.lastModalOpenTime > STREAM_REWARD_COOLDOWN &&
+          distance < 75
+        ) {
+          playerModalManager.open({
+            id: player.farmId,
+            clothing: player.clothing,
+            experience: player.experience,
+            username: player.username,
+          });
+          this.lastModalOpenTime = streamerHatLastClaimedAt;
+        }
       }
     });
   }

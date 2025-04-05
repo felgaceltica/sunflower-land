@@ -1,5 +1,5 @@
-import desert_plaza from "assets/map/desert_plaza.json";
-import bull_run_plaza from "assets/map/bull_run_plaza.json";
+import seasonal_plaza from "assets/map/seasonal_plaza.json";
+import seasonal_tileset from "assets/map/seasonal_tileset.json";
 import { SceneId } from "../mmoMachine";
 import { BaseScene, NPCBumpkin } from "./BaseScene";
 import { Label } from "../containers/Label";
@@ -9,9 +9,13 @@ import { PlaceableContainer } from "../containers/PlaceableContainer";
 import { budImageDomain } from "features/island/collectibles/components/Bud";
 import { SOUNDS } from "assets/sound-effects/soundEffects";
 import { NPCName } from "lib/npcs";
-import { FactionName, GameState } from "features/game/types/game";
+import {
+  FactionName,
+  GameState,
+  TemperateSeasonName,
+} from "features/game/types/game";
 import { translate } from "lib/i18n/translate";
-import { hasFeatureAccess } from "lib/flags";
+import { capitalize } from "lib/utils/capitalize";
 import { getBumpkinHoliday } from "lib/utils/getSeasonWeek";
 import { DogContainer } from "../containers/DogContainer";
 
@@ -24,6 +28,12 @@ export type FactionNPC = {
 };
 
 export const PLAZA_BUMPKINS: NPCBumpkin[] = [
+  {
+    x: 496,
+    y: 403,
+    npc: "rocket man",
+    direction: "left",
+  },
   {
     x: 207,
     y: 379,
@@ -116,12 +126,12 @@ export class PlazaScene extends BaseScene {
   public arrows: Phaser.GameObjects.Sprite | undefined;
 
   constructor({ gameState }: { gameState: GameState }) {
-    const showBullRunPlaza = hasFeatureAccess(gameState, "BULL_RUN_PLAZA");
     super({
       name: "plaza",
       map: {
-        json: showBullRunPlaza ? bull_run_plaza : desert_plaza,
-        imageKey: "tileset",
+        json: seasonal_plaza,
+        imageKey: "seasonal-tileset",
+        defaultTilesetConfig: seasonal_tileset,
       },
       audio: { fx: { walk_key: "dirt_footstep" } },
     });
@@ -131,12 +141,6 @@ export class PlazaScene extends BaseScene {
     this.load.audio("chime", SOUNDS.notifications.chime);
 
     this.load.image("vip_gift", "world/vip_gift.png");
-    this.load.image("rabbit_1", "world/rabbit_1.png");
-    this.load.image("rabbit_2", "world/rabbit_2.png");
-    this.load.image("rabbit_3", "world/rabbit_3.png");
-    this.load.image("rabbit_4", "world/rabbit_4.png");
-    this.load.image("rabbit_5", "world/rabbit_5.png");
-    this.load.image("rabbit_6", "world/rabbit_6.png");
 
     this.load.image("page", "world/page.png");
     this.load.image("arrows_to_move", "world/arrows_to_move.png");
@@ -179,11 +183,6 @@ export class PlazaScene extends BaseScene {
       frameHeight: 21,
     });
 
-    this.load.spritesheet("mecha_bull", "world/mecha_bull.webp", {
-      frameWidth: 35,
-      frameHeight: 31,
-    });
-
     this.load.image("chest", "world/rare_chest.png");
     this.load.image("weather_shop", "world/weather_shop.webp");
 
@@ -194,13 +193,28 @@ export class PlazaScene extends BaseScene {
     this.load.image("luxury_key_disc", "world/luxury_key_disc.png");
 
     // Stella Megastore items
-    this.load.image("tomato_bombard", "world/tomato_bombard.gif");
+    this.load.spritesheet("mecha_bull", "world/mecha_bull.webp", {
+      frameWidth: 35,
+      frameHeight: 31,
+    });
+    this.load.image("mammoth", "world/mammoth.webp");
 
-    this.load.image("explorer_hat", "world/explorer_hat.png");
+    // Auction Items
+    this.load.image("golden_sheep", "world/golden_sheep.webp");
+    this.load.image("barn_blueprint", "world/barn_blueprint.webp");
+    this.load.image("locust_king", "world/locust_king.webp");
+    this.load.image("sol_luna", "world/sol_luna.webp");
+    this.load.image("glacial_plume", "world/glacial_plume.webp");
+
     this.load.image("cowboy_hat", "world/cowboy_hat.png");
+    this.load.image("acorn_hat", "world/acorn_hat.png");
 
-    this.load.image("pharaoh_banner", "world/pharaohs_treasure_banner.webp");
     this.load.image("bull_run_banner", "world/bull_run_banner.webp");
+    this.load.image("woc_banner_summer", "world/winds_of_change_summer.webp");
+    this.load.image("woc_banner_spring", "world/winds_of_change_spring.webp");
+    this.load.image("woc_banner_autumn", "world/winds_of_change_autumn.webp");
+    this.load.image("woc_banner_winter", "world/winds_of_change_winter.webp");
+    this.load.image("ronin_banner", "world/ronin_banner.webp");
 
     this.load.spritesheet("glint", "world/glint.png", {
       frameWidth: 7,
@@ -432,7 +446,7 @@ export class PlazaScene extends BaseScene {
     });
 
     // Plaza Bud
-    const bud = this.add.sprite(500, 420, "plaza_bud");
+    const bud = this.add.sprite(525, 436, "plaza_bud");
     this.anims.create({
       key: "plaza_bud_animation",
       frames: this.anims.generateFrameNumbers("plaza_bud", {
@@ -453,20 +467,87 @@ export class PlazaScene extends BaseScene {
         }
       });
 
+    const season = this.gameState.season.season;
+
+    // List of all seasonal elements
+    const seasonElements = [
+      "Water",
+      "Ground",
+      "Flowers & Grass",
+      "Paths",
+      "Paths Layer 2",
+      "Decoration Base",
+      "Decoration Base 2",
+      "Decoration Base 3",
+      "Decorations Layer 2",
+      "Decorations Layer 3",
+      "Building Base",
+      "Building Base Decorations",
+      "Building Layer 2",
+      "Building Layer 3",
+      "Building Layer 4",
+      "Club House Roof",
+      "Club House Base",
+    ];
+    const seasons = ["Spring", "Summer", "Autumn", "Winter"];
+
+    const topElements = [
+      "Decorations Layer 2",
+      "Decorations Layer 3",
+      "Building Layer 2",
+      "Building Layer 3",
+      "Building Layer 4",
+      "Club House Roof",
+    ];
+
+    const topElementsSet = new Set(topElements);
+
+    // Filter all seasonal layers that are not used for the active season
+    seasons
+      .filter((seasonName) => seasonName !== capitalize(season)) // Skip the active season
+      .forEach((seasonName) => {
+        seasonElements.forEach((element) => {
+          const layerName = `${element}/${seasonName} ${element}`;
+          const layer = this.layers[layerName];
+
+          if (!layer) return; // Skip undefined layers
+
+          layer.setVisible(false); // Hide inactive season layer
+
+          // Set depth for elements that should be drawn on top
+          if (topElementsSet.has(element)) {
+            const activeLayerName = `${element}/${capitalize(season)} ${element}`;
+            this.layers[activeLayerName]?.setDepth(1000000);
+          }
+        });
+      });
+
+    const Banners: Record<TemperateSeasonName, string> = {
+      spring: "woc_banner_spring",
+      summer: "woc_banner_summer",
+      autumn: "woc_banner_autumn",
+      winter: "woc_banner_winter",
+    };
+
     // Banner
-    const banner = hasFeatureAccess(this.gameState, "BULL_RUN_PLAZA")
-      ? "bull_run_banner"
-      : "pharaoh_banner";
-    this.add.image(400, 225, banner).setDepth(100000000000);
+    const banner = Banners[season];
+    this.add.image(400, 225, banner).setDepth(225);
     // .setInteractive({ cursor: "pointer" })
     // .on("pointerdown", () => {
     //   interactableModalManager.open(banner);
     // });
-    this.add.image(464, 225, banner).setDepth(100000000000);
+    this.add.image(464, 225, banner).setDepth(225);
 
-    this.add.image(480, 386, banner).setDepth(100000000000);
+    this.add.image(480, 386, banner).setDepth(386);
 
-    this.add.sprite(385, 386, banner).setDepth(100000000000);
+    this.add.sprite(385, 386, banner).setDepth(386);
+
+    // Ronin Banner
+    this.add.sprite(400, 150, "ronin_banner").setDepth(150);
+    this.add.sprite(330, 355, "ronin_banner").setDepth(355);
+    this.add.sprite(672, 270, "ronin_banner").setDepth(270);
+    this.add.sprite(41, 287, "ronin_banner").setDepth(287);
+    this.add.sprite(106, 110, "ronin_banner").setDepth(120);
 
     const bud3 = this.add.sprite(176, 290, "plaza_bud_3");
     this.anims.create({
@@ -536,24 +617,9 @@ export class PlazaScene extends BaseScene {
         }
       });
 
-    if (hasFeatureAccess(this.gameState, "BULL_RUN_PLAZA")) {
-      const mechaBull = this.add.sprite(248, 244, "mecha_bull");
-      this.anims.create({
-        key: "mech_bull_anim",
-        frames: this.anims.generateFrameNumbers("mecha_bull", {
-          start: 0,
-          end: 7,
-        }),
-        repeat: -1,
-        frameRate: 10,
-      });
-      mechaBull.play("mech_bull_anim", true);
-    } else this.add.image(248, 244, "tomato_bombard");
+    this.add.image(248, 244, "mammoth");
 
-    const featuredHat = hasFeatureAccess(this.gameState, "BULL_RUN_PLAZA")
-      ? "cowboy_hat"
-      : "explorer_hat";
-    this.add.image(288.5, 248, featuredHat);
+    this.add.image(288.5, 248, "acorn_hat");
 
     if (this.textures.exists("sparkle")) {
       const sparkle = this.add.sprite(564, 191, "sparkle");
@@ -578,7 +644,7 @@ export class PlazaScene extends BaseScene {
       const sparkle4 = this.add.sprite(615, 205, "sparkle");
       sparkle4.setDepth(1000000);
 
-      const sparkle5 = this.add.sprite(639, 181, "sparkle");
+      const sparkle5 = this.add.sprite(635, 191, "sparkle");
       sparkle5.setDepth(1000000);
 
       sparkle.play(`sparkel_anim`, true);
@@ -587,6 +653,22 @@ export class PlazaScene extends BaseScene {
       sparkle4.play(`sparkel_anim`, true);
       sparkle5.play(`sparkel_anim`, true);
     }
+
+    // Change image every chapter change
+    const nft1 = this.add.image(564, 191, "barn_blueprint");
+    nft1.setDepth(191);
+
+    const nft2 = this.add.image(585, 205, "sol_luna");
+    nft2.setDepth(205);
+
+    const nft3 = this.add.image(598, 181, "golden_sheep");
+    nft3.setDepth(181);
+
+    const nft4 = this.add.image(615, 205, "glacial_plume");
+    nft4.setDepth(205);
+
+    const nft5 = this.add.image(635, 191, "locust_king");
+    nft5.setDepth(181);
 
     const door = this.colliders
       ?.getChildren()
@@ -609,8 +691,11 @@ export class PlazaScene extends BaseScene {
       const wasOpen = chest.visible;
       const isOpen = (obj1 as any).y > (obj2 as any).y;
 
-      this.layers["Club House Roof"].setVisible(isOpen);
-      this.layers["Club House Base"].setVisible(isOpen);
+      const roofBase = `${"Club House Base"}/${capitalize(season)} ${"Club House Base"}`;
+      const roofLayer = `${"Club House Roof"}/${capitalize(season)} ${"Club House Roof"}`;
+
+      this.layers[roofLayer].setVisible(isOpen);
+      this.layers[roofBase].setVisible(isOpen);
       this.layers["Club House Door"].setVisible(isOpen);
       clubHouseLabel.setVisible(isOpen);
 
