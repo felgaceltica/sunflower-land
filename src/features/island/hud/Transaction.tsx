@@ -29,6 +29,7 @@ import { useSelector } from "@xstate/react";
 import { wallet } from "lib/blockchain/wallet";
 import { config } from "features/wallet/WalletProvider";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { GaslessWidget } from "features/announcements/AnnouncementWidgets";
 
 const _transaction = (state: MachineState) => state.context.state.transaction;
 const compareTransaction = (prev?: GameTransaction, next?: GameTransaction) => {
@@ -57,6 +58,7 @@ export const TransactionCountdown: React.FC = () => {
         <Panel>
           <Transaction onClose={() => setShowTransaction(false)} />
         </Panel>
+        <GaslessWidget />
       </Modal>
       <ButtonPanel onClick={() => setShowTransaction(true)} className="flex">
         <WagmiProvider config={config}>
@@ -240,7 +242,7 @@ const EVENT_TO_NAME: Record<TransactionName, string> = {
   "transaction.budWithdrawn": "Withdraw bud",
   "transaction.itemsWithdrawn": "Withdraw items",
   "transaction.progressSynced": "Store on chain",
-  "transaction.sflWithdrawn": "Withdraw SFL",
+  "transaction.sflWithdrawn": "Withdraw FLOWER",
   "transaction.wearablesWithdrawn": "Withdraw wearables",
   "transaction.offerAccepted": "Accept offer",
   "transaction.listingPurchased": "Purchase listing",

@@ -32,11 +32,12 @@ import {
   getCurrentSeason,
   getSeasonalTicket,
 } from "features/game/types/seasons";
-import { hasFeatureAccess } from "lib/flags";
 import { ChoreBoard } from "./pages/ChoreBoard";
 import { FLOWERS } from "features/game/types/flowers";
 import { CompetitionDetails } from "features/competition/CompetitionBoard";
 import { MachineState } from "features/game/lib/gameMachine";
+import { LoveRushWidget } from "features/announcements/AnnouncementWidgets";
+import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   show: boolean;
@@ -45,12 +46,18 @@ interface Props {
 
 const _farmId = (state: MachineState) => state.context.farmId;
 const _state = (state: MachineState) => state.context.state;
+const _isLoveRushEventActive = (state: MachineState) =>
+  hasFeatureAccess(state.context.state, "LOVE_RUSH");
 
 export const Codex: React.FC<Props> = ({ show, onHide }) => {
   const { t } = useAppTranslation();
   const { gameService } = useContext(Context);
   const farmId = useSelector(gameService, _farmId);
   const state = useSelector(gameService, _state);
+  const isLoveRushEventActive = useSelector(
+    gameService,
+    _isLoveRushEventActive,
+  );
   const {
     username,
     bertObsession,
@@ -184,16 +191,11 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
           },
         ]
       : []),
-
-    ...(hasFeatureAccess(state, "ANIMAL_COMPETITION")
-      ? [
-          {
-            name: "Competition" as const,
-            icon: trophyIcon,
-            count: 0,
-          },
-        ]
-      : []),
+    {
+      name: "Competition" as const,
+      icon: trophyIcon,
+      count: 0,
+    },
   ];
 
   return (
@@ -306,6 +308,7 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
             )}
           </div>
         </OuterPanel>
+        {isLoveRushEventActive && <LoveRushWidget />}
         {showMilestoneReached && (
           <div className="absolute w-full sm:w-5/6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[200]">
             <MilestoneReached

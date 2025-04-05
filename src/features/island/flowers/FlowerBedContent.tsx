@@ -24,7 +24,6 @@ import { SquareIcon } from "components/ui/SquareIcon";
 import { secondsToString } from "lib/utils/time";
 import { getFlowerTime } from "features/game/events/landExpansion/plantFlower";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { hasFeatureAccess } from "lib/flags";
 import { SEASONAL_SEEDS } from "features/game/types/seeds";
 import { SEASON_ICONS } from "../buildings/components/building/market/SeasonalSeeds";
 
@@ -55,9 +54,11 @@ export const FlowerBedContent: React.FC<Props> = ({ id, onClose }) => {
 
   const selectSeed = (name: FlowerSeedName) => {
     setSeed(name);
-    if (!crossbreed) setSelecting("crossbreed");
+    const hasSelectedSeed = inventory[name]?.gte(1);
+
+    if (!crossbreed && hasSelectedSeed) setSelecting("crossbreed");
     if (crossbreed && !FLOWER_CROSS_BREED_AMOUNTS[name][crossbreed]) {
-      setSelecting("crossbreed");
+      if (hasSelectedSeed) setSelecting("crossbreed");
       setCrossBreed(undefined);
     }
   };
@@ -65,6 +66,12 @@ export const FlowerBedContent: React.FC<Props> = ({ id, onClose }) => {
   const selectCrossBreed = (name: FlowerCrossBreedName) => {
     setCrossBreed(name);
     if (!seed) setSelecting("seed");
+  };
+
+  const handleBack = () => {
+    setSelecting("seed");
+    setSeed(undefined);
+    setCrossBreed(undefined);
   };
 
   const plant = () => {
@@ -107,33 +114,53 @@ export const FlowerBedContent: React.FC<Props> = ({ id, onClose }) => {
   return (
     <>
       <div className="p-2">
-        {seed && crossbreed && (
-          <div className="flex items-center justify-center">
-            <img
-              src={
-                resultFlower
-                  ? ITEM_DETAILS[resultFlower].image
-                  : SUNNYSIDE.icons.search
-              }
-              className="h-4 mr-1"
-            />
-            <span className="text-xs">
-              {resultFlower ?? "Unknown combination"}
-            </span>
+        <div
+          className="flex items-center"
+          style={{ height: `${PIXEL_SCALE * 11}px` }}
+        >
+          {selecting === "crossbreed" && (
+            <div className="">
+              <img
+                src={SUNNYSIDE.icons.arrow_left}
+                className="cursor-pointer"
+                alt="back"
+                style={{
+                  width: `${PIXEL_SCALE * 11}px`,
+                  marginRight: `${PIXEL_SCALE * 4}px`,
+                }}
+                onClick={handleBack}
+              />
+            </div>
+          )}
+          <div className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
+            {seed && crossbreed && (
+              <div className="flex items-center justify-center">
+                <img
+                  src={
+                    resultFlower
+                      ? ITEM_DETAILS[resultFlower].image
+                      : SUNNYSIDE.icons.search
+                  }
+                  className="h-4 mr-1"
+                />
+                <span className="text-xs">
+                  {resultFlower ?? "Unknown combination"}
+                </span>
+              </div>
+            )}
+            {!(seed && crossbreed) && (
+              <div className="flex items-center justify-center">
+                <img
+                  src={SUNNYSIDE.icons.expression_confused}
+                  className="h-4 mr-1"
+                />
+                <span className="text-xs">
+                  {t("flowerBedContent.select.combination")}
+                </span>
+              </div>
+            )}
           </div>
-        )}
-        {!(seed && crossbreed) && (
-          <div className="flex items-center justify-center">
-            <img
-              src={SUNNYSIDE.icons.expression_confused}
-              className="h-4 mr-1"
-            />
-            <span className="text-xs">
-              {t("flowerBedContent.select.combination")}
-            </span>
-          </div>
-        )}
-
+        </div>
         <div
           className="relative mx-auto w-full mt-2"
           style={{
@@ -207,26 +234,6 @@ export const FlowerBedContent: React.FC<Props> = ({ id, onClose }) => {
             </Label>
             <div className="flex flex-wrap">
               {getKeys(FLOWER_SEEDS)
-                .filter(
-                  (name) =>
-                    name !== "Clover Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
-                .filter(
-                  (name) =>
-                    name !== "Edelweiss Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
-                .filter(
-                  (name) =>
-                    name !== "Lavender Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
-                .filter(
-                  (name) =>
-                    name !== "Gladiolus Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
                 .sort((a, b) => Number(isInSeason(b)) - Number(isInSeason(a)))
                 .map((name) => (
                   <Box

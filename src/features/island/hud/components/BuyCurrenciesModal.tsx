@@ -8,7 +8,9 @@ import exchangeIcon from "assets/icons/exchange.png";
 import coinsIcon from "assets/icons/coins.webp";
 import coinsStack from "assets/icons/coins_stack.webp";
 import coinsScattered from "assets/icons/coins_scattered.webp";
-import sflIcon from "assets/icons/sfl.webp";
+import sflIcon from "assets/icons/flower_token.webp";
+import flowerIcon from "assets/icons/flower_token.webp";
+
 import { SFL_TO_COIN_PACKAGES } from "features/game/events/landExpansion/exchangeSFLtoCoins";
 import { ButtonPanel } from "components/ui/Panel";
 import * as AuthProvider from "features/auth/lib/Provider";
@@ -33,6 +35,10 @@ import { VIPItems } from "../../../game/components/modal/components/VIPItems";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { isMobile } from "mobile-device-detect";
+import { RoninSupportWidget } from "features/wallet/components/PolygonRequired";
+import { BuyGemsWidget } from "features/announcements/AnnouncementWidgets";
+import { hasFeatureAccess } from "lib/flags";
+import { DepositFlower } from "./DepositFlower";
 
 const COIN_IMAGES = [coinsScattered, coinsIcon, coinsStack];
 
@@ -45,6 +51,7 @@ type Props = {
 const _token = (state: AuthMachineState) =>
   state.context.user.rawToken as string;
 const _farmId = (state: MachineState) => state.context.farmId;
+const _balance = (state: MachineState) => state.context.state.balance;
 const _autosaving = (state: MachineState) => state.matches("autosaving");
 
 export const BuyCurrenciesModal: React.FC<Props> = ({
@@ -64,14 +71,21 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
   const [price, setPrice] = useState<Price>();
   const [hideBuyBBLabel, setHideBuyBBLabel] = useState(false);
 
-  // SFL to Coins
+  // FLOWER to Coins
   const [exchangePackageId, setExchangePackageId] = useState<number>();
 
   const token = useSelector(authService, _token);
   const farmId = useSelector(gameService, _farmId);
+  const balance = useSelector(gameService, _balance);
   const autosaving = useSelector(gameService, _autosaving);
 
-  const showStarter = useEffect(() => {
+  const enoughSfl =
+    !!exchangePackageId &&
+    balance.greaterThanOrEqualTo(
+      SFL_TO_COIN_PACKAGES[Number(exchangePackageId)].sfl,
+    );
+
+  useEffect(() => {
     // Trigger an autosave in case they have changes so user can sync right away
     gameService.send("SAVE");
 
@@ -89,6 +103,19 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
       currency: "MATIC",
       amount: price?.amount,
     });
+    onClose();
+  };
+
+  const onFlowerBuy = async (quote: number) => {
+    gameService.send("gems.bought", {
+      effect: {
+        type: "gems.bought",
+        quote,
+        bundle: price?.amount,
+      },
+      authToken: token,
+    });
+
     onClose();
   };
 
@@ -156,6 +183,12 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
             { icon: ITEM_DETAILS.Gem.image, name: `Gems` },
             { icon: exchangeIcon, name: `${t("sfl/coins")}` },
             { icon: vipIcon, name: "VIP" },
+            ...(hasFeatureAccess(
+              gameService.getSnapshot().context.state,
+              "FLOWER_DEPOSIT",
+            )
+              ? [{ icon: flowerIcon, name: `$FLOWER` }]
+              : []),
           ]}
         >
           {tab === 0 && (
@@ -184,6 +217,7 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
                 price={price}
                 setPrice={setPrice}
                 onMaticBuy={onMaticBuy}
+                onFlowerBuy={onFlowerBuy}
                 onCreditCardBuy={handleCreditCardBuy}
                 onHideBuyBBLabel={(hide) => setHideBuyBBLabel(hide)}
               />
@@ -192,7 +226,7 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
           {tab === 1 && (
             <div className="flex flex-col space-y-2">
               <Label icon={exchangeIcon} type="default" className="mt-2 ml-1">
-                {`${t("exchange")} SFL ${t("for")} Coins`}
+                {t("exchange.flower.coins")}
               </Label>
               {/* Exchange packages */}
               {!exchangePackageId && (
@@ -224,7 +258,7 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
                             width: `calc(100% + ${PIXEL_SCALE * 6}px)`,
                           }}
                         >
-                          <span className="pl-1 sm:pl-0">{`${option.sfl} SFL`}</span>
+                          <span className="pl-1 sm:pl-0">{`${option.sfl} FLOWER`}</span>
                         </Label>
                       </ButtonPanel>
                     );
@@ -237,7 +271,10 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
                   <div className="py-1">
                     <img
                       src={SUNNYSIDE.icons.arrow_left}
-                      className="h-6 w-6 ml-2 cursor-pointer"
+                      className="ml-2 cursor-pointer"
+                      style={{
+                        width: `${PIXEL_SCALE * 11}px`,
+                      }}
                       onClick={() => setExchangePackageId(undefined)}
                     />
                   </div>
@@ -252,9 +289,15 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
                     </div>
                     <span>{`${t("total")} ${
                       SFL_TO_COIN_PACKAGES[Number(exchangePackageId)].sfl
-                    } SFL`}</span>
+                    } FLOWER`}</span>
                   </div>
+                  {!enoughSfl && (
+                    <Label type="danger" icon={sflIcon} className="mb-2">
+                      {t("not.enough.sfl")}
+                    </Label>
+                  )}
                   <Button
+                    disabled={!enoughSfl}
                     onClick={() => handleSFLtoCoinsExchange(exchangePackageId)}
                   >
                     {t("confirm")}
@@ -263,9 +306,12 @@ export const BuyCurrenciesModal: React.FC<Props> = ({
               )}
             </div>
           )}
-          {tab === 2 && <VIPItems onClose={onClose} />}
+          {tab === 2 && <VIPItems />}
+          {tab === 3 && <DepositFlower onClose={onClose} />}
         </CloseButtonPanel>
       )}
+      <RoninSupportWidget />
+      <BuyGemsWidget />
     </Modal>
   );
 };

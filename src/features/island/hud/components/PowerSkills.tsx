@@ -2,7 +2,6 @@ import { useSelector } from "@xstate/react";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
-import { Modal } from "components/ui/Modal";
 import { OuterPanel } from "components/ui/Panel";
 import { RequirementLabel } from "components/ui/RequirementsLabel";
 import { SplitScreenView } from "components/ui/SplitScreenView";
@@ -19,10 +18,8 @@ import {
 } from "features/game/types/bumpkinSkills";
 import { InventoryItemName } from "features/game/types/game";
 import { CROPS } from "features/game/types/crops";
-import { TimerDisplay } from "features/retreat/components/auctioneer/AuctionDetails";
 import { gameAnalytics } from "lib/gameAnalytics";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { useCountdown } from "lib/utils/hooks/useCountdown";
 import React, { useContext, useState } from "react";
 import {
   INNER_CANVAS_WIDTH,
@@ -32,36 +29,33 @@ import { SkillSquareIcon } from "features/bumpkins/components/revamp/SkillSquare
 import { getSkillImage } from "features/bumpkins/components/revamp/SkillPathDetails";
 import tradeOffs from "src/assets/icons/tradeOffs.png";
 import { powerSkillDisabledConditions } from "features/game/events/landExpansion/skillUsed";
+import { getRelativeTime, millisecondsToString } from "lib/utils/time";
 
 interface PowerSkillsProps {
-  show: boolean;
   onHide: () => void;
+  onBack: () => void;
 }
-export const PowerSkills: React.FC<PowerSkillsProps> = ({ show, onHide }) => {
+export const PowerSkills: React.FC<PowerSkillsProps> = ({ onHide, onBack }) => {
   const { t } = useAppTranslation();
   return (
-    <Modal show={show} onHide={onHide} size="lg">
-      <CloseButtonPanel
-        onClose={onHide}
-        container={OuterPanel}
-        tabs={[
-          {
-            icon: SUNNYSIDE.icons.lightning,
-            name: t("powerSkills.title"),
-          },
-        ]}
-      >
-        <PowerSkillsContent onClose={onHide} />
-      </CloseButtonPanel>
-    </Modal>
+    <CloseButtonPanel
+      onClose={onHide}
+      container={OuterPanel}
+      tabs={[
+        {
+          icon: SUNNYSIDE.icons.lightning,
+          name: t("powerSkills.title"),
+        },
+      ]}
+    >
+      <PowerSkillsContent onBack={onBack} />
+    </CloseButtonPanel>
   );
 };
 
 const _state = (state: MachineState) => state.context.state;
-interface PowerSkillsContentProps {
-  onClose: () => void;
-}
-const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
+
+const PowerSkillsContent: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { t } = useAppTranslation();
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
@@ -109,7 +103,6 @@ const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
   const isFruitFertiliserSkill = skillName === "Blend-tastic";
 
   const useSkill = () => {
-    onClose();
     setUseSkillConfirmation(false);
 
     if (isCropFertiliserSkill) {
@@ -152,7 +145,6 @@ const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
   };
 
   const nextSkillUse = (previousPowerUseAt?.[skillName] ?? 0) + (cooldown ?? 0);
-  const nextSkillUseCountdown = useCountdown(nextSkillUse);
 
   const powerSkillReady = nextSkillUse < Date.now();
 
@@ -168,6 +160,16 @@ const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col h-full px-1 py-0">
             <div className="flex space-x-2 justify-start items-center sm:flex-col-reverse md:space-x-0 sm:py-0 py-2">
+              <img
+                src={SUNNYSIDE.icons.arrow_left}
+                className="cursor-pointer block sm:hidden"
+                alt="back"
+                style={{
+                  width: `${PIXEL_SCALE * 11}px`,
+                  marginRight: `${PIXEL_SCALE * 1}px`,
+                }}
+                onClick={onBack}
+              />
               <div className="sm:mt-2">
                 <SkillSquareIcon
                   icon={getSkillImage(image, buff.boostedItemIcon, tree)}
@@ -253,30 +255,55 @@ const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
                 />
               </div>
             )}
-            <div className="flex flex-col lg:items-center">
-              <Label
-                type={
-                  !powerSkillReady ? "info" : disabled ? "danger" : "success"
-                }
-                icon={!powerSkillReady ? SUNNYSIDE.icons.stopwatch : undefined}
-                secondaryIcon={
-                  powerSkillReady && !disabled
-                    ? SUNNYSIDE.icons.confirm
-                    : undefined
-                }
-                className="mb-2"
-              >
-                {!powerSkillReady ? (
-                  <div className="flex lg:flex-col items-center">
-                    <p className="mr-1">{t("powerSkills.nextUse")}</p>
-                    <TimerDisplay time={nextSkillUseCountdown} />
-                  </div>
-                ) : disabled ? (
-                  reason
-                ) : (
-                  t("powerSkills.ready")
-                )}
-              </Label>
+            <div className="flex flex-wrap justify-between gap-x-2 sm:flex-col lg:items-center">
+              {!powerSkillReady ? (
+                // If power skill is not ready, show the next use time
+                <Label
+                  type="info"
+                  icon={SUNNYSIDE.icons.stopwatch}
+                  className="mb-2"
+                >
+                  {t("powerSkills.nextUse", {
+                    time: getRelativeTime(nextSkillUse, "medium"),
+                  })}
+                </Label>
+              ) : (
+                <>
+                  {disabled ? (
+                    // If power skill is disabled, show the reason if it exists
+                    reason && (
+                      <Label type="danger" className="mb-2">
+                        {reason}
+                      </Label>
+                    )
+                  ) : (
+                    // If power skill is not disabled, show the ready label
+                    <Label
+                      type="success"
+                      secondaryIcon={SUNNYSIDE.icons.confirm}
+                      className="mb-2"
+                    >
+                      {t("powerSkills.ready")}
+                    </Label>
+                  )}
+                  {cooldown && (
+                    // If power skill has a cooldown, show the cooldown
+                    <Label
+                      type="info"
+                      icon={SUNNYSIDE.icons.stopwatch}
+                      className="mb-2"
+                    >
+                      {t("skill.cooldown", {
+                        cooldown: millisecondsToString(cooldown, {
+                          length: "short",
+                          isShortFormat: true,
+                          removeTrailingZeros: true,
+                        }),
+                      })}
+                    </Label>
+                  )}
+                </>
+              )}
             </div>
           </div>
 
@@ -314,6 +341,16 @@ const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
                 className="flex flex-row my-2 items-center"
                 style={{ margin: `${PIXEL_SCALE * 2}px` }}
               >
+                <img
+                  src={SUNNYSIDE.icons.arrow_left}
+                  className="cursor-pointer hidden sm:block"
+                  alt="back"
+                  style={{
+                    width: `${PIXEL_SCALE * 11}px`,
+                    marginRight: `${PIXEL_SCALE * 4}px`,
+                  }}
+                  onClick={onBack}
+                />
                 <Label type="default">{t("powerSkills.title")}</Label>
               </div>
               <div className="flex flex-wrap mb-2">
@@ -359,6 +396,18 @@ const PowerSkillsContent: React.FC<PowerSkillsContentProps> = ({ onClose }) => {
                 className="flex flex-row my-2 items-center"
                 style={{ margin: `${PIXEL_SCALE * 2}px` }}
               >
+                {nonFertiliserSkill.length <= 0 && (
+                  <img
+                    src={SUNNYSIDE.icons.arrow_left}
+                    className="cursor-pointer hidden sm:block"
+                    alt="back"
+                    style={{
+                      width: `${PIXEL_SCALE * 11}px`,
+                      marginRight: `${PIXEL_SCALE * 4}px`,
+                    }}
+                    onClick={onBack}
+                  />
+                )}
                 <Label type="default">{t("powerSkills.fertiliser")}</Label>
               </div>
               <div className="flex flex-wrap mb-2">

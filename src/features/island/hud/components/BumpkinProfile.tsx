@@ -17,12 +17,16 @@ import {
 import Spritesheet, {
   SpriteSheetInstance,
 } from "components/animation/SpriteAnimator";
-import { Bumpkin, GameState } from "features/game/types/game";
+import { Bumpkin } from "features/game/types/game";
 import classNames from "classnames";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { SpringValue } from "@react-spring/web";
 import { useSound } from "lib/utils/hooks/useSound";
-import { hasFeatureAccess } from "lib/flags";
+import {
+  BumpkinRevampSkillName,
+  BumpkinSkillRevamp,
+  getPowerSkills,
+} from "features/game/types/bumpkinSkills";
 
 const DIMENSIONS = {
   original: 80,
@@ -64,19 +68,16 @@ const SPRITE_STEPS = 51;
 
 interface AvatarProps {
   bumpkin?: Bumpkin;
-  username?: string;
   showSkillPointAlert?: boolean;
-  state: GameState;
   onClick?: () => void;
+  powerSkillsReady: boolean;
 }
 
 export const BumpkinAvatar: React.FC<AvatarProps> = ({
   bumpkin,
-  // TODO: Remove when flag is removed
-  state,
-  username,
   showSkillPointAlert,
   onClick,
+  powerSkillsReady,
 }) => {
   const { showAnimations } = useContext(Context);
 
@@ -87,6 +88,7 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
 
   useEffect(() => {
     goToProgress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level, experience]);
 
   const goToProgress = () => {
@@ -116,7 +118,7 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
           "cursor-pointer hover:img-highlight": !!onClick,
         })}
         style={{
-          height: hasFeatureAccess(state, "TEMPERATE_SEASON") ? "70px" : "80px",
+          height: "70px",
         }}
         onClick={onClick}
       >
@@ -161,11 +163,7 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
           image={SUNNYSIDE.ui.progressBarSprite}
           widthFrame={DIMENSIONS.original}
           heightFrame={DIMENSIONS.original}
-          zoomScale={
-            new SpringValue(
-              hasFeatureAccess(state, "TEMPERATE_SEASON") ? 0.7 : 1,
-            )
-          }
+          zoomScale={new SpringValue(0.7)}
           fps={10}
           steps={SPRITE_STEPS}
           autoplay={false}
@@ -187,7 +185,7 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
           {level}
         </div>
 
-        {showSkillPointAlert && (
+        {(showSkillPointAlert || powerSkillsReady) && (
           <img
             src={SUNNYSIDE.icons.expression_alerted}
             className={
@@ -206,11 +204,9 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
   );
 };
 
-export const BumpkinProfile: React.FC<{
-  isFullUser: boolean;
-}> = ({ isFullUser }) => {
+export const BumpkinProfile: React.FC = () => {
   const progressBarEl = useRef<SpriteSheetInstance>();
-  const [viewSkillsPage, setViewSkillsPage] = useState(false);
+  const [viewSkillsTab, setViewSkillsTab] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const profile = useSound("profile");
@@ -224,17 +220,15 @@ export const BumpkinProfile: React.FC<{
   const experience = state.bumpkin?.experience ?? 0;
   const level = getBumpkinLevel(experience);
   const showSkillPointAlert = hasUnacknowledgedSkillPoints(state.bumpkin);
-  const username = state.username;
 
   useEffect(() => {
     goToProgress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level, experience]);
 
   const handleShowHomeModal = () => {
     profile.play();
-    setViewSkillsPage(
-      !hasFeatureAccess(state, "SKILLS_REVAMP") ? showSkillPointAlert : false,
-    );
+    setViewSkillsTab(showSkillPointAlert);
     setShowModal(true);
     if (showSkillPointAlert) {
       acknowledgeSkillPoints(state.bumpkin);
@@ -262,45 +256,59 @@ export const BumpkinProfile: React.FC<{
     setShowModal(false);
   };
 
+  const powerSkills = getPowerSkills();
+  const { skills, previousPowerUseAt } = state.bumpkin;
+
+  const powerSkillsUnlocked = powerSkills.filter(
+    (skill) => !!skills[skill.name as BumpkinRevampSkillName],
+  );
+
+  const hasPowerSkills = powerSkillsUnlocked.length > 0;
+
+  const powerSkillsReady = powerSkillsUnlocked
+    .filter((skill: BumpkinSkillRevamp) => {
+      const fertiliserSkill: BumpkinRevampSkillName[] = [
+        "Sprout Surge",
+        "Root Rocket",
+        "Blend-tastic",
+      ];
+      return !fertiliserSkill.includes(skill.name as BumpkinRevampSkillName);
+    })
+    .some((skill: BumpkinSkillRevamp) => {
+      const nextSkillUse =
+        (previousPowerUseAt?.[skill.name as BumpkinRevampSkillName] ?? 0) +
+        (skill.requirements.cooldown ?? 0);
+      return nextSkillUse < Date.now();
+    });
+
   return (
     <>
       {/* Bumpkin modal */}
       <Modal show={showModal} onHide={handleHideModal} size="lg">
         <BumpkinModal
-          initialView={viewSkillsPage ? "skills" : "home"}
+          initialTab={viewSkillsTab ? 2 : 0}
           onClose={handleHideModal}
           readonly={gameState.matches("visiting")}
           bumpkin={gameState.context.state.bumpkin as Bumpkin}
           inventory={gameState.context.state.inventory}
-          isFullUser={isFullUser}
           gameState={gameState.context.state}
+          powerSkillsReady={powerSkillsReady}
+          hasPowerSkills={hasPowerSkills}
         />
       </Modal>
 
       {/* Bumpkin profile */}
-      {hasFeatureAccess(gameState.context.state, "TEMPERATE_SEASON") ? (
-        <div className="scale-[0.7] absolute left-0 top-0">
-          <BumpkinAvatar
-            state={gameState.context.state}
-            bumpkin={state.bumpkin}
-            username={username}
-            onClick={handleShowHomeModal}
-            showSkillPointAlert={
-              showSkillPointAlert && !gameState.matches("visiting")
-            }
-          />
-        </div>
-      ) : (
+      {/* Mobile */}
+      <div className="scale-[0.7] absolute left-0 top-0">
         <BumpkinAvatar
-          state={gameState.context.state}
           bumpkin={state.bumpkin}
-          username={username}
           onClick={handleShowHomeModal}
           showSkillPointAlert={
             showSkillPointAlert && !gameState.matches("visiting")
           }
+          powerSkillsReady={powerSkillsReady}
         />
-      )}
+      </div>
     </>
   );
 };
