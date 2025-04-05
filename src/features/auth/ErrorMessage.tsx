@@ -14,6 +14,10 @@ import { ClockIssue } from "features/game/components/ClockIssue";
 import { SFLExceeded } from "features/game/components/SFLExceeded";
 import { NotOnDiscordServer } from "./components/NotOnDiscordServer";
 import { TooManyFarms } from "./components/TooManyFarms";
+import { TradeNotFound } from "./components/TradeNotFound";
+import { CONFIG } from "lib/config";
+import { MarketplaceTransferInProgress } from "./components/MarketplaceTransferInProgress";
+import { MarketplaceListingNotClaimed } from "./components/MarketplaceListingNotClaimed";
 
 interface Props {
   errorCode: ErrorCode;
@@ -78,10 +82,28 @@ export const ErrorMessage: React.FC<Props> = ({ errorCode }) => {
   }
 
   if (
-    errorCode === ERRORS.SIGN_UP_TOO_MANY_FARMS ||
-    errorCode === ERRORS.CLAIM_FARM_TOO_MANY_FARMS
+    CONFIG.NETWORK === "mainnet" &&
+    (errorCode === ERRORS.SIGN_UP_TOO_MANY_FARMS ||
+      errorCode === ERRORS.CLAIM_FARM_TOO_MANY_FARMS)
   ) {
     return <TooManyFarms />;
+  }
+  if (errorCode === ERRORS.TRADE_NOT_FOUND) {
+    return <TradeNotFound />;
+  }
+
+  if (
+    errorCode === ERRORS.BUY_GEMS_MARKETPLACE_TRANSFER_IN_PROGRESS ||
+    errorCode === ERRORS.RESET_MARKETPLACE_TRANSFER_IN_PROGRESS
+  ) {
+    return <MarketplaceTransferInProgress />;
+  }
+
+  if (
+    errorCode === ERRORS.BUY_GEMS_MARKETPLACE_UNCLAIMED_LISTINGS ||
+    errorCode === ERRORS.RESET_MARKETPLACE_UNCLAIMED_LISTINGS
+  ) {
+    return <MarketplaceListingNotClaimed />;
   }
 
   return <SomethingWentWrong />;

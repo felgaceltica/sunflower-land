@@ -20,6 +20,8 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { getImageUrl } from "lib/utils/getImageURLS";
 import { ITEM_ICONS } from "features/island/hud/components/inventory/Chest";
 import { IngredientsPopover } from "../IngredientsPopover";
+import { BuffLabel } from "features/game/types";
+import { isSeed } from "features/game/types/seeds";
 
 /**
  * The props for the details for items.
@@ -57,8 +59,8 @@ interface HarvestsRequirementProps {
  * @param resources The item resources requirements.
  * @param coins The Coins requirements.
  * @param showCoinsIfFree Whether to show free Coins requirement if cost is 0. Defaults to false.
- * @param sfl The SFL requirements.
- * @param showSflIfFree Whether to show free SFL requirement if SFL cost is 0. Defaults to false.
+ * @param sfl The FLOWER requirements.
+ * @param showSflIfFree Whether to show free FLOWER requirement if FLOWER cost is 0. Defaults to false.
  * @param harvests The min/max harvests for the item.
  * @param xp The XP gained for consuming the item.
  * @param timeSeconds The wait time in seconds for crafting the item.
@@ -92,7 +94,7 @@ interface Props {
   stock?: Decimal;
   isLimitedItem?: boolean;
   details: ItemDetailsProps;
-  boost?: string;
+  boost?: BuffLabel[];
   requirements?: RequirementsProps;
   limit?: number;
   actionView?: JSX.Element;
@@ -112,13 +114,15 @@ function getDetails(
 } {
   if (details.item) {
     const inventoryCount = game.inventory[details.item] ?? new Decimal(0);
-    const limit = INVENTORY_LIMIT(game)[details.item];
+    const limit = isSeed(details.item)
+      ? INVENTORY_LIMIT(game)[details.item]
+      : undefined;
 
     return {
       count: inventoryCount,
       description: ITEM_DETAILS[details.item].description,
       image:
-        ITEM_ICONS(game.island.type)[details.item] ??
+        ITEM_ICONS(game.island.type, game.season.season)[details.item] ??
         ITEM_DETAILS[details.item].image,
       name: details.item,
       limit: limit as Decimal,
@@ -229,12 +233,23 @@ export const CraftingRequirements: React.FC<Props> = ({
     if (!boost) return <></>;
 
     return (
-      <div className="flex flex-col space-y-1 mb-2">
-        <div className="flex justify-start sm:justify-center">
-          <Label type="info" className="text-center">
-            {boost}
-          </Label>
-        </div>
+      <div className="flex flex-wrap sm:flex-col gap-x-3 sm:gap-x-0 gap-y-1 mb-2 items-center">
+        {boost.map(
+          (
+            { labelType, boostTypeIcon, boostedItemIcon, shortDescription },
+            index,
+          ) => (
+            <Label
+              key={index}
+              type={labelType}
+              icon={boostTypeIcon}
+              secondaryIcon={boostedItemIcon}
+              className="text-center"
+            >
+              {shortDescription}
+            </Label>
+          ),
+        )}
       </div>
     );
   };
@@ -271,7 +286,7 @@ export const CraftingRequirements: React.FC<Props> = ({
           </div>
         )}
 
-        {/* SFL requirement */}
+        {/* FLOWER requirement */}
         {!!requirements.sfl &&
           (requirements.sfl.greaterThan(0) || requirements.showSflIfFree) && (
             <RequirementLabel

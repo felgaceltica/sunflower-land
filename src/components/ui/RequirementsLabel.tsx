@@ -5,7 +5,7 @@ import { LABEL_STYLES, Label } from "./Label";
 import { SquareIcon } from "./SquareIcon";
 import { ITEM_DETAILS } from "features/game/types/images";
 import levelup from "assets/icons/level_up.png";
-import token from "assets/icons/sfl.webp";
+import flowerIcon from "assets/icons/flower_token.webp";
 import coins from "assets/icons/coins.webp";
 import gems from "assets/icons/gem.webp";
 import { secondsToString } from "lib/utils/time";
@@ -18,21 +18,20 @@ import { getImageUrl } from "lib/utils/getImageURLS";
 import { KNOWN_IDS } from "features/game/types";
 
 /**
- * The props for SFL requirement label. Use this when the item costs SFL.
- * @param type The type is SFL.
- * @param balance The SFL balance of the player.
- * @param requirement The SFL requirement.
+ * The props for FLOWER requirement label. Use this when the item costs FLOWER.
+ * @param type The type is FLOWER.
+ * @param balance The FLOWER balance of the player.
+ * @param requirement The FLOWER requirement.
  */
 interface SFLProps {
   type: "sfl";
   balance: Decimal;
   requirement: Decimal;
-  showLabel?: boolean;
 }
 /**
- * The props for sell for SFL requirement label. Use this when selling the item gives players SFL.
- * @param type The type is sell for SFL.
- * @param requirement The SFL requirement.
+ * The props for sell for FLOWER requirement label. Use this when selling the item gives players FLOWER.
+ * @param type The type is sell for FLOWER.
+ * @param requirement The FLOWER requirement.
  */
 interface SellSFLProps {
   type: "sellForSfl";
@@ -49,7 +48,6 @@ interface CoinsProps {
   type: "coins";
   balance: number;
   requirement: number;
-  showLabel?: boolean;
 }
 
 /**
@@ -96,7 +94,6 @@ interface ItemProps {
   item: InventoryItemName | BumpkinItem;
   balance: Decimal;
   requirement: Decimal;
-  showLabel?: boolean;
 }
 
 interface WearableProps {
@@ -104,7 +101,6 @@ interface WearableProps {
   item: BumpkinItem;
   balance: number;
   requirement: BumpkinItem;
-  showLabel?: boolean;
 }
 
 /**
@@ -163,6 +159,12 @@ interface SkillPointsProps {
   requirement: number;
 }
 
+interface OtherProps {
+  type: "other";
+  currentProgress: number;
+  requirement: number;
+}
+
 /**
  * The default props.
  * @param className The class name for the label.
@@ -171,6 +173,7 @@ interface defaultProps {
   className?: string;
   textColor?: string;
   hideIcon?: boolean;
+  showLabel?: boolean;
 }
 
 type Props = (
@@ -187,6 +190,7 @@ type Props = (
   | LevelProps
   | HarvestsProps
   | SkillPointsProps
+  | OtherProps
 ) &
   defaultProps;
 
@@ -209,7 +213,7 @@ export const RequirementLabel: React.FC<Props> = (props) => {
         return ITEM_DETAILS[props.item].image;
       case "sfl":
       case "sellForSfl":
-        return token;
+        return flowerIcon;
       case "item":
         if (props.item in KNOWN_IDS) {
           return ITEM_DETAILS[props.item as InventoryItemName]?.image;
@@ -278,6 +282,9 @@ export const RequirementLabel: React.FC<Props> = (props) => {
         const roundedDownRequirement = formatNumber(props.requirement);
         return `${t("skillPts")} ${roundedDownPoints}/${roundedDownRequirement}`;
       }
+      case "other": {
+        return `Progress: ${props.currentProgress}/${props.requirement}`;
+      }
     }
   };
 
@@ -297,6 +304,9 @@ export const RequirementLabel: React.FC<Props> = (props) => {
         return props.currentLevel >= props.requirement;
       case "skillPoints":
         return props.points >= props.requirement;
+      case "other": {
+        return props.currentProgress >= props.requirement;
+      }
       case "sellForSfl":
       case "sellForCoins":
       case "sellForGems":
@@ -313,6 +323,7 @@ export const RequirementLabel: React.FC<Props> = (props) => {
     switch (props.type) {
       case "wearable":
         return requirementMet ? "success" : "danger";
+      case "other":
       case "skillPoints":
         return requirementMet ? "default" : "danger";
       default:
@@ -330,7 +341,7 @@ export const RequirementLabel: React.FC<Props> = (props) => {
       <div className="flex items-center">
         {!props.hideIcon && <SquareIcon icon={getIcon()} width={7} />}
         {props.type === "sfl" && props.showLabel && (
-          <span className="text-xs ml-1">{"SFL"}</span>
+          <span className="text-xs ml-1">{"FLOWER"}</span>
         )}
         {props.type === "item" && props.showLabel && (
           <span className="text-xs ml-1">{props.item}</span>

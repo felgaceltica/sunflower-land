@@ -17,6 +17,13 @@ import { Label } from "../Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { ITEM_ICONS } from "features/island/hud/components/inventory/Chest";
 import { SEASON_ICONS } from "features/island/buildings/components/building/market/SeasonalSeeds";
+import {
+  isBuildingUpgradable,
+  UpgradableBuildingType,
+} from "features/game/events/landExpansion/upgradeBuilding";
+import { makeUpgradableBuildingKey } from "features/game/events/landExpansion/upgradeBuilding";
+import { BuildingName } from "features/game/types/buildings";
+import { BumpkinRevampSkillName } from "features/game/types/bumpkinSkills";
 
 /**
  * The props for the details for items.
@@ -80,7 +87,14 @@ export const InventoryItemDetails: React.FC<Props> = ({
   const { t } = useAppTranslation();
   const getItemDetail = () => {
     const item = ITEM_DETAILS[details.item];
-    const icon = ITEM_ICONS(game.island.type)[details.item] ?? item.image;
+    const hasLevel = isBuildingUpgradable(details.item as BuildingName)
+      ? game[makeUpgradableBuildingKey(details.item as UpgradableBuildingType)]
+          .level
+      : undefined;
+    const icon =
+      ITEM_ICONS(game.island.type, game.season.season, hasLevel)[
+        details.item
+      ] ?? item.image;
     const title = details.item;
 
     let description = item.description;
@@ -91,7 +105,10 @@ export const InventoryItemDetails: React.FC<Props> = ({
           isCollectibleBuilt({
             name: boostedDescription.name as CollectibleName,
             game,
-          })
+          }) ||
+          game.bumpkin?.skills[
+            boostedDescription.name as BumpkinRevampSkillName
+          ]
         ) {
           description = boostedDescription.description;
         }
@@ -124,7 +141,7 @@ export const InventoryItemDetails: React.FC<Props> = ({
           {description}
         </span>
         {boost && (
-          <div className="flex flex-col gap-1 mb-2">
+          <div className="flex flex-wrap sm:flex-col gap-x-3 sm:gap-x-0 gap-y-1 mb-2 items-center">
             {boost.map(
               (
                 { labelType, boostTypeIcon, boostedItemIcon, shortDescription },
