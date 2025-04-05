@@ -13,6 +13,7 @@ import {
   BedName,
   GameState,
   InventoryItemName,
+  TemperateSeasonName,
 } from "features/game/types/game";
 import {
   CropName,
@@ -41,6 +42,7 @@ import { AnimalType } from "./animals";
 import { getBaseAnimalCapacity } from "../events/landExpansion/buyAnimal";
 import { CookingBuildingName } from "./buildings";
 import { BUILDING_DAILY_OIL_CAPACITY } from "../events/landExpansion/supplyCookingOil";
+import { SEASONAL_SEEDS } from "./seeds";
 
 export type Restriction = [boolean, string];
 type RemoveCondition = (gameState: GameState) => Restriction;
@@ -95,6 +97,49 @@ export function areAnyCropsOrGreenhouseCropsGrowing(
   const anyCropsGrowing = greenhouseCropsGrowing || cropsGrowing;
 
   return [anyCropsGrowing, translate("restrictionReason.cropsGrowing")];
+}
+
+export function areAnySeasonCropsGrowing(
+  game: GameState,
+  season: TemperateSeasonName,
+): Restriction {
+  const seasonalCrops = SEASONAL_SEEDS[season].map((seedName) =>
+    seedName.replace(" Seed", ""),
+  ) as CropName[];
+
+  const anySeasonalCropGrowing = seasonalCrops.some((cropName) => {
+    const [isGrowing] = cropIsGrowing({ item: cropName, game });
+    return isGrowing;
+  });
+
+  return [anySeasonalCropGrowing, translate("restrictionReason.cropsGrowing")];
+}
+
+export function areAnySeasonGHCropsGrowing(
+  game: GameState,
+  season: TemperateSeasonName,
+): Restriction {
+  const seasonalGHCrops = SEASONAL_SEEDS[season].map((seedName) =>
+    seedName.replace(" Seed", ""),
+  ) as GreenHouseCropName[];
+
+  const greenhouseCropsGrowing = seasonalGHCrops.some(
+    (crop) => greenhouseCropIsGrowing({ crop, game })[0],
+  );
+
+  return [greenhouseCropsGrowing, translate("restrictionReason.cropsGrowing")];
+}
+
+export function areAnySeasonCropsorGHCropsGrowing(
+  game: GameState,
+  season: TemperateSeasonName,
+): Restriction {
+  const [seasonCropsGrowing] = areAnySeasonCropsGrowing(game, season);
+  const [seasonGHCropsGrowing] = areAnySeasonGHCropsGrowing(game, season);
+
+  const anyCropsorGHGrowing = seasonCropsGrowing || seasonGHCropsGrowing;
+
+  return [anyCropsorGHGrowing, translate("restrictionReason.cropsGrowing")];
 }
 
 function beanIsPlanted(game: GameState): Restriction {
@@ -435,18 +480,37 @@ function hasBonusAnimals(game: GameState, animalType: AnimalType): Restriction {
 
   const bonusAnimalCount = animalCount - baseCapacity;
 
-  return [bonusAnimalCount > 0, translate("restrictionReason.hasBonusAnimals")];
+  return [
+    bonusAnimalCount > 0,
+    translate("restrictionReason.hasBonusAnimals", {
+      building:
+        animalType === "Chicken"
+          ? translate("restrictionReason.hasBonusAnimals.henHouse")
+          : translate("restrictionReason.hasBonusAnimals.barn"),
+    }),
+  ];
 }
 
 export function isCookingBuildingWorking(
   buildingName: CookingBuildingName,
   game: GameState,
 ): Restriction {
-  const isBuildingCooking = !!game.buildings[buildingName]?.some(
-    (building) => !!building.crafting,
-  );
+  const isBuildingCooking = !!game.buildings[buildingName]?.some((building) => {
+    if (building.crafting) {
+      return building.crafting.length > 0;
+    }
+
+    return false;
+  });
 
   return [isBuildingCooking, "Building is in use"];
+}
+export function isCraftingBoxWorking(game: GameState): Restriction {
+  const isCrafting =
+    game.craftingBox.status === "crafting" &&
+    game.craftingBox.item !== undefined;
+
+  return [isCrafting, "Crafting Box is in use"];
 }
 
 export function areAnyCookingBuildingWorking(game: GameState): Restriction {
@@ -454,7 +518,9 @@ export function areAnyCookingBuildingWorking(game: GameState): Restriction {
     BUILDING_DAILY_OIL_CAPACITY,
   ).some(
     (building) =>
-      !!game.buildings[building]?.some((building) => !!building.crafting),
+      !!game.buildings[building]?.some(
+        (building) => building.crafting && building.crafting.length > 0,
+      ),
   );
 
   return [areAnyCookingBuildingWorking, "Building is in use"];
@@ -698,6 +764,9 @@ export const REMOVAL_RESTRICTIONS: Partial<
   "Summer Chicken": (game) => areAnyChickensSleepingInSummer(game),
   Jellyfish: (game) => hasFishedTodayInSummer(game),
   Mammoth: (game) => areAnyCowsSleeping(game),
+  "Barn Blueprint": (game) =>
+    hasBonusAnimals(game, "Cow") || hasBonusAnimals(game, "Sheep"),
+  "Golden Sheep": (game) => areAnySheepSleeping(game),
 };
 
 export const BUD_REMOVAL_RESTRICTIONS: Record<

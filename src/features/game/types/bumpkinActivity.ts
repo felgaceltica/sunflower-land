@@ -56,7 +56,8 @@ type SellableName =
   | PatchFruitName
   | BeachBountyTreasure
   | GarbageName
-  | ExoticCropName;
+  | ExoticCropName
+  | "Love Charm";
 
 type Recipes = Food | CookableName;
 type Edibles = Food | ConsumableName;
@@ -125,6 +126,7 @@ export type BumpkinActivityName =
   | "Crimstone Mined"
   | "Sunstone Mined"
   | "Egg Collected"
+  | "Oil Drilled"
   // Misc
   | "Coins Spent"
   | "Coins Earned"

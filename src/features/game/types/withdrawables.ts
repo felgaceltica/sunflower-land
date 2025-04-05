@@ -325,6 +325,36 @@ export const BUMPKIN_RELEASES: Partial<Record<BumpkinItem, Releases>> = {
     tradeAt: SEASONS["Winds of Change"].endDate,
     withdrawAt: SEASONS["Winds of Change"].endDate,
   },
+  "Sol & Luna": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Locust King Onesie": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Glacial Plume": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Solflare Aegis": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Blossom Ward": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Autumn's Embrace": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Frozen Heart": {
+    tradeAt: SEASONS["Winds of Change"].endDate,
+    withdrawAt: SEASONS["Winds of Change"].endDate,
+  },
+  "Love Heart Onesie": CAN_WITHDRAW_AND_TRADE,
+  "Flower Bouquet": CAN_WITHDRAW_AND_TRADE,
 };
 
 export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
@@ -791,6 +821,14 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
       tradeAt: SEASONS["Winds of Change"].endDate,
       withdrawAt: SEASONS["Winds of Change"].endDate,
     },
+    "Golden Sheep": {
+      tradeAt: SEASONS["Winds of Change"].endDate,
+      withdrawAt: SEASONS["Winds of Change"].endDate,
+    },
+    "Barn Blueprint": {
+      tradeAt: SEASONS["Winds of Change"].endDate,
+      withdrawAt: SEASONS["Winds of Change"].endDate,
+    },
     "Goblin Emblem": {
       tradeAt: new Date("2021-01-01"),
     },
@@ -822,5 +860,9 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
     Jellyfish: {
       tradeAt: SEASONS["Winds of Change"].startDate,
       withdrawAt: SEASONS["Winds of Change"].endDate,
+    },
+    Jin: {
+      tradeAt: new Date("2025-08-20T00:00:00Z"),
+      withdrawAt: new Date("2025-08-20T00:00:00Z"),
     },
   };

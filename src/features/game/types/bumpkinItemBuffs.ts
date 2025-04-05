@@ -10,6 +10,7 @@ import chefHat from "assets/icons/chef_hat.png";
 import { ITEM_DETAILS } from "./images";
 import { translate } from "lib/i18n/translate";
 import { hasSeasonEnded } from "./seasons";
+import { SEASON_ICONS } from "features/island/buildings/components/building/market/SeasonalSeeds";
 
 export const SPECIAL_ITEM_LABELS: Partial<Record<BumpkinItem, BuffLabel[]>> = {
   Halo: [
@@ -22,6 +23,13 @@ export const SPECIAL_ITEM_LABELS: Partial<Record<BumpkinItem, BuffLabel[]>> = {
   "Gift Giver": [
     {
       shortDescription: translate("description.gift.giver.boost"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+    },
+  ],
+  "Streamer Hat": [
+    {
+      shortDescription: translate("description.streamer.hat.boost"),
       labelType: "vibrant",
       boostTypeIcon: lightning,
     },
@@ -852,10 +860,18 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<
           },
         ] as BuffLabel[])),
   ],
+  "Ladybug Suit": [
+    {
+      shortDescription: translate("description.ladybugSuit.boost"),
+      labelType: "success",
+      boostTypeIcon: SUNNYSIDE.ui.coins,
+      boostedItemIcon: CROP_LIFECYCLE.basic.Onion.crop,
+    },
+  ],
   "Crab Hat": [
     {
       shortDescription: translate("description.crabHat.boost"),
-      labelType: "vibrant",
+      labelType: "success",
       boostTypeIcon: powerup,
       boostedItemIcon: SUNNYSIDE.icons.fish,
     },
@@ -866,6 +882,46 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<
       labelType: "success",
       boostTypeIcon: powerup,
       boostedItemIcon: CROP_LIFECYCLE.basic.Wheat.crop,
+    },
+  ],
+  "Sol & Luna": [
+    {
+      shortDescription: translate("description.solAndLuna.boost"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: SUNNYSIDE.icons.hammer,
+    },
+  ],
+  "Blossom Ward": [
+    {
+      shortDescription: translate("description.blossomWard.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SEASON_ICONS["spring"],
+    },
+  ],
+  "Solflare Aegis": [
+    {
+      shortDescription: translate("description.solflareAegis.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SEASON_ICONS["summer"],
+    },
+  ],
+  "Autumn's Embrace": [
+    {
+      shortDescription: translate("description.autumnsEmbrace.boost"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: SEASON_ICONS["autumn"],
+    },
+  ],
+  "Frozen Heart": [
+    {
+      shortDescription: translate("description.frozenHeart.boost"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: SEASON_ICONS["winter"],
     },
   ],
   ...SPECIAL_ITEM_LABELS,

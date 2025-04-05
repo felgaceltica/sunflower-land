@@ -41,8 +41,8 @@ import thermalStone from "assets/sfts/thermal_stone.webp";
 import grinxsHammer from "assets/sfts/grinx_hammer.png";
 import chickenCoop from "assets/sfts/chicken_coop.png";
 import christmasTree from "assets/sfts/christmas_tree.png";
-import farmCat from "assets/sfts/farm_cat.gif";
-import farmDog from "assets/sfts/farm_dog.gif";
+import farmCat from "assets/sfts/farm_cat.webp";
+import farmDog from "assets/sfts/farm_dog.webp";
 import gnome from "assets/decorations/scarlet.png";
 import goldEgg from "assets/sfts/gold_egg.png";
 import potatoStatue from "assets/sfts/potato_statue.png";
@@ -56,7 +56,7 @@ import fountain from "assets/sfts/fountain.gif";
 import beaver from "assets/sfts/beaver.gif";
 import apprenticeBeaver from "assets/sfts/apprentice_beaver.gif";
 import constructionBeaver from "assets/sfts/construction_beaver.gif";
-import mysteriousParsnip from "assets/sfts/mysterious_parsnip.png";
+import mysteriousParsnip from "assets/sfts/mysterious_parsnip.webp";
 import carrotSword from "assets/sfts/carrot_sword.png";
 import goldenBonsai from "assets/sfts/golden_bonsai.png";
 import nancy from "assets/sfts/nancy.png";
@@ -147,48 +147,48 @@ import knightChicken from "assets/animals/chickens/knight_chicken.webp";
 import pharaohChicken from "assets/animals/chickens/pharaoh_chicken.webp";
 
 // Flags
-import australiaFlag from "assets/sfts/flags/australia_flag.gif";
-import belgiumFlag from "assets/sfts/flags/belgium_flag.gif";
-import brazilFlag from "assets/sfts/flags/brazil_flag.gif";
-import chinaFlag from "assets/sfts/flags/china_flag.gif";
-import finlandFlag from "assets/sfts/flags/finland_flag.gif";
-import franceFlag from "assets/sfts/flags/france_flag.gif";
-import germanFlag from "assets/sfts/flags/germany_flag.gif";
-import indiaFlag from "assets/sfts/flags/india_flag.gif";
-import indonesiaFlag from "assets/sfts/flags/indonesia_flag.gif";
-import iranFlag from "assets/sfts/flags/iran_flag.gif";
-import italyFlag from "assets/sfts/flags/italy_flag.gif";
-import japanFlag from "assets/sfts/flags/japan_flag.gif";
-import moroccoFlag from "assets/sfts/flags/morocco_flag.gif";
-import netherlandsFlag from "assets/sfts/flags/netherlands_flag.gif";
-import phillipinesFlag from "assets/sfts/flags/philippines_flag.gif";
-import polandFlag from "assets/sfts/flags/poland_flag.gif";
-import portugalFlag from "assets/sfts/flags/portugal_flag.gif";
-import russiaFlag from "assets/sfts/flags/russia_flag.gif";
-import saudiArabiaFlag from "assets/sfts/flags/saudi_arabia_flag.gif";
-import southKoreaFlag from "assets/sfts/flags/south_korea_flag.gif";
-import sunflowerFlag from "assets/sfts/flags/sunflower_flag.gif";
-import spainFlag from "assets/sfts/flags/spain_flag.gif";
-import thailandFlag from "assets/sfts/flags/thailand_flag.gif";
-import turkeyFlag from "assets/sfts/flags/turkey_flag.gif";
-import ukraineFlag from "assets/sfts/flags/ukraine_flag.gif";
-import usaFlag from "assets/sfts/flags/usa_flag.gif";
-import vietnamFlag from "assets/sfts/flags/vietnam_flag.gif";
-import algerian_flag from "assets/sfts/flags/algerian_flag.gif";
-import argentinian_flag from "assets/sfts/flags/argentinian_flag.gif";
-import british_flag from "assets/sfts/flags/british_flag.gif";
-import canadian_flag from "assets/sfts/flags/canadian_flag.gif";
-import colombian_flag from "assets/sfts/flags/colombian_flag.gif";
-import dominican_republic_flag from "assets/sfts/flags/dominican_republic_flag.gif";
-import goblin_flag from "assets/sfts/flags/goblin_flag.gif";
-import lithuanian_flag from "assets/sfts/flags/lithuanian_flag.gif";
-import malaysian_flag from "assets/sfts/flags/malaysian_flag.gif";
-import mexican_flag from "assets/sfts/flags/mexican_flag.gif";
-import pirate_flag from "assets/sfts/flags/pirate_flag.gif";
-import rainbow_flag from "assets/sfts/flags/rainbow_flag.gif";
-import romanian_flag from "assets/sfts/flags/romanian_flag.gif";
-import sierra_leone_flag from "assets/sfts/flags/sierra_leone_flag.gif";
-import singaporean_flag from "assets/sfts/flags/singaporean_flag.gif";
+import australiaFlag from "assets/sfts/flags/australia_flag.webp";
+import belgiumFlag from "assets/sfts/flags/belgium_flag.webp";
+import brazilFlag from "assets/sfts/flags/brazil_flag.webp";
+import chinaFlag from "assets/sfts/flags/china_flag.webp";
+import finlandFlag from "assets/sfts/flags/finland_flag.webp";
+import franceFlag from "assets/sfts/flags/france_flag.webp";
+import germanFlag from "assets/sfts/flags/germany_flag.webp";
+import indiaFlag from "assets/sfts/flags/india_flag.webp";
+import indonesiaFlag from "assets/sfts/flags/indonesia_flag.webp";
+import iranFlag from "assets/sfts/flags/iran_flag.webp";
+import italyFlag from "assets/sfts/flags/italy_flag.webp";
+import japanFlag from "assets/sfts/flags/japan_flag.webp";
+import moroccoFlag from "assets/sfts/flags/morocco_flag.webp";
+import netherlandsFlag from "assets/sfts/flags/netherlands_flag.webp";
+import phillipinesFlag from "assets/sfts/flags/philippines_flag.webp";
+import polandFlag from "assets/sfts/flags/poland_flag.webp";
+import portugalFlag from "assets/sfts/flags/portugal_flag.webp";
+import russiaFlag from "assets/sfts/flags/russia_flag.webp";
+import saudiArabiaFlag from "assets/sfts/flags/saudi_arabia_flag.webp";
+import southKoreaFlag from "assets/sfts/flags/south_korea_flag.webp";
+import sunflowerFlag from "assets/sfts/flags/sunflower_flag.webp";
+import spainFlag from "assets/sfts/flags/spain_flag.webp";
+import thailandFlag from "assets/sfts/flags/thailand_flag.webp";
+import turkeyFlag from "assets/sfts/flags/turkey_flag.webp";
+import ukraineFlag from "assets/sfts/flags/ukraine_flag.webp";
+import usaFlag from "assets/sfts/flags/usa_flag.webp";
+import vietnamFlag from "assets/sfts/flags/vietnam_flag.webp";
+import algerian_flag from "assets/sfts/flags/algerian_flag.webp";
+import argentinian_flag from "assets/sfts/flags/argentinian_flag.webp";
+import british_flag from "assets/sfts/flags/british_flag.webp";
+import canadian_flag from "assets/sfts/flags/canadian_flag.webp";
+import colombian_flag from "assets/sfts/flags/colombian_flag.webp";
+import dominican_republic_flag from "assets/sfts/flags/dominican_republic_flag.webp";
+import goblin_flag from "assets/sfts/flags/goblin_flag.webp";
+import lithuanian_flag from "assets/sfts/flags/lithuanian_flag.webp";
+import malaysian_flag from "assets/sfts/flags/malaysian_flag.webp";
+import mexican_flag from "assets/sfts/flags/mexican_flag.webp";
+import pirate_flag from "assets/sfts/flags/pirate_flag.webp";
+import rainbow_flag from "assets/sfts/flags/rainbow_flag.webp";
+import romanian_flag from "assets/sfts/flags/romanian_flag.webp";
+import sierra_leone_flag from "assets/sfts/flags/sierra_leone_flag.webp";
+import singaporean_flag from "assets/sfts/flags/singaporean_flag.webp";
 
 import generosityFlag from "assets/sfts/generosity_flag.png";
 import splendorFlag from "assets/sfts/splendor_flag.png";
@@ -248,7 +248,9 @@ import budTicket from "assets/icons/bud_ticket.png";
 import prizeTicket from "assets/icons/prize_ticket.png";
 import budSeedling from "assets/icons/bud_seedling.png";
 import earnAllianceBanner from "assets/sfts/earn_alliance_banner.png";
-
+import polygonBanner from "assets/sfts/polygon_banner.webp";
+import roninBanner from "assets/sfts/ronin_banner.webp";
+import baseBanner from "assets/sfts/base_banner.webp";
 // Banners
 import goblinBanner from "assets/decorations/banners/goblin_banner.png";
 import humanBanner from "assets/decorations/banners/human_banner.png";
@@ -283,6 +285,7 @@ import sunflowerCake from "assets/food/cakes/sunflower_cake.png";
 import wheatCake from "assets/food/cakes/wheat_cake.png";
 
 // Food
+import rhubarbTart from "assets/food/rhubarb_tart.webp";
 import roastedCauliflower from "assets/food/roasted_cauliflower.png";
 import radishPie from "assets/food/radish_pie.png";
 import cheese from "assets/food/cheese.webp";
@@ -712,9 +715,9 @@ import goldenCrop from "assets/events/golden_crop/golden_crop.gif";
 import goblinGoldChampion from "assets/sfts/goblin_gold_champion.png";
 import goblinSilverChampion from "assets/sfts/goblin_silver_champion.png";
 import goblinBronzeChampion from "assets/sfts/goblin_bronze_champion.png";
-import bumpkinGoldChampion from "assets/sfts/bumpkin_gold_champion.png";
-import bumpkinSilverChampion from "assets/sfts/bumpkin_silver_champion.png";
-import bumpkinBronzeChampion from "assets/sfts/bumpkin_bronze_champion.png";
+import bumpkinGoldChampion from "assets/sfts/bumpkin_gold_champion.webp";
+import bumpkinSilverChampion from "assets/sfts/bumpkin_silver_champion.webp";
+import bumpkinBronzeChampion from "assets/sfts/bumpkin_bronze_champion.webp";
 import nightshadeGoldChampion from "assets/sfts/nightshade_gold_champion.png";
 import nightshadeSilverChampion from "assets/sfts/nightshade_silver_champion.png";
 import nightshadeBronzeChampion from "assets/sfts/nightshade_bronze_champion.png";
@@ -824,6 +827,27 @@ import timeshard from "assets/icons/timeshard.webp";
 import ancientClock from "assets/icons/ancient_clock.png";
 import windsOfChangeBanner from "assets/decorations/banners/winds-of-change_banner_loop.gif";
 import pesticide from "assets/sfts/pesticide.webp";
+import jin from "assets/sfts/jin_ronin.webp";
+import loveCharm from "assets/icons/love_charm.webp";
+
+import floralArch from "assets/sfts/floral_arch.webp";
+import flowerCoin from "assets/sfts/flower_coin.webp";
+import streamersStatue from "assets/sfts/streamers_statue.webp";
+import cetus from "assets/sfts/cetus.webp";
+import goldcrestMosaicRug from "assets/sfts/goldcrest_mosaic_rug.webp";
+import sandyMosaicRug from "assets/sfts/sandy_mosaic_rug.webp";
+import twilightRug from "assets/sfts/twilight_rug.webp";
+import orchardRug from "assets/sfts/orchard_rug.webp";
+import carrotRug from "assets/sfts/carrot_rug.webp";
+import beetrootRug from "assets/sfts/beetroot_rug.webp";
+import harlequinRug from "assets/sfts/harlequin_rug.webp";
+
+import blackTile from "assets/decorations/tiles/icon/black_tile_icon.webp";
+import blueTile from "assets/decorations/tiles/icon/blue_tile_icon.webp";
+import greenTile from "assets/decorations/tiles/icon/green_tile_icon.webp";
+import purpleTile from "assets/decorations/tiles/icon/purple_tile_icon.webp";
+import redTile from "assets/decorations/tiles/icon/red_tile_icon.webp";
+import yellowTile from "assets/decorations/tiles/icon/yellow_tile_icon.webp";
 
 import { COUPONS, EASTER_EGG, FERTILISERS, InventoryItemName } from "./game";
 
@@ -3160,6 +3184,12 @@ export const ITEM_DETAILS: Items = {
     description: translate("compost.sproutMix"),
   },
   "Fruitful Blend": {
+    boostedDescriptions: [
+      {
+        name: "Fruitful Bounty",
+        description: translate("compost.fruitfulBlendBoosted"),
+      },
+    ],
     image: fruitfulBlend,
     description: translate("compost.fruitfulBlend"),
   },
@@ -3169,170 +3199,170 @@ export const ITEM_DETAILS: Items = {
   },
   Anchovy: {
     image: anchovy,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.anchovy.one"),
   },
   Butterflyfish: {
     image: butterflyfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.butterflyfish.one"),
   },
   Blowfish: {
     image: blowfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.blowfish.one"),
   },
   Clownfish: {
     image: clownfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.clownfish.one"),
   },
   "Sea Bass": {
     image: seaBass,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.seabass.one"),
   },
   "Sea Horse": {
     image: seahorse,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.seahorse.one"),
   },
   "Horse Mackerel": {
     image: horseMackerel,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.horsemackerel.one"),
   },
   Squid: {
     image: squid,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.squid.one"),
   },
   "Red Snapper": {
     image: redSnapper,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.redsnapper.one"),
   },
   "Moray Eel": {
     image: morayEel,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.morayeel.one"),
   },
   "Olive Flounder": {
     image: oliveFlounder,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.oliveflounder.one"),
   },
   Napoleanfish: {
     image: napoleonfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.napoleanfish.one"),
   },
   Surgeonfish: {
     image: surgeonfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.surgeonfish.one"),
   },
   "Zebra Turkeyfish": {
     image: zebraTurkeyfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.zebraturkeyfish.one"),
   },
   Ray: {
     image: ray,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.ray.one"),
   },
   "Hammerhead shark": {
     image: hammerheadShark,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.hammerheadshark.one"),
   },
   Tuna: {
     image: tuna,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.tuna.one"),
   },
   "Mahi Mahi": {
     image: mahiMahi,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.mahimahi.one"),
   },
   "Blue Marlin": {
     image: blueMarlin,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.bluemarlin.one"),
   },
   Oarfish: {
     image: oarfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.oarfish.one"),
   },
   "Football fish": {
     image: footballFish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.footballfish.one"),
   },
   Sunfish: {
     image: sunfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.sunfish.one"),
   },
   Coelacanth: {
     image: coelacanth,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.coelacanth.one"),
   },
   "Whale Shark": {
     image: whaleShark,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.whaleshark.one"),
   },
   "Barred Knifejaw": {
     image: barredKnifejaw,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.barredknifejaw.one"),
   },
   "Saw Shark": {
     image: sawShark,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.sawshark.one"),
   },
   "White Shark": {
     image: whiteShark,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     description: translate("description.whiteshark.one"),
   },
   "Twilight Anglerfish": {
     image: twilightAnglerfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.twilight.anglerfish"),
     availability: translate("permanent"),
   },
   "Starlight Tuna": {
     image: startlightTuna,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.starlight.tuna"),
     availability: translate("permanent"),
   },
   "Radiant Ray": {
     image: radiantRay,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.radiant.ray"),
     availability: translate("permanent"),
   },
   "Phantom Barracuda": {
     image: phantomBarracuda,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.phantom.barracuda"),
     availability: translate("permanent"),
   },
   "Gilded Swordfish": {
     image: gildedSwordfish,
-    howToGetItem: [translate("ocean.fishing"), translate("beach.fishing")],
+    howToGetItem: [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.gilded.swordfish"),
     availability: translate("permanent"),
@@ -3355,7 +3385,7 @@ export const ITEM_DETAILS: Items = {
     image: lemonShark,
     howToGetItem: hasSeasonEnded("Pharaoh's Treasure")
       ? [translate("howToGetThisItem.lemonShark")]
-      : [translate("ocean.fishing"), translate("beach.fishing")],
+      : [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.lemon.shark"),
     availability: translate("chapter"),
@@ -3364,7 +3394,7 @@ export const ITEM_DETAILS: Items = {
     image: longhornCowfish,
     howToGetItem: hasSeasonEnded("Bull Run")
       ? [translate("howToGetThisItem.longhornCowfish")]
-      : [translate("ocean.fishing"), translate("beach.fishing")],
+      : [translate("ocean.fishing")],
     itemType: "collectible",
     description: translate("description.longhorn.cowfish"),
     availability: translate("chapter"),
@@ -3487,17 +3517,17 @@ export const ITEM_DETAILS: Items = {
   },
   Angelfish: {
     image: angelFish,
-    howToGetItem: [translate("beach.fishing")],
+    howToGetItem: [],
     description: translate("description.angelfish"),
   },
   Halibut: {
     image: halibut,
-    howToGetItem: [translate("beach.fishing")],
+    howToGetItem: [],
     description: translate("description.halibut"),
   },
   Parrotfish: {
     image: parrotFish,
-    howToGetItem: [translate("beach.fishing")],
+    howToGetItem: [],
     description: translate("description.parrotFish"),
   },
   Porgy: {
@@ -4761,7 +4791,7 @@ export const ITEM_DETAILS: Items = {
   },
   "Trade Cake": {
     image: tradeCake,
-    description: "Cake that you can redeem at Trade Rewards Shop",
+    description: "Cake purchased at Trade Rewards Shop.",
   },
   "Christmas Stocking": {
     image: christmasStocking,
@@ -4916,7 +4946,136 @@ export const ITEM_DETAILS: Items = {
     description: translate("description.chamomile"),
   },
   "Rhubarb Tart": {
-    image: SUNNYSIDE.icons.expression_confused,
+    image: rhubarbTart,
     description: translate("description.rhubarb.tart"),
+  },
+  Jin: {
+    image: jin,
+    description:
+      "The Mythical Tiger of Ronin, embodies strength, resillence and adventurous spirit",
+  },
+  "Love Charm": {
+    image: loveCharm,
+    description: translate("description.love.charm"),
+  },
+  "Polygon Banner": {
+    image: polygonBanner,
+    description: translate("description.polygonBanner"),
+  },
+  "Ronin Banner": {
+    image: roninBanner,
+    description: translate("description.roninBanner"),
+  },
+  "Base Banner": {
+    image: baseBanner,
+    description: translate("description.baseBanner"),
+  },
+  "Floral Arch": {
+    image: floralArch,
+    description: translate("description.floralArch"),
+  },
+  "Flower Coin": {
+    image: flowerCoin,
+    description: translate("description.flowerCoin"),
+  },
+  "Flower Statue": {
+    image: SUNNYSIDE.decorations.flowerStatue,
+    description: translate("description.flowerStatue"),
+  },
+  "Heartstruck Tree": {
+    image: SUNNYSIDE.decorations.heartstruckTree,
+    description: translate("description.heartstruckTree"),
+  },
+  "Mermaid Fountain": {
+    image: SUNNYSIDE.decorations.mermaidFountain,
+    description: translate("description.mermaidFountain"),
+  },
+  "Mysterious Entrance": {
+    image: SUNNYSIDE.decorations.mysteriousEntrance,
+    description: translate("description.mysteriousEntrance"),
+  },
+  "Streamer's Statue": {
+    image: streamersStatue,
+    description: translate("description.streamersStatue"),
+  },
+  Cetus: {
+    image: cetus,
+    description: translate("description.cetus"),
+  },
+  "Goldcrest Mosaic Rug": {
+    image: goldcrestMosaicRug,
+    description: translate("description.goldcrestMosaicRug"),
+  },
+  "Sandy Mosaic Rug": {
+    image: sandyMosaicRug,
+    description: translate("description.sandyMosaicRug"),
+  },
+  "Twilight Rug": {
+    image: twilightRug,
+    description: translate("description.twilightRug"),
+  },
+  "Orchard Rug": {
+    image: orchardRug,
+    description: translate("description.orchardRug"),
+  },
+  "Carrot Rug": {
+    image: carrotRug,
+    description: translate("description.carrotRug"),
+  },
+  "Beetroot Rug": {
+    image: beetrootRug,
+    description: translate("description.beetrootRug"),
+  },
+  "Harlequin Rug": {
+    image: harlequinRug,
+    description: translate("description.harlequinRug"),
+  },
+  "Large Rug": {
+    image: SUNNYSIDE.decorations.largeRug,
+    description: translate("description.largeRug"),
+  },
+  "Golden Fence": {
+    image: SUNNYSIDE.decorations.goldenFence,
+    description: translate("description.goldenFence"),
+  },
+  "Golden Stone Fence": {
+    image: SUNNYSIDE.decorations.goldenStoneFence,
+    description: translate("description.goldenStoneFence"),
+  },
+  "Golden Pine Tree": {
+    image: SUNNYSIDE.decorations.goldenPineTree,
+    description: translate("description.goldenPineTree"),
+  },
+  "Golden Tree": {
+    image: SUNNYSIDE.decorations.goldenTree,
+    description: translate("description.goldenTree"),
+  },
+  "Golden Bush": {
+    image: SUNNYSIDE.decorations.goldenBush,
+    description: translate("description.goldenBush"),
+  },
+  "Black Tile": {
+    image: blackTile,
+    description: translate("description.blackTile"),
+  },
+  "Blue Tile": {
+    image: blueTile,
+    description: translate("description.blueTile"),
+  },
+  "Green Tile": {
+    image: greenTile,
+    description: translate("description.greenTile"),
+  },
+  "Purple Tile": {
+    image: purpleTile,
+    description: translate("description.purpleTile"),
+  },
+  "Red Tile": {
+    image: redTile,
+    description: translate("description.redTile"),
+  },
+  "Yellow Tile": {
+    image: yellowTile,
+    description: translate("description.yellowTile"),
   },
 };

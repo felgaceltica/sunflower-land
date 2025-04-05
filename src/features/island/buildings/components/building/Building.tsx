@@ -10,7 +10,11 @@ import { MachineState } from "features/game/lib/gameMachine";
 import { Context, useGame } from "features/game/GameProvider";
 import { BUILDING_COMPONENTS, READONLY_BUILDINGS } from "./BuildingComponents";
 import { CookableName } from "features/game/types/consumables";
-import { GameState, IslandType } from "features/game/types/game";
+import {
+  GameState,
+  IslandType,
+  TemperateSeasonName,
+} from "features/game/types/game";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { useCountdown } from "lib/utils/hooks/useCountdown";
 import { SUNNYSIDE } from "assets/sunnyside";
@@ -30,6 +34,10 @@ import {
   getActiveCalendarEvent,
   SeasonalEventName,
 } from "features/game/types/calendar";
+import {
+  isBuildingUpgradable,
+  makeUpgradableBuildingKey,
+} from "features/game/events/landExpansion/upgradeBuilding";
 
 interface Prop {
   name: BuildingName;
@@ -43,17 +51,19 @@ interface Prop {
   x: number;
   y: number;
   island: IslandType;
+  season: TemperateSeasonName;
 }
 
 export interface BuildingProps {
   buildingId: string;
-  buildingIndex: number;
-  craftingItemName?: CookableName;
-  craftingReadyAt?: number;
   isBuilt?: boolean;
-  onRemove?: () => void;
   island: IslandType;
+  season: TemperateSeasonName;
 }
+
+const _isUpgradable = (name: BuildingName) => (state: MachineState) =>
+  isBuildingUpgradable(name) &&
+  state.context.state[makeUpgradableBuildingKey(name)].level > 1;
 
 const InProgressBuilding: React.FC<Prop> = ({
   name,
@@ -63,6 +73,7 @@ const InProgressBuilding: React.FC<Prop> = ({
   createdAt,
   showTimers,
   island,
+  season,
 }) => {
   const { gameService, showAnimations } = useContext(Context);
 
@@ -80,11 +91,14 @@ const InProgressBuilding: React.FC<Prop> = ({
     }
   }, []);
 
+  const isUpgradable = useSelector(gameService, _isUpgradable(name));
+
   const onSpeedUp = (gems: number) => {
-    gameService.send("building.spedUp", {
-      name,
-      id,
-    });
+    if (isUpgradable) {
+      gameService.send("upgrade.spedUp", { name });
+    } else {
+      gameService.send("building.spedUp", { name, id });
+    }
 
     gameAnalytics.trackSink({
       currency: "Gem",
@@ -118,6 +132,7 @@ const InProgressBuilding: React.FC<Prop> = ({
       >
         <div className="w-full h-full pointer-events-none opacity-50">
           <BuildingPlaced
+            season={season}
             buildingId={id}
             buildingIndex={index}
             island={island}
@@ -161,26 +176,14 @@ const DestroyedBuilding: React.FC<
   Prop & {
     calendarEvent: DestructiveEvent;
   }
-> = ({
-  name,
-  id,
-  index,
-  readyAt,
-  createdAt,
-  showTimers,
-  island,
-  calendarEvent,
-}) => {
-  const { gameService, showAnimations } = useContext(Context);
+> = ({ name, id, index, island, calendarEvent, season }) => {
+  const { gameService } = useContext(Context);
 
   const BuildingPlaced = BUILDING_COMPONENTS[name];
 
   const { t } = useAppTranslation();
 
   const [showModal, setShowModal] = useState(false);
-
-  const totalSeconds = (readyAt - createdAt) / 1000;
-  const secondsLeft = (readyAt - Date.now()) / 1000;
 
   const game = gameService.getSnapshot().context.state;
 
@@ -225,6 +228,7 @@ const DestroyedBuilding: React.FC<
             buildingId={id}
             buildingIndex={index}
             island={island}
+            season={season}
           />
         </div>
         <img
@@ -297,6 +301,7 @@ const BuildingComponent: React.FC<Prop> = ({
   x,
   y,
   island,
+  season,
 }) => {
   const { gameState } = useGame();
   const BuildingPlaced = BUILDING_COMPONENTS[name];
@@ -324,6 +329,7 @@ const BuildingComponent: React.FC<Prop> = ({
         y={y}
         island={island}
         calendarEvent={destroyedBy}
+        season={season}
       />
     );
   }
@@ -342,6 +348,7 @@ const BuildingComponent: React.FC<Prop> = ({
           x={x}
           y={y}
           island={island}
+          season={season}
         />
       ) : (
         <BuildingPlaced
@@ -351,6 +358,7 @@ const BuildingComponent: React.FC<Prop> = ({
           craftingReadyAt={craftingReadyAt}
           isBuilt
           island={island}
+          season={season}
         />
       )}
     </>
@@ -382,7 +390,11 @@ const MoveableBuilding: React.FC<Prop> = (props) => {
         {inProgress ? (
           <BuildingComponent {...props} />
         ) : (
-          <BuildingPlaced buildingId={props.id} {...props} />
+          <BuildingPlaced
+            buildingId={props.id}
+            {...props}
+            buildingIndex={props.index}
+          />
         )}
       </MoveableComponent>
     );

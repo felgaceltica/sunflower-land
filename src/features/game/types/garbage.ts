@@ -1,9 +1,8 @@
-import { hasFeatureAccess } from "lib/flags";
 import { BB_TO_GEM_RATIO, Inventory, InventoryItemName } from "./game";
-import { SeasonalTicket, SEASONS } from "./seasons";
-import { TEST_FARM } from "../lib/constants";
+import { SEASON_TICKET_NAME, SeasonalTicket, SEASONS } from "./seasons";
 import Decimal from "decimal.js-light";
 import { BumpkinItem } from "./bumpkin";
+import { getObjectEntries } from "../expansion/lib/utils";
 
 export type GarbageName =
   | Extract<
@@ -29,6 +28,8 @@ export type GarbageName =
       | "Chicken"
       | "Hen House"
       | "Basic Bear"
+      | "Water Well"
+      | "Community Coin"
     >
   | Extract<BumpkinItem, "Basic Hair">;
 
@@ -44,26 +45,6 @@ export const GARBAGE: Record<GarbageName, Garbage> = {
   "Block Buck": {
     sellPrice: 0,
     gems: BB_TO_GEM_RATIO,
-  },
-  "Solar Flare Ticket": {
-    sellPrice: 0.1,
-    gems: 0,
-  },
-  "Dawn Breaker Ticket": {
-    sellPrice: 0.1,
-    gems: 0,
-  },
-  "Crow Feather": {
-    sellPrice: 0.1,
-    gems: 0,
-  },
-  "Mermaid Scale": {
-    sellPrice: 0.1,
-    gems: 0,
-  },
-  "Tulip Bulb": {
-    sellPrice: 0.1,
-    gems: 0,
   },
   "Jack-o-lantern": {
     sellPrice: 1,
@@ -130,67 +111,47 @@ export const GARBAGE: Record<GarbageName, Garbage> = {
     sellPrice: 0.1,
     gems: 0,
   },
-  ...(SEASONS["Clash of Factions"].endDate.getTime() < Date.now()
-    ? {
-        Scroll: {
-          sellPrice: 0.1,
-          gems: 0,
-        },
-      }
-    : ({} as { Scroll: { sellPrice: number; gems: number } })),
-  ...(SEASONS["Pharaoh's Treasure"].endDate.getTime() < Date.now()
-    ? {
-        "Amber Fossil": {
-          sellPrice: 0.1,
-          gems: 0,
-        },
-      }
-    : ({} as { "Amber Fossil": { sellPrice: number; gems: number } })),
-  ...(SEASONS["Bull Run"].endDate.getTime() < Date.now()
-    ? {
-        Horseshoe: {
-          sellPrice: 0.1,
-          gems: 0,
-        },
-      }
-    : ({} as { Horseshoe: { sellPrice: number; gems: number } })),
+  ...getObjectEntries(SEASON_TICKET_NAME).reduce(
+    (acc, [season, ticket]) => {
+      return {
+        ...acc,
+        ...(SEASONS[season].endDate.getTime() < Date.now()
+          ? {
+              [ticket]: {
+                sellPrice: 0.1,
+                gems: 0,
+              },
+            }
+          : {}),
+      };
+    },
+    {} as Record<SeasonalTicket, Garbage>,
+  ),
 
-  ...(SEASONS["Winds of Change"].endDate.getTime() < Date.now()
-    ? {
-        Timeshard: {
-          sellPrice: 0.1,
-          gems: 0,
-        },
-      }
-    : ({} as { Timeshard: { sellPrice: number; gems: number } })),
-
-  ...(hasFeatureAccess(TEST_FARM, "CHICKEN_GARBO")
-    ? {
-        Chicken: {
-          sellPrice: 200,
-          gems: 0,
-        },
-        "Hen House": {
-          sellPrice: 800,
-          gems: 0,
-          limit: 1,
-          items: {
-            Wood: new Decimal(200),
-            Iron: new Decimal(15),
-            Gold: new Decimal(15),
-            Egg: new Decimal(300),
-          },
-        },
-      }
-    : ({} as {
-        Chicken: { sellPrice: number; gems: number };
-        "Hen House": {
-          sellPrice: number;
-          gems: number;
-          limit: number;
-          items: Inventory;
-        };
-      })),
+  Chicken: {
+    sellPrice: 200,
+    gems: 0,
+  },
+  "Hen House": {
+    sellPrice: 800,
+    gems: 0,
+    limit: 1,
+    items: {
+      Wood: new Decimal(200),
+      Iron: new Decimal(15),
+      Gold: new Decimal(15),
+      Egg: new Decimal(300),
+    },
+  },
+  "Water Well": {
+    sellPrice: 320,
+    gems: 0,
+    limit: 3,
+    items: {
+      Wood: new Decimal(5),
+      Stone: new Decimal(5),
+    },
+  },
   "Basic Bear": {
     sellPrice: 1,
     gems: 0,
@@ -198,5 +159,10 @@ export const GARBAGE: Record<GarbageName, Garbage> = {
   "Basic Hair": {
     sellPrice: 1,
     gems: 0,
+  },
+  "Community Coin": {
+    sellPrice: 0,
+    gems: 0,
+    items: { "Love Charm": new Decimal(25) },
   },
 };

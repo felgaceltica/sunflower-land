@@ -10,7 +10,7 @@ import {
 
 import { CollectibleName, CraftableName, Food } from "./craftables";
 import { CommodityName, MushroomName, ResourceName } from "./resources";
-import { SkillName } from "./skills";
+import { LegacyBadgeName } from "./skills";
 import { BuildingName } from "./buildings";
 import { GameEvent } from "../events";
 import { BumpkinItem, Equipped as BumpkinParts } from "./bumpkin";
@@ -83,7 +83,6 @@ import {
   Recipes,
   RecipeWearableName,
 } from "../lib/crafting";
-import { AnimalBuildingLevel } from "../events/landExpansion/upgradeBuilding";
 import { SeasonalCollectibleName } from "./megastore";
 import { TradeFood } from "../events/landExpansion/redeemTradeReward";
 import {
@@ -92,6 +91,8 @@ import {
   SeasonalEventName,
 } from "./calendar";
 import { VipBundle } from "../lib/vipAccess";
+import { InGameTaskName } from "../events/landExpansion/completeSocialTask";
+import { TwitterPost, TwitterPostName } from "./social";
 
 export type Reward = {
   coins?: number;
@@ -230,6 +231,7 @@ export type Coupons =
   | "Prize Ticket"
   | "Mark"
   | "Trade Point"
+  | "Love Charm"
   | Keys
   | SeasonalTicket
   | FactionEmblem;
@@ -348,6 +350,9 @@ export const COUPONS: Record<Coupons, { description: string }> = {
   Timeshard: {
     description: "",
   },
+  "Love Charm": {
+    description: translate("description.love.charm"),
+  },
 };
 
 export type Purchase = {
@@ -381,8 +386,9 @@ export type Bumpkin = {
   skills: Skills;
   achievements?: Partial<Record<AchievementName, number>>;
   activity: Partial<Record<BumpkinActivityName, number>>;
-  previousSkillsResetAt?: number;
+  previousFreeSkillResetAt?: number;
   previousPowerUseAt?: Partial<Record<BumpkinRevampSkillName, number>>;
+  paidSkillResets?: number;
 };
 
 export type SpecialEvent = "Chef Apron" | "Chef Hat";
@@ -440,7 +446,7 @@ export type InventoryItemName =
   | CraftableName
   | CommodityName
   | ResourceName
-  | SkillName
+  | LegacyBadgeName
   | EasterEgg
   | EasterEventItemName
   | Food
@@ -622,14 +628,21 @@ export type BuildingProduce = {
   readyAt: number;
 };
 
+export type Cancelled = Partial<{
+  [key in InventoryItemName]: {
+    count: number;
+    cancelledAt: number;
+  };
+}>;
+
 export type PlacedItem = {
   id: string;
   coordinates: { x: number; y: number };
   readyAt: number;
   createdAt: number;
-
+  cancelled?: Cancelled;
+  crafting?: BuildingProduct[];
   oil?: number;
-  crafting?: BuildingProduct;
 };
 
 type ShakeItem = PlacedItem & { shakenAt?: number };
@@ -710,6 +723,7 @@ export type Airdrop = {
   message?: string;
   coordinates?: Coordinates;
   factionPoints?: number;
+  vipDays?: number;
 };
 
 // Mystery Prize reveals
@@ -932,6 +946,10 @@ export type NPCData = {
     giftClaimedAtPoints?: number;
     giftedAt?: number;
   };
+  streaks?: {
+    streak: number;
+    lastClaimedAt: number;
+  };
 };
 
 export type ChoreV2 = {
@@ -1052,6 +1070,7 @@ export type TradeListing = {
   fulfilledAt?: number;
   fulfilledById?: number;
   initiatedAt?: number;
+  tradeType: "instant" | "onchain";
 };
 
 export type TradeOffer = {
@@ -1063,6 +1082,7 @@ export type TradeOffer = {
   fulfilledById?: number;
   signature?: string;
   initiatedAt?: number;
+  tradeType: "instant" | "onchain";
 };
 
 type FishingSpot = {
@@ -1105,7 +1125,8 @@ export type Currency =
   | "Crimstone"
   | "Sunstone"
   | "Seasonal Ticket"
-  | "Mark";
+  | "Mark"
+  | "Love Charm";
 
 export type ShopItemBase = {
   shortDescription: string;
@@ -1274,6 +1295,8 @@ type Stores = "factionShop" | "treasureShop" | "megastore";
 export type KeysBought = Record<Stores, KeysBoughtAt>;
 
 export type AnimalBuildingKey = "henHouse" | "barn";
+export type UpgradableBuildingKey = AnimalBuildingKey | "waterWell";
+
 export type AnimalResource =
   | "Egg"
   | "Leather"
@@ -1297,9 +1320,14 @@ export type Animal = {
   reward?: Reward;
 };
 
-export type AnimalBuilding = {
-  level: AnimalBuildingLevel;
+export type AnimalBuilding = UpgradableBuilding & {
   animals: Record<string, Animal>;
+};
+
+export type UpgradableBuilding = {
+  level: number;
+  upgradeReadyAt?: number;
+  upgradedAt?: number;
 };
 
 export type Bank = {
@@ -1344,6 +1372,20 @@ export type LavaPit = {
   collectedAt?: number;
 };
 
+export type VIP = {
+  bundles: { name: VipBundle; boughtAt: number }[];
+  expiresAt: number;
+};
+
+export type Chain = "ronin";
+
+export type NFT = {
+  name: string;
+  tokenId: number;
+  expiresAt: number;
+  acknowledgedAt?: number;
+};
+
 export interface GameState {
   home: Home;
   bank: Bank;
@@ -1357,10 +1399,7 @@ export interface GameState {
   };
 
   calendar: Calendar;
-  vip?: {
-    bundles: { name: VipBundle; boughtAt: number }[];
-    expiresAt: number;
-  };
+  vip?: VIP;
   shipments: {
     restockedAt?: number;
   };
@@ -1369,6 +1408,10 @@ export interface GameState {
 
   gems: {
     history?: Record<string, { spent: number }>;
+  };
+
+  flower: {
+    history?: Record<string, { loveCharmsSpent: number }>;
   };
 
   // There are more fields but unused
@@ -1382,6 +1425,11 @@ export interface GameState {
   };
 
   username?: string;
+  settings: {
+    username?: {
+      setAt?: number;
+    };
+  };
   coins: number;
   balance: Decimal;
   previousBalance: Decimal;
@@ -1463,21 +1511,18 @@ export interface GameState {
     rewardCollectedAt?: number;
     kickedAt?: number;
     kickedById?: number;
-    budBox?: {
+    raffle?: { entries: Record<string, number> };
+    budBox?: { openedAt: number };
+    vipChest?: { openedAt: number };
+    blockchainBox?: {
       openedAt: number;
+      items: Partial<Record<InventoryItemName, number>>;
+      vipDays: number;
+      tier: "bronze" | "silver" | "gold" | "platinum" | "diamond";
     };
-    raffle?: {
-      entries: Record<string, number>;
-    };
-    vipChest?: {
-      openedAt: number;
-    };
-    giftGiver?: {
-      openedAt: number;
-    };
-    pirateChest?: {
-      openedAt: number;
-    };
+    giftGiver?: { openedAt: number };
+    streamerHat?: { openedAt: number };
+    pirateChest?: { openedAt: number };
     keysBought?: KeysBought;
   };
   conversations: ConversationName[];
@@ -1532,6 +1577,7 @@ export interface GameState {
   experiments: ExperimentName[];
   henHouse: AnimalBuilding;
   barn: AnimalBuilding;
+  waterWell: UpgradableBuilding;
 
   craftingBox: {
     status: "pending" | "idle" | "crafting";
@@ -1550,7 +1596,59 @@ export interface GameState {
   };
   season: Season;
   lavaPits: Record<string, LavaPit>;
+  nfts?: Partial<Record<Chain, NFT>>;
+
+  faceRecognition?: {
+    session?: {
+      id: string;
+      createdAt: number;
+      token: string;
+    };
+    history: FaceRecognitionEvent[];
+  };
+  telegram?: {
+    linkedAt: number;
+    startedAt?: number;
+    joinedAt?: number;
+  };
+  twitter?: {
+    linkedAt: number;
+    followedAt?: number;
+    isAuthorised?: boolean;
+    verifiedPostsAt?: number;
+    tweets?: Partial<Record<TwitterPostName, TwitterPost>>;
+  };
+  discord?: {
+    connected: boolean;
+  };
+  referrals?: {
+    totalReferrals: number;
+    totalVIPReferrals?: number;
+    totalUnclaimedReferrals?: number;
+    rewards?: {
+      items?: Partial<Record<InventoryItemName, number>>;
+      wearables?: Partial<Record<BumpkinItem, number>>;
+      coins?: number;
+      sfl?: number;
+    };
+  };
+  socialTasks?: {
+    completed: Partial<Record<InGameTaskName, { completedAt: number }>>;
+  };
 }
+
+export type FaceRecognitionEvent =
+  | { event: "succeeded"; createdAt: number; confidence: number }
+  | { event: "failed"; createdAt: number; confidence: number }
+  | {
+      event: "duplicate";
+      createdAt: number;
+      duplicates: {
+        similarity: number;
+        faceId: string;
+        farmId: number;
+      }[];
+    };
 
 export interface Context {
   state?: GameState;

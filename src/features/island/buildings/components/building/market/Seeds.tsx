@@ -46,7 +46,6 @@ import {
 import { NPC_WEARABLES } from "lib/npcs";
 import { ConfirmationModal } from "components/ui/ConfirmationModal";
 import { formatNumber, setPrecision } from "lib/utils/formatNumber";
-import { hasFeatureAccess } from "lib/flags";
 import {
   isAdvancedCrop,
   isBasicCrop,
@@ -236,12 +235,7 @@ export const Seeds: React.FC = () => {
       return seconds;
     }
 
-    return getCropPlotTime({
-      crop: yields as CropName,
-      inventory,
-      game: state,
-      buds: state.buds ?? {},
-    });
+    return getCropPlotTime({ crop: yields as CropName, game: state });
   };
 
   const getHarvestCount = () => {
@@ -308,10 +302,6 @@ export const Seeds: React.FC = () => {
             {seeds
               .filter((name) => name in CROP_SEEDS)
               .filter((name) => isBasicCrop(name.split(" ")[0] as CropName))
-              .filter(
-                (name) =>
-                  name !== "Barley Seed" || hasFeatureAccess(state, "BARLEY"),
-              )
               .map((name: SeedName) => (
                 <Box
                   isSelected={selectedName === name}
@@ -362,10 +352,6 @@ export const Seeds: React.FC = () => {
             {seeds
               .filter((name) => name in CROP_SEEDS)
               .filter((name) => isAdvancedCrop(name.split(" ")[0] as CropName))
-              .filter(
-                (name) =>
-                  name !== "Barley Seed" || hasFeatureAccess(state, "BARLEY"),
-              )
               .map((name: SeedName) => (
                 <Box
                   isSelected={selectedName === name}
@@ -386,24 +372,9 @@ export const Seeds: React.FC = () => {
           <div className="flex flex-wrap mb-2">
             {seeds
               .filter((name) => name in PATCH_FRUIT_SEEDS)
-              .filter(
-                (name) =>
-                  name !== "Lunara Seed" ||
-                  (hasFeatureAccess(state, "WEATHER_SHOP") &&
-                    isFullMoon(state)),
-              )
-              .filter(
-                (name) =>
-                  name !== "Celestine Seed" ||
-                  (hasFeatureAccess(state, "WEATHER_SHOP") &&
-                    isFullMoon(state)),
-              )
-              .filter(
-                (name) =>
-                  name !== "Duskberry Seed" ||
-                  (hasFeatureAccess(state, "WEATHER_SHOP") &&
-                    isFullMoon(state)),
-              )
+              .filter((name) => name !== "Lunara Seed" || isFullMoon(state))
+              .filter((name) => name !== "Celestine Seed" || isFullMoon(state))
+              .filter((name) => name !== "Duskberry Seed" || isFullMoon(state))
               .map((name: SeedName) => (
                 <Box
                   isSelected={selectedName === name}
@@ -429,26 +400,6 @@ export const Seeds: React.FC = () => {
             <div className="flex flex-wrap mb-2">
               {seeds
                 .filter((name) => name in FLOWER_SEEDS)
-                .filter(
-                  (name) =>
-                    name !== "Clover Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
-                .filter(
-                  (name) =>
-                    name !== "Edelweiss Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
-                .filter(
-                  (name) =>
-                    name !== "Lavender Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
-                .filter(
-                  (name) =>
-                    name !== "Gladiolus Seed" ||
-                    hasFeatureAccess(state, "SEASONAL_FLOWERS"),
-                )
                 .map((name: SeedName) => (
                   <Box
                     isSelected={selectedName === name}
