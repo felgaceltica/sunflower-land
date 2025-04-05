@@ -1,11 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
 import { Offer } from "features/game/types/marketplace";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
-import walletIcon from "assets/icons/wallet.png";
 import { useSelector } from "@xstate/react";
 import { GameWallet } from "features/wallet/Wallet";
 import { TradeableDisplay } from "../lib/tradeables";
@@ -16,7 +15,7 @@ import {
   getChestItems,
 } from "features/island/hud/components/inventory/utils/inventory";
 import { KNOWN_ITEMS } from "features/game/types";
-import { BumpkinItem, ITEM_NAMES } from "features/game/types/bumpkin";
+import { ITEM_NAMES } from "features/game/types/bumpkin";
 import { availableWardrobe } from "features/game/events/landExpansion/equip";
 import {
   BlockchainEvent,
@@ -28,10 +27,19 @@ import { Context } from "features/game/GameProvider";
 import { TradeableSummary } from "./TradeableSummary";
 import { calculateTradePoints } from "features/game/events/landExpansion/addTradePoints";
 import { InventoryItemName } from "features/game/types/game";
-import Decimal from "decimal.js-light";
-import { StoreOnChain } from "./StoreOnChain";
-
+import { hasReputation, Reputation } from "features/game/lib/reputation";
+import { RequiredReputation } from "features/island/hud/components/reputation/Reputation";
+import { hasFeatureAccess } from "lib/flags";
+import { isFaceVerified } from "features/retreat/components/personhood/lib/faceRecognition";
+import { FaceRecognition } from "features/retreat/components/personhood/FaceRecognition";
+import { isTradeResource } from "features/game/actions/tradeLimits";
+import { SUNNYSIDE } from "assets/sunnyside";
 const _state = (state: MachineState) => state.context.state;
+const _hasReputation = (state: MachineState) =>
+  hasReputation({
+    game: state.context.state,
+    reputation: Reputation.Cropkeeper,
+  });
 
 const AcceptOfferContent: React.FC<{
   onClose: () => void;
@@ -45,8 +53,8 @@ const AcceptOfferContent: React.FC<{
 
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
-  const [needsSync, setNeedsSync] = useState(false);
-  const { previousInventory, previousWardrobe, bertObsession, npcs } = state;
+  const { bertObsession, npcs } = state;
+  const hasReputation = useSelector(gameService, _hasReputation);
 
   useOnMachineTransition<ContextType, BlockchainEvent>(
     gameService,
@@ -63,30 +71,6 @@ const AcceptOfferContent: React.FC<{
   );
 
   const confirm = async () => {
-    if (offer.type === "onchain") {
-      if (display.type === "collectibles") {
-        const prevBal =
-          previousInventory[display.name as InventoryItemName] ??
-          new Decimal(0);
-
-        if (prevBal.lt(offer.quantity)) {
-          setNeedsSync(true);
-          return;
-        }
-      }
-
-      if (display.type === "wearables") {
-        const prevBal = new Decimal(
-          previousWardrobe[display.name as BumpkinItem] ?? 0,
-        );
-
-        if (prevBal.lt(offer.quantity)) {
-          setNeedsSync(true);
-          return;
-        }
-      }
-    }
-
     gameService.send("marketplace.offerAccepted", {
       effect: {
         type: "marketplace.offerAccepted",
@@ -129,16 +113,6 @@ const AcceptOfferContent: React.FC<{
           points: offer.type === "instant" ? 1 : 3,
         }).multipliedPoints;
 
-  if (needsSync) {
-    return (
-      <StoreOnChain
-        itemName={display.name}
-        onClose={onClose}
-        actionType="acceptOffer"
-      />
-    );
-  }
-
   // Check if the item is a bert obsession and whether the bert obsession is completed
   const isItemBertObsession = bertObsession?.name === display.name;
   const obsessionCompletedAt = npcs?.bert?.questCompletedAt;
@@ -150,6 +124,23 @@ const AcceptOfferContent: React.FC<{
 
   const isResource = display.type === "resources";
 
+  if (
+    isTradeResource(display.name as InventoryItemName) &&
+    hasFeatureAccess(state, "FACE_RECOGNITION") &&
+    !isFaceVerified({ game: state })
+  ) {
+    return (
+      <>
+        <img
+          src={SUNNYSIDE.icons.close}
+          onClick={onClose}
+          className="w-8 h-8 absolute -top-10 right-2 cursor-pointer"
+        />
+        <FaceRecognition />
+      </>
+    );
+  }
+
   return (
     <>
       <div className="p-2">
@@ -157,10 +148,8 @@ const AcceptOfferContent: React.FC<{
           <Label type="default" className="-ml-1">
             {t("marketplace.acceptOffer")}
           </Label>
-          {offer.type === "onchain" && (
-            <Label type="formula" icon={walletIcon} className="-mr-1">
-              {t("marketplace.walletRequired")}
-            </Label>
+          {!hasReputation && (
+            <RequiredReputation reputation={Reputation.Cropkeeper} />
           )}
         </div>
         <TradeableSummary
@@ -183,6 +172,7 @@ const AcceptOfferContent: React.FC<{
         </Button>
         <Button
           disabled={
+            !hasReputation ||
             !hasItem ||
             (isItemBertObsession && isBertsObesessionCompleted && !isResource)
           }
@@ -190,9 +180,6 @@ const AcceptOfferContent: React.FC<{
           className="relative"
         >
           <span>{t("confirm")}</span>
-          {offer.type === "onchain" && (
-            <img src={walletIcon} className="absolute right-1 top-0.5 h-7" />
-          )}
         </Button>
       </div>
     </>

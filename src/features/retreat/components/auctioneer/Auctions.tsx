@@ -4,7 +4,7 @@ import { useActor } from "@xstate/react";
 import { ButtonPanel } from "components/ui/Panel";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { ITEM_IDS } from "features/game/types/bumpkin";
-import token from "assets/icons/sfl.webp";
+import token from "assets/icons/flower_token.webp";
 
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Label } from "components/ui/Label";
@@ -26,7 +26,7 @@ export const Auctions: React.FC<Props> = ({ auctionService, onSelect }) => {
   const { auctions } = auctioneerState.context;
 
   const currentAuctions = auctions.filter(
-    (auction) => auction.endAt > Date.now()
+    (auction) => auction.endAt > Date.now(),
   );
   if (currentAuctions.length === 0) {
     return <AuctionsComingSoon />;

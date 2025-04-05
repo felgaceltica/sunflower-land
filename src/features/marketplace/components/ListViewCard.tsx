@@ -1,16 +1,14 @@
 import React, { useContext, useState } from "react";
 import Decimal from "decimal.js-light";
 import { ButtonPanel } from "components/ui/Panel";
-import sfl from "assets/icons/sfl.webp";
+import sfl from "assets/icons/flower_token.webp";
 import lightning from "assets/icons/lightning.png";
-import wallet from "assets/icons/wallet.png";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { formatNumber } from "lib/utils/formatNumber";
 import { getTradeType } from "../lib/getTradeType";
 import { getItemId } from "../lib/offers";
 import { TradeableDisplay } from "../lib/tradeables";
-import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
-import { getKeys } from "features/game/types/craftables";
+import { isTradeResource } from "features/game/actions/tradeLimits";
 import { InventoryItemName } from "features/game/types/game";
 import { secondsToString } from "lib/utils/time";
 import { SUNNYSIDE } from "assets/sunnyside";
@@ -56,8 +54,7 @@ export const ListViewCard: React.FC<Props> = ({
   });
 
   const isResources =
-    getKeys(TRADE_LIMITS).includes(name as InventoryItemName) &&
-    type === "collectibles";
+    isTradeResource(name as InventoryItemName) && type === "collectibles";
 
   // Check inventory count
   const getTotalCount = () => {
@@ -102,12 +99,6 @@ export const ListViewCard: React.FC<Props> = ({
             type={type}
             isResources={isResources}
           />
-          {tradeType === "onchain" && (
-            <img
-              src={wallet}
-              className="h-5 mr-1 absolute bottom-1 -right-1.5"
-            />
-          )}
         </div>
 
         <div
@@ -182,7 +173,7 @@ export const ListViewCard: React.FC<Props> = ({
             <p className="text-xxs truncate pb-0.5">
               {`Last sale: ${formatNumber(lastSalePrice, {
                 decimalPlaces: 4,
-              })} SFL`}
+              })} FLOWER`}
             </p>
           )}
         </div>

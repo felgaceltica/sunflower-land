@@ -10,8 +10,7 @@ import {
 } from "features/game/types/marketplace";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
-import sflIcon from "assets/icons/sfl.webp";
-import walletIcon from "assets/icons/wallet.png";
+import sflIcon from "assets/icons/flower_token.webp";
 import { GameWallet } from "features/wallet/Wallet";
 import { Context } from "features/game/GameProvider";
 import confetti from "canvas-confetti";
@@ -27,11 +26,9 @@ import { formatNumber } from "lib/utils/formatNumber";
 import { KNOWN_ITEMS } from "features/game/types";
 import { useSelector } from "@xstate/react";
 import { useParams } from "react-router";
-import { getKeys } from "features/game/types/craftables";
-import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
+import { isTradeResource } from "features/game/actions/tradeLimits";
 import classNames from "classnames";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { isMobile } from "mobile-device-detect";
 import Decimal from "decimal.js-light";
 import { getRemainingTrades, Reputation } from "features/game/lib/reputation";
 import { hasReputation } from "features/game/lib/reputation";
@@ -123,7 +120,7 @@ export const TradeableHeader: React.FC<TradeableHeaderProps> = ({
   );
 
   const isResources =
-    getKeys(TRADE_LIMITS).includes(KNOWN_ITEMS[Number(params.id)]) &&
+    isTradeResource(KNOWN_ITEMS[Number(params.id)]) &&
     params.collection === "collectibles";
 
   const showBuyNow =
@@ -132,7 +129,6 @@ export const TradeableHeader: React.FC<TradeableHeaderProps> = ({
     tradeable?.isActive &&
     // Don't show buy now if the listing is mine
     cheapestListing.listedById !== farmId;
-  const showWalletRequired = showBuyNow && cheapestListing?.type === "onchain";
   // const showFreeListing = !isVIP && dailyListings === 0;
 
   const usd = gameService.getSnapshot().context.prices.sfl?.usd ?? 0.0;
@@ -173,12 +169,7 @@ export const TradeableHeader: React.FC<TradeableHeaderProps> = ({
         <div className="p-2 pt-1">
           <div className="flex flex-wrap items-center justify-between mb-3 space-y-1">
             <div
-              className={classNames(
-                "flex items-center justify-between w-full",
-                {
-                  "w-full": isMobile && showWalletRequired,
-                },
-              )}
+              className={classNames("flex items-center justify-between w-full")}
             >
               <Label
                 type="default"
@@ -193,11 +184,6 @@ export const TradeableHeader: React.FC<TradeableHeaderProps> = ({
                   count: Math.floor(count),
                 })}
               </Label>
-              {showWalletRequired && (
-                <Label type="formula" icon={walletIcon}>
-                  {t("marketplace.walletRequired")}
-                </Label>
-              )}
             </div>
           </div>
 
@@ -213,10 +199,10 @@ export const TradeableHeader: React.FC<TradeableHeaderProps> = ({
                   >
                     <p className={classNames("text-base")}>
                       {!tradeable
-                        ? "0 SFL"
+                        ? "0 FLOWER"
                         : `${formatNumber(cheapestListing?.sfl ?? 0, {
                             decimalPlaces: 4,
-                          })} SFL`}
+                          })} FLOWER`}
                     </p>
                     <p className="text-xs">
                       {`$${new Decimal(usd)

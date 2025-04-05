@@ -6,7 +6,7 @@ import { InnerPanel, Panel } from "components/ui/Panel";
 import { Offer, TradeableDetails } from "features/game/types/marketplace";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
-import sflIcon from "assets/icons/sfl.webp";
+import sflIcon from "assets/icons/flower_token.webp";
 import increaseArrow from "assets/icons/increase_arrow.png";
 
 import { OfferTable } from "./TradeTable";
@@ -14,7 +14,6 @@ import { Loading } from "features/auth/components";
 import { Modal } from "components/ui/Modal";
 import { useSelector } from "@xstate/react";
 import { TradeableDisplay } from "../lib/tradeables";
-import { getKeys } from "features/game/types/decorations";
 import {
   BlockchainEvent,
   Context as ContextType,
@@ -31,13 +30,11 @@ import { ResourceTable } from "./ResourceTable";
 import { formatNumber } from "lib/utils/formatNumber";
 import { getBasketItems } from "features/island/hud/components/inventory/utils/inventory";
 import { KNOWN_ITEMS } from "features/game/types";
-import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
+import { isTradeResource } from "features/game/actions/tradeLimits";
 
 import Decimal from "decimal.js-light";
 import { useParams } from "react-router";
 import { KeyedMutator } from "swr";
-
-// JWT TOKEN
 
 const _hasPendingOfferEffect = (state: MachineState) =>
   state.matches("marketplaceOffering") || state.matches("marketplaceAccepting");
@@ -144,7 +141,7 @@ export const TradeableOffers: React.FC<{
   };
 
   const loading = !tradeable;
-  const isResource = getKeys(TRADE_LIMITS).includes(KNOWN_ITEMS[Number(id)]);
+  const isResource = isTradeResource(KNOWN_ITEMS[Number(id)]);
 
   // Check if the item is a bert obsession and whether the bert obsession is completed
   const isItemBertObsession = bertObsession?.name === display.name;
@@ -193,7 +190,7 @@ export const TradeableOffers: React.FC<{
                 <div className="flex w-full mb-2 sm:mb-0 items-center">
                   <img src={sflIcon} className="h-8 mr-2" />
                   <div>
-                    <p className="text-base">{`${topOffer.sfl} SFL`}</p>
+                    <p className="text-base">{`${topOffer.sfl} FLOWER`}</p>
                     <p className="text-xxs">
                       {`$${new Decimal(usd).mul(topOffer.sfl).toFixed(2)}`}
                     </p>
