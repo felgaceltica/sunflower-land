@@ -53,8 +53,12 @@ import {
   canDiscoverRecipe,
   RECIPE_UNLOCKS,
 } from "../events/landExpansion/discoverRecipe";
-import { hasFeatureAccess } from "lib/flags";
 import { RecipeStack } from "features/island/recipes/RecipeStack";
+import {
+  isBuildingUpgradable,
+  makeUpgradableBuildingKey,
+  UpgradableBuildingType,
+} from "../events/landExpansion/upgradeBuilding";
 
 export const LAND_WIDTH = 6;
 
@@ -82,6 +86,7 @@ type IslandElementArgs = {
   beehives: GameState["beehives"];
   oilReserves: GameState["oilReserves"];
   lavaPits: GameState["lavaPits"];
+  isVisiting: boolean;
 };
 
 const getRecipeLocation = (game: GameState, level: number) => {
@@ -174,6 +179,7 @@ const getIslandElements = ({
   beehives,
   oilReserves,
   lavaPits,
+  isVisiting,
 }: IslandElementArgs) => {
   const mapPlacements: Array<JSX.Element> = [];
 
@@ -185,6 +191,19 @@ const getIslandElements = ({
         return items.map((building, itemIndex) => {
           const { x, y } = building.coordinates;
           const { width, height } = BUILDINGS_DIMENSIONS[name];
+          const buildingKey = makeUpgradableBuildingKey(
+            name as UpgradableBuildingType,
+          );
+
+          const readyAt =
+            !!isBuildingUpgradable(name) && !!game[buildingKey].upgradeReadyAt
+              ? game[buildingKey].upgradeReadyAt
+              : building.readyAt;
+
+          const upgradedAt =
+            !!isBuildingUpgradable(name) && !!game[buildingKey].upgradedAt
+              ? game[buildingKey].upgradedAt
+              : building.createdAt;
 
           return (
             <MapPlacement
@@ -198,14 +217,13 @@ const getIslandElements = ({
                 name={name}
                 id={building.id}
                 index={itemIndex}
-                readyAt={building.readyAt}
-                createdAt={building.createdAt}
-                craftingItemName={building.crafting?.name}
-                craftingReadyAt={building.crafting?.readyAt}
+                readyAt={readyAt}
+                createdAt={upgradedAt}
                 showTimers={showTimers}
                 x={x}
                 y={y}
                 island={game.island.type}
+                season={game.season.season}
               />
             </MapPlacement>
           );
@@ -663,7 +681,7 @@ const getIslandElements = ({
     }),
   );
 
-  if (hasFeatureAccess(game, "BEDS")) {
+  if (!isVisiting) {
     const recipeLocations = getRecipeLocations(game);
     // Group recipes by location, to stop them overlapping
     const recipeGroups = recipeLocations.reduce(
@@ -709,6 +727,8 @@ const selectGameState = (state: MachineState) => state.context.state;
 const isLandscaping = (state: MachineState) => state.matches("landscaping");
 const isVisiting = (state: MachineState) => state.matches("visiting");
 const isPaused = (state: MachineState) => !!state.context.paused;
+const _islandType = (state: MachineState) => state.context.state.island.type;
+const _season = (state: MachineState) => state.context.state.season.season;
 
 export const Land: React.FC = () => {
   const { gameService, showTimers } = useContext(Context);
@@ -717,6 +737,8 @@ export const Land: React.FC = () => {
 
   const { pathname } = useLocation();
   const state = useSelector(gameService, selectGameState);
+  const islandType = useSelector(gameService, _islandType);
+  const season = useSelector(gameService, _season);
   const showMarketplace = pathname.includes("marketplace");
 
   const {
@@ -779,7 +801,7 @@ export const Land: React.FC = () => {
           // dynamic gameboard
           width: `${gameboardDimensions.x * GRID_WIDTH_PX}px`,
           height: `${gameboardDimensions.y * GRID_WIDTH_PX}px`,
-          backgroundImage: `url(${SUNNYSIDE.decorations.ocean})`,
+          backgroundImage: `url(${season === "winter" ? SUNNYSIDE.decorations.frozenOcean : islandType === "volcano" ? SUNNYSIDE.decorations.darkOcean : SUNNYSIDE.decorations.ocean})`,
           backgroundSize: `${64 * PIXEL_SCALE}px`,
           imageRendering: "pixelated",
         }}
@@ -855,6 +877,7 @@ export const Land: React.FC = () => {
                 beehives,
                 oilReserves,
                 lavaPits,
+                isVisiting: visiting,
               }).sort((a, b) => {
                 if (a.props.canCollide === false) {
                   return -1;

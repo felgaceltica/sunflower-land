@@ -691,7 +691,7 @@ const INITIAL_VOLCANO_LAND: Pick<
       width: 2,
       height: 2,
       oil: {
-        amount: 1,
+        amount: 10,
         drilledAt: 0,
       },
       drilled: 0,
@@ -957,6 +957,9 @@ const INITIAL_VOLCANO_LAND: Pick<
 };
 
 const SUNSTONE_RELOCATION: Coordinates[] = [
+  { x: -5, y: 5 },
+  { x: -5, y: 9 },
+  { x: -5, y: 7 },
   { x: -3, y: 7 },
   { x: -1, y: 7 },
   { x: 1, y: 7 },
@@ -1039,40 +1042,32 @@ function springUpgrade(state: GameState) {
   return game;
 }
 
-/**
- * Any stale items that are still on the island or home
- */
-export function expireItems({
-  game,
-  createdAt,
-}: {
-  game: GameState;
-  createdAt: number;
-}) {
-  // iterate the expiry cooldowns and remove any items that have expired
-  const expiredItems = Object.entries(EXPIRY_COOLDOWNS).reduce(
-    (acc, [name, cooldown]) => {
+export function expireItems({ game }: { game: GameState }) {
+  const temporaryCollectibles = getKeys(EXPIRY_COOLDOWNS).reduce(
+    (acc, name) => {
       const items = game.collectibles[name as CollectibleName] ?? [];
       const homeItems = game.home.collectibles[name as CollectibleName] ?? [];
-      const expiredItems = [...items, ...homeItems].filter(
-        (item) => item.createdAt + cooldown < createdAt,
-      );
 
-      if (expiredItems.length > 0) {
-        return { ...acc, [name]: expiredItems.length };
+      const count = [...items, ...homeItems].length;
+
+      if (count > 0) {
+        return {
+          ...acc,
+          [name]: count,
+        };
       }
 
       return acc;
     },
-    {},
+    {} as Record<string, number>,
   );
 
-  if (getKeys(expiredItems).length > 0) {
-    getKeys(expiredItems).forEach((name) => {
+  if (getKeys(temporaryCollectibles).length > 0) {
+    getKeys(temporaryCollectibles).forEach((name) => {
       const previous =
         game.inventory[name as InventoryItemName] ?? new Decimal(0);
       game.inventory[name as InventoryItemName] = previous.sub(
-        expiredItems[name],
+        temporaryCollectibles[name],
       );
     });
   }
@@ -1217,7 +1212,7 @@ export function upgrade({ state, action, createdAt = Date.now() }: Options) {
   });
 
   // Remove any time sensitive items that have expired
-  game = expireItems({ game, createdAt });
+  game = expireItems({ game });
 
   // Clear all in progress items
   game.collectibles = {};
@@ -1228,16 +1223,15 @@ export function upgrade({ state, action, createdAt = Date.now() }: Options) {
     mushrooms: {},
     spawnedAt: game.mushrooms?.spawnedAt ?? 0,
   };
-  game.buds = getKeys(game.buds ?? {}).reduce(
-    (acc, key) => ({
-      ...acc,
-      [key]: {
-        ...(game.buds ?? {})[key],
-        location: undefined,
-        coordinates: undefined,
+  game.buds = Object.fromEntries(
+    Object.entries(game.buds ?? {}).map(([budId, bud]) => [
+      budId,
+      {
+        ...bud,
+        location: bud.location === "home" ? "home" : undefined,
+        coordinates: bud.location === "home" ? bud.coordinates : undefined,
       },
-    }),
-    game.buds,
+    ]),
   );
   game.crimstones = {};
   game.beehives = {};

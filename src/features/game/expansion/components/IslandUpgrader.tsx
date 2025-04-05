@@ -15,7 +15,7 @@ import { Label } from "components/ui/Label";
 import { Panel } from "components/ui/Panel";
 import { useActor } from "@xstate/react";
 import { ISLAND_UPGRADE } from "features/game/events/landExpansion/upgradeFarm";
-import { getKeys } from "features/game/types/craftables";
+import { CollectibleName, getKeys } from "features/game/types/craftables";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 import { GameState, IslandType } from "features/game/types/game";
@@ -25,20 +25,16 @@ import { Transition } from "@headlessui/react";
 import { formatDateTime } from "lib/utils/time";
 import { translate } from "lib/i18n/translate";
 import { Loading } from "features/auth/components";
-import { hasFeatureAccess } from "lib/flags";
+import { EXPIRY_COOLDOWNS } from "features/game/lib/collectibleBuilt";
 
-const UPGRADE_DATES: (state: GameState) => Record<IslandType, number | null> = (
-  state,
-) => ({
+const UPGRADE_DATES: Record<IslandType, number | null> = {
   basic: new Date(0).getTime(),
   spring: new Date("2024-05-15T00:00:00Z").getTime(),
-  desert: hasFeatureAccess(state, "VOLCANO_ISLAND")
-    ? new Date("2025-01-03T00:00:00Z").getTime()
-    : new Date("2025-02-03T00:00:00Z").getTime(),
+  desert: new Date("2025-02-03T00:00:00Z").getTime(),
   volcano: null, // Next prestige after volcano
-});
+};
 
-const UPGRADE_RAFTS: Record<IslandType, string | null> = {
+export const UPGRADE_RAFTS: Record<IslandType, string | null> = {
   basic: SUNNYSIDE.land.springRaft,
   spring: SUNNYSIDE.land.desertRaft,
   desert: SUNNYSIDE.land.volcanoRaft,
@@ -75,7 +71,7 @@ const IslandUpgraderModal: React.FC<{
 
   const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const { island, inventory } = gameState.context.state;
+  const { island, inventory, collectibles, home } = gameState.context.state;
   const upgrade = ISLAND_UPGRADE[island.type];
   const { t } = useAppTranslation();
 
@@ -111,7 +107,30 @@ const IslandUpgraderModal: React.FC<{
     );
   }
 
-  const upgradeDate = UPGRADE_DATES(gameState.context.state)[island.type];
+  const hasUnexpiredItemsPlaced = () => {
+    const temporaryCollectibles = getKeys(EXPIRY_COOLDOWNS).reduce(
+      (acc, name) => {
+        const items = collectibles[name as CollectibleName] ?? [];
+        const homeItems = home.collectibles[name as CollectibleName] ?? [];
+
+        const count = [...items, ...homeItems].length;
+
+        if (count > 0) {
+          return {
+            ...acc,
+            [name]: count,
+          };
+        }
+
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    return getKeys(temporaryCollectibles).length > 0;
+  };
+
+  const upgradeDate = UPGRADE_DATES[island.type];
   const hasUpgrade = upgradeDate !== null;
   const isReady = hasUpgrade && upgradeDate < Date.now();
 
@@ -167,6 +186,15 @@ const IslandUpgraderModal: React.FC<{
                 </Label>
               )}
 
+              {isReady && hasUnexpiredItemsPlaced() && (
+                <Label
+                  icon={SUNNYSIDE.icons.expression_alerted}
+                  type="danger"
+                  className="mr-3 mb-1"
+                >
+                  {t("islandupgrade.tempItemWarning")}
+                </Label>
+              )}
               {getKeys(upgrade.items).map((name) => (
                 <Label
                   key={name}

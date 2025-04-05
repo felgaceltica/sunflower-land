@@ -9,7 +9,7 @@ import { Label } from "components/ui/Label";
 import { InlineDialogue } from "features/world/ui/TypingMessage";
 import { Box } from "components/ui/Box";
 import trade from "assets/icons/trade.png";
-import token from "assets/icons/sfl.webp";
+import token from "assets/icons/flower_token.webp";
 import { formatNumber } from "lib/utils/formatNumber";
 import { InventoryItemName } from "features/game/types/game";
 import { tradeToId } from "features/marketplace/lib/offers";
@@ -18,7 +18,7 @@ import Decimal from "decimal.js-light";
 import { MARKETPLACE_TAX } from "features/game/types/marketplace";
 import { calculateTradePoints } from "features/game/events/landExpansion/addTradePoints";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { TRADE_LIMITS } from "features/game/actions/tradeLimits";
+import { isTradeResource } from "features/game/actions/tradeLimits";
 import { KNOWN_ITEMS } from "features/game/types";
 
 /**
@@ -76,9 +76,7 @@ export const MarketplaceSalesPopup: React.FC = () => {
             points: !listing.signature ? 1 : 3,
           }).multipliedPoints;
 
-          const isResource = getKeys(TRADE_LIMITS).includes(
-            KNOWN_ITEMS[Number(itemId)],
-          );
+          const isResource = isTradeResource(KNOWN_ITEMS[Number(itemId)]);
 
           return (
             <div className="flex flex-col space-y-1" key={listingId}>
@@ -92,7 +90,7 @@ export const MarketplaceSalesPopup: React.FC = () => {
                     <div className="flex items-center space-x-1">
                       <p className="text-xs mt-0.5">{`${formatNumber(sfl, {
                         decimalPlaces: 4,
-                      })} SFL`}</p>
+                      })} FLOWER`}</p>
                       <img src={token} className="w-4" />
                     </div>
                     {!isResource && (
