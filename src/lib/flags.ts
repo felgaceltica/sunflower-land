@@ -5,38 +5,10 @@ const adminFeatureFlag = ({ wardrobe, inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" ||
   (!!((wardrobe["Gift Giver"] ?? 0) > 0) && !!inventory["Beta Pass"]?.gt(0));
 
-const seasonAdminFeatureFlag = (game: GameState) => {
+const usernameFeatureFlag = (game: GameState) => {
   return (
     testnetFeatureFlag() ||
-    (defaultFeatureFlag(game) &&
-      Date.now() > new Date("2025-02-01:00:00Z").getTime()) ||
-    [
-      "adam",
-      "tango",
-      "eliassfl",
-      "dcol",
-      "Vitt0c",
-      "Telk",
-      "ThinkTronik",
-      "Henry",
-      "Blasta",
-      "Aeon",
-      "kegw",
-      "Dionis",
-      "MamaMahalkoe",
-      "Andrei",
-      "SlyKai",
-      "Oniel",
-      "Tourist",
-      "Kevin",
-      "ShinKan42",
-      "JcEii",
-      "Pecel",
-      "inubakabo",
-      "JKrak",
-      "Droid",
-      "Craig",
-    ]
+    ["adam", "tango", "elias", "dcol", "birb", "Celinhotv", "LittleEins"]
       .map((name) => name.toLowerCase())
       .includes(game.username?.toLowerCase() ?? "")
   );
@@ -46,6 +18,13 @@ const defaultFeatureFlag = ({ inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" || !!inventory["Beta Pass"]?.gt(0);
 
 const testnetFeatureFlag = () => CONFIG.NETWORK === "amoy";
+
+const localStorageFeatureFlag = (key: string) =>
+  !!localStorage.getItem(key) === true;
+
+const testnetLocalStorageFeatureFlag = (key: string) => () => {
+  return testnetFeatureFlag() || localStorageFeatureFlag(key);
+};
 
 const timeBasedFeatureFlag = (date: Date) => () => {
   return testnetFeatureFlag() || Date.now() > date.getTime();
@@ -65,11 +44,10 @@ const periodBasedFeatureFlag =
     return Date.now() > startDate.getTime() && Date.now() < endDate.getTime();
   };
 // Used for testing production features
-export const ADMIN_IDS = [1, 3, 51, 39488, 128727];
+export const ADMIN_IDS = [1, 3, 39488, 128727];
 /**
  * Adam: 1
  * Spencer: 3
- * Sacul: 51
  * Craig: 39488
  * Elias: 128727
  */
@@ -85,58 +63,63 @@ export type ExperimentName = "ONBOARDING_CHALLENGES" | "GEM_BOOSTS";
  *
  * Do not delete JEST_TEST.
  */
-const featureFlags = {
-  CHORE_BOARD: betaTimeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
-  ONBOARDING_REWARDS: (game: GameState) =>
-    game.experiments.includes("ONBOARDING_CHALLENGES"),
-  SEASONAL_TIERS: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
-  CROP_QUICK_SELECT: () => false,
-  PORTALS: testnetFeatureFlag,
+const FEATURE_FLAGS = {
+  // For testing
   JEST_TEST: defaultFeatureFlag,
   EASTER: () => false, // To re-enable next easter
-  SKILLS_REVAMP: (game: GameState) =>
-    Date.now() > new Date("2025-02-01T00:00:00Z").getTime()
-      ? defaultFeatureFlag(game)
-      : adminFeatureFlag(game),
-  FSL: betaTimeBasedFeatureFlag(new Date("2024-10-10T00:00:00Z")),
-  ANIMAL_BUILDINGS: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
-  BARLEY: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
-  CHICKEN_GARBO: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
-  CRAFTING_BOX: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
-  FLOWER_BOUNTIES: timeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
-  BEDS: timeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
-  BULL_RUN_PLAZA: betaTimeBasedFeatureFlag(new Date("2024-11-01T00:00:00Z")),
-  BALE_AOE_END: betaTimeBasedFeatureFlag(new Date("2024-11-04T00:00:00Z")),
-  HALLOWEEN_2024: defaultFeatureFlag,
-  CHRISTMAS_2024: timePeriodFeatureFlag({
-    start: new Date("2024-12-12T00:00:00Z"),
-    end: new Date("2024-12-28T00:00:00Z"),
-  }),
-  ANIMAL_COMPETITION: betaTimeBasedFeatureFlag(
-    new Date("2024-12-18T00:00:00Z"),
+
+  // Permanent Feature Flags
+  AIRDROP_PLAYER: adminFeatureFlag,
+  HOARDING_CHECK: defaultFeatureFlag,
+
+  // Temporary Feature Flags
+  FACE_RECOGNITION: (game) =>
+    game.createdAt > new Date("2025-01-01T00:00:00Z").getTime(),
+  FACE_RECOGNITION_TEST: defaultFeatureFlag,
+
+  DISABLE_BLOCKCHAIN_ACTIONS: timeBasedFeatureFlag(
+    new Date("2025-03-24T00:00:00Z"),
   ),
-  TEMPERATE_SEASON: seasonAdminFeatureFlag,
   PIZZA_SPEED_UP_RESTRICTION: timePeriodFeatureFlag({
     start: new Date("2024-12-18T00:00:00Z"),
     end: new Date("2025-02-01T00:00:00Z"),
   }),
-  WEATHER_SHOP: seasonAdminFeatureFlag,
   FRUIT_PATCH_QUICK_SELECT: defaultFeatureFlag,
-  SEASONAL_EVENTS_NOTIFICATIONS: seasonAdminFeatureFlag,
-  SEASONAL_SEEDS: seasonAdminFeatureFlag,
-  SEASONAL_FISH: seasonAdminFeatureFlag,
+  TASK_BOARD: betaTimeBasedFeatureFlag(new Date("2025-04-07T00:00:00Z")),
+
+  FLOWER_DEPOSIT: usernameFeatureFlag,
+  TELEGRAM: defaultFeatureFlag,
+
+  // Released to All Players on 5th May
+  FLOWER_GEMS: timeBasedFeatureFlag(new Date("2025-05-05T00:00:00Z")),
+
+  // Testnet only feature flags - Please don't change these until release
+  LOVE_CHARM_FLOWER_EXCHANGE: timeBasedFeatureFlag(
+    new Date("2025-04-14T00:00:00Z"),
+  ),
+  //Testnet only
+  LOVE_CHARM_REWARD_SHOP: timeBasedFeatureFlag(
+    new Date("2025-04-14T00:00:00Z"),
+  ),
+
+  LEDGER: testnetLocalStorageFeatureFlag("ledger"),
+  BLOCKCHAIN_BOX: defaultFeatureFlag,
+
+  // Don't change this feature flag until the love rush event is over
+  LOVE_RUSH: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-04-07T00:00:00Z"))(game) &&
+    Date.now() < new Date("2025-05-05T00:00:00Z").getTime(),
+
   FRUIT_DASH_TIMED_EVENT: periodBasedFeatureFlag(
     new Date("2024-12-12T00:00:00Z"),
     new Date("2024-12-26T00:00:00Z"),
   ),
-  VOLCANO_ISLAND: seasonAdminFeatureFlag,
-  SEASONAL_FLOWERS: seasonAdminFeatureFlag,
 } satisfies Record<string, FeatureFlag>;
 
-export type FeatureName = keyof typeof featureFlags;
+export type FeatureName = keyof typeof FEATURE_FLAGS;
 
 export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {
-  return featureFlags[featureName](game);
+  return FEATURE_FLAGS[featureName](game);
 };
 
 export const TIMED_EVENT_NAME = "FRUIT_DASH_TIMED_EVENT";

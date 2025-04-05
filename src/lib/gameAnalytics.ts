@@ -139,7 +139,9 @@ class GameAnalyticTracker {
       | "FishingReels"
       | "Instant Expand"
       | "Instant Build"
-      | "Instant Cook";
+      | "Instant Cook"
+      | "Skills Reset"
+      | "Username Change";
   }) {
     const { currency, amount, type, item } = event;
 
