@@ -25,12 +25,14 @@ export class FruitDashObstacleFactory {
   private throwableLines: Phaser.GameObjects.Container[] = [];
   private IS_HALLOWEEN = false;
   private IS_CHRISTMAS = false;
+  private IS_EASTER = false;
   private deadObstacles: number;
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
     this.deadObstacles = 0;
     this.IS_HALLOWEEN = getHalloweenModeSetting();
     this.IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
+    this.IS_EASTER = getIsTimedEvent("EASTER");
     //this.obstacles["turtle"] = new TurtleObstacle(10,10,false);
     // this.obstacles["stonewall"] = new StoneWallObstacle(10, 10, false);
     //this.obstacles["oilbarrel"] = new OilBarrelObstacle(20, 5, false);
@@ -65,6 +67,13 @@ export class FruitDashObstacleFactory {
       this.obstacles["gravestone"] = new GraveStoneObstacle(20, 2, "obstacle");
       //Points
       this.obstacles["fruit"] = new FruitChristmasObstacle(50, 20, "bounty");
+    } else if (this.IS_EASTER) {
+      this.obstacles["oilpit"] = new OilPitObstacle(20, 5, "obstacle");
+      this.obstacles["rock"] = new RockObstacle(100, 2, "obstacle");
+      this.obstacles["largerock"] = new StoneRockObstacle(20, 5, "obstacle");
+      this.obstacles["gravestone"] = new GraveStoneObstacle(100, 2, "obstacle");
+      //Points
+      this.obstacles["fruit"] = new FruitEasterObstacle(50, 20, "bounty");
     } else {
       this.obstacles["oilpit"] = new OilPitObstacle(20, 5, "obstacle");
       this.obstacles["rock"] = new RockObstacle(100, 2, "obstacle");
@@ -1450,6 +1459,44 @@ class FruitChristmasObstacle extends FruitDashObstacle {
       bounds.width / 2,
       bounds.height / 2,
       bounds.width / 2,
+    );
+    shape.radius = shape.radius * 0.8;
+    if (scene.physics.world.drawDebug) {
+      const graphics = new Phaser.GameObjects.Graphics(scene, {
+        lineStyle: { width: 1, color: 0xffff00 },
+        fillStyle: { color: 0xff0000 },
+      });
+      graphics.strokeCircleShape(shape);
+      graphics.setDepth(1000);
+      container.add(graphics);
+    }
+    container.setCollisionCircle(shape);
+    return container;
+  }
+}
+
+class FruitEasterObstacle extends FruitDashObstacle {
+  add(scene: FruitDashBaseScene, name: string): FruitDashObstacleContainer {
+    const fruits = ["Egg1", "Egg2", "Egg3", "Egg4", "Egg5", "Egg6", "Egg7"];
+    const fruit = fruits[randomInt(0, fruits.length)];
+    const container = new FruitDashObstacleContainer(
+      scene,
+      0,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
+      this._weight,
+      this._points,
+      this._type,
+      fruit,
+    );
+    const image = scene.add.image(0, 0, fruit);
+    image.setOrigin(-0.1, -0.1);
+    image.setScale(1.1, 1.1);
+    container.add(image);
+    const bounds = container.getBounds();
+    const shape = new Phaser.Geom.Circle(
+      bounds.width / 1.6,
+      bounds.height / 1.6,
+      bounds.width / 1.6,
     );
     shape.radius = shape.radius * 0.8;
     if (scene.physics.world.drawDebug) {

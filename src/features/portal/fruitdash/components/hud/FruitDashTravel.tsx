@@ -3,7 +3,7 @@ import { useSelector } from "@xstate/react";
 import { PortalContext } from "../../lib/PortalProvider";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { SUNNYSIDE } from "assets/sunnyside";
-import worldIcon from "assets/icons/world.png";
+import worldIcon from "assets/icons/world_small.png";
 import { goHome } from "features/portal/lib/portalUtil";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { ConfirmationModal } from "components/ui/ConfirmationModal";

@@ -3,7 +3,7 @@
 // import { PortalContext } from "../../lib/PortalProvider";
 // import { PIXEL_SCALE } from "features/game/lib/constants";
 // import { SUNNYSIDE } from "assets/sunnyside";
-// import worldIcon from "assets/icons/world.png";
+// import worldIcon from "assets/icons/world_small.png";
 // import zoomIn from "assets/icons/portal/irrigate/ZoomIn.png";
 // import zoomOut from "assets/icons/portal/irrigate/ZoomOut.png";
 // import { goHome } from "../../../lib/portalUtil";

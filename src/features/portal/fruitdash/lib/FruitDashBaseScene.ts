@@ -120,6 +120,13 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.load.image("Orange", ITEM_DETAILS["Orange"].image);
     this.load.image("Blueberry", ITEM_DETAILS["Blueberry"].image);
     this.load.image("Grape", ITEM_DETAILS["Grape"].image);
+    this.load.image("Egg1", ITEM_DETAILS["Blue Egg"].image);
+    this.load.image("Egg2", ITEM_DETAILS["Green Egg"].image);
+    this.load.image("Egg3", ITEM_DETAILS["Orange Egg"].image);
+    this.load.image("Egg4", ITEM_DETAILS["Pink Egg"].image);
+    this.load.image("Egg5", ITEM_DETAILS["Purple Egg"].image);
+    this.load.image("Egg6", ITEM_DETAILS["Red Egg"].image);
+    this.load.image("Egg7", ITEM_DETAILS["Yellow Egg"].image);
     this.load.image("ghost", SUNNYSIDE.resource.magic_mushroom);
     this.load.image("axe", SUNNYSIDE.tools.gold_pickaxe);
 
@@ -173,7 +180,8 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
           }
         }
       }, 5000);
-
+    const playerclothing = this.gameState.bumpkin?.equipped as BumpkinParts;
+    playerclothing.onesie = "Bunny Onesie";
     this.createPlayer({
       x: window.innerWidth / 2,
       y: PLAYER_Y,
@@ -183,7 +191,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
       isCurrentPlayer: true,
       // gameService
       clothing: {
-        ...(this.gameState.bumpkin?.equipped as BumpkinParts),
+        ...playerclothing,
         updatedAt: 0,
       },
       experience: 0,

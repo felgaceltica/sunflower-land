@@ -22,20 +22,26 @@ export class FruitDashDecorationFactory {
   private decorationsLines: Phaser.GameObjects.Container[] = [];
   private IS_HALLOWEEN = false;
   private IS_CHRISTMAS = false;
+  private IS_EASTER = false;
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
     this.IS_HALLOWEEN = getHalloweenModeSetting();
     this.IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
+    this.IS_EASTER = getIsTimedEvent("EASTER");
     if (this.IS_HALLOWEEN) {
-      this.decorations["tree"] = new HalloweenTreeDecoration(60);
+      //this.decorations["tree"] = new HalloweenTreeDecoration(60);
     } else if (this.IS_CHRISTMAS) {
-      this.decorations["tree"] = new ChristmasTreeDecoration(60);
+      //this.decorations["tree"] = new ChristmasTreeDecoration(60);
+    } else if (this.IS_EASTER) {
+      //this.decorations["tree"] = new EasterTreeDecoration(60);
+      this.decorations["bush"] = new EasterBushDecoration(50);
+      this.decorations["bunny"] = new EasterBunnyDecoration(2);
     } else {
-      this.decorations["tree"] = new TreeDecoration(60);
+      //this.decorations["tree"] = new TreeDecoration(60);
     }
     //this.decorations["flower"] = new FlowerDecoration(20);
-    // this.decorations["bush"] = new BushDecoration(15);
+
     // this.decorations["mushroom"] = new MushroomDecoration(15);
     // this.decorations["choppedtree"] = new ChoppedTreeDecoration(10);
     // this.decorations["goldrock"] = new GoldRockDecoration(5);
@@ -103,261 +109,6 @@ abstract class FruitDashDecoration {
     return this._weight;
   }
 }
-class ChristmasTreeDecoration extends FruitDashDecoration {
-  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
-    const containerbase = scene.add.container(
-      0,
-      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
-    );
-    const baseX = getBaseXL(2);
-    const container = scene.add.container(baseX, 0);
-    const image = scene.add.image(0, 0, "christmas_tree");
-    image.setOrigin(0, 0);
-    container.add(image);
-    containerbase.add(container);
-
-    const baseX1 = getBaseXR(2);
-    const container1 = scene.add.container(baseX1, 0);
-    const image1 = scene.add.image(0, 0, "christmas_tree");
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    containerbase.add(container1);
-    return containerbase;
-  }
-}
-class HalloweenTreeDecoration extends FruitDashDecoration {
-  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
-    const containerbase = scene.add.container(
-      0,
-      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
-    );
-    const baseX = getBaseXL(2);
-    const container = scene.add.container(baseX, 0);
-    let image = scene.add.image(0, 0, "SunnySideSpritesHalloween", 125);
-    image.setScale(
-      SQUARE_WIDTH_TEXTURE / image.width,
-      SQUARE_WIDTH_TEXTURE / image.height,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      0,
-      "SunnySideSpritesHalloween",
-      126,
-    );
-    image.setScale(
-      SQUARE_WIDTH_TEXTURE / image.width,
-      SQUARE_WIDTH_TEXTURE / image.height,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      0,
-      SQUARE_WIDTH_TEXTURE,
-      "SunnySideSpritesHalloween",
-      178,
-    );
-    image.setScale(
-      SQUARE_WIDTH_TEXTURE / image.width,
-      SQUARE_WIDTH_TEXTURE / image.height,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE,
-      "SunnySideSpritesHalloween",
-      179,
-    );
-    image.setScale(
-      SQUARE_WIDTH_TEXTURE / image.width,
-      SQUARE_WIDTH_TEXTURE / image.height,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      0,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSpritesHalloween",
-      231,
-    );
-    image.setScale(
-      SQUARE_WIDTH_TEXTURE / image.width,
-      SQUARE_WIDTH_TEXTURE / image.height,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSpritesHalloween",
-      232,
-    );
-    image.setScale(
-      SQUARE_WIDTH_TEXTURE / image.width,
-      SQUARE_WIDTH_TEXTURE / image.height,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-
-    containerbase.add(container);
-
-    const baseX1 = getBaseXR(2);
-    const container1 = scene.add.container(baseX1, 0);
-    let image1 = scene.add.image(0, 0, "SunnySideSpritesHalloween", 125);
-    image1.setScale(
-      SQUARE_WIDTH_TEXTURE / image1.width,
-      SQUARE_WIDTH_TEXTURE / image1.height,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      0,
-      "SunnySideSpritesHalloween",
-      126,
-    );
-    image1.setScale(
-      SQUARE_WIDTH_TEXTURE / image1.width,
-      SQUARE_WIDTH_TEXTURE / image1.height,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      0,
-      SQUARE_WIDTH_TEXTURE,
-      "SunnySideSpritesHalloween",
-      178,
-    );
-    image1.setScale(
-      SQUARE_WIDTH_TEXTURE / image1.width,
-      SQUARE_WIDTH_TEXTURE / image1.height,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE,
-      "SunnySideSpritesHalloween",
-      179,
-    );
-    image1.setScale(
-      SQUARE_WIDTH_TEXTURE / image1.width,
-      SQUARE_WIDTH_TEXTURE / image1.height,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      0,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSpritesHalloween",
-      231,
-    );
-    image1.setScale(
-      SQUARE_WIDTH_TEXTURE / image1.width,
-      SQUARE_WIDTH_TEXTURE / image1.height,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSpritesHalloween",
-      232,
-    );
-    image1.setScale(
-      SQUARE_WIDTH_TEXTURE / image1.width,
-      SQUARE_WIDTH_TEXTURE / image1.height,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    containerbase.add(container1);
-    return containerbase;
-  }
-}
-class TreeDecoration extends FruitDashDecoration {
-  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
-    const containerbase = scene.add.container(
-      0,
-      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 2,
-    );
-    const baseX = getBaseXL(2);
-    const container = scene.add.container(baseX, 0);
-    let image = scene.add.image(0, 0, "SunnySideSprites", 119);
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(SQUARE_WIDTH_TEXTURE, 0, "SunnySideSprites", 120);
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(0, SQUARE_WIDTH_TEXTURE, "SunnySideSprites", 309);
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE,
-      "SunnySideSprites",
-      444,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      0,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSprites",
-      507,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    image = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSprites",
-      508,
-    );
-    image.setOrigin(0, 0);
-    container.add(image);
-    containerbase.add(container);
-
-    const baseX1 = getBaseXR(2);
-    const container1 = scene.add.container(baseX1, 0);
-    let image1 = scene.add.image(0, 0, "SunnySideSprites", 119);
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(SQUARE_WIDTH_TEXTURE, 0, "SunnySideSprites", 120);
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(0, SQUARE_WIDTH_TEXTURE, "SunnySideSprites", 309);
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE,
-      "SunnySideSprites",
-      444,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      0,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSprites",
-      507,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    image1 = scene.add.image(
-      SQUARE_WIDTH_TEXTURE,
-      SQUARE_WIDTH_TEXTURE * 2,
-      "SunnySideSprites",
-      508,
-    );
-    image1.setOrigin(0, 0);
-    container1.add(image1);
-    containerbase.add(container1);
-    return containerbase;
-  }
-}
 class MushroomDecoration extends FruitDashDecoration {
   add(scene: Phaser.Scene): Phaser.GameObjects.Container {
     const baseX = getBaseX(1);
@@ -391,6 +142,40 @@ class GoldRockDecoration extends FruitDashDecoration {
       "SunnySideSprites",
       1844,
     );
+    image.setOrigin(0, 0);
+    container.add(image);
+    return container;
+  }
+}
+
+class EasterBunnyDecoration extends FruitDashDecoration {
+  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
+    const baseX = getBaseX(2);
+    const container = scene.add.container(
+      baseX,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 1,
+    );
+    const image = scene.add.image(0, 0, "easterbunny");
+    image.setOrigin(0, 0);
+    container.add(image);
+    // image = scene.add.image(0, 0, "easterbush");
+    // image.setOrigin(0, 0);
+    // container.add(image);
+    return container;
+  }
+}
+
+class EasterBushDecoration extends FruitDashDecoration {
+  add(scene: Phaser.Scene): Phaser.GameObjects.Container {
+    const baseX = getBaseX(2);
+    const container = scene.add.container(
+      baseX,
+      START_HEIGHT - SQUARE_WIDTH_TEXTURE * 1,
+    );
+    let image = scene.add.image(0, 0, "easterbushshadow");
+    image.setOrigin(0, -1.1);
+    container.add(image);
+    image = scene.add.image(0, 0, "easterbush");
     image.setOrigin(0, 0);
     container.add(image);
     return container;
@@ -452,16 +237,13 @@ class ChoppedTreeDecoration extends FruitDashDecoration {
   }
 }
 function getBaseX(squares: number): number {
-  return GRASS_LEFT_MAX - (GRASS_LEFT_MAX - GRASS_LEFT_MIN) / 4;
+  //return GRASS_LEFT_MAX - (GRASS_LEFT_MAX - GRASS_LEFT_MIN) / 4;
   //Left or right
   if (randomBoolean()) {
-    return randomInt(
-      GRASS_LEFT_MIN,
-      GRASS_LEFT_MAX - squares * SQUARE_WIDTH_TEXTURE,
-    );
+    return randomInt(GRASS_LEFT_MIN, GRASS_LEFT_MAX - 3 * SQUARE_WIDTH_TEXTURE);
   } else {
     return randomInt(
-      GRASS_RIGHT_MIN,
+      GRASS_RIGHT_MIN + 2.5 * SQUARE_WIDTH_TEXTURE,
       GRASS_RIGHT_MAX - squares * SQUARE_WIDTH_TEXTURE,
     );
   }

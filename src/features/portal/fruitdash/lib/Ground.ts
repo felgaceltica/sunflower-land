@@ -11,11 +11,13 @@ import {
   BACKGROUND_SPEED_RATIO,
 } from "../util/FruitDashConstants";
 import { FruitDashBaseScene } from "./FruitDashBaseScene";
+import { FruitDashTreeFactory } from "./Trees";
 import { FruitDashDecorationFactory } from "./Decorations";
 import { FruitDashObstacleFactory } from "./Obstacles";
 import weightedRandom from "../util/Utils";
 import { getHalloweenModeSetting } from "../util/useIsHalloweenMode";
 import { getIsTimedEvent } from "../util/useIsTimedEvent";
+import { SUNNYSIDE } from "assets/sunnyside";
 
 export class FruitDashGroundFactory {
   private _scene: FruitDashBaseScene;
@@ -26,17 +28,21 @@ export class FruitDashGroundFactory {
   public fenceCount = 0;
   private streetLines: Phaser.GameObjects.Container[] = [];
   private backgroundLines: Phaser.GameObjects.Container[] = [];
-  nextDecoration = 0; //randomInt(0, MAX_DECORATIONS_LINES);
+  nextDecoration = randomInt(0, 5);
+  nextTree = 0;
   private _decorationsFactory: FruitDashDecorationFactory;
+  private _treesFactory: FruitDashTreeFactory;
   nextObstacle: number = randomInt(0, MAX_OBSTACLES_LINES);
   private _obstaclesFactory: FruitDashObstacleFactory;
   private IS_HALLOWEEN = false;
   private IS_CHRISTMAS = false;
+  private IS_EASTER = false;
 
   constructor(scene: FruitDashBaseScene) {
     this._scene = scene;
     this.IS_HALLOWEEN = getHalloweenModeSetting();
     this.IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
+    this.IS_EASTER = getIsTimedEvent("EASTER");
     this.dirtyTiles = this.IS_HALLOWEEN ? [117, 69, 121] : [449, 459, 522]; //[449, 457, 458, 459, 521, 522];
     this.dirtyWeights = [180, 1, 1]; //[180, 1, 1, 1, 1, 1];
     this.grassTiles = this.IS_HALLOWEEN
@@ -46,6 +52,7 @@ export class FruitDashGroundFactory {
       ? [250, 1, 1, 1, 1]
       : [250, 1, 1, 1, 1, 1, 1, 1];
     this._decorationsFactory = new FruitDashDecorationFactory(scene);
+    this._treesFactory = new FruitDashTreeFactory(scene);
     this._obstaclesFactory = new FruitDashObstacleFactory(scene);
   }
   public preload() {
@@ -80,6 +87,13 @@ export class FruitDashGroundFactory {
     this._scene.load.image(
       "christmas_tree",
       "world/fruitdash/christmas/tree.png",
+    );
+    this._scene.load.image("easter_tree", "src/assets/sfts/giant_carrot.png");
+    this._scene.load.image("easterbush", SUNNYSIDE.sfts.easterBush);
+    this._scene.load.image("easterbushshadow", SUNNYSIDE.sfts.easterBushShadow);
+    this._scene.load.image(
+      "easterbunny",
+      "src/assets/sfts/easter/easter_bunny.gif",
     );
     this._scene.load.image("snow", "world/fruitdash/christmas/snow.png");
     this._scene.load.image("snowman", "world/fruitdash/christmas/snowman.png");
@@ -426,6 +440,26 @@ export class FruitDashGroundFactory {
             SQUARE_WIDTH_TEXTURE / image.height,
           );
         }
+        // else if (this.IS_EASTER && item == 258) {
+        //   //129, 130, 131, 194, 199, 257, 258
+        //   const easterimage = weightedRandom(
+        //     ["easterbush", "easterbunny"],
+        //     [1, 25],
+        //   )?.item;
+        //   image = this._scene.add.image(x, y, easterimage);
+        //   if(easterimage == "easterbush"){
+        //     image.setScale(
+        //       SQUARE_WIDTH_TEXTURE / image.width * 1.5,
+        //       SQUARE_WIDTH_TEXTURE / image.height * 1.5,
+        //     );
+        //   }
+        //   else{
+        //     image.setScale(
+        //       SQUARE_WIDTH_TEXTURE / image.width,
+        //       SQUARE_WIDTH_TEXTURE / image.height,
+        //     );
+        //   }
+        // }
         image.setOrigin(0, 0);
         container.add(image);
       }
@@ -470,9 +504,15 @@ export class FruitDashGroundFactory {
         true,
       );
       this.nextDecoration--;
+      this.nextTree--;
     }
+    if (this.nextTree < 0) {
+      this.nextTree = this.IS_CHRISTMAS ? 5 : 2; //randomInt(0, MAX_DECORATIONS_LINES);
+      this._treesFactory.addRandomDecoration();
+    }
+    this._treesFactory.update(speed_factor);
     if (this.nextDecoration < 0) {
-      this.nextDecoration = this.IS_CHRISTMAS ? 5 : 2; //randomInt(0, MAX_DECORATIONS_LINES);
+      this.nextDecoration = this.IS_EASTER ? randomInt(8, 20) : 0;
       this._decorationsFactory.addRandomDecoration();
     }
     this._decorationsFactory.update(speed_factor);

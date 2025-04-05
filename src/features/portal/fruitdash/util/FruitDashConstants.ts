@@ -92,6 +92,22 @@ export const BONUS_SCORE_TABLE_CHRISTMAS: {
   },
 };
 
+export const BONUS_SCORE_TABLE_EASTER: {
+  [key: number]: {
+    item: string;
+    description: string;
+  };
+} = {
+  0: {
+    item: ITEM_DETAILS["Pirate Bounty"].image,
+    description: "250 base points - Chance after 500 points",
+  },
+  1: {
+    item: "src/assets/sfts/easter/pink_egg.png",
+    description: "20 base points",
+  },
+};
+
 export const OBSTACLES_SCORE_TABLE: {
   [key: number]: {
     item: string;
@@ -167,7 +183,7 @@ export const INITIAL_WALK_SPEED = 100;
 export const MAX_WALK_SPEED = 170;
 export const WALK_SPEED_INCREMENT = 5;
 export const BACKGROUND_SPEED_RATIO = 2;
-export type FruitDashNPCName = "Felga" | "Felga Christmas";
+export type FruitDashNPCName = "Felga" | "Felga Christmas" | "Felga Easter";
 export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
   Felga: {
     hair: "Basic Hair",
@@ -189,9 +205,22 @@ export const FRUIT_DASH_NPC_WEREABLES: Record<FruitDashNPCName, Equipped> = {
     shoes: "Yellow Boots",
     tool: "Farmer Pitchfork",
   },
+  "Felga Easter": {
+    hair: "Basic Hair",
+    shirt: "Skull Shirt",
+    pants: "Farmer Pants",
+    background: "Seashore Background",
+    hat: "Santa Hat",
+    body: "Beige Farmer Potion",
+    shoes: "Yellow Boots",
+    tool: "Farmer Pitchfork",
+    onesie: "Bunny Onesie",
+  },
 };
 export const FRUIT_DASH_NPC_NAME = getIsTimedEvent("CHRISTMAS")
   ? "Felga Christmas"
-  : "Felga";
+  : getIsTimedEvent("EASTER")
+    ? "Felga Easter"
+    : "Felga";
 //https://opengameart.org/content/christmas-village-asset-pack
 export const SQUARE_WIDTH_TEXTURE_HALLOWEEN = 16;

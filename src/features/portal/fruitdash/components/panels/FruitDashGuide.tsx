@@ -9,6 +9,7 @@ import {
   BONUS_SCORE_TABLE,
   BONUS_SCORE_TABLE_CHRISTMAS,
   BONUS_SCORE_TABLE_HALLOWEEN,
+  BONUS_SCORE_TABLE_EASTER,
   OBSTACLES_SCORE_TABLE,
   OBSTACLES_SCORE_TABLE_CHRISTMAS,
   OBSTACLES_SCORE_TABLE_HALLOWEEN,
@@ -28,6 +29,7 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
   const button = useSound("button");
   const IS_HALLOWEEN = getHalloweenModeSetting();
   const IS_CHRISTMAS = getIsTimedEvent("CHRISTMAS");
+  const IS_EASTER = getIsTimedEvent("EASTER");
   return (
     <div className="flex flex-col gap-1 max-h-[75vh]">
       {/* title */}
@@ -84,9 +86,18 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
           </div>
 
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Apple"].image} width={7} />
+            <SquareIcon
+              icon={
+                IS_EASTER
+                  ? ITEM_DETAILS["Pink Egg"].image
+                  : ITEM_DETAILS["Apple"].image
+              }
+              width={7}
+            />
             <p className="text-xs ml-3 flex-1">
-              {t("fruit-dash.instructions3")}
+              {IS_EASTER
+                ? t("fruit-dash.instructions3-easter")
+                : t("fruit-dash.instructions3")}
             </p>
           </div>
 
@@ -134,7 +145,9 @@ export const FruitDashGuide: React.FC<Props> = ({ onBack }) => {
                 ? BONUS_SCORE_TABLE_HALLOWEEN
                 : IS_CHRISTMAS
                   ? BONUS_SCORE_TABLE_CHRISTMAS
-                  : BONUS_SCORE_TABLE,
+                  : IS_EASTER
+                    ? BONUS_SCORE_TABLE_EASTER
+                    : BONUS_SCORE_TABLE,
             ).map(({ item, description }, index) => (
               <tr key={index}>
                 <td

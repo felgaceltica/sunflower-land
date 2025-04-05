@@ -111,8 +111,8 @@ const FEATURE_FLAGS = {
     Date.now() < new Date("2025-05-05T00:00:00Z").getTime(),
 
   FRUIT_DASH_TIMED_EVENT: periodBasedFeatureFlag(
-    new Date("2024-12-12T00:00:00Z"),
-    new Date("2024-12-26T00:00:00Z"),
+    new Date("2025-04-17T00:00:00Z"),
+    new Date("2025-04-21T00:00:00Z"),
   ),
 } satisfies Record<string, FeatureFlag>;
 
@@ -122,4 +122,4 @@ export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {
   return FEATURE_FLAGS[featureName](game);
 };
 
-export const TIMED_EVENT_NAME = "FRUIT_DASH_TIMED_EVENT";
+export const TIMED_EVENT_NAME = "EASTER";
