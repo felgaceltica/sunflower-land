@@ -26,9 +26,14 @@ import { BumpkinItem } from "features/game/types/bumpkin";
 import { availableWardrobe } from "./equip";
 import { FISH } from "features/game/types/fishing";
 import { hasVipAccess } from "features/game/lib/vipAccess";
-import { hasFeatureAccess } from "lib/flags";
 import { getActiveCalendarEvent } from "features/game/types/calendar";
 import { isCollectibleBuilt } from "features/game/lib/collectibleBuilt";
+import { hasReputation, Reputation } from "features/game/lib/reputation";
+import { hasFeatureAccess } from "lib/flags";
+import {
+  getLoveRushStreaks,
+  getLoveRushDeliveryRewards,
+} from "features/game/types/loveRushDeliveries";
 
 export const TICKET_REWARDS: Record<QuestNPCName, number> = {
   "pumpkin' pete": 1,
@@ -116,17 +121,11 @@ export function generateDeliveryTickets({
     new Date(completedAt).toISOString().substring(0, 10) === dateKey;
 
   // Leave this at the end as it will multiply the whole amount by 2
-  if (hasFeatureAccess(game, "WEATHER_SHOP")) {
-    if (
-      getActiveCalendarEvent({ game }) === "doubleDelivery" &&
-      !hasClaimedBonus
-    ) {
-      amount *= 2;
-    }
-  } else {
-    if (game.delivery.doubleDelivery === dateKey && !hasClaimedBonus) {
-      amount *= 2;
-    }
+  if (
+    getActiveCalendarEvent({ game }) === "doubleDelivery" &&
+    !hasClaimedBonus
+  ) {
+    amount *= 2;
   }
 
   return amount;
@@ -359,17 +358,11 @@ export function getOrderSellPrice<T>(
     new Date(completedAt).toISOString().substring(0, 10) === dateKey;
 
   // Leave this at the end as it will multiply the whole amount by 2
-  if (hasFeatureAccess(game, "WEATHER_SHOP")) {
-    if (
-      getActiveCalendarEvent({ game }) === "doubleDelivery" &&
-      !hasClaimedBonus
-    ) {
-      mul *= 2;
-    }
-  } else {
-    if (game.delivery.doubleDelivery === dateKey && !hasClaimedBonus) {
-      mul *= 2;
-    }
+  if (
+    getActiveCalendarEvent({ game }) === "doubleDelivery" &&
+    !hasClaimedBonus
+  ) {
+    mul *= 2;
   }
 
   if (order.reward.sfl) {
@@ -378,6 +371,14 @@ export function getOrderSellPrice<T>(
 
   return ((order.reward.coins ?? 0) * mul) as T;
 }
+
+export const GOBLINS_REQUIRING_REPUTATION: NPCName[] = [
+  "grimtooth",
+  "grubnuk",
+  "gordo",
+  "guria",
+  "gambit",
+];
 
 export function deliverOrder({
   state,
@@ -399,6 +400,19 @@ export function deliverOrder({
 
     if (order.readyAt > createdAt) {
       throw new Error("Order has not started");
+    }
+
+    const hasCropkeeperReputation = hasReputation({
+      game,
+      reputation: Reputation.Cropkeeper,
+    });
+
+    const requiresReputation = GOBLINS_REQUIRING_REPUTATION.includes(
+      order.from,
+    );
+
+    if (requiresReputation && !hasCropkeeperReputation) {
+      throw new Error("You do not have the required reputation");
     }
 
     if (order.completedAt) {
@@ -516,6 +530,30 @@ export function deliverOrder({
         points: (npc.friendship?.points ?? 0) + DELIVERY_FRIENDSHIP_POINTS,
         giftClaimedAtPoints: npc.friendship?.giftClaimedAtPoints ?? 0,
         giftedAt: npc.friendship?.giftedAt,
+      };
+    }
+
+    // Handle Love Rush rewards during the Love Rush event
+    if (hasFeatureAccess(game, "LOVE_RUSH")) {
+      const { newStreak, currentStreak } = getLoveRushStreaks({
+        streaks: npc.streaks,
+        createdAt,
+      });
+
+      const { loveCharmReward } = getLoveRushDeliveryRewards({
+        currentStreak,
+        newStreak,
+        game,
+        npcName: order.from,
+      });
+
+      const loveCharmCount = game.inventory["Love Charm"] ?? new Decimal(0);
+
+      game.inventory["Love Charm"] = loveCharmCount.add(loveCharmReward);
+
+      npc.streaks = {
+        streak: newStreak,
+        lastClaimedAt: createdAt,
       };
     }
 

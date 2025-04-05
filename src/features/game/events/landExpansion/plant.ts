@@ -2,12 +2,10 @@ import Decimal from "decimal.js-light";
 
 import { CropName, CROPS, GreenHouseCropName } from "../../types/crops";
 import {
-  Bumpkin,
+  Buildings,
   CropPlot,
   GameState,
-  Inventory,
   InventoryItemName,
-  PlacedItem,
   Position,
 } from "../../types/game";
 import {
@@ -20,13 +18,16 @@ import {
 } from "features/game/lib/collectibleBuilt";
 import { setPrecision } from "lib/utils/formatNumber";
 import { SEASONAL_SEEDS, SeedName, SEEDS } from "features/game/types/seeds";
-import { BuildingName } from "features/game/types/buildings";
 import { isWithinAOE } from "features/game/expansion/placeable/lib/collisionDetection";
 import {
   isBasicCrop,
   isMediumCrop,
   isAdvancedCrop,
   isOvernightCrop,
+  isSummerCrop,
+  isAutumnCrop,
+  isSpringCrop,
+  isWinterCrop,
 } from "./harvest";
 import { getBudYieldBoosts } from "features/game/lib/getBudYieldBoosts";
 import { getBudSpeedBoosts } from "features/game/lib/getBudSpeedBoosts";
@@ -35,17 +36,16 @@ import {
   BumpkinActivityName,
   trackActivity,
 } from "features/game/types/bumpkinActivity";
-import { getBumpkinLevel } from "features/game/lib/level";
-import { isBuildingEnabled } from "features/game/expansion/lib/buildingRequirements";
 import { isWearableActive } from "features/game/lib/wearables";
 import { isGreenhouseCrop } from "./plantGreenhouse";
 import { FACTION_ITEMS } from "features/game/lib/factions";
 import { produce } from "immer";
-import { hasFeatureAccess } from "lib/flags";
 import {
   CalendarEventName,
   getActiveCalendarEvent,
 } from "features/game/types/calendar";
+import { getCurrentSeason } from "features/game/types/seasons";
+import { hasVipAccess } from "features/game/lib/vipAccess";
 
 export type LandExpansionPlantAction = {
   type: "seed.planted";
@@ -63,40 +63,16 @@ type Options = {
 type IsPlotFertile = {
   plotIndex: string;
   crops: Record<string, CropPlot>;
-  buildings: Partial<Record<BuildingName, PlacedItem[]>>;
-  bumpkin?: Bumpkin;
+  wellLevel: number;
+  buildings: Buildings;
+  upgradeReadyAt?: number;
+  createdAt?: number;
 };
 
 // First 15 plots do not need water
-const INITIAL_SUPPORTED_PLOTS = 17;
+const INITIAL_SUPPORTED_PLOTS = 18;
 // Each well can support an additional 8 plots
 const WELL_PLOT_SUPPORT = 8;
-
-export const getCompletedWellCount = (
-  buildings: Partial<Record<BuildingName, PlacedItem[]>>,
-) => {
-  return (
-    buildings["Water Well"]?.filter((well) => well.readyAt < Date.now())
-      .length ?? 0
-  );
-};
-
-export const getEnabledWellCount = (
-  buildings: Partial<Record<BuildingName, PlacedItem[]>>,
-  bumpkin?: Bumpkin,
-) => {
-  let enabledWells =
-    buildings["Water Well"]?.filter((well) => well.readyAt < Date.now())
-      .length ?? 0;
-
-  const bumpkinLevel = getBumpkinLevel(bumpkin?.experience ?? 0);
-  while (enabledWells > 0) {
-    if (isBuildingEnabled(bumpkinLevel, "Water Well", enabledWells - 1)) break;
-    --enabledWells;
-  }
-
-  return enabledWells;
-};
 
 function isCropDestroyed({ id, game }: { id: string; game: GameState }) {
   // Sort oldest to newest
@@ -108,20 +84,47 @@ function isCropDestroyed({ id, game }: { id: string; game: GameState }) {
   return cropsToRemove.includes(id);
 }
 
+export const getSupportedPlots = ({
+  wellLevel,
+  buildings,
+  upgradeReadyAt,
+  createdAt = Date.now(),
+}: {
+  wellLevel: number;
+  buildings: Buildings;
+  upgradeReadyAt?: number;
+  createdAt?: number;
+}) => {
+  let plots = INITIAL_SUPPORTED_PLOTS;
+  const hasWell = (buildings["Water Well"]?.length ?? 0) > 0;
+  let effectiveWellLevel = wellLevel;
+
+  if (upgradeReadyAt && upgradeReadyAt > createdAt) {
+    effectiveWellLevel -= 1;
+  }
+
+  if (!hasWell) return plots;
+  if (effectiveWellLevel >= 4) return 99;
+
+  plots = effectiveWellLevel * WELL_PLOT_SUPPORT + INITIAL_SUPPORTED_PLOTS;
+  return plots;
+};
+
 export function isPlotFertile({
   plotIndex,
   crops,
+  wellLevel,
   buildings,
-  bumpkin,
+  upgradeReadyAt,
+  createdAt = Date.now(),
 }: IsPlotFertile): boolean {
   // get the well count
-  const wellCount = getEnabledWellCount(buildings, bumpkin);
-  let cropsWellCanWater =
-    wellCount * WELL_PLOT_SUPPORT + INITIAL_SUPPORTED_PLOTS;
-
-  if (wellCount >= 4) {
-    cropsWellCanWater = 99;
-  }
+  const cropsWellCanWater = getSupportedPlots({
+    wellLevel,
+    buildings,
+    upgradeReadyAt,
+    createdAt,
+  });
 
   const cropPosition =
     getKeys(crops)
@@ -215,7 +218,23 @@ export function getCropTime({
     seconds = seconds * 0.5;
   }
 
-  if (skills["Green Thumb"] && hasFeatureAccess(game, "SKILLS_REVAMP")) {
+  if (
+    isSummerCrop(crop, game.season.season, SEASONAL_SEEDS) &&
+    !isGreenhouseCrop(crop) &&
+    isWearableActive({ name: "Solflare Aegis", game })
+  ) {
+    seconds = seconds * 0.5;
+  }
+
+  if (
+    isAutumnCrop(crop, game.season.season, SEASONAL_SEEDS) &&
+    !isGreenhouseCrop(crop) &&
+    isWearableActive({ name: "Autumn's Embrace", game })
+  ) {
+    seconds = seconds * 0.5;
+  }
+
+  if (skills["Green Thumb"] && !isGreenhouseCrop(crop)) {
     seconds = seconds * 0.95;
   }
 
@@ -245,16 +264,12 @@ export function getCropTime({
  */
 export const getCropPlotTime = ({
   crop,
-  inventory,
   game,
-  buds,
   plot,
   fertiliser,
 }: {
   crop: CropName;
-  inventory: Inventory;
   game: GameState;
-  buds: NonNullable<GameState["buds"]>;
   plot?: CropPlot;
   fertiliser?: CropCompostName;
 }) => {
@@ -357,11 +372,9 @@ export const getCropPlotTime = ({
 
 type GetPlantedAtArgs = {
   crop: CropName;
-  inventory: Inventory;
   game: GameState;
   createdAt: number;
   plot: CropPlot;
-  buds: NonNullable<GameState["buds"]>;
   fertiliser?: CropCompostName;
 };
 
@@ -370,9 +383,7 @@ type GetPlantedAtArgs = {
  */
 export function getPlantedAt({
   crop,
-  inventory,
   game,
-  buds,
   createdAt,
   plot,
   fertiliser,
@@ -380,14 +391,7 @@ export function getPlantedAt({
   if (!crop) return 0;
 
   const cropTime = CROPS[crop].harvestSeconds;
-  const boostedTime = getCropPlotTime({
-    crop,
-    inventory,
-    game: game,
-    buds,
-    plot,
-    fertiliser,
-  });
+  const boostedTime = getCropPlotTime({ crop, game, plot, fertiliser });
 
   const offset = cropTime - boostedTime;
 
@@ -398,6 +402,43 @@ function isPlotCrop(plant: GreenHouseCropName | CropName): plant is CropName {
   return (plant as CropName) in CROPS;
 }
 
+const getWindsOfChangeVIPYieldBoost = ({
+  crop,
+  game,
+  createdAt,
+}: {
+  crop: CropName | GreenHouseCropName;
+  game: GameState;
+  createdAt: number;
+}) => {
+  try {
+    const chapter = getCurrentSeason(new Date(createdAt));
+
+    if (chapter !== "Winds of Change") return 0;
+
+    if (!hasVipAccess({ game, now: createdAt })) return 0;
+
+    const newCrops: (CropName | GreenHouseCropName)[] = [
+      "Zucchini",
+      "Pepper",
+      "Onion",
+      "Turnip",
+      "Yam",
+      "Broccoli",
+      "Artichoke",
+      "Rhubarb",
+    ];
+
+    if (newCrops.includes(crop)) {
+      return 0.25;
+    }
+
+    return 0;
+  } catch (e) {
+    return 0;
+  }
+};
+
 /**
  * Based on items, the output will be different
  */
@@ -406,11 +447,13 @@ export function getCropYieldAmount({
   plot,
   game,
   fertiliser,
+  createdAt,
 }: {
   crop: CropName | GreenHouseCropName;
   plot?: CropPlot;
   game: GameState;
   fertiliser?: CropCompostName;
+  createdAt: number;
 }): number {
   if (game.bumpkin === undefined) return 1;
 
@@ -428,11 +471,6 @@ export function getCropYieldAmount({
 
   if (inventory.Coder?.gte(1)) {
     amount *= 1.2;
-  }
-
-  //Bumpkin Skill boost Green Thumb Skill
-  if (skills["Green Thumb"] && !hasFeatureAccess(game, "SKILLS_REVAMP")) {
-    amount *= 1.05;
   }
 
   //Bumpkin Skill boost Master Farmer Skill
@@ -477,6 +515,23 @@ export function getCropYieldAmount({
     isCollectibleBuilt({ name: "Golden Cauliflower", game })
   ) {
     amount *= 2;
+  }
+
+  //Seasonal Additions
+  if (
+    isSpringCrop(crop, game.season.season, SEASONAL_SEEDS) &&
+    !isGreenhouseCrop(crop) &&
+    isWearableActive({ name: "Blossom Ward", game })
+  ) {
+    amount += 1;
+  }
+
+  if (
+    isWinterCrop(crop, game.season.season, SEASONAL_SEEDS) &&
+    !isGreenhouseCrop(crop) &&
+    isWearableActive({ name: "Frozen Heart", game })
+  ) {
+    amount += 1;
   }
 
   // Generic Additive Crop Boosts
@@ -787,6 +842,16 @@ export function getCropYieldAmount({
     amount = amount * 0.5;
   }
 
+  const vipBoost = getWindsOfChangeVIPYieldBoost({
+    crop,
+    createdAt,
+    game,
+  });
+
+  if (vipBoost) {
+    amount += vipBoost;
+  }
+
   return Number(setPrecision(amount));
 }
 
@@ -796,8 +861,7 @@ export function plant({
   createdAt = Date.now(),
 }: Options): GameState {
   return produce(state, (stateCopy) => {
-    const { crops: plots, bumpkin, inventory } = stateCopy;
-    const buds = stateCopy.buds ?? {};
+    const { crops: plots, bumpkin, inventory, buildings } = stateCopy;
 
     if (bumpkin === undefined) {
       throw new Error("You do not have a Bumpkin!");
@@ -811,6 +875,19 @@ export function plant({
 
     if (!plot) {
       throw new Error("Plot does not exist");
+    }
+
+    if (
+      !isPlotFertile({
+        plotIndex: action.index,
+        crops: plots,
+        wellLevel: stateCopy.waterWell.level,
+        buildings,
+        upgradeReadyAt: stateCopy.waterWell.upgradeReadyAt ?? 0,
+        createdAt,
+      })
+    ) {
+      throw new Error("Plot is not fertile");
     }
 
     if (plot.crop?.plantedAt) {
@@ -832,7 +909,6 @@ export function plant({
     }
 
     if (
-      hasFeatureAccess(stateCopy, "SEASONAL_SEEDS") &&
       !SEASONAL_SEEDS[stateCopy.season.season].includes(action.item as SeedName)
     ) {
       throw new Error("This seed is not available in this season");
@@ -850,11 +926,9 @@ export function plant({
         id: action.cropId,
         plantedAt: getPlantedAt({
           crop: cropName,
-          inventory,
           game: stateCopy,
           createdAt,
           plot,
-          buds,
           fertiliser: plot.fertiliser?.name,
         }),
         name: cropName,
@@ -862,6 +936,7 @@ export function plant({
           crop: cropName,
           game: stateCopy,
           plot,
+          createdAt,
           fertiliser: plot.fertiliser?.name,
         }),
       },

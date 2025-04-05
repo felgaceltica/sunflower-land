@@ -16,7 +16,6 @@ import { getFruitYield } from "./fruitHarvested";
 import { isWearableActive } from "features/game/lib/wearables";
 import { produce } from "immer";
 import { SEASONAL_SEEDS } from "features/game/types/seeds";
-import { hasFeatureAccess } from "lib/flags";
 import { isFullMoonBerry } from "./seedBought";
 
 export type PlantFruitAction = {
@@ -78,10 +77,11 @@ export function getPlantedAt(
   return createdAt - offset * 1000;
 }
 
-const isBasicFruitSeed = (name: PatchFruitSeedName | GreenHouseFruitSeedName) =>
-  name === "Blueberry Seed" || name === "Orange Seed";
+export const isBasicFruitSeed = (
+  name: PatchFruitSeedName | GreenHouseFruitSeedName,
+) => name === "Blueberry Seed" || name === "Orange Seed";
 
-const isAdvancedFruitSeed = (
+export const isAdvancedFruitSeed = (
   name: PatchFruitSeedName | GreenHouseFruitSeedName,
 ) => name === "Apple Seed" || name === "Banana Plant";
 
@@ -255,7 +255,6 @@ export function plantFruit({
     }
 
     if (
-      hasFeatureAccess(stateCopy, "SEASONAL_SEEDS") &&
       !SEASONAL_SEEDS[stateCopy.season.season].includes(action.seed) &&
       !isFullMoonBerry(action.seed)
     ) {
