@@ -38,6 +38,7 @@ import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
 import RexGesturePlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 
 export abstract class FruitDashBaseScene extends Phaser.Scene {
+  IS_EASTER = false;
   joystick?: VirtualJoystick;
   rexGestures: RexGesturePlugin | undefined;
   sceneId: SceneId = "fruit_dash";
@@ -181,7 +182,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
         }
       }, 5000);
     const playerclothing = this.gameState.bumpkin?.equipped as BumpkinParts;
-    playerclothing.onesie = "Bunny Onesie";
+    if (this.IS_EASTER) playerclothing.onesie = "Bunny Onesie";
     this.createPlayer({
       x: window.innerWidth / 2,
       y: PLAYER_Y,

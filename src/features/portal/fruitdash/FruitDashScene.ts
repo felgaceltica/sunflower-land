@@ -1,10 +1,12 @@
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import { FruitDashBaseScene } from "./lib/FruitDashBaseScene";
 import { INITIAL_SPEED, INITIAL_WALK_SPEED } from "./util/FruitDashConstants";
+import { getIsTimedEvent } from "./util/useIsTimedEvent";
 
 export class FruitDashScene extends FruitDashBaseScene {
   constructor() {
     super();
+    this.IS_EASTER = getIsTimedEvent("EASTER");
   }
 
   preload() {
