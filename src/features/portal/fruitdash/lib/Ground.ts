@@ -88,7 +88,10 @@ export class FruitDashGroundFactory {
       "christmas_tree",
       "world/fruitdash/christmas/tree.png",
     );
-    this._scene.load.image("easter_tree", "src/assets/sfts/giant_carrot.png");
+    this._scene.load.image(
+      "easter_tree",
+      "world/fruitdash/easter/giant_carrot.png",
+    );
     this._scene.load.image("easterbush", SUNNYSIDE.sfts.easterBush);
     this._scene.load.image("easterbushshadow", SUNNYSIDE.sfts.easterBushShadow);
     this._scene.load.image(
