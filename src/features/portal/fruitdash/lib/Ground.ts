@@ -96,7 +96,7 @@ export class FruitDashGroundFactory {
     this._scene.load.image("easterbushshadow", SUNNYSIDE.sfts.easterBushShadow);
     this._scene.load.image(
       "easterbunny",
-      "src/assets/sfts/easter/easter_bunny.gif",
+      "world/fruitdash/easter/easter_bunny.gif",
     );
     this._scene.load.image("snow", "world/fruitdash/christmas/snow.png");
     this._scene.load.image("snowman", "world/fruitdash/christmas/snowman.png");
