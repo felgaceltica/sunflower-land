@@ -1,39 +1,34 @@
 import React, { useContext } from "react";
-import { getItemBuffLabel, getItemImage } from "../MegaStore";
+import { getItemImage, getItemBuffLabel } from "../eventShop";
 import { Label } from "components/ui/Label";
 import { pixelDarkBorderStyle } from "features/game/lib/style";
 import { SquareIcon } from "components/ui/SquareIcon";
 import { PIXEL_SCALE } from "features/game/lib/constants";
-import { shortenCount } from "lib/utils/formatNumber";
-import { getSeasonalTicket } from "features/game/types/seasons";
 
-import token from "assets/icons/flower_token.webp";
 import lightning from "assets/icons/lightning.png";
 
 import { ITEM_DETAILS } from "features/game/types/images";
-import {
-  CollectiblesItem,
-  Currency,
-  InventoryItemName,
-  WearablesItem,
-} from "features/game/types/game";
 import { Context } from "features/game/GameProvider";
-import { MachineState } from "features/game/lib/gameMachine";
 import { useSelector } from "@xstate/react";
-import { BumpkinItem } from "features/game/types/bumpkin";
-import Decimal from "decimal.js-light";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
+import {
+  EventShopCollectibleName,
+  EventShopItem,
+  EventShopWearableName,
+} from "features/game/types/minigameShop";
+import { MachineState } from "features/game/lib/gameMachine";
 
 interface Props {
-  itemsLabel: string;
-  type: "wearables" | "collectibles" | "keys";
-  items: (WearablesItem | CollectiblesItem)[];
-  onItemClick: (item: WearablesItem | CollectiblesItem) => void;
+  itemsLabel?: string;
+  type?: "wearables" | "collectibles" | "limited";
+  items: EventShopItem[];
+  onItemClick: (item: EventShopItem) => void;
 }
 
+const _state = (state: MachineState) => state.context.state;
 const _inventory = (state: MachineState) => state.context.state.inventory;
 const _wardrobe = (state: MachineState) => state.context.state.wardrobe;
-const _state = (state: MachineState) => state.context.state;
+
 export const ItemsList: React.FC<Props> = ({
   items,
   type,
@@ -42,39 +37,24 @@ export const ItemsList: React.FC<Props> = ({
 }) => {
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
-
   const inventory = useSelector(gameService, _inventory);
   const wardrobe = useSelector(gameService, _wardrobe);
 
-  const getBalanceOfItem = (item: WearablesItem | CollectiblesItem): number => {
-    if (type === "wearables") {
-      return wardrobe[item.name as BumpkinItem] ?? 0;
-    }
-
-    return (
-      inventory[item.name as InventoryItemName] ?? new Decimal(0)
-    ).toNumber();
-  };
-
-  const getCurrencyIcon = (currency: Currency) => {
-    if (currency === "SFL") return token;
-
-    const currencyItem =
-      currency === "Seasonal Ticket" ? getSeasonalTicket() : currency;
-
-    return ITEM_DETAILS[currencyItem as InventoryItemName].image;
-  };
-
   const sortedItems = items
     .slice()
-    .sort((a, b) => Number(a.price.sub(b.price)));
+    .sort((a, b) => Number(a.cost.price) - Number(b.cost.price));
   const { t } = useAppTranslation();
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div className=" sticky -top-1 pb-1 z-10">
-        <Label type="default">{itemsLabel}</Label>
-      </div>
+    <div className="flex flex-col mb-5">
+      {itemsLabel && (
+        <div className="flex z-10">
+          <div className="grow w-9/10 mb-1">
+            {itemsLabel && <Label type="default">{itemsLabel}</Label>}
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-2 flex-wrap">
         {sortedItems.length === 0 ? (
           <span className="text-xxs">{`${itemsLabel} ${t(
@@ -83,11 +63,15 @@ export const ItemsList: React.FC<Props> = ({
         ) : (
           sortedItems.map((item) => {
             const buff = getItemBuffLabel(item, state);
-            const balanceOfItem = getBalanceOfItem(item);
+
+            const balanceOfItem =
+              type === "collectibles"
+                ? Number(inventory[item.name as EventShopCollectibleName] ?? 0)
+                : Number(wardrobe[item.name as EventShopWearableName] ?? 0);
 
             return (
               <div
-                id={`mega-store-item-${item.name}`}
+                id={`event-shop-item-${item?.name}`}
                 key={item.name}
                 className="flex flex-col space-y-1"
               >
@@ -98,7 +82,7 @@ export const ItemsList: React.FC<Props> = ({
                   }}
                   onClick={() => onItemClick(item)}
                 >
-                  <div className="flex relative justify-center items-center w-full h-full">
+                  <div className="flex justify-center items-center w-full h-full z-20">
                     <SquareIcon icon={getItemImage(item)} width={20} />
                     {buff && (
                       <img
@@ -110,6 +94,7 @@ export const ItemsList: React.FC<Props> = ({
                         alt="crop"
                       />
                     )}
+
                     {balanceOfItem > 0 && (
                       <Label
                         type="default"
@@ -118,12 +103,22 @@ export const ItemsList: React.FC<Props> = ({
                         {balanceOfItem}
                       </Label>
                     )}
+
+                    {/* Price */}
+                    <div className="absolute px-4 bottom-3 -left-4 object-contain">
+                      <Label
+                        icon={ITEM_DETAILS["Easter Token 2025"].image}
+                        type="warning"
+                        className={"text-xxs absolute center text-center p-1 "}
+                        style={{
+                          width: `calc(100% + ${PIXEL_SCALE * 10}px)`,
+                          height: "24px",
+                        }}
+                      >
+                        {item.cost.price}
+                      </Label>
+                    </div>
                   </div>
-                </div>
-                {/* Price */}
-                <div className="flex items-center space-x-1">
-                  <SquareIcon icon={getCurrencyIcon(item.currency)} width={7} />
-                  <span className="text-xxs">{shortenCount(item.price)}</span>
                 </div>
               </div>
             );

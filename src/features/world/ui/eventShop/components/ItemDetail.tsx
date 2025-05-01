@@ -2,12 +2,7 @@ import React, { useContext, useLayoutEffect, useState } from "react";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Label } from "components/ui/Label";
 import Decimal from "decimal.js-light";
-import {
-  CollectiblesItem,
-  InventoryItemName,
-  Keys,
-  WearablesItem,
-} from "features/game/types/game";
+import { InventoryItemName } from "features/game/types/game";
 
 import { Context } from "features/game/GameProvider";
 import { useSelector } from "@xstate/react";
@@ -19,14 +14,18 @@ import { BuffLabel } from "features/game/types";
 import { RequirementLabel } from "components/ui/RequirementsLabel";
 import { gameAnalytics } from "lib/gameAnalytics";
 import { MachineState } from "features/game/lib/gameMachine";
-import { getSeasonalTicket } from "features/game/types/seasons";
 import confetti from "canvas-confetti";
 import { BumpkinItem } from "features/game/types/bumpkin";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { FACTION_SHOP_KEYS } from "features/game/types/factionShop";
+import { getItemDescription } from "../eventShop";
+import {
+  EventShopItem,
+  EventShopItemName,
+  MINIGAME_SHOP_ITEMS,
+} from "features/game/types/minigameShop";
 
 interface ItemOverlayProps {
-  item: WearablesItem | CollectiblesItem | null;
+  item: EventShopItem | null;
   image: string;
   isWearable: boolean;
   buff?: BuffLabel[];
@@ -35,11 +34,7 @@ interface ItemOverlayProps {
   readonly?: boolean;
 }
 
-const _sflBalance = (state: MachineState) => state.context.state.balance;
 const _inventory = (state: MachineState) => state.context.state.inventory;
-const _wardrobe = (state: MachineState) => state.context.state.wardrobe;
-const _keysBought = (state: MachineState) =>
-  state.context.state.pumpkinPlaza.keysBought;
 
 export const ItemDetail: React.FC<ItemOverlayProps> = ({
   item,
@@ -51,23 +46,14 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   readonly,
 }) => {
   const { shortcutItem, gameService, showAnimations } = useContext(Context);
-  const sflBalance = useSelector(gameService, _sflBalance);
   const inventory = useSelector(gameService, _inventory);
-  const wardrobe = useSelector(gameService, _wardrobe);
-  const keysBought = useSelector(gameService, _keysBought);
+
   const [imageWidth, setImageWidth] = useState<number>(0);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
   const [confirmBuy, setConfirmBuy] = useState<boolean>(false);
 
-  const isKey = (name: InventoryItemName): name is Keys =>
-    name in FACTION_SHOP_KEYS;
-  const keysBoughtAt = keysBought?.megastore[item?.name as Keys]?.boughtAt;
-  const keysBoughtToday =
-    !!keysBoughtAt &&
-    new Date(keysBoughtAt).toISOString().substring(0, 10) ===
-      new Date().toISOString().substring(0, 10);
-
-  const keysAmountBoughtToday = keysBoughtToday ? 1 : 0;
+  const description = getItemDescription(item);
+  const easterTokenBalance = inventory["Easter Token 2025"] ?? new Decimal(0);
 
   useLayoutEffect(() => {
     if (isWearable) {
@@ -85,51 +71,28 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
     };
 
     imgElement.src = image;
-  }, []);
-
-  const getBalanceOfItem = (
-    item: WearablesItem | CollectiblesItem | null,
-  ): number => {
-    if (!item) return 0;
-
-    if (item.type === "wearable") {
-      return wardrobe[item.name as BumpkinItem] ?? 0;
-    }
-
-    return (
-      inventory[item.name as InventoryItemName] ?? new Decimal(0)
-    ).toNumber();
-  };
+  }, [image, isWearable]);
 
   const canBuy = () => {
-    if (keysBoughtToday) return false;
-
     if (!item) return false;
 
-    if (item.limit && getBalanceOfItem(item) >= item.limit) return false;
-
-    if (item.currency === "SFL") {
-      return sflBalance.greaterThanOrEqualTo(item.price);
+    if (item) {
+      return easterTokenBalance.greaterThanOrEqualTo(item.cost.price);
     }
-
-    const currency =
-      item.currency === "Seasonal Ticket" ? getSeasonalTicket() : item.currency;
-
-    return (
-      inventory[currency as InventoryItemName] ?? new Decimal(0)
-    ).greaterThanOrEqualTo(item.price);
   };
 
   const trackAnalytics = () => {
     if (!item) return;
-
-    const { name, currency, price } = item;
+    const { name } = item;
     const type = isWearable ? "Wearable" : "Collectible";
+    const typedName = isWearable
+      ? (name as BumpkinItem)
+      : (name as InventoryItemName);
 
     gameAnalytics.trackSink({
-      currency,
-      amount: price.toNumber(),
-      item: name,
+      currency: "Easter Token 2025",
+      amount: item.cost.price,
+      item: typedName,
       type,
     });
 
@@ -145,7 +108,8 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   const handleBuy = () => {
     if (!item) return;
 
-    gameService.send("megastoreItem.bought", {
+    gameService.send("minigameItem.bought", {
+      id: "easter-eggstravaganza",
       name: item.name,
     });
 
@@ -170,41 +134,19 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
 
   const getSuccessCopy = () => {
     if (isWearable) {
-      return t("megaStore.wearable");
+      return t("rewardShop.wearable");
     }
 
-    return t("megaStore.collectible");
-  };
-
-  const balanceOfItem = getBalanceOfItem(item);
-
-  const getLimitLabel = () => {
-    if (!item?.limit) return;
-
-    if (balanceOfItem >= item.limit) {
-      return (
-        <Label
-          type="danger"
-          className="absolute bottom-1 right-1 text-xxs"
-        >{`${t("limit")}: ${balanceOfItem}/${item.limit}`}</Label> //t
-      );
-    }
-
-    <span className="absolute bottom-1 right-2 text-xxs">{`${t(
-      "limit",
-    )}: ${balanceOfItem}/${item.limit}`}</span>; //t
+    return t("rewardShop.collectible");
   };
 
   const getButtonLabel = () => {
-    if (confirmBuy) return `${t("confirm")} ${t("buy")}`; //t
+    if (confirmBuy) return `${t("confirm")} ${t("buy")}`;
 
     return `${t("buy")} ${isWearable ? "wearable" : "collectible"}`;
   };
 
-  const currency =
-    item?.currency === "Seasonal Ticket"
-      ? getSeasonalTicket()
-      : (item?.currency as InventoryItemName);
+  const max = MINIGAME_SHOP_ITEMS[item?.name as EventShopItemName]?.max ?? 0;
 
   return (
     <InnerPanel className="shadow">
@@ -229,7 +171,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                   <div
                     className="w-[40%] relative min-w-[40%] rounded-md overflow-hidden shadow-md mr-2 flex justify-center items-center h-32"
                     style={
-                      item?.type === "collectible"
+                      !isWearable
                         ? {
                             backgroundImage: `url(${SUNNYSIDE.ui.grey_background})`,
                             backgroundSize: "cover",
@@ -246,15 +188,6 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                         width: `${imageWidth}px`,
                       }}
                     />
-                    {!!item?.limit && getLimitLabel()}
-                    {item?.type === "keys" && (
-                      <Label
-                        type={keysBoughtToday ? "danger" : "default"}
-                        className="absolute bottom-1 right-1 text-xxs"
-                      >
-                        {t("keys.dailyLimit", { keysAmountBoughtToday })}
-                      </Label>
-                    )}
                   </div>
                   <div className="flex flex-col space-y-2">
                     {!!buff && (
@@ -281,26 +214,23 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                         )}
                       </div>
                     )}
-                    <span className="text-xs leading-none">
-                      {item?.shortDescription}
-                    </span>
+                    <span className="text-xs leading-none">{description}</span>
+
+                    {max && max < 1000 && (
+                      <Label type="default">{t("maxPerPerson", { max })}</Label>
+                    )}
+
                     {item && (
                       <div className="flex flex-1 items-end">
-                        {item?.currency === "SFL" && (
-                          <RequirementLabel
-                            type="sfl"
-                            balance={sflBalance}
-                            requirement={item.price}
-                          />
-                        )}
-                        {item?.currency !== "SFL" && (
-                          <RequirementLabel
-                            type="item"
-                            item={currency}
-                            balance={inventory[currency] ?? new Decimal(0)}
-                            requirement={item?.price ?? new Decimal(0)}
-                          />
-                        )}
+                        {/* Easter Token 2025 */}
+                        <RequirementLabel
+                          type={"item"}
+                          item={"Easter Token 2025"}
+                          balance={easterTokenBalance}
+                          requirement={
+                            new Decimal(item.cost.price ?? new Decimal(0))
+                          }
+                        />
                       </div>
                     )}
                   </div>
@@ -322,15 +252,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                     </Button>
                   )}
 
-                  <Button
-                    disabled={
-                      !canBuy() ||
-                      (item?.name &&
-                        isKey(item?.name as InventoryItemName) &&
-                        !!keysBoughtToday)
-                    }
-                    onClick={buttonHandler}
-                  >
+                  <Button disabled={!canBuy()} onClick={buttonHandler}>
                     {getButtonLabel()}
                   </Button>
                 </div>

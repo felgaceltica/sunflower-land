@@ -1,7 +1,7 @@
 import type { GameState } from "features/game/types/game";
 import { CONFIG } from "lib/config";
 
-const adminFeatureFlag = ({ wardrobe, inventory }: GameState) =>
+export const adminFeatureFlag = ({ wardrobe, inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" ||
   (!!((wardrobe["Gift Giver"] ?? 0) > 0) && !!inventory["Beta Pass"]?.gt(0));
 
@@ -43,7 +43,7 @@ const periodBasedFeatureFlag =
   (startDate: Date, endDate: Date) => (game: GameState) => {
     return Date.now() > startDate.getTime() && Date.now() < endDate.getTime();
   };
-// Used for testing production features
+// Used for testing production features and dev access
 export const ADMIN_IDS = [1, 3, 39488, 128727];
 /**
  * Adam: 1
@@ -66,11 +66,12 @@ export type ExperimentName = "ONBOARDING_CHALLENGES" | "GEM_BOOSTS";
 const FEATURE_FLAGS = {
   // For testing
   JEST_TEST: defaultFeatureFlag,
-  EASTER: () => false, // To re-enable next easter
 
   // Permanent Feature Flags
   AIRDROP_PLAYER: adminFeatureFlag,
   HOARDING_CHECK: defaultFeatureFlag,
+  STREAMER_HAT: (game) =>
+    (game.wardrobe["Streamer Hat"] ?? 0) > 0 || testnetFeatureFlag(),
 
   // Temporary Feature Flags
   FACE_RECOGNITION: (game) =>
@@ -98,7 +99,7 @@ const FEATURE_FLAGS = {
     new Date("2025-05-01T00:00:00Z"),
   ),
   //Testnet only
-  LOVE_CHARM_REWARD_SHOP: timeBasedFeatureFlag(
+  LOVE_CHARM_REWARD_SHOP: betaTimeBasedFeatureFlag(
     new Date("2025-05-01T00:00:00Z"),
   ),
 
@@ -116,6 +117,17 @@ const FEATURE_FLAGS = {
     new Date("2025-04-17T00:00:00Z"),
     new Date("2025-04-21T00:00:00Z"),
   ),
+  EASTER: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-04-21T00:00:00Z"))(game) &&
+    Date.now() < new Date("2025-04-29T00:00:00Z").getTime(),
+  STREAM_STAGE_ACCESS: adminFeatureFlag,
+
+  LOVE_ISLAND: betaTimeBasedFeatureFlag(new Date("2025-05-01T00:00:00Z")),
+
+  GOODBYE_BERT: timeBasedFeatureFlag(new Date("2025-05-01T00:00:00Z")),
+  FLOWER_BOXES: betaTimeBasedFeatureFlag(new Date("2025-05-01T00:00:00Z")),
+
+  MEGA_BOUNTIES: betaTimeBasedFeatureFlag(new Date("2025-05-05T00:00:00Z")),
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;
