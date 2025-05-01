@@ -40,8 +40,8 @@ export class StreamScene extends BaseScene {
     }
   }
 
-  update() {
-    super.update();
+  update(time: number, delta: number) {
+    super.update(time, delta);
 
     // Make the players face the center
     getKeys(this.playerEntities).forEach((playerId) => {

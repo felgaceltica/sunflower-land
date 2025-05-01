@@ -176,8 +176,8 @@ export class LoveIslandScene extends BaseScene {
     this.loveBox?.setVisible(isSolved);
   }
 
-  update() {
-    super.update();
+  update(time: number, delta: number) {
+    super.update(time, delta);
 
     this.updateFlower();
     this.updatePrize();
