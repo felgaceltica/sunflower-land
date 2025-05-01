@@ -5,11 +5,34 @@ import { CollectionName } from "features/game/types/marketplace";
 
 export type TradeType = "instant" | "onchain";
 
+/**
+ * Note from Elias:
+ * This object is used to determine whether an item can be airdropped offchain or not.
+ * Even though all trades are "instant" now, please add supply limited items as "onchain" in this object
+ */
 export const ITEM_TRADE_TYPES: {
   collectibles: Record<InventoryItemName, TradeType>;
   wearables: Record<BumpkinItem, TradeType>;
 } = {
   collectibles: {
+    "Test Box": "instant",
+    "Bronze Tool Box": "instant",
+    "Silver Tool Box": "instant",
+    "Gold Tool Box": "instant",
+    "Bronze Food Box": "instant",
+    "Silver Food Box": "instant",
+    "Gold Food Box": "instant",
+    "Bronze Flower Box": "instant",
+    "Silver Flower Box": "instant",
+    "Gold Flower Box": "instant",
+    Lunalist: "instant",
+    "Dr. Cow": "instant",
+    "Nurse Sheep": "instant",
+    "Love Chicken": "instant",
+    "Pink Dolphin": "instant",
+    "Bronze Love Box": "instant",
+    "Silver Love Box": "instant",
+    "Gold Love Box": "instant",
     "Polygon Banner": "instant",
     "Ronin Banner": "instant",
     "Base Banner": "instant",
@@ -464,7 +487,7 @@ export const ITEM_TRADE_TYPES: {
     "Bumpkin Emblem": "instant",
     "Sunflorian Emblem": "instant",
     "Nightshade Emblem": "instant",
-    Mark: "onchain",
+    Mark: "instant",
     "Pharaoh's Treasure Banner": "instant",
     "Amber Fossil": "instant",
     Gem: "instant",
@@ -950,8 +973,11 @@ export const ITEM_TRADE_TYPES: {
     "Autumn Duckling": "instant",
     "Winter Duckling": "instant",
     "Winds of Change Banner": "instant",
+    "Great Bloom Banner": "instant",
     Timeshard: "instant",
+    Geniseed: "instant",
     "Ancient Clock": "instant",
+    "Broken Pillar": "instant",
     Jin: "instant",
     "Floral Arch": "instant",
     "Flower Coin": "instant",
@@ -980,6 +1006,28 @@ export const ITEM_TRADE_TYPES: {
     "Purple Tile": "instant",
     "Red Tile": "instant",
     "Yellow Tile": "instant",
+    "Easter Token 2025": "onchain",
+    "Easter Ticket 2025": "onchain",
+    "Carrot House": "instant",
+    "Orange Bunny Lantern": "instant",
+    "White Bunny Lantern": "instant",
+    "Orange Tunnel Bunny": "instant",
+    "White Tunnel Bunny": "instant",
+    "Easter Basket": "instant",
+    Quarry: "onchain",
+    "Obsidian Turtle": "onchain",
+    "Winter Guardian": "onchain",
+    "Summer Guardian": "onchain",
+    "Spring Guardian": "onchain",
+    "Autumn Guardian": "onchain",
+    "Sky Pillar": "onchain",
+    "Flower-Scribed Statue": "instant",
+    "Balloon Rug": "instant",
+    "Giant Yam": "instant",
+    "Heart Air Balloon": "instant",
+    "Giant Zucchini": "instant",
+    "Giant Kale": "instant",
+    "Mini Floating Island": "instant",
   },
   wearables: {
     "New Years Crown": "instant",
@@ -1421,6 +1469,23 @@ export const ITEM_TRADE_TYPES: {
     "Luvvy Head": "instant",
     "Grumpy Cat": "instant",
     "Love Puff Aura": "instant",
+    "Bunny Pants": "instant",
+    "Carrot Pitchfork": "instant",
+    "Handheld Bunny": "instant",
+    "Bunny Mask": "instant",
+    "Easter Apron": "instant",
+    "Bloomwarden Suit": "instant",
+    "Embersteel Suit": "instant",
+    "Amberfall Suit": "instant",
+    "Glacierguard Suit": "instant",
+    "Broccoli Hat": "onchain",
+    "Frost Sword": "instant",
+    "Medic Apron": "onchain",
+    "Obsidian Necklace": "onchain",
+    "Red Pepper Onesie": "instant",
+    "Love Charm Shirt": "instant",
+    "Sky Island Background": "onchain",
+    "Oracle Syringe": "instant",
   },
 };
 

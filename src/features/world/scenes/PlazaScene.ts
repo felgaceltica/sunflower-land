@@ -18,6 +18,7 @@ import { translate } from "lib/i18n/translate";
 import { capitalize } from "lib/utils/capitalize";
 import { getBumpkinHoliday } from "lib/utils/getSeasonWeek";
 import { DogContainer } from "../containers/DogContainer";
+import { hasFeatureAccess } from "lib/flags";
 
 export type FactionNPC = {
   npc: NPCName;
@@ -82,13 +83,6 @@ export const PLAZA_BUMPKINS: NPCBumpkin[] = [
     direction: "left",
   },
 
-  {
-    x: 506,
-    y: 250,
-    npc: "birdie",
-    direction: "left",
-  },
-
   ...(Date.now() < new Date("2024-11-01T00:00:00").getTime()
     ? [
         {
@@ -147,6 +141,7 @@ export class PlazaScene extends BaseScene {
 
     this.load.image("shop_icon", "world/shop_disc.png");
     this.load.image("trade_icon", "world/trade_icon.png");
+    this.load.image("balloon", `world/heart_air_balloon.webp`);
 
     this.load.spritesheet("plaza_bud", "world/plaza_bud.png", {
       frameWidth: 15,
@@ -354,6 +349,16 @@ export class PlazaScene extends BaseScene {
         },
       ];
     }
+
+    if (!hasFeatureAccess(this.gameState, "LOVE_ISLAND")) {
+      bumpkins.push({
+        x: 506,
+        y: 250,
+        npc: "birdie" as NPCName,
+        direction: "left" as const,
+      });
+    }
+
     this.initialiseNPCs(bumpkins);
 
     if (!this.joystick && !localStorage.getItem("mmo_introduction.read")) {
@@ -413,6 +418,22 @@ export class PlazaScene extends BaseScene {
     });
 
     this.add.sprite(321.5, 230, "shop_icon");
+
+    if (hasFeatureAccess(this.gameState, "LOVE_ISLAND")) {
+      const balloon = this.add.sprite(510, 228, "balloon");
+
+      balloon.setDepth(272);
+
+      const balloonLabel = new Label(this, "FLY", "brown");
+      balloonLabel.setPosition(510, 208);
+      balloonLabel.setDepth(10000000);
+      this.add.existing(balloonLabel);
+
+      // On clikc open
+      balloon.setInteractive({ cursor: "pointer" }).on("pointerdown", () => {
+        interactableModalManager.open("air_balloon");
+      });
+    }
 
     if (this.gameState.inventory["Luxury Key"]) {
       this.add.sprite(825, 50, "luxury_key_disc").setDepth(1000000000);

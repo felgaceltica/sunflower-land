@@ -28,6 +28,18 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 450 - randomYOffset,
     },
   },
+  love_island: {
+    default: {
+      x: 608,
+      y: 770,
+    },
+  },
+  stream: {
+    default: {
+      x: 240,
+      y: 180,
+    },
+  },
   infernos: {
     default: {
       x: 318,

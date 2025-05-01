@@ -21,12 +21,13 @@ import { BumpkinActivityName } from "./bumpkinActivity";
 import { DecorationName } from "./decorations";
 import { BeanName, ExoticCropName, MutantCropName } from "./beans";
 import {
+  FullMoonFruit,
   GreenHouseFruitName,
   GreenHouseFruitSeedName,
   PatchFruitName,
   PatchFruitSeedName,
 } from "./fruits";
-import { TreasureName } from "./treasure";
+import { BeachBountyTreasure, TreasureName } from "./treasure";
 import {
   GoblinBlacksmithItemName,
   GoblinPirateItemName,
@@ -71,7 +72,6 @@ import { TradeableName } from "../actions/sellMarketResource";
 import { MinigameCurrency } from "../events/minigames/purchaseMinigameItem";
 import { FactionShopCollectibleName, FactionShopFoodName } from "./factionShop";
 import { DiggingFormationName } from "./desert";
-import { Rewards } from "./rewards";
 import { ExperimentName } from "lib/flags";
 import { CollectionName, MarketplaceTradeableName } from "./marketplace";
 import { GameTransaction } from "./transactions";
@@ -83,7 +83,7 @@ import {
   Recipes,
   RecipeWearableName,
 } from "../lib/crafting";
-import { SeasonalCollectibleName } from "./megastore";
+import { SeasonalCollectibleName, SeasonalTierItemName } from "./megastore";
 import { TradeFood } from "../events/landExpansion/redeemTradeReward";
 import {
   CalendarEvent,
@@ -94,6 +94,8 @@ import { VipBundle } from "../lib/vipAccess";
 import { InGameTaskName } from "../events/landExpansion/completeSocialTask";
 import { TwitterPost, TwitterPostName } from "./social";
 import { NetworkName } from "../events/landExpansion/updateNetwork";
+import { RewardBoxes, RewardBoxName } from "./rewardBoxes";
+import { FloatingIslandShop, FloatingShopItemName } from "./floatingIsland";
 
 export type Reward = {
   coins?: number;
@@ -200,11 +202,12 @@ export type MutantChicken =
   | "Knight Chicken"
   | "Pharaoh Chicken"
   | "Alien Chicken"
-  | "Summer Chicken";
+  | "Summer Chicken"
+  | "Love Chicken";
 
-export type MutantCow = "Mootant" | "Frozen Cow";
+export type MutantCow = "Mootant" | "Frozen Cow" | "Dr. Cow";
 
-export type MutantSheep = "Toxic Tuft" | "Frozen Sheep";
+export type MutantSheep = "Toxic Tuft" | "Frozen Sheep" | "Nurse Sheep";
 
 export type MutantAnimal = MutantChicken | MutantCow | MutantSheep;
 
@@ -233,6 +236,8 @@ export type Coupons =
   | "Mark"
   | "Trade Point"
   | "Love Charm"
+  | "Easter Token 2025"
+  | "Easter Ticket 2025"
   | Keys
   | SeasonalTicket
   | FactionEmblem;
@@ -354,6 +359,15 @@ export const COUPONS: Record<Coupons, { description: string }> = {
   "Love Charm": {
     description: translate("description.love.charm"),
   },
+  "Easter Token 2025": {
+    description: "",
+  },
+  "Easter Ticket 2025": {
+    description: "",
+  },
+  Geniseed: {
+    description: translate("description.geniseed"),
+  },
 };
 
 export type Purchase = {
@@ -419,16 +433,40 @@ export type FlowerBounty = Bounty & {
   name: FlowerName;
 };
 
-export type SFLBounty = Bounty & {
+export type ObsidianBounty = Bounty & {
   name: "Obsidian";
-  sfl: number;
+  sfl?: number;
 };
 
-export type BountyRequest = AnimalBounty | FlowerBounty | SFLBounty;
+export type FishBounty = Bounty & {
+  name: FishName;
+};
+
+export type ExoticBounty = Bounty & {
+  name:
+    | ExoticCropName
+    | BeachBountyTreasure
+    | FullMoonFruit
+    | RecipeCraftableName;
+};
+
+export type MarkBounty = Bounty & {
+  name: "Mark";
+  quantity: number;
+};
+
+export type BountyRequest =
+  | AnimalBounty
+  | FlowerBounty
+  | ObsidianBounty
+  | FishBounty
+  | ExoticBounty
+  | MarkBounty;
 
 export type Bounties = {
   requests: BountyRequest[];
   completed: { id: string; soldAt: number }[];
+  bonusClaimedAt?: number;
 };
 
 export type InventoryItemName =
@@ -494,7 +532,8 @@ export type InventoryItemName =
   | RecipeCraftableName
   | SeasonalCollectibleName
   | TradeFood
-  | SeasonalBanner;
+  | SeasonalBanner
+  | RewardBoxName;
 
 export type Inventory = Partial<Record<InventoryItemName, Decimal>>;
 
@@ -1051,11 +1090,19 @@ export type MinigameAchievement = {
 
 export type Minigame = {
   highscore: number;
+  // SFL attempts purchased
   purchases?: {
     sfl: number;
     items?: Partial<Record<MinigameCurrency, number>>;
     purchasedAt: number;
   }[];
+
+  // Minigame shop
+  shop?: {
+    wearables?: Wardrobe;
+    items?: Partial<Record<InventoryItemName, number>>;
+  };
+
   history: Record<string, MinigameHistory>;
   achievements?: Record<string, MinigameAchievement>;
 };
@@ -1127,7 +1174,8 @@ export type Currency =
   | "Sunstone"
   | "Seasonal Ticket"
   | "Mark"
-  | "Love Charm";
+  | "Love Charm"
+  | "Easter Token 2025";
 
 export type ShopItemBase = {
   shortDescription: string;
@@ -1391,8 +1439,6 @@ export interface GameState {
   home: Home;
   bank: Bank;
 
-  rewards: Rewards;
-
   choreBoard: ChoreBoard;
 
   competitions: {
@@ -1551,12 +1597,19 @@ export interface GameState {
     tradePoints?: number;
     dailyListings?: { date: number; count: number };
     dailyPurchases?: { date: number; count: number };
+    weeklySales?: {
+      [date: string]: Partial<Record<MarketplaceTradeableName, number>>;
+    };
+
+    weeklyPurchases?: {
+      [date: string]: Partial<Record<MarketplaceTradeableName, number>>;
+    };
   };
+
   buds?: Record<number, Bud>;
 
   christmas2024?: Christmas;
   flowerShop?: FlowerShop;
-  megastore: MegaStore;
   specialEvents: SpecialEvents;
   goblinMarket: {
     resources: Partial<
@@ -1641,6 +1694,21 @@ export interface GameState {
   };
   socialTasks?: {
     completed: Partial<Record<InGameTaskName, { completedAt: number }>>;
+  };
+
+  rewardBoxes?: RewardBoxes;
+
+  floatingIsland: {
+    schedule: {
+      startAt: number;
+      endAt: number;
+    }[];
+    shop: FloatingIslandShop;
+    boughtAt?: Partial<Record<FloatingShopItemName, number>>;
+    petalPuzzleSolvedAt?: number;
+  };
+  megastore?: {
+    boughtAt: Partial<Record<SeasonalTierItemName, number>>;
   };
 }
 

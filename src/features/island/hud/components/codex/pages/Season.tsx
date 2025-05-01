@@ -21,9 +21,11 @@ import { SeasonalMutants } from "../components/SeasonalMutants";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { SeasonalStore } from "features/world/ui/megastore/SeasonalStore";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { FlowerBountiesModal } from "features/world/ui/flowerShop/FlowerBounties";
 import { BertObsession } from "features/world/ui/npcs/Bert";
 import { GameState } from "features/game/types/game";
+import { MegaBountyBoardContent } from "features/world/ui/flowerShop/MegaBountyBoard";
+import { FlowerBountiesModal } from "features/world/ui/flowerShop/FlowerBounties";
+import { hasFeatureAccess } from "lib/flags";
 
 const CHAPTER_GRAPHICS: Record<SeasonName, string> = {
   "Solar Flare": "?",
@@ -35,6 +37,7 @@ const CHAPTER_GRAPHICS: Record<SeasonName, string> = {
   "Pharaoh's Treasure": SUNNYSIDE.announcement.desertSeason,
   "Bull Run": SUNNYSIDE.announcement.bullRunSeason,
   "Winds of Change": SUNNYSIDE.announcement.windsOfChangeSeason,
+  "Great Bloom": "",
 };
 
 const CHORES_DELIVERIES_START_DATE: Record<SeasonName, string> = {
@@ -47,6 +50,7 @@ const CHORES_DELIVERIES_START_DATE: Record<SeasonName, string> = {
   "Pharaoh's Treasure": "?",
   "Bull Run": "Nov 11th",
   "Winds of Change": "Feb 10th",
+  "Great Bloom": "May 5th",
 };
 
 interface Props {
@@ -152,9 +156,13 @@ export const Season: React.FC<Props> = ({
           />
         </div>
       </InnerPanel>
-      <InnerPanel className="mb-1">
-        <FlowerBountiesModal readonly state={state} />
-      </InnerPanel>
+      {hasFeatureAccess(state, "MEGA_BOUNTIES") ? (
+        <MegaBountyBoardContent readonly />
+      ) : (
+        <InnerPanel className="mb-1">
+          <FlowerBountiesModal readonly state={state} />
+        </InnerPanel>
+      )}
       <InnerPanel className="mb-1">
         <BertObsession
           readonly
