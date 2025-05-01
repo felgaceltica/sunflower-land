@@ -8,7 +8,6 @@ import {
   INITIAL_EQUIPMENT,
   INITIAL_STOCK,
 } from "./constants";
-import { INITIAL_REWARDS } from "../types/rewards";
 import { Equipped } from "../types/bumpkin";
 import { tokenUriBuilder } from "lib/utils/tokenUriBuilder";
 import { EXPIRY_COOLDOWNS } from "./collectibleBuilt";
@@ -24,7 +23,11 @@ export const STATIC_OFFLINE_FARM: GameState = {
     expiresAt: Date.now() + 31 * 24 * 60 * 60 * 1000,
   },
   inventory: {
+    "Love Charm": new Decimal(1000),
+    "Great Bloom Banner": new Decimal(1),
+    "Winds of Change Banner": new Decimal(1),
     Beetroot: new Decimal(100),
+    Timeshard: new Decimal(1000),
     Jin: new Decimal(1),
     Egg: new Decimal(100),
     Oil: new Decimal(50),
@@ -86,6 +89,8 @@ export const STATIC_OFFLINE_FARM: GameState = {
     Mangrove: new Decimal(1),
     "Thermal Stone": new Decimal(1),
     "Beta Pass": new Decimal(1),
+    Hay: new Decimal(100),
+    "Dr. Cow": new Decimal(1),
   },
   previousInventory: {
     "Dirt Path": new Decimal(20),
@@ -108,9 +113,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     Iron: new Decimal(1000),
     Gold: new Decimal(1000),
   },
-  wardrobe: {
-    Halo: 1,
-  },
+  wardrobe: {},
   previousWardrobe: {},
   bank: { taxFreeSFL: 0 },
   beehives: {},
@@ -130,6 +133,9 @@ export const STATIC_OFFLINE_FARM: GameState = {
           name: "Red Balloon Flower",
           plantedAt: 0,
           amount: 1,
+          reward: {
+            items: [{ name: "Lunalist", amount: 1 }],
+          },
         },
       },
     },
@@ -226,20 +232,9 @@ export const STATIC_OFFLINE_FARM: GameState = {
     activity: {},
   },
 
-  rewards: INITIAL_REWARDS,
-
   minigames: {
     games: {},
     prizes: {},
-  },
-
-  megastore: {
-    available: {
-      from: 0,
-      to: 0,
-    },
-    collectibles: [],
-    wearables: [],
   },
 
   bounties: {
@@ -249,61 +244,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
         soldAt: 100000,
       },
     ],
-    requests: [
-      {
-        id: "1",
-        name: "Cow",
-        level: 4,
-        coins: 100,
-      },
-      {
-        id: "3",
-        name: "Chicken",
-        level: 1,
-        coins: 100,
-      },
-      {
-        id: "4",
-        name: "Cow",
-        level: 1,
-        items: { Gem: 1 },
-      },
-      {
-        id: "2",
-        name: "Chicken",
-        level: 5,
-        items: { Scroll: 1 },
-      },
-      {
-        id: "2",
-        name: "Chicken",
-        level: 5,
-        items: { Scroll: 1 },
-      },
-      {
-        id: "2",
-        name: "Chicken",
-        level: 5,
-        items: { Scroll: 1 },
-      },
-      {
-        id: "2",
-        name: "Chicken",
-        level: 5,
-        items: { Scroll: 1 },
-      },
-      {
-        id: "22",
-        name: "Chicken",
-        level: 1,
-        items: { Gem: 1 },
-      },
-      {
-        id: "obsidian-test",
-        name: "Obsidian",
-        sfl: 5,
-      },
-    ],
+    requests: [],
   },
 
   mysteryPrizes: {},
@@ -448,7 +389,14 @@ export const STATIC_OFFLINE_FARM: GameState = {
   fishing: {
     dailyAttempts: {},
     weather: "Sunny",
-    wharf: {},
+    wharf: {
+      castedAt: 0,
+      bait: "Fishing Lure",
+      chum: "Carrot",
+      caught: {
+        "Pink Dolphin": 1,
+      },
+    },
     beach: {},
   },
   mailbox: {
@@ -587,6 +535,46 @@ export const STATIC_OFFLINE_FARM: GameState = {
     },
   },
   collectibles: {
+    "Dr. Cow": [
+      {
+        id: "1",
+        createdAt: 0,
+        coordinates: { x: 13, y: -5 },
+        readyAt: 0,
+      },
+    ],
+    "Nurse Sheep": [
+      {
+        id: "1",
+        createdAt: 0,
+        coordinates: { x: 12, y: -5 },
+        readyAt: 0,
+      },
+    ],
+    "Pink Dolphin": [
+      {
+        id: "1",
+        createdAt: 0,
+        coordinates: { x: 13, y: -5 },
+        readyAt: 0,
+      },
+    ],
+    Lunalist: [
+      {
+        id: "1",
+        createdAt: 0,
+        coordinates: { x: 13, y: -5 },
+        readyAt: 0,
+      },
+    ],
+    "Love Chicken": [
+      {
+        id: "1",
+        createdAt: 0,
+        coordinates: { x: 13, y: 0 },
+        readyAt: 0,
+      },
+    ],
     "Gourmet Hourglass": [
       {
         id: "1",
@@ -722,9 +710,12 @@ export const STATIC_OFFLINE_FARM: GameState = {
         createdAt: 0,
         experience: 120,
         asleepAt: Date.now() - 1000 * 60 * 60 * 12,
-        awakeAt: Date.now() + 1000 * 60 * 60 * 12,
+        awakeAt: Date.now(),
         lovedAt: Date.now(),
         item: "Petting Hand",
+        reward: {
+          items: [{ name: "Love Chicken", amount: 1 }],
+        },
       },
     },
   },
@@ -734,7 +725,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
       "1": {
         id: "1",
         type: "Sheep",
-        state: "idle",
+        state: "sick",
         createdAt: 0,
         experience: 120,
         asleepAt: Date.now() - 1000 * 60 * 60 * 12,
@@ -765,10 +756,34 @@ export const STATIC_OFFLINE_FARM: GameState = {
     recipes: {},
   },
   season: {
-    season: "autumn",
-    startedAt: Date.now(),
+    season: "spring",
+    startedAt: new Date("2025-04-22").getTime(),
   },
   ban: {
     status: "ok",
+  },
+  floatingIsland: {
+    boughtAt: {},
+    schedule: [
+      {
+        startAt: Date.now(),
+        endAt: Date.now() + 1000 * 60 * 30,
+      },
+      {
+        startAt: Date.now() + 24 * 60 * 60 * 1000,
+        endAt: Date.now() + 24 * 60 * 60 * 1000 + 1000 * 60 * 30,
+      },
+    ],
+    shop: {
+      "Bronze Love Box": {
+        name: "Bronze Love Box",
+        cost: {
+          items: {
+            "Love Charm": 100,
+          },
+        },
+        type: "collectible",
+      },
+    },
   },
 };

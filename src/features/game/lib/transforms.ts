@@ -101,15 +101,8 @@ export function makeGame(farm: any): GameState {
     flowerShop: farm.flowerShop,
     specialEvents: farm.specialEvents,
     experiments: farm.experiments,
-    rewards: farm.rewards,
-    megastore: {
-      available: {
-        from: 0,
-        to: 0,
-      },
-      collectibles: [],
-      wearables: [],
-    },
+    floatingIsland: farm.floatingIsland,
+    megastore: farm.megastore,
     goblinMarket: farm.goblinMarket,
     faction: farm.faction,
     dailyFactionDonationRequest: farm.dailyFactionDonationRequest
@@ -134,5 +127,6 @@ export function makeGame(farm: any): GameState {
     referrals: farm.referrals,
     twitter: farm.twitter,
     ban: farm.ban,
+    rewardBoxes: farm.rewardBoxes,
   };
 }
