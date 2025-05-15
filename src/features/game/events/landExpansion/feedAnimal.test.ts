@@ -597,6 +597,54 @@ describe("feedAnimal", () => {
     expect(state.henHouse.animals[chickenId].state).toBe("ready");
   });
 
+  it("cures a sick animal for Free when Oracle Syringe is equipped", () => {
+    const chickenId = "xyz";
+
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin?.equipped,
+            wings: "Oracle Syringe",
+          },
+        },
+        inventory: {
+          ...INITIAL_FARM.inventory,
+          "Barn Delight": new Decimal(1),
+        },
+        henHouse: {
+          ...INITIAL_FARM.henHouse,
+          animals: {
+            [chickenId]: {
+              id: chickenId,
+              type: "Chicken",
+              createdAt: 0,
+              state: "sick",
+              experience: 0,
+              asleepAt: 0,
+              awakeAt: 0,
+              lovedAt: 0,
+              item: "Petting Hand",
+            },
+          },
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Chicken",
+        id: chickenId,
+        item: "Barn Delight",
+      },
+    });
+
+    expect(state.henHouse.animals[chickenId].state).toBe("idle");
+    expect(state.inventory["Barn Delight"]).toStrictEqual(new Decimal(1));
+    expect(state.henHouse.animals[chickenId].experience).toBe(0);
+  });
+
   it("cures a sick animal with Barn Delight", () => {
     const chickenId = "xyz";
 
@@ -635,6 +683,54 @@ describe("feedAnimal", () => {
 
     expect(state.henHouse.animals[chickenId].state).toBe("idle");
     expect(state.inventory["Barn Delight"]).toStrictEqual(new Decimal(0));
+    expect(state.henHouse.animals[chickenId].experience).toBe(0);
+  });
+
+  it("cures a sick animal with Barn Delight with Medic Apron", () => {
+    const chickenId = "xyz";
+
+    const state = feedAnimal({
+      createdAt: now,
+      state: {
+        ...INITIAL_FARM,
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin.equipped,
+            coat: "Medic Apron",
+          },
+        },
+        inventory: {
+          ...INITIAL_FARM.inventory,
+          "Barn Delight": new Decimal(1),
+        },
+        henHouse: {
+          ...INITIAL_FARM.henHouse,
+          animals: {
+            [chickenId]: {
+              id: chickenId,
+              type: "Chicken",
+              createdAt: 0,
+              state: "sick",
+              experience: 0,
+              asleepAt: 0,
+              awakeAt: 0,
+              lovedAt: 0,
+              item: "Petting Hand",
+            },
+          },
+        },
+      },
+      action: {
+        type: "animal.fed",
+        animal: "Chicken",
+        id: chickenId,
+        item: "Barn Delight",
+      },
+    });
+
+    expect(state.henHouse.animals[chickenId].state).toBe("idle");
+    expect(state.inventory["Barn Delight"]).toStrictEqual(new Decimal(0.5));
     expect(state.henHouse.animals[chickenId].experience).toBe(0);
   });
 
@@ -1687,7 +1783,7 @@ describe("feedAnimal", () => {
     expect(state.inventory["Mixed Grain"]).toEqual(new Decimal(2));
   });
 
-  it("takes 5% less food to feed a cow if Dr. Cow is placed", () => {
+  it("takes 5% less food to feed a cow if Dr Cow is placed", () => {
     const state = feedAnimal({
       createdAt: now,
       state: {
@@ -1696,7 +1792,7 @@ describe("feedAnimal", () => {
           "Kernel Blend": new Decimal(5),
         },
         collectibles: {
-          "Dr. Cow": [
+          "Dr Cow": [
             {
               coordinates: { x: 0, y: 0 },
               createdAt: 0,
