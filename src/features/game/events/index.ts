@@ -28,11 +28,6 @@ import {
   LandExpansionIronMineAction,
 } from "./landExpansion/ironMine";
 
-import {
-  feedChicken as LandExpansionFeedChicken,
-  LandExpansionFeedChickenAction,
-} from "./landExpansion/feedChicken";
-
 import { GameState } from "../types/game";
 import { claimAirdrop, ClaimAirdropAction } from "./claimAirdrop";
 import {
@@ -148,10 +143,6 @@ import { refundBid, RefundBidAction } from "./landExpansion/refundBid";
 import { mixPotion, MixPotionAction } from "./landExpansion/mixPotion";
 import { buyWearable, BuyWearableAction } from "./landExpansion/buyWearable";
 import { skipOrder, SkipOrderAction } from "./landExpansion/skipOrder";
-import {
-  completeBertObsession,
-  CompleteBertObsessionAction,
-} from "./landExpansion/completeBertObsession";
 import { StartPotionAction, startPotion } from "./landExpansion/startPotion";
 import { placeBud, PlaceBudAction } from "./landExpansion/placeBud";
 import { moveBud, MoveBudAction } from "./landExpansion/moveBud";
@@ -519,7 +510,6 @@ export type PlayingEvent =
   | ResetSkillsAction
   | SeedBoughtAction
   | ClaimAchievementAction
-  | LandExpansionFeedChickenAction
   | CraftToolAction
   | buyDecorationAction
   | SellCropAction
@@ -545,7 +535,6 @@ export type PlayingEvent =
   | MixPotionAction
   | BuyWearableAction
   | SkipOrderAction
-  | CompleteBertObsessionAction
   | StartPotionAction
   | StartComposterAction
   | collectCompostAction
@@ -732,7 +721,6 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "skills.reset": resetSkills,
   "seed.bought": seedBought,
   "achievement.claimed": claimAchievement,
-  "chicken.fed": LandExpansionFeedChicken,
   "tool.crafted": craftTool,
   "decoration.bought": buyDecoration,
   "crop.sold": sellCrop,
@@ -758,7 +746,6 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "bid.refunded": refundBid,
   "potion.mixed": mixPotion,
   "wearable.bought": buyWearable,
-  "bertObsession.completed": completeBertObsession,
   "potion.started": startPotion,
   "composter.started": startComposter,
   "compost.collected": collectCompost,

@@ -25,7 +25,7 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
     image: "../public/erc1155/images/2255.png",
     attributes: [{ trait_type: "Tradable", value: "Yes" }],
   },
-  "Dr. Cow": {
+  "Dr Cow": {
     description:
       "A mutant cow dressed as a caring doctor, gives 5% less feeding cost for cows",
     decimals: 0,
@@ -18047,5 +18047,17 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/wearables/images/461.png",
     name: "Oracle Syringe",
+  },
+  "Coin Head": {
+    description:
+      "Proof you put your tokens where your flowers are. Now you’ve got the hat to prove it.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/462.png",
+    name: "Coin Head",
   },
 };
