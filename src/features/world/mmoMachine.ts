@@ -224,7 +224,6 @@ export const mmoMachine = createMachine<MMOContext, MMOEvent, MMOState>({
       muted: [],
     },
   },
-  exit: (context) => context.server?.leave(),
   states: {
     initialising: {
       always: [

@@ -8,7 +8,7 @@ import Decimal from "decimal.js-light";
 import { DepositArgs } from "lib/blockchain/Deposit";
 import { Modal } from "components/ui/Modal";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
-import { Deposit } from "features/goblins/bank/components/Deposit";
+import { DepositGameItems } from "features/goblins/bank/components/DepositGameItems";
 import { placeEvent } from "features/game/expansion/placeable/landscapingMachine";
 import { Save } from "./components/Save";
 import { PIXEL_SCALE } from "features/game/lib/constants";
@@ -26,7 +26,6 @@ import { MarketplaceButton } from "./components/MarketplaceButton";
 import { GameCalendar } from "features/game/expansion/components/temperateSeason/GameCalendar";
 
 import chest from "assets/icons/chest.png";
-import { LockdownWidget } from "features/announcements/AnnouncementWidgets";
 import { RewardsButton } from "./components/referral/RewardsButton";
 import { StreamCountdown } from "./components/StreamCountdown";
 import { FloatingIslandCountdown } from "./components/FloatingIslandCountdown";
@@ -56,7 +55,7 @@ const HudComponent: React.FC = () => {
   };
 
   const handleDeposit = (
-    args: Pick<DepositArgs, "sfl" | "itemIds" | "itemAmounts">,
+    args: Pick<DepositArgs, "itemIds" | "itemAmounts">,
   ) => {
     gameService.send("DEPOSIT", args);
   };
@@ -154,7 +153,7 @@ const HudComponent: React.FC = () => {
                 },
               ]}
             >
-              <Deposit
+              <DepositGameItems
                 farmAddress={farmAddress}
                 linkedWallet={linkedWallet}
                 onDeposit={handleDeposit}
@@ -162,7 +161,6 @@ const HudComponent: React.FC = () => {
                 onClose={handleDepositModal}
               />
             </CloseButtonPanel>
-            <LockdownWidget />
           </Modal>
         )}
       </HudContainer>

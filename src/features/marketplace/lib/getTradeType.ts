@@ -26,7 +26,7 @@ export const ITEM_TRADE_TYPES: {
     "Silver Flower Box": "instant",
     "Gold Flower Box": "instant",
     Lunalist: "instant",
-    "Dr. Cow": "instant",
+    "Dr Cow": "instant",
     "Nurse Sheep": "instant",
     "Love Chicken": "instant",
     "Pink Dolphin": "instant",
@@ -1486,6 +1486,7 @@ export const ITEM_TRADE_TYPES: {
     "Love Charm Shirt": "instant",
     "Sky Island Background": "onchain",
     "Oracle Syringe": "instant",
+    "Coin Head": "instant",
   },
 };
 
