@@ -880,7 +880,7 @@
   "fruit-dash.targetScore": "Target Score: {{target}}",
   "fruit-dash.inventory": "inventory",
   "fruit-dash.easterEvent": "Welcome to the Easter event of Fruit Dash. Don't forget to check the help section to see the bonuses and obstacles!",
-  "fruit-dash.entrancemessage_1": "The Halloween event has ended, but you can continue playing in dark mode by accessing the gear icon.",
+  "fruit-dash.entrancemessage_2": "New feature! You can now throw axes using the Arrow Up key!",
   "irrigate.portal.title": "Minigame - Irrigate",
   "irrigate.portal.description": "Run through the farm, dodge obstacles, and collect delicious fruits.",
   "irrigate.portal.missionObjectives": "Mission: Reach {{targetScore}} points.",

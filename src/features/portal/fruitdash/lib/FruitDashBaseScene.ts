@@ -94,6 +94,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
         a?: Phaser.Input.Keyboard.Key;
         d?: Phaser.Input.Keyboard.Key;
         space?: Phaser.Input.Keyboard.Key;
+        up?: Phaser.Input.Keyboard.Key;
       }
     | undefined;
   constructor() {
@@ -595,6 +596,9 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
 
       //this.input.keyboard?.removeCapture("SPACE");
       this.cursorKeys.space?.on("down", () => {
+        this.throwAxe();
+      });
+      this.cursorKeys.up?.on("down", () => {
         this.throwAxe();
       });
     }

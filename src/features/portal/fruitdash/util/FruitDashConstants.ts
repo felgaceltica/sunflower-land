@@ -167,7 +167,7 @@ export const POWERUPS_SCORE_TABLE: {
   2: {
     item: SUNNYSIDE.tools.gold_pickaxe,
     description:
-      "Collect axes and press space or hit the button to throw them at obstacles",
+      "Grab some axes and throw them at obstacles using Space, Arrow Up, or the action button",
     //description: "Slow down for 10 seconds - Chance after 500 points",
   },
 };

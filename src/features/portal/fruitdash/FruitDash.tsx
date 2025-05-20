@@ -40,8 +40,8 @@ const _isIntroduction = (state: PortalMachineState) =>
 const _isLoser = (state: PortalMachineState) => state.matches("loser");
 const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
-const _EntranceMessageMaxDate = new Date("2024-11-10T00:00:00Z");
-const _EntranceMessage = "fruit-dash.entrancemessage_1";
+const _EntranceMessageMaxDate = new Date("2025-05-25T00:00:00Z");
+const _EntranceMessage = "fruit-dash.entrancemessage_2";
 const _timedEventName = "fruit-dash.easterEvent";
 const _isReadEntranceMessage = hasReadFruitEntranceMessage();
 const _isReadTimedEventMessage = hasReadFruitDashTimedEventMessage();
