@@ -54,7 +54,6 @@ import { MilestoneName } from "./milestones";
 import {
   FishName,
   FishingBait,
-  FishingConditions,
   MarineMarvelName,
   OldFishName,
 } from "./fishing";
@@ -655,7 +654,6 @@ export type BuildingProduce = {
 
 export type Cancelled = Partial<{
   [key in InventoryItemName]: {
-    count: number;
     cancelledAt: number;
   };
 }>;
@@ -1126,13 +1124,15 @@ type FishingSpot = {
 };
 
 export type Fishing = {
-  weather: FishingConditions;
   wharf: FishingSpot;
-  beach: FishingSpot;
   dailyAttempts?: {
     [date: string]: number;
   };
   extraReels?: ExtraReels;
+
+  // TODO remove after 1st June
+  beach?: FishingSpot;
+  weather?: string;
 };
 
 export type ExtraReels = {

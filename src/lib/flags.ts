@@ -56,7 +56,11 @@ const periodBasedFeatureFlag =
 // Used for testing production features and dev access
 export const ADMIN_IDS = [1, 3, 39488, 128727];
 
-export const MANAGER_IDS = [...ADMIN_IDS, 29];
+export const MANAGER_IDS = [
+  ...ADMIN_IDS,
+  29, // Aeon
+  130170, // Dcol
+];
 
 /**
  * Adam: 1
@@ -106,6 +110,8 @@ const FEATURE_FLAGS = {
   // Released to All Players on 5th May
   FLOWER_GEMS: timeBasedFeatureFlag(new Date("2025-05-05T00:00:00Z")),
 
+  FLOWER_DASHBOARD: usernameFeatureFlag,
+
   // Testnet only feature flags - Please don't change these until release
   LOVE_CHARM_FLOWER_EXCHANGE: timeBasedFeatureFlag(
     new Date("2025-05-01T00:00:00Z"),
@@ -145,6 +151,8 @@ const FEATURE_FLAGS = {
     start: new Date("2025-05-08T00:00:00Z"),
     end: new Date("2025-06-20T00:00:00.000Z"),
   }),
+
+  GEMS_CHANGES: timeBasedFeatureFlag(new Date("2025-05-21T00:00:00Z")),
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;
