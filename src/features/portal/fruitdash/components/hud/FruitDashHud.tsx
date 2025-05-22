@@ -50,31 +50,39 @@ export const FruitDashHud: React.FC = () => {
   }, [achievements]);
 
   return (
-    <HudContainer zIndex={"99999"}>
-      <div>
-        <div
-          className="absolute"
-          style={{
-            top: `${PIXEL_SCALE * 4}px`,
-            left: `${PIXEL_SCALE * 6}px`,
-          }}
-        >
-          <FruitDashTarget />
-          {!isJoystickActive && <FruitDashScoresPC />}
-          {isJoystickActive && <FruitDashScoresMobile />}
+    <div>
+      <HudContainer>
+        <div>
+          <div
+            className="absolute"
+            style={{
+              top: `${PIXEL_SCALE * 4}px`,
+              left: `${PIXEL_SCALE * 6}px`,
+            }}
+          >
+            <FruitDashTarget />
+            {!isJoystickActive && <FruitDashScoresPC />}
+            {isJoystickActive && <FruitDashScoresMobile />}
+          </div>
+          {(!isJoystickActive || !isPlaying) && (
+            <>
+              <FruitDashTravel />
+            </>
+          )}
+          {isPlaying && (
+            <>
+              <FruitDashTimer />
+            </>
+          )}
         </div>
-        {(!isJoystickActive || !isPlaying) && (
-          <>
-            <FruitDashTravel />
-            {!isPlaying && <FruitDashSettings />}
-          </>
-        )}
-        {isPlaying && (
-          <>
-            <FruitDashTimer />
-          </>
-        )}
-      </div>
-    </HudContainer>
+      </HudContainer>
+      <HudContainer zIndex="z-50">
+        <div>
+          {(!isJoystickActive || !isPlaying) && (
+            <>{!isPlaying && <FruitDashSettings />}</>
+          )}
+        </div>
+      </HudContainer>
+    </div>
   );
 };
