@@ -5183,6 +5183,7 @@
   "deposit.linkedWallet": "Связанный кошелек:",
   "deposit.refreshWallet": "Обновить кошелек",
   "ronin.comingSoon": "1 апреля. Используйте кошелек Ronin для покупки драгоценных камней, создания NFT, торговли и многого другого!",
+  "announcement.flowerGems": "Покупайте драгоценные камни за $FLOWER - в мае 2025 года",
   "announcement.gasless": "Сделки без газа начнутся 1 апреля.",
   "rocketman.intro": "Привет, Бампкин, я пытаюсь построить цветочную башню на Луне!",
   "rocketman.flower.coming": "Скоро появится $FLOWER",
@@ -5895,5 +5896,7 @@
   "flowerDashboard.topBurners": "Лучшие горелки",
   "flowerDashboard.title": "Панель управления цветами",
   "flowerDashboard.last7Days": "Последние 7 дней",
-  "flowerDashboard.comingSoon": "Скоро"
+  "flowerDashboard.comingSoon": "Скоро",
+  "airdropping.reward.failed": "Одна или несколько сбросов с воздуха не удались. Проверьте #team -logs в Discord для получения дополнительной информации",
+  "airdropping.reward.failed.title": "Сбой при перебросе"
 }

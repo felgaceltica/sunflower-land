@@ -7,6 +7,7 @@ import { Panel } from "components/ui/Panel";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Context } from "features/game/GameProvider";
 import { VIPItems } from "features/game/components/modal/components/VIPItems";
+import { BuyGemsWidget } from "features/announcements/AnnouncementWidgets";
 import { DepositFlower } from "./DepositFlower";
 import { SwapSFLForCoins } from "./SwapSFLForCoins";
 import * as AuthProvider from "features/auth/lib/Provider";
@@ -116,14 +117,6 @@ export const CurrenciesModal: React.FC<Props> = ({
     onboardingAnalytics.logEvent("begin_checkout");
   }, []);
 
-  const onMaticBuy = async () => {
-    gameService.send("BUY_GEMS", {
-      currency: "MATIC",
-      amount: price?.amount,
-    });
-    onClose();
-  };
-
   const onFlowerBuy = async (quote: number) => {
     gameService.send("gems.bought", {
       effect: {
@@ -231,7 +224,6 @@ export const CurrenciesModal: React.FC<Props> = ({
                   price={price}
                   onFlowerBuy={onFlowerBuy}
                   setPrice={setPrice}
-                  onMaticBuy={onMaticBuy}
                   onCreditCardBuy={handleCreditCardBuy}
                   onHideBuyBBLabel={(hide) => setHideBuyBBLabel(hide)}
                   hideIntroLabel={hideBuyBBLabel}
@@ -247,6 +239,7 @@ export const CurrenciesModal: React.FC<Props> = ({
             )}
           </Panel>
           <RoninSupportWidget />
+          <BuyGemsWidget />
         </>
       )}
     </Modal>

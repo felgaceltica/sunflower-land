@@ -5183,6 +5183,7 @@
   "deposit.linkedWallet": "关联钱包：",
   "deposit.refreshWallet": "刷新钱包",
   "ronin.comingSoon": "4 月 1 日-使用 Ronin 钱包购买钻石、铸造 NFT、交易等！",
+  "announcement.flowerGems": "用 $FLOWER 购买钻石-2025 年 5 月上市",
   "announcement.gasless": "无燃气费交易将于 4 月 1 日开始。",
   "rocketman.intro": "你好 Bumpkin，我想建造一座通往月球的花塔！",
   "rocketman.flower.coming": "$FLOWER 来了",
@@ -5895,5 +5896,7 @@
   "flowerDashboard.topBurners": "顶级燃烧器",
   "flowerDashboard.title": "花卉仪表板",
   "flowerDashboard.last7Days": "最近 7 天",
-  "flowerDashboard.comingSoon": "即将推出"
+  "flowerDashboard.comingSoon": "即将推出",
+  "airdropping.reward.failed": "一次或多次空投失败。查看 Discord 上的 #team-logs 了解更多信息",
+  "airdropping.reward.failed.title": "空投失败"
 }
