@@ -300,7 +300,7 @@ export class WhackAMoleScene extends Phaser.Scene {
       }
     }
     this.portalService?.send("GAME_OVER", {
-      score: score,
+      score: currentScore,
     });
   };
 
