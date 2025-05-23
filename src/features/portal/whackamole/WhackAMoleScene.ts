@@ -18,7 +18,9 @@ import confetti from "canvas-confetti";
 import { getMusicMutedSetting } from "./util/useIsMusicMuted";
 import { getDarkModeSetting } from "./util/useIsDarkMode";
 import seasonal_tileset from "assets/map/seasonal_tileset.json";
+import { WhackNightShaderPipeline } from "./util/WhackAMoleShader";
 
+//import { WhackAMoleShader } from './util/WhackAMoleShader'
 export class WhackAMoleScene extends Phaser.Scene {
   sceneId: SceneId = MINIGAME_NAME;
   // gameBoard: Netwalk;
@@ -129,6 +131,10 @@ export class WhackAMoleScene extends Phaser.Scene {
     PubSub.subscribe("changeMap", () => {
       this.ChangeMap();
     });
+    const nightShaderPipeline = this.cameras.main.getPostPipeline(
+      "night",
+    ) as WhackNightShaderPipeline;
+    nightShaderPipeline.lightSources = [{ x: 0.475, y: 0.575 }];
   }
   private ChangeMap = () => {
     if (this.map) this.map.destroy();
@@ -146,10 +152,22 @@ export class WhackAMoleScene extends Phaser.Scene {
     };
     //console.log(this);
     // Limpa o cache antes de recarregar
-    this.cache.tilemap.remove("WhackAMolemap");
+    this.cache.tilemap?.remove("WhackAMolemap");
     this.load.tilemapTiledJSON("WhackAMolemap", json);
     this.load.once("complete", () => {
       this.initialiseMap();
+      this.cameras.main.resetPostPipeline();
+
+      if (getDarkModeSetting()) {
+        this.cameras.main.setPostPipeline("night");
+
+        const nightShaderPipeline = this.cameras.main.getPostPipeline(
+          "night",
+        ) as WhackNightShaderPipeline;
+        if (nightShaderPipeline) {
+          nightShaderPipeline.lightSources = [{ x: 0.475, y: 0.575 }];
+        }
+      }
     });
 
     this.load.start();
@@ -320,6 +338,14 @@ export class WhackAMoleScene extends Phaser.Scene {
     else this.ZOOM = baseZoom / (15 * SQUARE_WIDTH);
     camera.setZoom(this.ZOOM);
     camera.fadeIn();
+    //var pipeline = (this.renderer as Phaser.Renderer.WebGL.WebGLRenderer).pipelines.add('Night', new WhackAMoleShader(this.game));
+    //this.cameras.main.setRenderToTexture(pipeline);
+    (
+      this.renderer as Phaser.Renderer.WebGL.WebGLRenderer
+    ).pipelines.addPostPipeline("night", WhackNightShaderPipeline);
+    if (getDarkModeSetting()) {
+      this.cameras.main.setPostPipeline("night");
+    }
   }
 
   private loadSprites() {
