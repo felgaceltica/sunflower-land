@@ -7,17 +7,17 @@ import { Button } from "components/ui/Button";
 
 import { PortalContext, PortalProvider } from "./lib/PortalProvider";
 import { WalletProvider } from "features/wallet/WalletProvider";
-import { IrrigateHud } from "./components/hud/IrrigateHud";
-import { IrrigatePhaser } from "./IrrigatePhaser";
+import { WhackAMoleHud } from "./components/hud/WhackAMoleHud";
+import { WhackAMolePhaser } from "./WhackAMolePhaser";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { PortalMachineState } from "./lib/IrrigateMachine";
+import { PortalMachineState } from "./lib/WhackAMoleMachine";
 import { Loading } from "features/auth/components";
 import { CONFIG } from "lib/config";
 import { authorisePortal, claimPrize } from "../lib/portalUtil";
 
-import { IrrigateRulesPanel } from "./components/panels/IrrigateRulesPanel";
-import { IrrigateNoAttemptsPanel } from "./components/panels/IrrigateNoAttemptsPanel";
+import { WhackAMoleRulesPanel } from "./components/panels/WhackAMoleRulesPanel";
+import { WhackAMoleNoAttemptsPanel } from "./components/panels/WhackAMoleNoAttemptsPanel";
 // import AchievementToastProvider from "./providers/AchievementToastProvider";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
@@ -33,17 +33,17 @@ const _isLoser = (state: PortalMachineState) => state.matches("loser");
 const _isWinner = (state: PortalMachineState) => state.matches("winner");
 const _isComplete = (state: PortalMachineState) => state.matches("complete");
 
-export const IrrigateApp: React.FC = () => {
+export const WhackAMoleApp: React.FC = () => {
   return (
     <WalletProvider>
       <PortalProvider>
-        <Irrigate />
+        <WhackAMole />
       </PortalProvider>
     </WalletProvider>
   );
 };
 
-export const Irrigate: React.FC = () => {
+export const WhackAMole: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
 
@@ -118,13 +118,13 @@ export const Irrigate: React.FC = () => {
     <div>
       {isNoAttempts && (
         <Modal show>
-          <IrrigateNoAttemptsPanel />
+          <WhackAMoleNoAttemptsPanel />
         </Modal>
       )}
 
       {isIntroduction && (
         <Modal show>
-          <IrrigateRulesPanel
+          <WhackAMoleRulesPanel
             mode={"introduction"}
             showScore={false}
             showExitButton={true}
@@ -136,7 +136,7 @@ export const Irrigate: React.FC = () => {
 
       {isLoser && (
         <Modal show>
-          <IrrigateRulesPanel
+          <WhackAMoleRulesPanel
             mode={"failed"}
             showScore={true}
             showExitButton={true}
@@ -148,7 +148,7 @@ export const Irrigate: React.FC = () => {
 
       {isWinner && (
         <Modal show>
-          <IrrigateRulesPanel
+          <WhackAMoleRulesPanel
             mode={"success"}
             showScore={true}
             showExitButton={false}
@@ -160,7 +160,7 @@ export const Irrigate: React.FC = () => {
 
       {isComplete && (
         <Modal show>
-          <IrrigateRulesPanel
+          <WhackAMoleRulesPanel
             mode={"introduction"}
             showScore={true}
             showExitButton={true}
@@ -173,8 +173,8 @@ export const Irrigate: React.FC = () => {
       {sflBalance && (
         <>
           {/* <AchievementToastProvider> */}
-          <IrrigateHud />
-          <IrrigatePhaser />
+          <WhackAMoleHud />
+          <WhackAMolePhaser />
           {/* </AchievementToastProvider> */}
         </>
       )}

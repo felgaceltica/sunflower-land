@@ -32,6 +32,7 @@ export type Scenes = {
   fruit_dash: Room<PlazaRoomState> | undefined;
   farmer_football: Room<PlazaRoomState> | undefined;
   irrigate: Room<PlazaRoomState> | undefined;
+  minewhack: Room<PlazaRoomState> | undefined;
   infernos: Room<PlazaRoomState> | undefined;
   stream: Room<PlazaRoomState> | undefined;
   love_island: Room<PlazaRoomState> | undefined;
