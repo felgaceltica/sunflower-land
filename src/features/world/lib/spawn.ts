@@ -22,7 +22,7 @@ export const SPAWNS: () => SpawnLocation = () => ({
       y: 450 - randomYOffset,
     },
   },
-  minewhack: {
+  "mine-whack": {
     default: {
       x: 400 + randomXOffset,
       y: 450 - randomYOffset,

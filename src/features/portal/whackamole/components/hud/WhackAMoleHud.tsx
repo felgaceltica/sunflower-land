@@ -161,9 +161,9 @@ import { WhackAMoleTarget } from "./WhackAMoleTarget";
 const _isJoystickActive = (state: PortalMachineState) =>
   state.context.isJoystickActive;
 const _target = (state: PortalMachineState) =>
-  state.context.state?.minigames.prizes["minewhack"]?.score ?? 0;
+  state.context.state?.minigames.prizes["mine-whack"]?.score ?? 0;
 const _achievements = (state: PortalMachineState) =>
-  state.context.state?.minigames.games["minewhack"]?.achievements ?? {};
+  state.context.state?.minigames.games["mine-whack"]?.achievements ?? {};
 const _isPlaying = (state: PortalMachineState) => state.matches("playing");
 
 export const WhackAMoleHud: React.FC = () => {

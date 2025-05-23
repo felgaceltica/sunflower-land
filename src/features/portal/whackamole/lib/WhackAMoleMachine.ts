@@ -129,7 +129,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     //         state: context.state!,
     //         action: {
     //           type: "minigame.achievementsUnlocked",
-    //           id: "minewhack",
+    //           id: "mine-whack",
     //           achievementNames: event.achievementNames,
     //         },
     //       });
@@ -166,7 +166,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             token: context.jwt as string,
           });
 
-          const minigame = game.minigames.games["minewhack"];
+          const minigame = game.minigames.games["mine-whack"];
           const attemptsLeft = getAttemptsLeft(minigame);
 
           return { game, farmId, attemptsLeft };
@@ -199,7 +199,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
               purchaseMinigameItem({
                 state: context.state!,
                 action: {
-                  id: "minewhack",
+                  id: "mine-whack",
                   sfl: RESTOCK_ATTEMPTS_SFL,
                   type: "minigame.itemPurchased",
                   items: {},
@@ -214,7 +214,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
               purchaseMinigameItem({
                 state: context.state!,
                 action: {
-                  id: "minewhack",
+                  id: "mine-whack",
                   sfl: UNLIMITED_ATTEMPTS_SFL,
                   type: "minigame.itemPurchased",
                   items: {},
@@ -230,7 +230,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "noAttempts",
           cond: (context) => {
-            const minigame = context.state?.minigames.games["minewhack"];
+            const minigame = context.state?.minigames.games["mine-whack"];
             const attemptsLeft = getAttemptsLeft(minigame);
             return attemptsLeft <= 0;
           },
@@ -264,7 +264,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 state: context.state,
                 action: {
                   type: "minigame.attemptStarted",
-                  id: "minewhack",
+                  id: "mine-whack",
                 },
               });
             },
@@ -296,7 +296,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 action: {
                   type: "minigame.scoreSubmitted",
                   score: 0,
-                  id: "minewhack",
+                  id: "mine-whack",
                 },
               });
             },
@@ -314,7 +314,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 action: {
                   type: "minigame.scoreSubmitted",
                   score: Math.round(context.score),
-                  id: "minewhack",
+                  id: "mine-whack",
                 },
               });
             },
@@ -331,7 +331,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           cond: (context) => {
             const dateKey = new Date().toISOString().slice(0, 10);
 
-            const minigame = context.state?.minigames.games["minewhack"];
+            const minigame = context.state?.minigames.games["mine-whack"];
             const history = minigame?.history ?? {};
 
             return !!history[dateKey]?.prizeClaimedAt;
@@ -346,7 +346,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "winner",
           cond: (context) => {
-            const prize = context.state?.minigames.prizes["minewhack"];
+            const prize = context.state?.minigames.prizes["mine-whack"];
             if (!prize) {
               return false;
             }

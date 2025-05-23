@@ -12,13 +12,13 @@ import { PortalContext } from "../../lib/PortalProvider";
 
 const _dailyHighscore = (state: PortalMachineState) => {
   const dateKey = new Date().toISOString().slice(0, 10);
-  const minigame = state.context.state?.minigames.games["minewhack"];
+  const minigame = state.context.state?.minigames.games["mine-whack"];
   const history = minigame?.history ?? {};
 
   return history[dateKey]?.highscore ?? 0;
 };
 const _prize = (state: PortalMachineState) => {
-  return state.context.state?.minigames.prizes["minewhack"];
+  return state.context.state?.minigames.prizes["mine-whack"];
 };
 
 export const WhackAMolePrize: React.FC = () => {

@@ -7,7 +7,7 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "../../lib/WhackAMoleMachine";
 
 const _target = (state: PortalMachineState) =>
-  state.context.state?.minigames.prizes["minewhack"]?.score ?? 0;
+  state.context.state?.minigames.prizes["mine-whack"]?.score ?? 0;
 const _score = (state: PortalMachineState) => state.context.score;
 
 export const WhackAMoleTarget: React.FC = () => {

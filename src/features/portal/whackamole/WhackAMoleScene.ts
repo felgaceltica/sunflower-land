@@ -243,12 +243,13 @@ export class WhackAMoleScene extends Phaser.Scene {
         currentScore = this.portalService?.state?.context?.score;
       }
       if (
-        this.portalService?.state?.context?.state?.minigames.prizes["minewhack"]
-          ?.score
+        this.portalService?.state?.context?.state?.minigames.prizes[
+          "mine-whack"
+        ]?.score
       ) {
         targetScore =
           this.portalService?.state?.context?.state?.minigames.prizes[
-            "minewhack"
+            "mine-whack"
           ]?.score;
       }
       if (currentScore < targetScore) {
@@ -276,12 +277,13 @@ export class WhackAMoleScene extends Phaser.Scene {
       currentScore = this.portalService?.state?.context?.score;
     }
     if (
-      this.portalService?.state?.context?.state?.minigames.prizes["minewhack"]
+      this.portalService?.state?.context?.state?.minigames.prizes["mine-whack"]
         ?.score
     ) {
       targetScore =
-        this.portalService?.state?.context?.state?.minigames.prizes["minewhack"]
-          ?.score;
+        this.portalService?.state?.context?.state?.minigames.prizes[
+          "mine-whack"
+        ]?.score;
     }
     if (currentScore >= targetScore) {
       if (!getAudioMutedSetting()) {

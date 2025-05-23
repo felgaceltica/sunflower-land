@@ -13,7 +13,7 @@ export const PortalApp: React.FC = () => {
       return <IrrigateApp />;
     case "fruit-dash":
       return <FruitDashApp />;
-    case "minewhack":
+    case "mine-whack":
       return <WhackAMoleApp />;
     case "farmer-football":
       return <FarmerFootballApp />;

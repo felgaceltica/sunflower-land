@@ -25,7 +25,7 @@ interface Props {
 }
 
 const _minigame = (state: PortalMachineState) =>
-  state.context.state?.minigames.games["minewhack"];
+  state.context.state?.minigames.games["mine-whack"];
 const _score = (state: PortalMachineState) => state.context.score;
 const _state = (state: PortalMachineState) => state.context.state;
 

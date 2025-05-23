@@ -1,6 +1,6 @@
 import { Equipped } from "features/game/types/bumpkin";
 
-export const MINIGAME_NAME = "minewhack";
+export const MINIGAME_NAME = "mine-whack";
 //export const ZOOM = window.innerWidth < 500 ? 2 : 3;
 export const UNLIMITED_ATTEMPTS_SFL = 3;
 export const RESTOCK_ATTEMPTS_SFL = 1;
