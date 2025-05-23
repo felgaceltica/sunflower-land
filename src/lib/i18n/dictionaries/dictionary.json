@@ -925,7 +925,7 @@
   "irrigate.endGame": "End game",
   "irrigate.targetScore": "Target: Less than {{moves}} moves",
   "irrigate.inventory": "inventory",
-  "whackamole.portal.title": "Minigame - Irrigate",
+  "whackamole.portal.title": "Minigame - Mine Whack",
   "whackamole.portal.description": "Run through the farm, dodge obstacles, and collect delicious fruits.",
   "whackamole.portal.missionObjectives": "Mission: Reach {{targetScore}} points.",
   "whackamole.portal.rewardMessage": "Congratulations, you completed the mission! Here is your reward.",
