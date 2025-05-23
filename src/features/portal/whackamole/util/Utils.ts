@@ -112,6 +112,7 @@ export function drawHitbox(
   }
 
   const graphics = scene.add.graphics();
+  graphics.setDepth(1000);
   graphics.lineStyle(1, 0xff0000);
 
   const hitArea = gameObject.input.hitArea;

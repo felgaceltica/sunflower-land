@@ -1,4 +1,4 @@
-import weightedRandom from "../util/Utils";
+import weightedRandom, { drawHitbox } from "../util/Utils";
 import { WhackAMoleScene } from "../WhackAMoleScene";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 
@@ -22,7 +22,7 @@ export class GameHole {
       .sprite(this._x, this._y, "rockmole")
       .setScale(0.85)
       .setOrigin(0, 0);
-    const circleHitArea = new Phaser.Geom.Circle(10, 12, 8);
+    const circleHitArea = new Phaser.Geom.Circle(10, 12, 12);
     this._hole
       .setInteractive(circleHitArea, Phaser.Geom.Circle.Contains)
       .on("pointerup", () => {
@@ -84,7 +84,7 @@ export class GameHole {
           });
         }
       });
-    //drawHitbox(this._scene, this._hole);
+    drawHitbox(this._scene, this._hole);
     this.setDepth(1000);
     this.createanims();
   }
