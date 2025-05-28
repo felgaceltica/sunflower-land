@@ -12,7 +12,6 @@ import { Label } from "components/ui/Label";
 // } from "../../util/FruitDashConstants";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
-import { BUMPKIN_SKILL_TREE } from "features/game/types/bumpkinSkills";
 
 type Props = {
   onBack: () => void;
@@ -65,26 +64,30 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
         <Label type="default">{t("whackamole.topic1")}</Label>
         <div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={SUNNYSIDE.icons.water} width={7} />
+            <SquareIcon icon={SUNNYSIDE.icons.confirm} width={7} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic1.a")}</p>
+          </div>
+          <div className="flex items-center mb-3 mx-2">
+            <SquareIcon icon={SUNNYSIDE.icons.stopwatch} width={7} />
+            <p className="text-xs ml-3 flex-1">{t("whackamole.topic1.b")}</p>
           </div>
         </div>
         {/* how to play */}
         <Label type="default">{t("whackamole.topic2")}</Label>
         <div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon
-              icon={BUMPKIN_SKILL_TREE["Free Range"].image}
-              width={7}
-            />
+            <SquareIcon icon={SUNNYSIDE.icons.mouse} width={7} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic2.a")}</p>
           </div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Pumpkin"].image} width={7} />
+            <SquareIcon icon={SUNNYSIDE.tools.hammer} width={7} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic2.b")}</p>
           </div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={SUNNYSIDE.icons.stopwatch} width={7} />
+            <SquareIcon
+              icon={ITEM_DETAILS["Orange Tunnel Bunny"].image}
+              width={7}
+            />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic2.c")}</p>
           </div>
         </div>
@@ -92,30 +95,125 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
         <Label type="default">{t("whackamole.topic3")}</Label>
         <div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={SUNNYSIDE.icons.expression_confused} width={7} />
+            <SquareIcon icon={ITEM_DETAILS["Tunnel Mole"].image} width={7} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic3.a")}</p>
           </div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={SUNNYSIDE.icons.confirm} width={7} />
+            <SquareIcon icon={SUNNYSIDE.resource.plot} width={7} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic3.b")}</p>
           </div>
         </div>
         {/* levels */}
         <Label type="default">{t("whackamole.topic4")}</Label>
-        <div>
-          <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Iron"].image} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("whackamole.topic4.a")}</p>
-          </div>
-          <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Gold"].image} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("whackamole.topic4.b")}</p>
-          </div>
-          <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Crimstone"].image} width={7} />
-            <p className="text-xs ml-3 flex-1">{t("whackamole.topic4.c")}</p>
-          </div>
-        </div>
+        <table className="w-full text-xs table-fixed border-collapse">
+          <tbody>
+            <tr>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-1/6"
+              >
+                <div className="flex items-center justify-center">
+                  {
+                    <SquareIcon
+                      icon={ITEM_DETAILS["Tunnel Mole"].image}
+                      width={15}
+                    />
+                  }
+                </div>
+              </td>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-5/6"
+              >
+                {"+5 points"}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-1/6"
+              >
+                <div className="flex items-center justify-center">
+                  {
+                    <SquareIcon
+                      icon={ITEM_DETAILS["Rocky the Mole"].image}
+                      width={15}
+                    />
+                  }
+                </div>
+              </td>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-5/6"
+              >
+                {"+10 points"}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-1/6"
+              >
+                <div className="flex items-center justify-center">
+                  {
+                    <SquareIcon
+                      icon={ITEM_DETAILS["Nugget"].image}
+                      width={15}
+                    />
+                  }
+                </div>
+              </td>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-5/6"
+              >
+                {"+15 points"}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-1/6"
+              >
+                <div className="flex items-center justify-center">
+                  {
+                    <SquareIcon
+                      icon={ITEM_DETAILS["Orange Tunnel Bunny"].image}
+                      width={13}
+                    />
+                  }
+                </div>
+              </td>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-5/6"
+              >
+                {"-20 points"}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-1/6"
+              >
+                <div className="flex items-center justify-center">
+                  {
+                    <SquareIcon
+                      icon={ITEM_DETAILS["White Tunnel Bunny"].image}
+                      width={13}
+                    />
+                  }
+                </div>
+              </td>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-5/6"
+              >
+                {"-30 points / -5 seconds"}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

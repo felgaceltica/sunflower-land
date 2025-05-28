@@ -1,4 +1,4 @@
-import weightedRandom, { drawHitbox } from "../util/Utils";
+import weightedRandom from "../util/Utils";
 import { WhackAMoleScene } from "../WhackAMoleScene";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 
@@ -84,7 +84,7 @@ export class GameHole {
           });
         }
       });
-    drawHitbox(this._scene, this._hole);
+    //drawHitbox(this._scene, this._hole);
     this.setDepth(1000);
     this.createanims();
   }
