@@ -95,6 +95,7 @@ import { TwitterPost, TwitterPostName } from "./social";
 import { NetworkName } from "../events/landExpansion/updateNetwork";
 import { RewardBoxes, RewardBoxName } from "./rewardBoxes";
 import { FloatingIslandShop, FloatingShopItemName } from "./floatingIsland";
+import { Blessing } from "../lib/blessings";
 
 export type Reward = {
   coins?: number;
@@ -1093,6 +1094,7 @@ export type Minigame = {
 export type TradeListing = {
   items: Partial<Record<MarketplaceTradeableName, number>>;
   sfl: number;
+  tax?: number; // Defaults to 10% of the sfl
   createdAt: number;
   collection: CollectionName;
   boughtAt?: number;
@@ -1107,6 +1109,7 @@ export type TradeListing = {
 export type TradeOffer = {
   items: Partial<Record<MarketplaceTradeableName, number>>;
   sfl: number;
+  tax?: number; // Defaults to 10% of the sfl
   collection: CollectionName;
   createdAt: number;
   fulfilledAt?: number;
@@ -1690,6 +1693,10 @@ export interface GameState {
   megastore?: {
     boughtAt: Partial<Record<SeasonalTierItemName, number>>;
   };
+  withdrawals?: {
+    amount: number;
+  };
+  blessing: Blessing;
 }
 
 export type FaceRecognitionEvent =

@@ -95,23 +95,6 @@ const FEATURE_FLAGS = {
     game.createdAt > new Date("2025-01-01T00:00:00Z").getTime() ||
     !game.verified,
   FACE_RECOGNITION_TEST: defaultFeatureFlag,
-
-  DISABLE_BLOCKCHAIN_ACTIONS: timeBasedFeatureFlag(
-    new Date("2025-03-24T00:00:00Z"),
-  ),
-  PIZZA_SPEED_UP_RESTRICTION: timePeriodFeatureFlag({
-    start: new Date("2024-12-18T00:00:00Z"),
-    end: new Date("2025-02-01T00:00:00Z"),
-  }),
-  FRUIT_PATCH_QUICK_SELECT: defaultFeatureFlag,
-  TASK_BOARD: betaTimeBasedFeatureFlag(new Date("2025-04-07T00:00:00Z")),
-  FLOWER_WITHDRAW: timeBasedFeatureFlag(new Date("2025-05-09T01:00:00Z")),
-
-  // Released to All Players on 5th May
-  FLOWER_GEMS: timeBasedFeatureFlag(new Date("2025-05-05T00:00:00Z")),
-
-  FLOWER_DASHBOARD: usernameFeatureFlag,
-
   LEDGER: testnetLocalStorageFeatureFlag("ledger"),
 
   FRUIT_DASH_TIMED_EVENT: periodBasedFeatureFlag(
@@ -129,6 +112,8 @@ const FEATURE_FLAGS = {
   }),
 
   MODERATOR: (game) => !!game.wardrobe.Halo,
+
+  BLESSING: defaultFeatureFlag,
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;
