@@ -192,7 +192,7 @@ export class WhackAMoleScene extends Phaser.Scene {
         this.gameStartSound?.play({ volume: 0.15 });
       }
       this.portalService?.send("START", {
-        duration: 60000,
+        duration: 20000,
       });
       this.lastMole = time;
       this.target = false;
@@ -205,7 +205,7 @@ export class WhackAMoleScene extends Phaser.Scene {
         this.musicSound.volume = 0;
       }
     }
-    //console.log(this.portalService?.state.context.endAt);
+    //console.log(this.portalService?.state.value);
     if (this.isGamePlaying) {
       const secondsLeft = !this.portalService?.state.context.endAt
         ? 0

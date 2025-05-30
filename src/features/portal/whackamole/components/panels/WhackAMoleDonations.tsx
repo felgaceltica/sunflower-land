@@ -7,30 +7,30 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { NumberInput } from "components/ui/NumberInput";
 import Decimal from "decimal.js-light";
 import { donate } from "features/portal/lib/portalUtil";
-import { NPCIcon, NPCParts } from "features/island/bumpkin/components/NPC";
+import { NPCParts } from "features/island/bumpkin/components/NPC";
 
 let FelgaParts: Partial<NPCParts>;
 let AsterionParts: Partial<NPCParts>;
 
-window
-  .fetch("https://api.sunflower-land.com/community/farms/155026", {
-    method: "GET",
-  })
-  .then((response) => {
-    response.json().then((json) => {
-      FelgaParts = json.farm.bumpkin.equipped;
-    });
-  });
+// window
+//   .fetch("https://api.sunflower-land.com/community/farms/155026", {
+//     method: "GET",
+//   })
+//   .then((response) => {
+//     response.json().then((json) => {
+//       FelgaParts = json.farm.bumpkin.equipped;
+//     });
+//   });
 
-window
-  .fetch("https://api.sunflower-land.com/community/farms/55626", {
-    method: "GET",
-  })
-  .then((response) => {
-    response.json().then((json) => {
-      AsterionParts = json.farm.bumpkin.equipped;
-    });
-  });
+// window
+//   .fetch("https://api.sunflower-land.com/community/farms/55626", {
+//     method: "GET",
+//   })
+//   .then((response) => {
+//     response.json().then((json) => {
+//       AsterionParts = json.farm.bumpkin.equipped;
+//     });
+//   });
 
 export const WhackAMoleDonations: React.FC = () => {
   const { t } = useAppTranslation();
@@ -68,11 +68,11 @@ export const WhackAMoleDonations: React.FC = () => {
 
       <div className="flex flex-wrap mt-1 mb-4 gap-x-3 gap-y-1 justify-center">
         <>
-          <NPCIcon width={24} parts={FelgaParts} />
+          {/* <NPCIcon width={24} parts={FelgaParts} /> */}
           <Label key={nameFelga} type="chill">
             <span className="pl-1">{nameFelga}</span>
           </Label>
-          <NPCIcon width={24} parts={AsterionParts} />
+          {/* <NPCIcon width={24} parts={AsterionParts} /> */}
           <Label key={nameAsterion} type="chill">
             <span className="pl-1">{nameAsterion}</span>
           </Label>

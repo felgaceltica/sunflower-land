@@ -29,6 +29,7 @@ export interface Context {
   state: GameState | undefined;
   endAt: number;
   attemptsLeft: number;
+  lastScore: number;
   score: number;
 }
 
@@ -43,6 +44,10 @@ type GainPointsEvent = {
 };
 type GameOverEvent = {
   type: "GAME_OVER";
+  score: number;
+};
+type EndEarlyEvent = {
+  type: "END_GAME_EARLY";
   score: number;
 };
 
@@ -64,7 +69,7 @@ export type PortalEvent =
   | { type: "PURCHASED_UNLIMITED" }
   | { type: "RETRY" }
   | { type: "CONTINUE" }
-  | { type: "END_GAME_EARLY" }
+  | EndEarlyEvent
   | GainPointsEvent
   | GameOverEvent
   | StartEvent;
@@ -112,6 +117,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     attemptsLeft: 0,
     endAt: 0,
     score: 0,
+    lastScore: 0,
   },
   on: {
     SET_JOYSTICK_ACTIVE: {
@@ -287,27 +293,32 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           }),
         },
         END_GAME_EARLY: {
+          target: "gameOver",
           actions: assign<Context, any>({
             endAt: (context: any) => 0,
+            lastScore: (context: any) => {
+              return context.score;
+            },
             state: (context: any) => {
-              submitScore({ score: 0 });
+              submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
                 state: context.state,
                 action: {
                   type: "minigame.scoreSubmitted",
-                  score: 0,
+                  score: Math.round(context.score),
                   id: "mine-whack",
                 },
               });
             },
           }),
-          target: "introduction",
         },
         GAME_OVER: {
           target: "gameOver",
           actions: assign({
-            state: (context: any, event: GameOverEvent) => {
-              context.score = event.score;
+            lastScore: (context: any) => {
+              return context.score;
+            },
+            state: (context: any) => {
               submitScore({ score: Math.round(context.score) });
               return submitMinigameScore({
                 state: context.state,
@@ -355,7 +366,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           },
           actions: assign({
             score: () => 0,
-            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -363,7 +373,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "loser",
           actions: assign({
             score: () => 0,
-            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -376,7 +385,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
-            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -389,7 +397,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
-            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },
@@ -402,7 +409,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
-            axes: () => 0,
             startedAt: () => 0,
           }) as any,
         },

@@ -26,7 +26,7 @@ interface Props {
 
 const _minigame = (state: PortalMachineState) =>
   state.context.state?.minigames.games["mine-whack"];
-const _score = (state: PortalMachineState) => state.context.score;
+const _lastScore = (state: PortalMachineState) => state.context.lastScore;
 const _state = (state: PortalMachineState) => state.context.state;
 
 export const WhackAMoleMission: React.FC<Props> = ({
@@ -41,7 +41,7 @@ export const WhackAMoleMission: React.FC<Props> = ({
   const { portalService } = useContext(PortalContext);
 
   const minigame = useSelector(portalService, _minigame);
-  const score = useSelector(portalService, _score);
+  const lastScore = useSelector(portalService, _lastScore);
   const state = useSelector(portalService, _state);
   const attemptsLeft = getAttemptsLeft(minigame, state);
 
@@ -50,7 +50,6 @@ export const WhackAMoleMission: React.FC<Props> = ({
   //   : false;
 
   const dateKey = new Date().toISOString().slice(0, 10);
-
   const [page, setPage] = React.useState<"main" | "achievements" | "guide">(
     "main",
   );
@@ -89,7 +88,7 @@ export const WhackAMoleMission: React.FC<Props> = ({
                 {showScore && (
                   <span>
                     {t("whackamole.score", {
-                      score: Math.round(score),
+                      score: Math.round(lastScore),
                     })}
                   </span>
                 )}

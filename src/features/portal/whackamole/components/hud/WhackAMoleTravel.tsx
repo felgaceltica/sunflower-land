@@ -86,13 +86,13 @@ export const WhackAMoleTravel: React.FC = () => {
         bumpkinParts={WhackAMole_NPC_WEREABLES["WhackaMole"]}
         show={showExitConfirmation}
         onHide={() => setShowExitConfirmation(false)}
-        messages={[t("fruit-dash.endGameConfirmation")]}
+        messages={[t("whackamole.endGameConfirmation")]}
         onCancel={() => setShowExitConfirmation(false)}
         onConfirm={() => {
           portalService.send("END_GAME_EARLY");
           setShowExitConfirmation(false);
         }}
-        confirmButtonLabel={t("fruit-dash.endGame")}
+        confirmButtonLabel={t("whackamole.endGame")}
       />
     </>
   );
