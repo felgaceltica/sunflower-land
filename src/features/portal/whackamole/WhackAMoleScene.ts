@@ -62,6 +62,8 @@ export class WhackAMoleScene extends Phaser.Scene {
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
     | Phaser.Sound.WebAudioSound;
+  private countdownText?: Phaser.GameObjects.Text;
+  private countdownStarted = false;
   constructor() {
     super(MINIGAME_NAME);
   }
@@ -183,20 +185,107 @@ export class WhackAMoleScene extends Phaser.Scene {
       Math.max(this.map.heightInPixels, canvasHeight),
     );
   }
+  private startGameCountdown() {
+    const centerX = this.cameras.main.centerX;
+    const centerY = this.cameras.main.centerY;
+    const countdownTexts = ["3", "2", "1", "GO!"];
+    let index = 0;
+
+    const showNext = () => {
+      if (this.countdownText) {
+        this.countdownText.destroy();
+        this.countdownText = undefined;
+      }
+
+      if (index >= countdownTexts.length) {
+        this.onCountdownFinished();
+        return;
+      }
+
+      this.countdownText = this.add
+        .text(centerX - 10, centerY + 15, countdownTexts[index], {
+          fontSize: "50px",
+          color: index === countdownTexts.length - 1 ? "#00ff00" : "#ffffff",
+          fontStyle: "bold",
+          fontFamily: "Arial",
+          stroke: "#000000",
+          strokeThickness: 4,
+          shadow: {
+            offsetX: 2,
+            offsetY: 2,
+            color: "#000000",
+            blur: 2,
+            fill: true,
+          },
+        })
+        .setOrigin(0.5)
+        .setScrollFactor(0)
+        .setDepth(9999)
+        .setAlpha(0)
+        .setScale(1);
+      if (!getAudioMutedSetting()) {
+        // Tocar som
+        if (index < countdownTexts.length - 1) {
+          this.sound.play("beep"); // toca beep nos números 3, 2, 1
+        } else {
+          this.sound.play("go"); // toca som diferente no GO!
+        }
+      }
+      // Fade in
+      this.tweens.add({
+        targets: this.countdownText,
+        alpha: 1,
+        duration: 100,
+        onComplete: () => {
+          // Scale pulse (aumenta e volta)
+          this.tweens.add({
+            targets: this.countdownText,
+            scale: 1.5,
+            duration: 400,
+            yoyo: true,
+            ease: "Power1",
+            onComplete: () => {
+              index++;
+              showNext();
+              // // Fade out
+              // this.tweens.add({
+              //   targets: this.countdownText,
+              //   alpha: 0,
+              //   duration: 150,
+              //   onComplete: () => {
+              //     index++;
+              //     showNext();
+              //   },
+              // });
+            },
+          });
+        },
+      });
+    };
+
+    showNext();
+  }
+  private onCountdownFinished() {
+    // Coloque aqui o código para iniciar o jogo após o countdown
+    // if (!getAudioMutedSetting()) {
+    //   this.gameStartSound?.play({ volume: 0.15 });
+    // }
+    this.portalService?.send("START", { duration: 60000 });
+    this.lastMole = this.time.now;
+    this.target = false;
+    this.timeWarning = false;
+  }
   async update(time: number, delta: number) {
     const audioMuted = getAudioMutedSetting();
     const musicMuted = getMusicMutedSetting();
 
     if (this.isGameReady) {
-      if (!audioMuted) {
-        this.gameStartSound?.play({ volume: 0.15 });
+      if (!this.countdownStarted) {
+        this.countdownStarted = true;
+        this.startGameCountdown();
       }
-      this.portalService?.send("START", {
-        duration: 60000,
-      });
-      this.lastMole = time;
-      this.target = false;
-      this.timeWarning = false;
+    } else {
+      this.countdownStarted = false; // reset se sair do ready (opcional)
     }
     if (this.musicSound) {
       if (!musicMuted) {
@@ -382,6 +471,8 @@ export class WhackAMoleScene extends Phaser.Scene {
     this.load.audio("target_achieve", "world/whackamole/targetAchieve.mp3");
     this.load.audio("time_ticking", "world/whackamole/timeTicking.mp3");
     this.load.audio("music", "world/whackamole/music2.mp3");
+    this.load.audio("beep", "world/whackamole/beep.mp3");
+    this.load.audio("go", "world/whackamole/go.mp3");
   }
   public initialiseMap() {
     this.map = this.make.tilemap({
