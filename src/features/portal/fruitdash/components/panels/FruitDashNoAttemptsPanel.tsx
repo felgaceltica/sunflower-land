@@ -7,7 +7,7 @@ import { PortalContext } from "../../lib/PortalProvider";
 import { Label } from "components/ui/Label";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "../../lib/FruitDashMachine";
-import sfl from "assets/icons/sfl.webp";
+import flowerIcon from "assets/icons/flower_token.webp";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import {
   FRUIT_DASH_NPC_NAME,
@@ -19,7 +19,6 @@ import {
 import { purchase } from "features/portal/lib/portalUtil";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { setPrecision } from "lib/utils/formatNumber";
-import sflIcon from "assets/icons/sfl.webp";
 import Decimal from "decimal.js-light";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 
@@ -42,7 +41,7 @@ export const FruitDashNoAttemptsPanel: React.FC = () => {
             {t("fruit-dash.noAttemptsRemaining")}
           </Label>
           <Label
-            icon={sfl}
+            icon={flowerIcon}
             type={sflBalance.lt(RESTOCK_ATTEMPTS_SFL) ? "danger" : "default"}
           >
             {t("fruit-dash.sflRequired")}
@@ -57,7 +56,7 @@ export const FruitDashNoAttemptsPanel: React.FC = () => {
         <div className="flex items-center space-x-1 relative">
           <p className="balance-text">{setPrecision(sflBalance).toString()}</p>
           <img
-            src={sflIcon}
+            src={flowerIcon}
             alt="SFL"
             style={{
               width: `${PIXEL_SCALE * 11}px`,
