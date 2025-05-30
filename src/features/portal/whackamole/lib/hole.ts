@@ -25,6 +25,12 @@ export class GameHole {
     const circleHitArea = new Phaser.Geom.Circle(10, 12, 12);
     this._hole
       .setInteractive(circleHitArea, Phaser.Geom.Circle.Contains)
+      .on("pointerover", () => {
+        this._scene.input.setDefaultCursor("pointer");
+      })
+      .on("pointerout", () => {
+        this._scene.input.setDefaultCursor("default");
+      })
       .on("pointerup", () => {
         if (
           this._state == "idle" ||

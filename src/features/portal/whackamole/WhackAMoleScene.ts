@@ -192,7 +192,7 @@ export class WhackAMoleScene extends Phaser.Scene {
         this.gameStartSound?.play({ volume: 0.15 });
       }
       this.portalService?.send("START", {
-        duration: 20000,
+        duration: 60000,
       });
       this.lastMole = time;
       this.target = false;
