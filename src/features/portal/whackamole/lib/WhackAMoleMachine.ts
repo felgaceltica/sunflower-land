@@ -167,7 +167,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           });
 
           const minigame = game.minigames.games["mine-whack"];
-          const attemptsLeft = getAttemptsLeft(minigame);
+          const attemptsLeft = getAttemptsLeft(minigame, game);
 
           return { game, farmId, attemptsLeft };
         },
@@ -231,7 +231,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "noAttempts",
           cond: (context) => {
             const minigame = context.state?.minigames.games["mine-whack"];
-            const attemptsLeft = getAttemptsLeft(minigame);
+            const attemptsLeft = getAttemptsLeft(minigame, context.state);
             return attemptsLeft <= 0;
           },
         },

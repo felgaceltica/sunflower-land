@@ -41,9 +41,9 @@ export const WhackAMoleMission: React.FC<Props> = ({
   const { portalService } = useContext(PortalContext);
 
   const minigame = useSelector(portalService, _minigame);
-  const attemptsLeft = getAttemptsLeft(minigame);
   const score = useSelector(portalService, _score);
   const state = useSelector(portalService, _state);
+  const attemptsLeft = getAttemptsLeft(minigame, state);
 
   // const hasBetaAccess = state
   //   ? hasFeatureAccess(state, "WHACKAMOLE")

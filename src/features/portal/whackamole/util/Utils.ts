@@ -46,20 +46,23 @@ export default function weightedRandom(items: any[], weights: number[]) {
   }
 }
 
-import { Minigame } from "features/game/types/game";
+import { GameState, Minigame } from "features/game/types/game";
 import {
   RESTOCK_ATTEMPTS_SFL,
   UNLIMITED_ATTEMPTS_SFL,
   DAILY_ATTEMPTS,
   RESTOCK_ATTEMPTS,
 } from "./WhackAMoleConstants";
+import { hasFeatureAccess } from "lib/flags";
 
 /**
  * Gets the number of attempts left for the minigame.
  * @param minigame The minigame.
  * @returns The number of attempts left.
  */
-export const getAttemptsLeft = (minigame?: Minigame) => {
+export const getAttemptsLeft = (minigame?: Minigame, gameState?: GameState) => {
+  if (gameState && hasFeatureAccess(gameState, "MINE_WHACK_BETA"))
+    return Infinity;
   const dateKey = new Date().toISOString().slice(0, 10);
 
   const history = minigame?.history ?? {};
