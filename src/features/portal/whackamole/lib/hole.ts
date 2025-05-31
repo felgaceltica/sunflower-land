@@ -61,6 +61,11 @@ export class GameHole {
             default:
               break;
           }
+          let streak = 1;
+          if (this._scene.portalService && points > 0)
+            streak = this._scene.portalService.state.context.streak + 1;
+          if (streak > 5) streak = 5;
+          this.showFloatingScore(points * streak);
           if (!getAudioMutedSetting()) {
             if (points > 0) {
               this._scene.collectPointSound?.play({ volume: 0.15 });
@@ -81,6 +86,7 @@ export class GameHole {
             });
         }
         if (this._state == "avaiable" && this._mole == "") {
+          this.showFloatingScore(-10);
           if (!getAudioMutedSetting()) {
             this._scene.targetErrorSound?.play({ volume: 0.15 });
           }
@@ -196,6 +202,37 @@ export class GameHole {
       "orangebunnyhide",
       time,
     );
+  }
+  private showFloatingScore(points: number) {
+    const textColor = points > 0 ? "#00ff00" : "#ff0000";
+    const prefix = points > 0 ? "+" : "";
+
+    const scoreText = this._scene.add.text(
+      this._x + this._hole.width * 0.5,
+      this._y,
+      `${prefix}${points}`,
+      {
+        fontSize: "15px",
+        color: textColor,
+        fontFamily: "Arial",
+        stroke: "#000",
+        strokeThickness: 3,
+      },
+    );
+
+    scoreText.setOrigin(0.5);
+    scoreText.setDepth(1000); // Garante que fique acima dos outros elementos
+
+    this._scene.tweens.add({
+      targets: scoreText,
+      y: scoreText.y - 25,
+      alpha: 0,
+      duration: 600,
+      ease: "Cubic.easeOut",
+      onComplete: () => {
+        scoreText.destroy();
+      },
+    });
   }
   protected createanims() {
     if (!this._scene.anims.exists("rockmoleshow")) {
