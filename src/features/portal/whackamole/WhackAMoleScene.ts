@@ -186,6 +186,8 @@ export class WhackAMoleScene extends Phaser.Scene {
     );
   }
   private startGameCountdown() {
+    this.onCountdownFinished();
+    return;
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
     const countdownTexts = ["3", "2", "1", "GO!"];
