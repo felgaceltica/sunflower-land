@@ -59,11 +59,11 @@ export const WhackAMoleHud: React.FC = () => {
           <div
             className="absolute"
             style={{
-              top: `${PIXEL_SCALE * 0}px`,
+              top: `${PIXEL_SCALE * 2}px`,
               left: `${PIXEL_SCALE * 3}px`,
             }}
           >
-            {(isPlaying || true) && (
+            {isPlaying && (
               <>
                 <WhackAMoleTarget />
                 <WhackAMoleScores />

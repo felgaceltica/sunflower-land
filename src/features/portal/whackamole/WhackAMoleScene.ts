@@ -19,7 +19,6 @@ import { getMusicMutedSetting } from "./util/useIsMusicMuted";
 import { getDarkModeSetting } from "./util/useIsDarkMode";
 import seasonal_tileset from "assets/map/seasonal_tileset.json";
 import { WhackNightShaderPipeline } from "./util/WhackAMoleShader";
-import { ComboBar } from "./lib/comboBar";
 
 //import { WhackAMoleShader } from './util/WhackAMoleShader'
 export class WhackAMoleScene extends Phaser.Scene {
@@ -65,7 +64,6 @@ export class WhackAMoleScene extends Phaser.Scene {
     | Phaser.Sound.WebAudioSound;
   private countdownText?: Phaser.GameObjects.Text;
   private countdownStarted = false;
-  private comboBar!: ComboBar;
   constructor() {
     super(MINIGAME_NAME);
   }
@@ -140,20 +138,6 @@ export class WhackAMoleScene extends Phaser.Scene {
     ) as WhackNightShaderPipeline;
     nightShaderPipeline.lightSources = [{ x: 0.475, y: 0.575 }];
     document.fonts.load("16px Teeny");
-    // this.comboBar = new ComboBar(this, 100, 100);
-
-    // this.time.addEvent({
-    //   delay: 1000,
-    //   loop: true,
-    //   callback: () => {
-    //     this.comboBar.incrementCombo();
-
-    //     if (this.comboBar.isMaxCombo()) {
-    //       console.log("Combo máximo atingido!");
-    //       this.comboBar.resetCombo();
-    //     }
-    //   },
-    // });
   }
   private ChangeMap = () => {
     if (this.map) this.map.destroy();

@@ -38,6 +38,7 @@ export class GameHole {
           this._state == "hide"
         ) {
           this._hole.anims.stop();
+          this._hole.setFrame(0);
           this._state = "dead";
           let points = 0;
           let time = 0;
