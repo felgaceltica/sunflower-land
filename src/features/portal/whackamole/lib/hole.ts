@@ -156,6 +156,14 @@ export class GameHole {
             this._hole
               .play(hide)
               .once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+                if (
+                  this._state == "hide" &&
+                  (this._mole == "rock" ||
+                    this._mole == "iron" ||
+                    this._mole == "gold")
+                ) {
+                  this._scene.portalService?.send("RESET_STREAK");
+                }
                 this._state = "avaiable";
                 this._mole = "";
               });

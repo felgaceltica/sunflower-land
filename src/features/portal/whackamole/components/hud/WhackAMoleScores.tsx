@@ -4,13 +4,11 @@ import { PortalContext } from "../../lib/PortalProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "../../lib/WhackAMoleMachine";
 
-// const _score = (state: PortalMachineState) => state.context.score;
 const _score = (state: PortalMachineState) => state.context.score;
 
 export const WhackAMoleScores: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const { t } = useAppTranslation();
-  // const score = useSelector(portalService, _score);
   const score = useSelector(portalService, _score);
 
   return (

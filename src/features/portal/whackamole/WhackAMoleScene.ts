@@ -19,6 +19,7 @@ import { getMusicMutedSetting } from "./util/useIsMusicMuted";
 import { getDarkModeSetting } from "./util/useIsDarkMode";
 import seasonal_tileset from "assets/map/seasonal_tileset.json";
 import { WhackNightShaderPipeline } from "./util/WhackAMoleShader";
+import { ComboBar } from "./lib/comboBar";
 
 //import { WhackAMoleShader } from './util/WhackAMoleShader'
 export class WhackAMoleScene extends Phaser.Scene {
@@ -64,6 +65,7 @@ export class WhackAMoleScene extends Phaser.Scene {
     | Phaser.Sound.WebAudioSound;
   private countdownText?: Phaser.GameObjects.Text;
   private countdownStarted = false;
+  private comboBar!: ComboBar;
   constructor() {
     super(MINIGAME_NAME);
   }
@@ -137,6 +139,21 @@ export class WhackAMoleScene extends Phaser.Scene {
       "night",
     ) as WhackNightShaderPipeline;
     nightShaderPipeline.lightSources = [{ x: 0.475, y: 0.575 }];
+
+    // this.comboBar = new ComboBar(this, 100, 100);
+
+    // this.time.addEvent({
+    //   delay: 1000,
+    //   loop: true,
+    //   callback: () => {
+    //     this.comboBar.incrementCombo();
+
+    //     if (this.comboBar.isMaxCombo()) {
+    //       console.log("Combo máximo atingido!");
+    //       this.comboBar.resetCombo();
+    //     }
+    //   },
+    // });
   }
   private ChangeMap = () => {
     if (this.map) this.map.destroy();
@@ -296,7 +313,7 @@ export class WhackAMoleScene extends Phaser.Scene {
         this.musicSound.volume = 0;
       }
     }
-    //console.log(this.portalService?.state.value);
+    //console.log(this.portalService?.state.context.streak);
     if (this.isGamePlaying) {
       const secondsLeft = !this.portalService?.state.context.endAt
         ? 0
@@ -319,13 +336,13 @@ export class WhackAMoleScene extends Phaser.Scene {
       let nextMole = 999999;
       switch (fase) {
         case 1:
-          nextMole = 900;
+          nextMole = 800;
           break;
         case 2:
-          nextMole = 700;
+          nextMole = 600;
           break;
         case 3:
-          nextMole = 500;
+          nextMole = 450;
           break;
         default:
           nextMole = 999999;
