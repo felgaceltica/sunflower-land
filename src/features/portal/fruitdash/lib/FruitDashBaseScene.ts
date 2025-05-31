@@ -28,6 +28,7 @@ import {
   TOTAL_LINES,
 } from "../util/FruitDashConstants";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
+import { getMusicMutedSetting } from "../util/useIsMusicMuted";
 import { MINIGAME_NAME } from "../util/FruitDashConstants";
 import { FruitDashGroundFactory } from "./Ground";
 import { getAnimationUrl } from "features/world/lib/animations";
@@ -164,8 +165,8 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     this.initialiseCamera();
     this.initialiseSounds();
     this.initialiseControls();
-    const audioMuted = getAudioMutedSetting();
-    if (!audioMuted) {
+    const musicMuted = getMusicMutedSetting();
+    if (!musicMuted) {
       this.musicSound?.play({ volume: 0.07 });
     }
     this.groundFactory?.createBaseRoad();
@@ -260,10 +261,11 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
     }
   }
   public updatePlayer(speed_factor: number) {
-    const audioMuted = getAudioMutedSetting();
+    const musicMuted = getMusicMutedSetting();
     if (this.musicSound) {
-      if (!audioMuted) {
+      if (!musicMuted) {
         this.musicSound.volume = 0.07;
+        if (!this.musicSound.isPlaying) this.musicSound.play();
       } else {
         this.musicSound.volume = 0;
       }

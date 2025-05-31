@@ -17,8 +17,11 @@ import classNames from "classnames";
 import { isTouchDevice } from "features/world/lib/device";
 import sound_on from "assets/icons/sound_on.png";
 import sound_off from "assets/icons/sound_off.png";
+import music_on from "../../assets/music_on.png";
+import music_off from "../../assets/music_off.png";
 import { useIsAudioMuted } from "lib/utils/hooks/useIsAudioMuted";
 import { useIsHalloweenMode } from "../../util/useIsHalloweenMode";
+import { useIsMusicMuted } from "../../util/useIsMusicMuted";
 
 const buttonWidth = PIXEL_SCALE * 22;
 const buttonHeight = PIXEL_SCALE * 23;
@@ -31,7 +34,7 @@ export const FruitDashSettings: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const state = useSelector(portalService, _state);
   const { isHalloweenMode, toggleHalloweenMode } = useIsHalloweenMode();
-
+  const { isMusicMuted, toggleMusicMuted } = useIsMusicMuted();
   const { isAudioMuted, toggleAudioMuted } = useIsAudioMuted();
 
   useEffect(() => {
@@ -119,7 +122,23 @@ export const FruitDashSettings: React.FC = () => {
         }}
       />,
     );
-
+  const musicButton = (index: number) =>
+    settingButton(
+      index,
+      () => {
+        button.play();
+        toggleMusicMuted();
+      },
+      <img
+        src={isMusicMuted ? music_off : music_on}
+        className="absolute"
+        style={{
+          top: `${PIXEL_SCALE * 4}px`,
+          left: `${PIXEL_SCALE * 5}px`,
+          width: `${PIXEL_SCALE * 13}px`,
+        }}
+      />,
+    );
   const halloweenModeButton = (index: number) =>
     settingButton(
       index,
@@ -158,7 +177,7 @@ export const FruitDashSettings: React.FC = () => {
     );
 
   // list of buttons to show in the HUD from right to left in order
-  const buttons = [gearButton, audioButton, halloweenModeButton];
+  const buttons = [gearButton, musicButton, audioButton, halloweenModeButton];
   return (
     <div
       className="fixed z-50 flex flex-col justify-between"
