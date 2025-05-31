@@ -207,27 +207,28 @@ export class GameHole {
     const textColor = points > 0 ? "#00ff00" : "#ff0000";
     const prefix = points > 0 ? "+" : "";
 
-    const scoreText = this._scene.add.text(
-      this._x + this._hole.width * 0.5,
-      this._y,
-      `${prefix}${points}`,
-      {
-        fontSize: "15px",
-        color: textColor,
-        fontFamily: "Arial",
-        stroke: "#000",
-        strokeThickness: 3,
-      },
-    );
+    // Arredonda posição para evitar texto borrado
+    const x = this._x - 1 + this._hole.width * 0.5;
+    const y = this._y + 1;
+
+    const scoreText = this._scene.add.text(x, y, `${prefix}${points}`, {
+      fontSize: "10px", // Texto com mais resolução
+      fontFamily: "Teeny",
+      color: textColor,
+      stroke: "#000",
+      strokeThickness: 2,
+    });
 
     scoreText.setOrigin(0.5);
-    scoreText.setDepth(1000); // Garante que fique acima dos outros elementos
+    scoreText.setScale(0.5); // Aparece como “8px” visualmente
+    scoreText.setDepth(1000);
+    //scoreText.setResolution?.(2);       // Se suportado, dobra a nitidez
 
     this._scene.tweens.add({
       targets: scoreText,
-      y: scoreText.y - 25,
+      //y: y - 25,
       alpha: 0,
-      duration: 600,
+      duration: 1000,
       ease: "Cubic.easeOut",
       onComplete: () => {
         scoreText.destroy();

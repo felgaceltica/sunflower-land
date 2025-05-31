@@ -139,7 +139,7 @@ export class WhackAMoleScene extends Phaser.Scene {
       "night",
     ) as WhackNightShaderPipeline;
     nightShaderPipeline.lightSources = [{ x: 0.475, y: 0.575 }];
-
+    document.fonts.load("16px Teeny");
     // this.comboBar = new ComboBar(this, 100, 100);
 
     // this.time.addEvent({
@@ -481,6 +481,11 @@ export class WhackAMoleScene extends Phaser.Scene {
       frameWidth: 20,
       frameHeight: 19,
     });
+    this.load.bitmapFont(
+      "Teeny Tiny Pixls",
+      "world/Teeny Tiny Pixls5.png",
+      "world/Teeny Tiny Pixls5.xml",
+    );
   }
   private loadSounds() {
     this.load.audio("game_start", "world/whackamole/gameStart.mp3");
