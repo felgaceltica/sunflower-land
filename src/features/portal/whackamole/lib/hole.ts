@@ -171,6 +171,9 @@ export class GameHole {
                     this._mole == "gold")
                 ) {
                   this._scene.portalService?.send("RESET_STREAK");
+                  if (!getAudioMutedSetting()) {
+                    this._scene.loseLifeSound?.play({ volume: 0.15 });
+                  }
                 }
                 this._state = "avaiable";
                 this._mole = "";

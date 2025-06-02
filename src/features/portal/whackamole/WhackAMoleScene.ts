@@ -61,6 +61,10 @@ export class WhackAMoleScene extends Phaser.Scene {
     | Phaser.Sound.NoAudioSound
     | Phaser.Sound.HTML5AudioSound
     | Phaser.Sound.WebAudioSound;
+  loseLifeSound?:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound;
   private countdownText?: Phaser.GameObjects.Text;
   private countdownStarted = false;
   constructor() {
@@ -487,6 +491,7 @@ export class WhackAMoleScene extends Phaser.Scene {
   }
   private loadSounds() {
     this.load.audio("game_start", "world/whackamole/gameStart.mp3");
+    this.load.audio("lose_life", "world/whackamole/loseLife.mp3");
     this.load.audio("game_over", "world/whackamole/gameOver.mp3");
     this.load.audio("target_error", "world/whackamole/targetError1.mp3");
     this.load.audio("collect_point", "world/whackamole/collectPoint.mp3");
@@ -534,6 +539,7 @@ export class WhackAMoleScene extends Phaser.Scene {
       this.targetReachedSound = this.sound.add("target_achieve");
     if (!this.timeTickingSound)
       this.timeTickingSound = this.sound.add("time_ticking");
+    if (!this.loseLifeSound) this.loseLifeSound = this.sound.add("lose_life");
     if (!this.musicSound) {
       this.musicSound = this.sound.add("music");
       this.musicSound.loop = true;
