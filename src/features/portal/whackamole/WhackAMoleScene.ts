@@ -12,7 +12,6 @@ import RexGesturePlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 import { isMobile } from "mobile-device-detect";
 import { GameHole } from "./lib/hole";
 import { GameState } from "features/game/types/game";
-import weightedRandom from "./util/Utils";
 import { getAudioMutedSetting } from "lib/utils/hooks/useIsAudioMuted";
 import confetti from "canvas-confetti";
 import { getMusicMutedSetting } from "./util/useIsMusicMuted";
@@ -297,55 +296,62 @@ export class WhackAMoleScene extends Phaser.Scene {
         this.musicSound.volume = 0;
       }
     }
-    //console.log(this.portalService?.state.context.streak);
+    //console.log(this.portalService?.state.context.lives);
     if (this.isGamePlaying) {
-      const secondsLeft = !this.portalService?.state.context.endAt
+      const secondsPassed = !this.portalService?.state.context.startedAt
         ? 0
-        : Math.max(this.portalService?.state.context.endAt - Date.now(), 0) /
-          1000;
-      if (secondsLeft <= 10 && !this.timeWarning) {
-        if (!getAudioMutedSetting()) {
-          this.timeTickingSound?.play({ volume: 0.8 });
-        }
-        this.timeWarning = true;
-      }
-      let fase = 0;
-      if (secondsLeft > 40) {
-        fase = 1;
-      } else if (secondsLeft > 20) {
-        fase = 2;
-      } else {
-        fase = 3;
-      }
-      let nextMole = 999999;
-      switch (fase) {
-        case 1:
-          nextMole = 800;
-          break;
-        case 2:
-          nextMole = 600;
-          break;
-        case 3:
-          nextMole = 450;
-          break;
-        default:
-          nextMole = 999999;
-          break;
-      }
+        : Math.max(
+            Date.now() - this.portalService?.state.context.startedAt,
+            0,
+          ) / 1000;
+      // if (secondsPassed <= 10 && !this.timeWarning) {
+      //   if (!getAudioMutedSetting()) {
+      //     this.timeTickingSound?.play({ volume: 0.8 });
+      //   }
+      //   this.timeWarning = true;
+      // }
+      //let fase = 0;
+      const fase = Math.floor(secondsPassed / 10) + 1;
+      //console.log(fase);
+      const nextMole = Math.max(850 - fase * 50, 200);
+      //console.log(nextMole);
+      // if (secondsPassed < 20) {
+      //   fase = 1;
+      // } else if (secondsPassed < 40 ) {
+      //   fase = 2;
+      // } else {
+      //   fase = 3;
+      // }
+      // let nextMole = 999999;
+      // switch (fase) {
+      //   case 1:
+      //     nextMole = 800;
+      //     break;
+      //   case 2:
+      //     nextMole = 600;
+      //     break;
+      //   case 3:
+      //     nextMole = 450;
+      //     break;
+      //   default:
+      //     nextMole = 999999;
+      //     break;
+      // }
       const moleTime = time - this.lastMole;
       if (moleTime > nextMole) {
         this.lastMole = time;
         let holeIndex = -1;
-        while (holeIndex == -1) {
-          const nextHole = weightedRandom(
-            [0, 1, 2, 3, 4, 5, 6, 7, 8],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1],
-          );
-          if (this.holes[nextHole?.item].getState() == "avaiable") {
-            holeIndex = nextHole?.item;
+        const avaiableHoles = [];
+        for (let index = 0; index < this.holes.length; index++) {
+          if (this.holes[index].getState() == "avaiable") {
+            avaiableHoles.push(index);
           }
         }
-        this.holes[holeIndex].showMole(fase);
+        if (avaiableHoles.length > 0) {
+          const index = Math.floor(Math.random() * avaiableHoles.length);
+          holeIndex = avaiableHoles[index];
+          this.holes[holeIndex].showMole(fase);
+        }
       }
       let currentScore = 0;
       let targetScore = 0;
@@ -376,11 +382,19 @@ export class WhackAMoleScene extends Phaser.Scene {
     }
     //if (!this.isGamePlaying) this.gameBoard.cleanBoard();
     // end game when time is up
-    if (this.isGamePlaying && this.secondsLeft <= 0) {
-      this.endGame(0);
+    // if (this.isGamePlaying && this.secondsLeft <= 0) {
+    //   this.endGame(0);
+    // }
+    //console.log(this.portalService?.state.context.lives);
+    if (
+      this.isGamePlaying &&
+      this.portalService &&
+      this.portalService?.state.context.lives <= 0
+    ) {
+      this.endGame();
     }
   }
-  public endGame = (score: number) => {
+  public endGame = () => {
     let currentScore = 0;
     let targetScore = 0;
     if (this.portalService?.state?.context?.score) {
@@ -414,11 +428,11 @@ export class WhackAMoleScene extends Phaser.Scene {
     });
   };
 
-  public get secondsLeft() {
-    const endAt = this.portalService?.state.context.endAt;
-    const secondsLeft = !endAt ? 0 : Math.max(endAt - Date.now(), 0) / 1000;
-    return secondsLeft;
-  }
+  // public get secondsPassed() {
+  //   const startedAt = this.portalService?.state.context.startedAt;
+  //   const secondsPassed = !startedAt ? 0 : Math.max(Date.now() - startedAt, 0) / 1000;
+  //   return secondsPassed;
+  // }
 
   private initialiseCamera() {
     const camera = this.cameras.main;

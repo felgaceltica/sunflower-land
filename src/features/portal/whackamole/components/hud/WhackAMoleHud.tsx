@@ -11,6 +11,7 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import { WhackAMoleScores } from "./WhackAMoleScores";
 import { WhackAMoleTarget } from "./WhackAMoleTarget";
 import { WhackAMoleComboBar } from "./WhackAMoleCombo";
+import { WhackAMoleLivesDisplay } from "./WhackAMoleLivesDisplay";
 //import { useAchievementToast } from "../../providers/AchievementToastProvider";
 
 const _isJoystickActive = (state: PortalMachineState) =>
@@ -80,6 +81,7 @@ export const WhackAMoleHud: React.FC = () => {
           {isPlaying && (
             <>
               <WhackAMoleTimer />
+              <WhackAMoleLivesDisplay />
             </>
           )}
         </div>

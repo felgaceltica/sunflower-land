@@ -27,16 +27,18 @@ export interface Context {
   jwt: string | null;
   isJoystickActive: boolean;
   state: GameState | undefined;
-  endAt: number;
+  //endAt: number;
+  startedAt: number;
   attemptsLeft: number;
   lastScore: number;
   score: number;
   streak: number;
+  lives: number;
 }
 
 type StartEvent = {
   type: "START";
-  duration: number;
+  //duration: number;
 };
 type GainPointsEvent = {
   type: "GAIN_POINTS";
@@ -117,10 +119,12 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
     attemptsLeft: 0,
-    endAt: 0,
+    //endAt: 0,
+    startedAt: 0,
     score: 0,
     lastScore: 0,
     streak: 0,
+    lives: 3,
   },
   on: {
     SET_JOYSTICK_ACTIVE: {
@@ -263,10 +267,14 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         START: {
           target: "playing",
           actions: assign<Context, any>({
-            endAt: (context: Context, event: StartEvent) => {
-              return Date.now() + event.duration;
+            // endAt: (context: Context, event: StartEvent) => {
+            //   return Date.now() + event.duration;
+            // },
+            startedAt: (context: Context, event: StartEvent) => {
+              return Date.now();
             },
             score: 0,
+            lives: 3,
             state: (context: any) => {
               startAttempt();
               return startMinigameAttempt({
@@ -290,6 +298,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             streak: (context: Context, event: GainPointsEvent) => {
               return 0;
             },
+            lives: (context: Context, event: GainPointsEvent) => {
+              return context.lives - 1;
+            },
           }),
         },
         GAIN_POINTS: {
@@ -308,15 +319,23 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 return context.score + event.points;
               }
             },
-            endAt: (context: Context, event: GainPointsEvent) => {
-              return context.endAt + event.time;
+            lives: (context: Context, event: GainPointsEvent) => {
+              if (event.points < 0) {
+                return context.lives - 1;
+              } else {
+                return context.lives;
+              }
             },
+            // endAt: (context: Context, event: GainPointsEvent) => {
+            //   return context.endAt + event.time;
+            // },
           }),
         },
         END_GAME_EARLY: {
           target: "gameOver",
           actions: assign<Context, any>({
-            endAt: (context: any) => 0,
+            //endAt: (context: any) => 0,
+            lives: (context: any) => 0,
             lastScore: (context: any) => {
               return context.score;
             },
@@ -370,6 +389,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           },
           actions: assign({
             score: () => 0,
+            lives: () => 0,
             streak: () => 0,
             startedAt: () => 0,
           }) as any,
@@ -387,6 +407,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           },
           actions: assign({
             score: () => 0,
+            lives: () => 0,
             streak: () => 0,
             startedAt: () => 0,
           }) as any,
@@ -395,6 +416,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "loser",
           actions: assign({
             score: () => 0,
+            lives: () => 0,
             streak: () => 0,
             startedAt: () => 0,
           }) as any,
@@ -408,6 +430,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
+            lives: () => 0,
             streak: () => 0,
             startedAt: () => 0,
           }) as any,
@@ -421,8 +444,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
+            lives: () => 0,
             streak: () => 0,
-            startedAt: () => 0,
+            //startedAt: () => 0,
           }) as any,
         },
       },
@@ -434,8 +458,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "starting",
           actions: assign({
             score: () => 0,
+            lives: () => 0,
             streak: () => 0,
-            startedAt: () => 0,
+            //startedAt: () => 0,
           }) as any,
         },
       },

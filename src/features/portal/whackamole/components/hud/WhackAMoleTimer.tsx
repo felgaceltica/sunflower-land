@@ -8,16 +8,18 @@ import useUiRefresher from "lib/utils/hooks/useUiRefresher";
 import { Label } from "components/ui/Label";
 import { PortalMachineState } from "../../lib/WhackAMoleMachine";
 
-const _endAt = (state: PortalMachineState) => state.context.endAt;
+const _startedAt = (state: PortalMachineState) => state.context.startedAt;
 
 export const WhackAMoleTimer: React.FC = () => {
   useUiRefresher({ delay: 100 });
 
   const { portalService } = useContext(PortalContext);
 
-  const endAt = useSelector(portalService, _endAt);
+  const startedAt = useSelector(portalService, _startedAt);
 
-  const secondsLeft = !endAt ? 0 : Math.max(endAt - Date.now(), 0) / 1000;
+  const secondsPassed = !startedAt
+    ? 0
+    : Math.max(Date.now() - startedAt, 0) / 1000;
 
   return (
     <Label
@@ -25,11 +27,11 @@ export const WhackAMoleTimer: React.FC = () => {
       icon={SUNNYSIDE.icons.stopwatch}
       type={"info"}
       style={{
-        top: `${PIXEL_SCALE * 3}px`,
+        top: `${PIXEL_SCALE * 18}px`,
         right: `${PIXEL_SCALE * 3}px`,
       }}
     >
-      {secondsToString(secondsLeft, {
+      {secondsToString(secondsPassed, {
         length: "full",
       })}
     </Label>

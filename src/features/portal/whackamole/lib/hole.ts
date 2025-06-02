@@ -111,21 +111,22 @@ export class GameHole {
   showMole(fase: number) {
     const moles = ["rock", "iron", "gold", "white", "orange"];
     let weights = [80, 0, 0, 0, 20];
-    let duration = 1000;
+    const duration = Math.max(900 - fase * 40, 150);
     switch (fase) {
       case 1:
-        weights = [80, 0, 0, 0, 20];
-        duration = 700;
-        break;
       case 2:
-        weights = [50, 25, 0, 15, 10];
-        duration = 600;
+        weights = [80, 0, 0, 0, 20];
         break;
       case 3:
+      case 4:
+        weights = [50, 25, 0, 15, 10];
+        break;
+      case 5:
+      case 6:
         weights = [0, 40, 20, 20, 20];
-        duration = 400;
         break;
       default:
+        weights = [0, 15, 25, 30, 30];
         break;
     }
     const nextMole = weightedRandom(moles, weights);
