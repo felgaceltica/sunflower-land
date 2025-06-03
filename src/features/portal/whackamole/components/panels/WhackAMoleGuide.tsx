@@ -68,7 +68,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic1.a")}</p>
           </div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={SUNNYSIDE.icons.stopwatch} width={7} />
+            <SquareIcon icon={SUNNYSIDE.icons.heart} width={7} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic1.b")}</p>
           </div>
         </div>
@@ -84,10 +84,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic2.b")}</p>
           </div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon
-              icon={ITEM_DETAILS["Orange Tunnel Bunny"].image}
-              width={7}
-            />
+            <SquareIcon icon={"world/whackamole/orangebunny.gif"} width={8} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic2.c")}</p>
           </div>
         </div>
@@ -95,11 +92,11 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
         <Label type="default">{t("whackamole.topic3")}</Label>
         <div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={ITEM_DETAILS["Tunnel Mole"].image} width={7} />
+            <SquareIcon icon={ITEM_DETAILS["Tunnel Mole"].image} width={8} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic3.a")}</p>
           </div>
           <div className="flex items-center mb-3 mx-2">
-            <SquareIcon icon={SUNNYSIDE.resource.plot} width={7} />
+            <SquareIcon icon={"world/whackamole/empty_hole.png"} width={8} />
             <p className="text-xs ml-3 flex-1">{t("whackamole.topic3.b")}</p>
           </div>
         </div>
@@ -116,7 +113,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
                   {
                     <SquareIcon
                       icon={ITEM_DETAILS["Tunnel Mole"].image}
-                      width={15}
+                      width={12}
                     />
                   }
                 </div>
@@ -137,7 +134,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
                   {
                     <SquareIcon
                       icon={ITEM_DETAILS["Rocky the Mole"].image}
-                      width={15}
+                      width={12}
                     />
                   }
                 </div>
@@ -158,7 +155,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
                   {
                     <SquareIcon
                       icon={ITEM_DETAILS["Nugget"].image}
-                      width={15}
+                      width={12}
                     />
                   }
                 </div>
@@ -178,7 +175,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
                 <div className="flex items-center justify-center">
                   {
                     <SquareIcon
-                      icon={ITEM_DETAILS["Orange Tunnel Bunny"].image}
+                      icon={"world/whackamole/orangebunny.gif"}
                       width={13}
                     />
                   }
@@ -199,7 +196,7 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
                 <div className="flex items-center justify-center">
                   {
                     <SquareIcon
-                      icon={ITEM_DETAILS["White Tunnel Bunny"].image}
+                      icon={"world/whackamole/whitebunny.gif"}
                       width={13}
                     />
                   }
@@ -210,6 +207,27 @@ export const WhackAMoleGuide: React.FC<Props> = ({ onBack }) => {
                 className="p-1.5 w-5/6"
               >
                 {"-30 points / -5 seconds"}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-1/6"
+              >
+                <div className="flex items-center justify-center">
+                  {
+                    <SquareIcon
+                      icon={"world/whackamole/empty_hole.png"}
+                      width={13}
+                    />
+                  }
+                </div>
+              </td>
+              <td
+                style={{ border: "1px solid #b96f50" }}
+                className="p-1.5 w-5/6"
+              >
+                {"-10 points"}
               </td>
             </tr>
           </tbody>
