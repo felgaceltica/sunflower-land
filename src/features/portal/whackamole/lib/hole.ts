@@ -77,6 +77,7 @@ export class GameHole {
           this._scene.portalService?.send("GAIN_POINTS", {
             points: points,
             time: time,
+            takelife: true,
           });
           this._hole.anims
             .play("molepoof")
@@ -94,6 +95,7 @@ export class GameHole {
           this._scene.portalService?.send("GAIN_POINTS", {
             points: -10,
             time: 0,
+            takelife: false,
           });
         }
       });

@@ -44,6 +44,7 @@ type GainPointsEvent = {
   type: "GAIN_POINTS";
   points: number;
   time: number;
+  takelife: number;
 };
 type GameOverEvent = {
   type: "GAME_OVER";
@@ -320,7 +321,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
               }
             },
             lives: (context: Context, event: GainPointsEvent) => {
-              if (event.points < 0) {
+              if (event.points < 0 && event.takelife) {
                 return context.lives - 1;
               } else {
                 return context.lives;
