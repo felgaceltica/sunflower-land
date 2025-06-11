@@ -12,11 +12,7 @@ import { ErrorCode } from "lib/errors";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Button } from "components/ui/Button";
 import { shortAddress } from "lib/utils/shortAddress";
-import {
-  NFTMigrating,
-  NFTMinting,
-  NFTWaiting,
-} from "features/wallet/components/NFTMinting";
+import { NFTMinting, NFTWaiting } from "features/wallet/components/NFTMinting";
 import { WalletContext } from "features/wallet/WalletProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Loading } from "features/auth/components";
@@ -257,9 +253,9 @@ export const PortalWallet: React.FC<Props> = ({
       return <NFTMinting />;
     }
 
-    if (walletState.matches("migrating")) {
-      return <NFTMigrating />;
-    }
+    // if (walletState.matches("migrating")) {
+    //   return <NFTMigrating />;
+    // }
 
     return <Loading text={t("connecting")} />;
   };
