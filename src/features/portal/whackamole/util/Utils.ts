@@ -53,7 +53,6 @@ import {
   DAILY_ATTEMPTS,
   RESTOCK_ATTEMPTS,
 } from "./WhackAMoleConstants";
-import { hasFeatureAccess } from "lib/flags";
 
 /**
  * Gets the number of attempts left for the minigame.
@@ -61,8 +60,8 @@ import { hasFeatureAccess } from "lib/flags";
  * @returns The number of attempts left.
  */
 export const getAttemptsLeft = (minigame?: Minigame, gameState?: GameState) => {
-  if (gameState && hasFeatureAccess(gameState, "MINE_WHACK_BETA"))
-    return Infinity;
+  // if (gameState && hasFeatureAccess(gameState, "MINE_WHACK_BETA"))
+  //   return Infinity;
   const dateKey = new Date().toISOString().slice(0, 10);
 
   const history = minigame?.history ?? {};
