@@ -5875,7 +5875,6 @@
   "merkl.three": "おまけのフードボックスと全プロバイダー限定のウェアラブルをプレゼント！",
   "streams.tuesday.ongoing": "Discordストリーム配信中",
   "streams.friday.ongoing": "Twitch ストリーム配信中",
-  "stream.isLive": "タウンホールがライブです！",
   "liquidity": "流動性",
   "flowerDashboard.sevenDayPlayerSpend": "7dプレイヤーの支出",
   "flowerDashboard.uniquePlayersSpent": "{{count}} プレイヤーは花を使いました",
@@ -5927,9 +5926,6 @@
   "seeking.blessing": "祝福を請う",
   "seeking.blessing.success": "おめでとうございます、あなたは祝福を受けました！",
   "blessing.noResults": "この日付の結果は見つかりませんでした",
-  "blessing.donated": "{金額} x {アイテム} が寄付されました",
-  "blessing.winners": "{カウント} 人の勝者",
-  "blessing.maxAmount": "{name} が足りません。",
   "transaction.deposit.flower": "デポジットフラワー",
   "deposit.flower": "デポジットフラワー",
   "deposit.flower.onlyDeposit": "選択したネットワークにのみFLOWERを入金してください。",
@@ -5962,5 +5958,13 @@
   "mine-whack.portal.missionObjectives": "ミッション:{{targetScore}} ポイント達成",
   "mine-whack.portal.rewardMessage": "おめでとうございます。ミッションを完了しました！報酬はこちらです。",
   "portal.mineWhack.title": "マイン・ワック",
-  "portal.mineWhack.description": "このリフレックスチャレンジでは、ほくろをタップし、ウサギをかわし、時間との戦いを繰り広げましょう！"
+  "portal.mineWhack.description": "このリフレックスチャレンジでは、ほくろをタップし、ウサギをかわし、時間との戦いを繰り広げましょう！",
+  "blessing.donated": "{{amount}} x {{item}} が寄付されました",
+  "blessing.winners": "{{count}} 勝者",
+  "blessing.maxAmount": "{{name}} が不足しています。",
+  "wallet.seedlingRequired": "苗木の評判を上げてファームNFTを作ろう",
+  "reputation.seedling.farmNFT": "オンチェーンファーム",
+  "reputation.seedlingRequired": "苗が必要です",
+  "stream.isLive": "タウンホールがライブです！",
+  "marketplace.label.pricePerUnit": "ユニットあたりの価格"
 }

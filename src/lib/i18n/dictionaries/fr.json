@@ -5875,7 +5875,6 @@
   "merkl.three": "Des boîtes alimentaires en prime et un accessoire portable exclusif pour tous les fournisseurs !",
   "streams.tuesday.ongoing": "Diffusion Discord en cours",
   "streams.friday.ongoing": "Stream Twitch en cours",
-  "stream.isLive": "L'hôtel de ville est en ligne !",
   "liquidity": "Liquidité",
   "flowerDashboard.sevenDayPlayerSpend": "7 joueurs dépensent",
   "flowerDashboard.uniquePlayersSpent": "{{count}} les joueurs ont dépensé des fleurs",
@@ -5927,9 +5926,6 @@
   "seeking.blessing": "Réclamer la bénédiction",
   "seeking.blessing.success": "Félicitations, vous avez reçu une bénédiction !",
   "blessing.noResults": "Aucun résultat n'a été trouvé pour cette date",
-  "blessing.donated": "{montant} x {article} donné",
-  "blessing.winners": "{count} gagnants",
-  "blessing.maxAmount": "{name} insuffisant.",
   "transaction.deposit.flower": "Déposer FLOWER",
   "deposit.flower": "Déposer FLOWER",
   "deposit.flower.onlyDeposit": "Déposez FLOWER uniquement sur le réseau sélectionné.",
@@ -5962,5 +5958,13 @@
   "mine-whack.portal.missionObjectives": "Mission : Atteindre {{targetScore}} points.",
   "mine-whack.portal.rewardMessage": "Félicitations, vous avez terminé la mission ! Voici ta récompense.",
   "portal.mineWhack.title": "Mine Wack",
-  "portal.mineWhack.description": "Tapez sur les taupes, esquivez les lapins et courez contre la montre dans ce défi réflexe !"
+  "portal.mineWhack.description": "Tapez sur les taupes, esquivez les lapins et courez contre la montre dans ce défi réflexe !",
+  "blessing.donated": "{{amount}} x {{item}} a fait un don",
+  "blessing.winners": "{{count}} gagnants",
+  "blessing.maxAmount": "Insuffisant {{name}}.",
+  "wallet.seedlingRequired": "Atteignez la réputation d'un plant pour créer un NFT agricole",
+  "reputation.seedling.farmNFT": "Ferme en chaîne",
+  "reputation.seedlingRequired": "Semis requis",
+  "stream.isLive": "L'hôtel de ville est en ligne !",
+  "marketplace.label.pricePerUnit": "Prix par unité"
 }

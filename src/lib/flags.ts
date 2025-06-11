@@ -54,20 +54,23 @@ const periodBasedFeatureFlag =
     return Date.now() > startDate.getTime() && Date.now() < endDate.getTime();
   };
 // Used for testing production features and dev access
-export const ADMIN_IDS = [1, 3, 39488, 128727];
-
-export const MANAGER_IDS = [
-  ...ADMIN_IDS,
-  29, // Aeon
-  130170, // Dcol
-];
 
 /**
- * Adam: 1
- * Spencer: 3
- * Craig: 39488
- * Elias: 128727
+ * Used for testing production features and dev access
+ * @Adam 1
+ * @Spencer 3
+ * @Craig 39488
+ * @Elias 128727
  */
+export const ADMIN_IDS = [1, 3, 39488, 128727];
+
+/**
+ * IDs whitelisted to airdrop players
+ * @Aeon 29
+ * @Dcol 130170
+ * @Labochi 7841
+ */
+export const MANAGER_IDS = [...ADMIN_IDS, 29, 130170, 7841];
 
 export type FeatureFlag = (game: GameState) => boolean;
 
@@ -113,8 +116,11 @@ const FEATURE_FLAGS = {
 
   MODERATOR: (game) => !!game.wardrobe.Halo,
 
-  BLESSING: defaultFeatureFlag,
+  BLESSING: testnetFeatureFlag,
   MINE_WHACK_BETA: defaultFeatureFlag,
+  NEW_LAVA_PIT_REQUIREMENTS: timeBasedFeatureFlag(
+    new Date("2025-06-16T00:00:00Z"),
+  ),
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;

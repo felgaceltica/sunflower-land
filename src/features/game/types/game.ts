@@ -622,6 +622,10 @@ export type CropPlot = {
   crop?: PlantedCrop;
   fertiliser?: CropFertiliser;
   createdAt: number;
+  beeSwarm?: {
+    count: number;
+    swarmActivatedAt: number;
+  };
 } & Coordinates;
 
 export type GreenhousePlant = {
