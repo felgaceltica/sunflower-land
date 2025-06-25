@@ -94,9 +94,6 @@ const FEATURE_FLAGS = {
     (game.wardrobe["Streamer Hat"] ?? 0) > 0 || testnetFeatureFlag(),
 
   // Temporary Feature Flags
-  FACE_RECOGNITION: (game) =>
-    game.createdAt > new Date("2025-01-01T00:00:00Z").getTime() ||
-    !game.verified,
   FACE_RECOGNITION_TEST: defaultFeatureFlag,
   LEDGER: testnetLocalStorageFeatureFlag("ledger"),
 
@@ -107,6 +104,11 @@ const FEATURE_FLAGS = {
   EASTER: (game) =>
     betaTimeBasedFeatureFlag(new Date("2025-04-21T00:00:00Z"))(game) &&
     Date.now() < new Date("2025-04-29T00:00:00Z").getTime(),
+
+  FESTIVALOFCOLORS: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-06-30T00:00:00Z"))(game) &&
+    Date.now() < new Date("2025-07-07T00:00:00Z").getTime(),
+
   STREAM_STAGE_ACCESS: adminFeatureFlag,
 
   WITHDRAWAL_THRESHOLD: timePeriodFeatureFlag({
@@ -116,11 +118,14 @@ const FEATURE_FLAGS = {
 
   MODERATOR: (game) => !!game.wardrobe.Halo,
 
-  BLESSING: testnetFeatureFlag,
+  BLESSING: defaultFeatureFlag,
+  POTION_SHOP_EXOTIC_CROPS: () =>
+    Date.now() < new Date("2025-08-01T00:00:00Z").getTime(),
+  WARDROBE: testnetFeatureFlag,
   MINE_WHACK_BETA: defaultFeatureFlag,
-  NEW_LAVA_PIT_REQUIREMENTS: timeBasedFeatureFlag(
-    new Date("2025-06-16T00:00:00Z"),
-  ),
+  SOCIAL_FARMING: testnetFeatureFlag,
+  LANDSCAPING: testnetFeatureFlag,
+  CRAFTING: testnetFeatureFlag,
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;
