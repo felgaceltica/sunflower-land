@@ -6,26 +6,30 @@ import {
   Inventory,
   TemperateSeasonName,
 } from "features/game/types/game";
-import { hasFeatureAccess } from "lib/flags";
 
 export const LAVA_PIT_REQUIREMENTS: Record<TemperateSeasonName, Inventory> = {
   autumn: {
     "Royal Ornament": new Decimal(1),
-    Broccoli: new Decimal(1500),
+    Artichoke: new Decimal(30),
+    Broccoli: new Decimal(750),
+    Yam: new Decimal(1000),
   },
   winter: {
-    Onion: new Decimal(1000),
     "Merino Wool": new Decimal(200),
+    Onion: new Decimal(400),
+    Turnip: new Decimal(200),
   },
   spring: {
     Celestine: new Decimal(2),
-    Duskberry: new Decimal(2),
     Lunara: new Decimal(2),
-    Rhubarb: new Decimal(3000),
+    Duskberry: new Decimal(2),
+    Rhubarb: new Decimal(2000),
+    Kale: new Decimal(100),
   },
   summer: {
-    Oil: new Decimal(120),
-    Pepper: new Decimal(1000),
+    Oil: new Decimal(100),
+    Pepper: new Decimal(750),
+    Zucchini: new Decimal(1000),
   },
 };
 
@@ -54,12 +58,7 @@ export function startLavaPit({
       throw new Error("Lava pit not found");
     }
 
-    const requirements = hasFeatureAccess(state, "NEW_LAVA_PIT_REQUIREMENTS")
-      ? LAVA_PIT_REQUIREMENTS[state.season.season]
-      : {
-          Oil: new Decimal(60),
-          Cobia: new Decimal(5),
-        };
+    const requirements = LAVA_PIT_REQUIREMENTS[state.season.season];
 
     getKeys(requirements).forEach((item) => {
       const inventoryAmount = inventory[item] ?? new Decimal(0);
