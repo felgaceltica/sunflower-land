@@ -34,6 +34,7 @@ export interface Context {
   score: number;
   streak: number;
   lives: number;
+  lastLostLife: number;
 }
 
 type StartEvent = {
@@ -126,6 +127,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     lastScore: 0,
     streak: 0,
     lives: 3,
+    lastLostLife: 0,
   },
   on: {
     SET_JOYSTICK_ACTIVE: {
@@ -276,6 +278,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             },
             score: 0,
             lives: 3,
+            lastLostLife: Date.now(),
             state: (context: any) => {
               startAttempt();
               return startMinigameAttempt({
@@ -296,11 +299,26 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       on: {
         RESET_STREAK: {
           actions: assign<Context, any>({
-            streak: (context: Context, event: GainPointsEvent) => {
-              return 0;
+            streak: () => 0,
+            lives: (context: Context) => {
+              const now = Date.now();
+              const timeSinceLastLifeLost = now - context.lastLostLife;
+
+              if (timeSinceLastLifeLost >= 3000) {
+                return context.lives - 1;
+              }
+
+              return context.lives;
             },
-            lives: (context: Context, event: GainPointsEvent) => {
-              return context.lives - 1;
+            lastLostLife: (context: Context) => {
+              const now = Date.now();
+              const timeSinceLastLifeLost = now - context.lastLostLife;
+
+              if (timeSinceLastLifeLost >= 3000) {
+                return now;
+              }
+
+              return context.lastLostLife;
             },
           }),
         },
@@ -315,17 +333,39 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             },
             score: (context: Context, event: GainPointsEvent) => {
               if (event.points > 0) {
-                return context.score + event.points * (context.streak + 1);
+                const streak = context.streak < 5 ? context.streak + 1 : 5;
+                return context.score + event.points * (streak + 1);
               } else {
                 return context.score + event.points;
               }
             },
             lives: (context: Context, event: GainPointsEvent) => {
-              if (event.points < 0 && event.takelife) {
+              const now = Date.now();
+              const timeSinceLastLifeLost = now - context.lastLostLife;
+
+              if (
+                event.points < 0 &&
+                event.takelife &&
+                timeSinceLastLifeLost >= 3000
+              ) {
                 return context.lives - 1;
-              } else {
-                return context.lives;
               }
+
+              return context.lives;
+            },
+            lastLostLife: (context: Context, event: GainPointsEvent) => {
+              const now = Date.now();
+              const timeSinceLastLifeLost = now - context.lastLostLife;
+
+              if (
+                event.points < 0 &&
+                event.takelife &&
+                timeSinceLastLifeLost >= 3000
+              ) {
+                return now;
+              }
+
+              return context.lastLostLife;
             },
             // endAt: (context: Context, event: GainPointsEvent) => {
             //   return context.endAt + event.time;

@@ -6,7 +6,6 @@ import { Loading } from "features/auth/components";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
-import { PortalWallet } from "../PortalWallet";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 
 const VALID_INTEGER = new RegExp(/^\d+$/);
@@ -133,14 +132,14 @@ export const FarmerFootballDonations: React.FC = () => {
           <p className="my-4">{t("statements.ohNo")}</p>
         </div>
       )}
-      {state.matches("confirming") && (
-        <PortalWallet action="donate">
-          <p className="m-2">{`${donation} (MATIC)`}</p>
-          <Button className="w-full ml-1" onClick={donate}>
-            <span className="text-xs whitespace-nowrap">{t("confirm")}</span>
-          </Button>
-        </PortalWallet>
-      )}
+      {/* {state.matches("confirming") && (
+        // <PortalWallet action="donate">
+        //   <p className="m-2">{`${donation} (MATIC)`}</p>
+        //   <Button className="w-full ml-1" onClick={donate}>
+        //     <span className="text-xs whitespace-nowrap">{t("confirm")}</span>
+        //   </Button>
+        // </PortalWallet>
+      )} */}
     </>
   );
 };
