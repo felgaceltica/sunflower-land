@@ -13,10 +13,12 @@ import { Section } from "lib/utils/hooks/useScrollIntoView";
 import { HomeBumpkins } from "./HomeBumpkins";
 import { MANOR_VARIANTS } from "features/island/lib/alternateArt";
 import { DailyReward } from "features/game/expansion/components/dailyReward/DailyReward";
+import { useVisiting } from "lib/utils/visitUtils";
 
 export const House: React.FC<BuildingProps> = ({ isBuilt, island, season }) => {
   const { gameService, showAnimations } = useContext(Context);
   const [gameState] = useActor(gameService);
+  const { isVisiting } = useVisiting();
 
   const [showHeart, setShowHeart] = useState(false);
 
@@ -24,9 +26,11 @@ export const House: React.FC<BuildingProps> = ({ isBuilt, island, season }) => {
 
   const handleClick = () => {
     if (isBuilt) {
-      navigate("/home");
-
-      // Add future on click actions here
+      if (isVisiting) {
+        navigate(`/visit/${gameState.context.farmId}/home`);
+      } else {
+        navigate("/home");
+      }
       return;
     }
   };
@@ -54,7 +58,7 @@ export const House: React.FC<BuildingProps> = ({ isBuilt, island, season }) => {
     <div className="absolute h-full w-full">
       <BuildingImageWrapper name="Town Center" onClick={handleClick}>
         <img
-          src={MANOR_VARIANTS["spring"][season]}
+          src={MANOR_VARIANTS["Spring Biome"][season]}
           className="absolute pointer-events-none"
           id={Section.Home}
           style={{

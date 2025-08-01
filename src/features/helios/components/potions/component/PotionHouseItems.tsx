@@ -13,6 +13,7 @@ import { CraftingRequirements } from "components/ui/layouts/CraftingRequirements
 import { Box } from "components/ui/Box";
 import { ITEM_DETAILS } from "features/game/types/images";
 import {
+  POTION_HOUSE_EXOTIC_CROPS,
   POTION_HOUSE_ITEMS,
   PotionHouseItem,
 } from "features/game/types/collectibles";
@@ -23,7 +24,7 @@ import { hasFeatureAccess } from "lib/flags";
 export const PotionHouseItems: React.FC = () => {
   const { t } = useAppTranslation();
   const [selected, setSelected] = useState<Decoration | PotionHouseItem>(
-    POTION_HOUSE_DECORATIONS()["Giant Potato"],
+    POTION_HOUSE_DECORATIONS["Giant Potato"],
   );
   const { gameService, shortcutItem } = useContext(Context);
   const [
@@ -47,7 +48,10 @@ export const PotionHouseItems: React.FC = () => {
     );
 
   const buy = () => {
-    if (selected.name in POTION_HOUSE_ITEMS) {
+    if (
+      selected.name in POTION_HOUSE_ITEMS ||
+      selected.name in POTION_HOUSE_EXOTIC_CROPS
+    ) {
       gameService.send("collectible.crafted", {
         name: selected.name,
       });
@@ -95,12 +99,13 @@ export const PotionHouseItems: React.FC = () => {
       content={
         <>
           {Object.values({
-            ...POTION_HOUSE_DECORATIONS(),
+            ...POTION_HOUSE_DECORATIONS,
             ...POTION_HOUSE_ITEMS,
+            ...POTION_HOUSE_EXOTIC_CROPS,
           }).map((item) => {
             if (
               isExoticCrop(item.name) &&
-              hasFeatureAccess(state, "POTION_SHOP_EXOTIC_CROPS")
+              !hasFeatureAccess(state, "POTION_HOUSE_UPDATES")
             ) {
               return null;
             }
