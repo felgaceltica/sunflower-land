@@ -10,6 +10,7 @@ import { useContext, useState } from "react";
 import { ChestRevealing } from "../chests/ChestRevealing";
 import { Context } from "features/game/GameProvider";
 import giftIcon from "assets/icons/gift.png";
+import { InnerPanel } from "components/ui/Panel";
 
 export const PlayerGift: React.FC = () => {
   const { gameService } = useContext(Context);
@@ -48,21 +49,27 @@ export const PlayerGift: React.FC = () => {
       new Date().toISOString().substring(0, 10);
 
   if (isPicking || (gameState.matches("revealing") && isRevealing)) {
-    return <ChestRevealing type={"Gift Giver"} />;
+    return (
+      <InnerPanel>
+        <ChestRevealing type={"Gift Giver"} />
+      </InnerPanel>
+    );
   }
 
   if (gameState.matches("revealed") && isRevealing) {
     return (
-      <Revealed
-        onAcknowledged={() => {
-          setIsRevealing(false);
-        }}
-      />
+      <InnerPanel>
+        <Revealed
+          onAcknowledged={() => {
+            setIsRevealing(false);
+          }}
+        />
+      </InnerPanel>
     );
   }
 
   return (
-    <>
+    <InnerPanel>
       <div className="ml-1 mb-2">
         <div className="flex justify-between items-center px-1 mb-2">
           <Label type="success" icon={giftIcon}>
@@ -81,6 +88,6 @@ export const PlayerGift: React.FC = () => {
       <Button onClick={open} disabled={hasOpened}>
         {t("open")}
       </Button>
-    </>
+    </InnerPanel>
   );
 };
