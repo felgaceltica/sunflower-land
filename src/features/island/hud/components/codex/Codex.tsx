@@ -22,7 +22,6 @@ import classNames from "classnames";
 import { useSound } from "lib/utils/hooks/useSound";
 
 import factions from "assets/icons/factions.webp";
-import trophyIcon from "assets/icons/trophy.png";
 import chores from "assets/icons/chores.webp";
 import { Leaderboards } from "features/game/expansion/components/leaderboard/actions/cache";
 import { fetchLeaderboardData } from "features/game/expansion/components/leaderboard/actions/leaderboard";
@@ -165,11 +164,6 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
           },
         ]
       : []),
-    {
-      name: "Competition" as const,
-      icon: trophyIcon,
-      count: 0,
-    },
   ];
 
   return (
@@ -277,7 +271,13 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
                   "flex flex-col h-full overflow-hidden overflow-y-auto scrollable",
                 )}
               >
-                <CompetitionDetails competitionName="ANIMALS" state={state} />
+                <CompetitionDetails
+                  competitionName="PEGGYS_COOKOFF"
+                  state={state}
+                  hideLeaderboard={
+                    Date.now() < new Date("2025-07-17T00:00:00Z").getTime()
+                  }
+                />
               </div>
             )}
           </div>

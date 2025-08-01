@@ -33,7 +33,7 @@ interface Props {
   showTimers: boolean;
 }
 
-const _island = (state: MachineState) => state.context.state.island.type;
+const _island = (state: MachineState) => state.context.state.island;
 
 const FertilePlotComponent: React.FC<Props> = ({
   cropName,
@@ -55,13 +55,12 @@ const FertilePlotComponent: React.FC<Props> = ({
 
   let startAt = plantedAt ?? 0;
   if (cropName && game.bumpkin) {
-    const fertiliserName = fertiliser?.name ?? undefined;
     harvestSeconds = getCropPlotTime({
       crop: cropName,
       game,
       plot,
-      fertiliser: fertiliserName,
-    });
+      createdAt: Date.now(),
+    }).time;
     startAt = readyAt - harvestSeconds * 1000;
   }
   const timeLeft = readyAt > 0 ? (readyAt - Date.now()) / 1000 : 0;
@@ -118,7 +117,7 @@ const FertilePlotComponent: React.FC<Props> = ({
             width: `${PIXEL_SCALE * 16}px`,
           }}
         >
-          <Soil cropName={cropName} stage={stage} islandType={island} />
+          <Soil cropName={cropName} stage={stage} island={island} />
         </div>
       </div>
       {activeInsectPlague && !isProtected && (

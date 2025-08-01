@@ -27,7 +27,7 @@ import { signTypedData } from "@wagmi/core";
 import { config } from "features/wallet/WalletProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Modal } from "components/ui/Modal";
-import { InnerPanel, Panel } from "components/ui/Panel";
+import { Panel } from "components/ui/Panel";
 import { useAccount } from "wagmi";
 
 // Types
@@ -235,7 +235,7 @@ const AirdropContent: React.FC<AirdropContentProps> = ({
   const { t } = useAppTranslation();
 
   return (
-    <InnerPanel className="flex flex-col gap-1 max-h-[500px] overflow-y-auto scrollable">
+    <>
       <div className="p-1 flex flex-col gap-1">
         <div className="flex flex-col gap-1">
           <Label type="default" icon={SUNNYSIDE.icons.search} className="m-1">
@@ -309,7 +309,7 @@ const AirdropContent: React.FC<AirdropContentProps> = ({
           <Button onClick={closeErrorModal}>{t("continue")}</Button>
         </Panel>
       </Modal>
-    </InnerPanel>
+    </>
   );
 };
 
@@ -349,19 +349,13 @@ export const AirdropPlayer: React.FC<
     ...(gems ? { Gem: gems } : {}),
     ...(loveCharm ? { "Love Charm": loveCharm } : {}),
     ...selectedItems.reduce(
-      (acc, item) => ({
-        ...acc,
-        [item.name]: item.quantity,
-      }),
+      (acc, item) => ({ ...acc, [item.name]: item.quantity }),
       {} as Partial<Record<InventoryItemName, number>>,
     ),
   };
 
   const wearables = selectedWearables.reduce(
-    (acc, wearable) => ({
-      ...acc,
-      [wearable]: 1,
-    }),
+    (acc, wearable) => ({ ...acc, [wearable]: 1 }),
     {} as Wardrobe,
   );
 
@@ -382,7 +376,7 @@ export const AirdropPlayer: React.FC<
         message,
         signature,
       },
-      authToken: authService.state.context.user.rawToken as string,
+      authToken: authService.getSnapshot().context.user.rawToken as string,
     });
   };
 
@@ -393,11 +387,7 @@ export const AirdropPlayer: React.FC<
       .filter((id) => !isNaN(id));
 
     const signature = await signTypedData(config, {
-      domain: {
-        name: "Sunflower Land",
-        version: "1",
-        chainId,
-      },
+      domain: { name: "Sunflower Land", version: "1", chainId },
       types: {
         Airdrop: [
           { name: "items", type: "string" },
