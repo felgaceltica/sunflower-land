@@ -4,7 +4,9 @@ import { MinigameName } from "./minigames";
 
 export type EventShopItemName =
   | EventShopCollectibleName
-  | EventShopWearableName;
+  | EventShopWearableName
+  | FestivalOfColorsShopItemName
+  | FestivalOfColorsShopWearableName;
 
 export type EventShopCollectibleName = Extract<
   InventoryItemName,
@@ -18,8 +20,10 @@ export type EventShopCollectibleName = Extract<
   | "Orange Tunnel Bunny"
   | "Orange Bunny Lantern"
   | "Carrot House"
+>;
 
-  // Festival of Colors
+export type FestivalOfColorsShopCollectibleName = Extract<
+  InventoryItemName,
   | "Floating Toy"
   | "Paint Buckets"
   | "Rainbow Well"
@@ -41,8 +45,10 @@ export type EventShopWearableName = Extract<
   | "Carrot Pitchfork"
   | "Bunny Mask"
   | "Easter Apron"
+>;
 
-  // Festival of Colors
+export type FestivalOfColorsShopWearableName = Extract<
+  BumpkinItem,
   | "Paint Splattered Hair"
   | "Paint Splattered Shirt"
   | "Paint Splattered Overalls"
@@ -51,6 +57,9 @@ export type EventShopWearableName = Extract<
   | "Slime Wings"
   | "Slime Aura"
 >;
+export type FestivalOfColorsShopItemName =
+  | FestivalOfColorsShopCollectibleName
+  | FestivalOfColorsShopWearableName;
 
 type EventShopBase = {
   cost: { sfl: number; items: Partial<Record<InventoryItemName, number>> };
@@ -212,7 +221,10 @@ export const EASTER_SHOP_ITEMS: MinigameShop = {
   },
 };
 
-const FESTIVAL_OF_COLORS_STORE: MinigameShop = {
+export const FESTIVAL_OF_COLORS_STORE: Record<
+  FestivalOfColorsShopItemName,
+  EventShopItem
+> = {
   "Floating Toy": {
     cost: { sfl: 20, items: {} },
     type: "collectible",

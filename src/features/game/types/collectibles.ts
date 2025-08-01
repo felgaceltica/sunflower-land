@@ -3,6 +3,7 @@ import { GameState, Inventory, Keys } from "./game";
 import { translate } from "lib/i18n/translate";
 import { SEASONS } from "./seasons";
 import { ExoticCropName } from "./beans";
+import { WORKBENCH_MONUMENTS, WorkbenchMonumentName } from "./monuments";
 
 export type PlaceableLocation = "farm" | "home";
 
@@ -41,7 +42,8 @@ export type HeliosBlacksmithItem =
   | "Fairy Circle"
   | "Squirrel"
   | "Macaw"
-  | "Butterfly";
+  | "Butterfly"
+  | WorkbenchMonumentName;
 
 export type TreasureCollectibleItem =
   | "Treasure Map"
@@ -111,7 +113,13 @@ export type SoldOutCollectibleName =
   | "Summer Guardian"
   | "Spring Guardian"
   | "Autumn Guardian"
-  | "Sky Pillar";
+  | "Sky Pillar"
+  | "Rocket Statue"
+  | "Ant Queen"
+  | "Jurassic Droplet"
+  | "Giant Onion"
+  | "Giant Turnip"
+  | "Groovy Gramophone";
 
 export type MegaStoreCollectibleName =
   | "Flower Cart"
@@ -174,8 +182,7 @@ export type GoblinPirateItemName =
 export type PotionHouseItemName =
   | "Lab Grown Carrot"
   | "Lab Grown Radish"
-  | "Lab Grown Pumpkin"
-  | ExoticCropName;
+  | "Lab Grown Pumpkin";
 
 export type CraftableCollectible = {
   ingredients: Inventory;
@@ -307,6 +314,7 @@ export const HELIOS_BLACKSMITH_ITEMS: (
     coins: 15000,
     ingredients: {},
   },
+  ...WORKBENCH_MONUMENTS,
 });
 
 export const ARTEFACT_SHOP_KEYS: Record<Keys, CraftableCollectible> = {
@@ -386,7 +394,7 @@ export const TREASURE_COLLECTIBLE_ITEM: Record<
 };
 
 export type PotionHouseItem = CraftableCollectible & {
-  name: PotionHouseItemName;
+  name: PotionHouseItemName | ExoticCropName;
 };
 
 export const POTION_HOUSE_ITEMS: Record<PotionHouseItemName, PotionHouseItem> =
@@ -415,63 +423,69 @@ export const POTION_HOUSE_ITEMS: Record<PotionHouseItemName, PotionHouseItem> =
         "Potion Ticket": new Decimal(7000),
       },
     },
-    "Black Magic": {
-      name: "Black Magic",
-      description: translate("description.black.magic"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(8000),
-      },
-    },
-    "Golden Helios": {
-      name: "Golden Helios",
-      description: translate("description.golden.helios"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(4000),
-      },
-    },
-    Chiogga: {
-      name: "Chiogga",
-      description: translate("description.chiogga"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(2000),
-      },
-    },
-    "Purple Cauliflower": {
-      name: "Purple Cauliflower",
-      description: translate("description.purple.cauliflower"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(800),
-      },
-    },
-    "Adirondack Potato": {
-      name: "Adirondack Potato",
-      description: translate("description.adirondack.potato"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(600),
-      },
-    },
-    "Warty Goblin Pumpkin": {
-      name: "Warty Goblin Pumpkin",
-      description: translate("description.warty.goblin.pumpkin"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(400),
-      },
-    },
-    "White Carrot": {
-      name: "White Carrot",
-      description: translate("description.white.carrot"),
-      coins: 0,
-      ingredients: {
-        "Potion Ticket": new Decimal(200),
-      },
-    },
   };
+
+export const POTION_HOUSE_EXOTIC_CROPS: Record<
+  ExoticCropName,
+  PotionHouseItem
+> = {
+  "Black Magic": {
+    name: "Black Magic",
+    description: translate("description.black.magic"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(8000),
+    },
+  },
+  "Golden Helios": {
+    name: "Golden Helios",
+    description: translate("description.golden.helios"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(4000),
+    },
+  },
+  Chiogga: {
+    name: "Chiogga",
+    description: translate("description.chiogga"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(2000),
+    },
+  },
+  "Purple Cauliflower": {
+    name: "Purple Cauliflower",
+    description: translate("description.purple.cauliflower"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(800),
+    },
+  },
+  "Adirondack Potato": {
+    name: "Adirondack Potato",
+    description: translate("description.adirondack.potato"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(600),
+    },
+  },
+  "Warty Goblin Pumpkin": {
+    name: "Warty Goblin Pumpkin",
+    description: translate("description.warty.goblin.pumpkin"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(400),
+    },
+  },
+  "White Carrot": {
+    name: "White Carrot",
+    description: translate("description.white.carrot"),
+    coins: 0,
+    ingredients: {
+      "Potion Ticket": new Decimal(200),
+    },
+  },
+};
 
 export type Purchasable = CraftableCollectible & {
   usd: number;
