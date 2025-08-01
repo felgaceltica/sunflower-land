@@ -27,6 +27,7 @@ import { hasReputation, Reputation } from "features/game/lib/reputation";
 import { RequiredReputation } from "features/island/hud/components/reputation/Reputation";
 import { isFaceVerified } from "features/retreat/components/personhood/lib/faceRecognition";
 import { FaceRecognition } from "features/retreat/components/personhood/FaceRecognition";
+import { hasBoostRestriction } from "features/game/types/withdrawRestrictions";
 
 interface Props {
   onWithdraw: (ids: number[], amounts: string[]) => void;
@@ -155,7 +156,13 @@ export const WithdrawItems: React.FC<Props> = ({
               <Box
                 count={inventoryCount}
                 key={itemName}
-                disabled={inventoryCount.lessThanOrEqualTo(0)}
+                disabled={
+                  inventoryCount.lessThanOrEqualTo(0) ||
+                  hasBoostRestriction({
+                    boostUsedAt: state.boostsUsedAt,
+                    item: itemName,
+                  }).isRestricted
+                }
                 onClick={() => onAdd(itemName)}
                 image={details.image}
                 canBeLongPressed={allowLongpressWithdrawal}

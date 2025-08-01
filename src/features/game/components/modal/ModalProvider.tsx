@@ -18,6 +18,7 @@ import { DiscordBonus } from "features/game/expansion/components/DiscordBoat";
 import { Streams } from "./components/Streams";
 import { Merkl } from "./components/Merkl";
 import { Rewards } from "features/island/hud/components/referral/Rewards";
+import { DailyRewardChest } from "features/game/expansion/components/dailyReward/DailyReward";
 type GlobalModal =
   | "BUY_GEMS"
   | "DISCORD"
@@ -45,19 +46,14 @@ export const ModalContext = createContext<{
   // eslint-disable-next-line no-console
 }>({ openModal: console.log });
 
-export const ModalProvider: FC = ({ children }) => {
+export const ModalProvider: FC<React.PropsWithChildren> = ({ children }) => {
   const [opened, setOpened] = useState<GlobalModal>();
-  const [closeable, setCloseable] = useState(true);
 
   const openModal = (type: GlobalModal) => {
     setOpened(type);
   };
 
-  const handleClose = () => {
-    if (!closeable) return;
-
-    setOpened(undefined);
-  };
+  const handleClose = () => setOpened(undefined);
 
   return (
     <ModalContext.Provider value={{ openModal }}>
@@ -218,10 +214,12 @@ export const ModalProvider: FC = ({ children }) => {
         />
       </Modal>
 
-      <Rewards
-        show={opened === "DAILY_REWARD" || opened === "EARN"}
+      <Rewards show={opened === "EARN"} onHide={handleClose} tab={"Earn"} />
+
+      <DailyRewardChest
+        show={opened === "DAILY_REWARD"}
         onHide={handleClose}
-        tab={opened === "DAILY_REWARD" ? "Rewards" : "Earn"}
+        tab={0}
       />
     </ModalContext.Provider>
   );
