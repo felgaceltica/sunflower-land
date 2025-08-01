@@ -41,9 +41,10 @@ import {
   getPlazaShaderSetting,
 } from "lib/utils/hooks/usePlazaShader";
 import { playerSelectionListManager } from "../ui/PlayerSelectionList";
-import { playerModalManager } from "../ui/player/PlayerModals";
+
 import { STREAM_REWARD_COOLDOWN } from "../ui/player/StreamReward";
 import { hasVipAccess } from "features/game/lib/vipAccess";
+import { playerModalManager } from "features/social/lib/playerModalManager";
 
 export type NPCBumpkin = {
   x: number;
@@ -70,23 +71,12 @@ type BaseSceneOptions = {
     imageKey?: string;
     defaultTilesetConfig?: any;
   };
-  mmo?: {
-    enabled: boolean;
-    url?: string;
-    serverId?: string;
-    sceneId?: string;
-  };
+  mmo?: { enabled: boolean; url?: string; serverId?: string; sceneId?: string };
   controls?: {
     enabled: boolean; // Default to true
   };
-  audio?: {
-    fx: {
-      walk_key: Footsteps;
-    };
-  };
-  player?: {
-    spawn: Coordinates;
-  };
+  audio?: { fx: { walk_key: Footsteps } };
+  player?: { spawn: Coordinates };
 };
 
 export const FACTION_NAME_COLORS: Record<FactionName, string> = {
@@ -116,9 +106,7 @@ export abstract class BaseScene extends Phaser.Scene {
   serverPosition: { x: number; y: number } = { x: 0, y: 0 };
   packetSentAt = 0;
 
-  playerEntities: {
-    [sessionId: string]: BumpkinContainer;
-  } = {};
+  playerEntities: { [sessionId: string]: BumpkinContainer } = {};
 
   colliders?: Phaser.GameObjects.Group;
   triggerColliders?: Phaser.GameObjects.Group;
@@ -456,9 +444,7 @@ export abstract class BaseScene extends Phaser.Scene {
   private roof: Phaser.Tilemaps.TilemapLayer | null = null;
 
   public initialiseMap() {
-    this.map = this.make.tilemap({
-      key: this.options.name,
-    });
+    this.map = this.make.tilemap({ key: this.options.name });
 
     const tilesetKey = this.options.map?.tilesetUrl ?? "Sunnyside V3";
     const imageKey = this.options.map?.imageKey ?? "tileset";
@@ -816,7 +802,7 @@ export abstract class BaseScene extends Phaser.Scene {
       experience,
       farmId,
       faction,
-      onClick: defaultClick,
+      onClick: !isCurrentPlayer ? defaultClick : undefined,
       totalDeliveries,
       dailyStreak,
       isVip,
@@ -1138,11 +1124,6 @@ export abstract class BaseScene extends Phaser.Scene {
           isCurrentPlayer: sessionId === server.sessionId,
           npc: player.npc,
           experience: player.experience,
-          totalDeliveries: player.totalDeliveries,
-          dailyStreak: player.dailyStreak,
-          isVip: player.isVip,
-          createdAt: player.createdAt,
-          islandType: player.islandType,
         });
       }
     });
@@ -1275,7 +1256,7 @@ export abstract class BaseScene extends Phaser.Scene {
         );
         const now = Date.now();
         const streamerHatLastClaimedAt =
-          this.gameService.state.context.state.pumpkinPlaza.streamerHat
+          this.gameService.getSnapshot().context.state.pumpkinPlaza.streamerHat
             ?.openedAt ?? 0;
 
         if (
@@ -1287,12 +1268,7 @@ export abstract class BaseScene extends Phaser.Scene {
             clothing: player.clothing,
             experience: player.experience,
             username: player.username,
-            isVip: hasVipAccess({ game: this.gameState }),
             faction: player.faction,
-            createdAt: player.createdAt,
-            islandType: player.islandType,
-            totalDeliveries: player.totalDeliveries,
-            dailyStreak: player.dailyStreak,
           });
           this.lastModalOpenTime = streamerHatLastClaimedAt;
         }

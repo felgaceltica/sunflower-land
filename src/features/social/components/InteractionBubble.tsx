@@ -7,21 +7,29 @@ import bubbleBottomRight from "assets/ui/feed_bubble_btm_right.webp";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { LABEL_STYLES } from "components/ui/Label";
 import classNames from "classnames";
+import { InteractionType } from "../types/types";
 
 type Props = {
   children: React.ReactNode;
   direction: "left" | "right";
-  type: "comment" | "action" | "milestone" | "announcement";
+  type: InteractionType;
+  onClick?: () => void;
 };
 
 export const InteractionBubble: React.FC<Props> = ({
   children,
   direction,
   type,
+  onClick,
 }) => {
-  if (type === "action") {
+  if (type === "follow") {
     return (
-      <div className="relative">
+      <div
+        className={classNames("relative min-h-[57px]", {
+          "cursor-pointer": onClick,
+        })}
+        onClick={onClick}
+      >
         <div
           className="flex flex-col gap-1 p-1"
           style={{
@@ -36,9 +44,14 @@ export const InteractionBubble: React.FC<Props> = ({
     );
   }
 
-  if (type === "milestone" || type === "announcement") {
+  if (type === "milestone" || type === "announcement" || type === "cheer") {
     return (
-      <div className="relative">
+      <div
+        className={classNames("relative min-h-[57px]", {
+          "cursor-pointer": onClick,
+        })}
+        onClick={onClick}
+      >
         <div
           className="flex flex-col gap-1 p-1"
           style={{
@@ -54,7 +67,12 @@ export const InteractionBubble: React.FC<Props> = ({
   }
 
   return (
-    <div className="relative">
+    <div
+      className={classNames("relative min-h-[57px]", {
+        "cursor-pointer": onClick,
+      })}
+      onClick={onClick}
+    >
       <div
         className="flex flex-col gap-1 p-1"
         style={{

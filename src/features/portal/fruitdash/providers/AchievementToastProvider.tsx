@@ -28,7 +28,9 @@ export const useAchievementToast = () => {
   return context;
 };
 
-const AchievementToastProvider: React.FC = ({ children }) => {
+export const AchievementToastProvider: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   const { t } = useAppTranslation();
 
   const [achievementNames, setAchievementNames] = useState<

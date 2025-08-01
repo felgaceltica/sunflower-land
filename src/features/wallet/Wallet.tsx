@@ -1,5 +1,6 @@
 import { useSelector } from "@xstate/react";
-import React, { useContext, useLayoutEffect, useRef, useState } from "react";
+import React, { PropsWithChildren, useContext } from "react";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 
 import { Context } from "features/game/GameProvider";
 
@@ -34,7 +35,6 @@ import { shortAddress } from "lib/utils/shortAddress";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { NoNFT } from "./components/NoNFT";
 import classNames from "classnames";
-import { createPortal } from "react-dom";
 
 export type WalletAction =
   | "specialEvent"
@@ -49,7 +49,8 @@ export type WalletAction =
   | "marketplace"
   | "transfer"
   | "sync"
-  | "purchase";
+  | "purchase"
+  | "raffle";
 
 interface Props {
   action: WalletAction;
@@ -165,6 +166,11 @@ const WALLET_ACTIONS: Record<WalletAction, WalletActionSettings> = {
       [CONFIG.NETWORK === "mainnet" ? polygon.id : polygonAmoy.id]: true,
     },
   },
+  raffle: {
+    requiresLinkedWallet: true,
+    requiresNFT: true,
+    chains: {},
+  },
 };
 
 const EstablishConnection: React.FC<{
@@ -194,25 +200,6 @@ const WalletConnectedHeader: React.FC<{ availableChains: number[] }> = ({
   const connections = useConnections();
   const { t } = useAppTranslation();
 
-  const buttonRef = useRef<HTMLDivElement>(null);
-
-  const [showChainDropdown, setShowChainDropdown] = useState(false);
-  const [showWalletDropdown, setShowWalletDropdown] = useState(false);
-  const [chainDropdownPosition, setChainDropdownPosition] = useState({
-    top: 0,
-    left: 0,
-  });
-
-  useLayoutEffect(() => {
-    if (showChainDropdown && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setChainDropdownPosition({
-        top: rect.bottom,
-        left: rect.left,
-      });
-    }
-  }, [showChainDropdown]);
-
   const filteredNetworkOptions = networkOptions.filter((network) =>
     availableChains.includes(network.chainId),
   );
@@ -232,90 +219,84 @@ const WalletConnectedHeader: React.FC<{ availableChains: number[] }> = ({
   return (
     <div className="flex justify-between items-center px-2">
       <div className="relative">
-        <div ref={buttonRef}>
-          <Label
-            type="formula"
-            icon={isPending ? undefined : chainIcon}
-            secondaryIcon={
-              showChainDropdown
-                ? SUNNYSIDE.icons.chevron_up
-                : SUNNYSIDE.icons.chevron_down
-            }
-            className={classNames("cursor-pointer", {
-              "pl-1": isPending,
-            })}
-            onClick={() => {
-              setShowChainDropdown(!showChainDropdown);
-              setShowWalletDropdown(false);
-            }}
-          >
-            {isPending ? "Switching Network..." : chainName}
-          </Label>
-        </div>
-        {/* Put in a portal to break it out of the modal stacking context which was blocking its zIndex */}
-        {showChainDropdown &&
-          createPortal(
-            <div
-              className="absolute left-0 mt-1"
-              style={{
-                zIndex: 10000,
-                top: chainDropdownPosition.top,
-                left: chainDropdownPosition.left,
-              }}
-            >
-              <InnerPanel className="flex flex-col">
-                {filteredNetworkOptions.map((network) => (
-                  <div
-                    key={network.chainId}
-                    className="flex items-center gap-2 cursor-pointer hover:bg-[#ead4aa]/50 py-1.5 px-2"
-                    onClick={() => {
-                      setShowChainDropdown(false);
-                      switchChain({ chainId: network.chainId });
-                    }}
-                  >
-                    {network.icon && (
-                      <img src={network.icon} className="pl-1 w-5" />
-                    )}
-                    <span className="text-sm whitespace-nowrap pr-4">
-                      {network.value}
-                    </span>
-                  </div>
-                ))}
-              </InnerPanel>
-            </div>,
-            document.getElementById("headlessui-portal-root") || document.body,
+        <Popover>
+          {({ open, close }) => (
+            <>
+              <PopoverButton>
+                <Label
+                  type="formula"
+                  icon={isPending ? undefined : chainIcon}
+                  secondaryIcon={
+                    open
+                      ? SUNNYSIDE.icons.chevron_up
+                      : SUNNYSIDE.icons.chevron_down
+                  }
+                  className={classNames("cursor-pointer", {
+                    "pl-1": isPending,
+                  })}
+                >
+                  {isPending ? "Switching Network..." : chainName}
+                </Label>
+              </PopoverButton>
+              <PopoverPanel anchor={{ to: "bottom start" }}>
+                <InnerPanel className="flex flex-col">
+                  {filteredNetworkOptions.map((network) => (
+                    <div
+                      key={network.chainId}
+                      className="flex items-center gap-2 cursor-pointer hover:bg-[#ead4aa]/50 py-1.5 px-2"
+                      onClick={() => {
+                        switchChain({ chainId: network.chainId });
+                        close();
+                      }}
+                    >
+                      {network.icon && (
+                        <img src={network.icon} className="pl-1 w-5" />
+                      )}
+                      <span className="text-sm whitespace-nowrap pr-4">
+                        {network.value}
+                      </span>
+                    </div>
+                  ))}
+                </InnerPanel>
+              </PopoverPanel>
+            </>
           )}
+        </Popover>
       </div>
       <div className="relative">
         {address && (
-          <Label
-            type="default"
-            icon={getWalletIcon(connector)}
-            secondaryIcon={
-              showWalletDropdown
-                ? SUNNYSIDE.icons.chevron_up
-                : SUNNYSIDE.icons.chevron_down
-            }
-            className="cursor-pointer"
-            onClick={() => {
-              setShowChainDropdown(false);
-              setShowWalletDropdown(!showWalletDropdown);
-            }}
-          >
-            {shortAddress(address)}
-          </Label>
-        )}
-        {showWalletDropdown && (
-          <div className="absolute right-0 mt-1 z-50">
-            <InnerPanel className="flex flex-col">
-              <div
-                className="flex items-center gap-2 cursor-pointer hover:bg-[#ead4aa]/50 pb-1 px-2"
-                onClick={onDisconnect}
-              >
-                <span className="text-sm">{t("walletWall.disconnect")}</span>
-              </div>
-            </InnerPanel>
-          </div>
+          <Popover>
+            {({ open }) => (
+              <>
+                <PopoverButton>
+                  <Label
+                    type="default"
+                    icon={getWalletIcon(connector)}
+                    secondaryIcon={
+                      open
+                        ? SUNNYSIDE.icons.chevron_up
+                        : SUNNYSIDE.icons.chevron_down
+                    }
+                    className="cursor-pointer"
+                  >
+                    {shortAddress(address)}
+                  </Label>
+                </PopoverButton>
+                <PopoverPanel anchor={{ to: "bottom end" }}>
+                  <InnerPanel className="flex flex-col">
+                    <div
+                      className="flex items-center gap-2 cursor-pointer hover:bg-[#ead4aa]/50 pb-1 px-2"
+                      onClick={onDisconnect}
+                    >
+                      <span className="text-sm">
+                        {t("walletWall.disconnect")}
+                      </span>
+                    </div>
+                  </InnerPanel>
+                </PopoverPanel>
+              </>
+            )}
+          </Popover>
         )}
       </div>
     </div>
@@ -336,6 +317,7 @@ const ACTION_HUMAN_NAMES: Record<WalletAction, string> = {
   transfer: "transfer",
   sync: "sync",
   purchase: "purchase",
+  raffle: "enter the raffle",
 };
 
 const SelectChain: React.FC<{
@@ -370,7 +352,7 @@ const SelectChain: React.FC<{
   );
 };
 
-export const Wallet: React.FC<Props> = ({
+export const Wallet: React.FC<PropsWithChildren<Props>> = ({
   children,
   action,
   linkedAddress,
@@ -438,7 +420,10 @@ const _wallet = (state: MachineState) => state.context.wallet;
 const _linkedWallet = (state: MachineState): string | undefined =>
   state.context.linkedWallet;
 
-export const GameWallet: React.FC<Props> = ({ children, action }) => {
+export const GameWallet: React.FC<PropsWithChildren<Props>> = ({
+  children,
+  action,
+}) => {
   const { gameService } = useContext(Context);
 
   const farmId = useSelector(gameService, _farmId);
