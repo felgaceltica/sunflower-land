@@ -22,7 +22,7 @@ interface Props {
   longPressInterval?: number;
   contentAlign?: "start" | "center" | "end";
 }
-export const Button: React.FC<Props> = ({
+export const Button: React.FC<React.PropsWithChildren<Props>> = ({
   children,
   onClick,
   disabled,
@@ -71,7 +71,8 @@ export const Button: React.FC<Props> = ({
     <>
       <button
         className={classnames(
-          `w-full p-1 text-sm object-contain justify-center items-center hover:brightness-90 cursor-pointer flex disabled:opacity-50 [border-image:var(--button-image)_3_3_4_3_fill] active:[border-image:var(--button-pressed-image)_3_3_4_3_fill] transition-transform active:scale-[0.99]`,
+          `p-1 text-sm object-contain justify-center items-center hover:brightness-90 cursor-pointer flex disabled:opacity-50 [border-image:var(--button-image)_3_3_4_3_fill] active:[border-image:var(--button-pressed-image)_3_3_4_3_fill] transition-transform active:scale-[0.99]`,
+          !className?.match(/\bw-/g) && "w-full",
           className,
           { "cursor-not-allowed": disabled },
         )}
