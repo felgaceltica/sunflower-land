@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 
-import worldMap from "assets/map/world_map.png";
+//import worldMap from "assets/map/world_map.png";
+import worldMap from "public/world/halloween_island_assets/event_world_map.png";
 
 import { Context } from "features/game/GameProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
@@ -11,6 +12,7 @@ import { useSound } from "lib/utils/hooks/useSound";
 import { getBumpkinLevel } from "features/game/lib/level";
 import { Label } from "components/ui/Label";
 import { isMobile } from "mobile-device-detect";
+import { hasFeatureAccess } from "lib/flags";
 
 const showDebugBorders = false;
 
@@ -348,54 +350,6 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       <div
         style={{
-          width: "15%",
-          height: "15%",
-          border: showDebugBorders ? "2px solid red" : "",
-          position: "absolute",
-          right: "34%",
-          bottom: "33%",
-        }}
-        className={`flex justify-center items-center ${
-          level >= 6 ? "cursor-pointer" : "cursor-not-allowed"
-        }`}
-        onClick={() => {
-          if (level < 6) return;
-          travel.play();
-          navigate("/world/woodlands");
-          onClose();
-        }}
-      >
-        {level < 6 ? (
-          isMobile ? (
-            <img
-              src={SUNNYSIDE.icons.lock}
-              className="h-4 sm:h-6 ml-1 img-highlight"
-              onClick={() => {
-                setShowPopup(true);
-                setReqLvl(6);
-                setTimeout(() => {
-                  setShowPopup(false);
-                }, 1300);
-              }}
-            />
-          ) : (
-            <Label
-              type="default"
-              icon={SUNNYSIDE.icons.lock}
-              className="text-sm"
-            >
-              {t("world.lvl.requirement", { lvl: 6 })}
-            </Label>
-          )
-        ) : (
-          <span className="map-text text-xxs sm:text-sm">
-            {t("world.woodlands")}
-          </span>
-        )}
-      </div>
-
-      <div
-        style={{
           width: "35%",
           height: "34%",
           border: showDebugBorders ? "2px solid red" : "",
@@ -441,6 +395,53 @@ export const WorldMap: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </span>
         )}
       </div>
+      {hasFeatureAccess(gameService.state.context.state, "HALLOWEEN") && (
+        <div
+          style={{
+            width: "35%",
+            height: "14%",
+            border: showDebugBorders ? "2px solid red" : "",
+            position: "absolute",
+            right: "35%",
+            bottom: "0%",
+          }}
+          className={`flex justify-center items-center ${
+            level >= 2 ? "cursor-pointer" : "cursor-not-allowed"
+          }`}
+          onClick={() => {
+            if (level < 2) return;
+            travel.play();
+            navigate("/world/halloween_island");
+            onClose();
+          }}
+        >
+          {level < 2 ? (
+            isMobile ? (
+              <img
+                src={SUNNYSIDE.icons.lock}
+                className="h-4 sm:h-6 ml-1 img-highlight"
+                onClick={() => {
+                  setShowPopup(true);
+                  setReqLvl(2);
+                  setTimeout(() => {
+                    setShowPopup(false);
+                  }, 1300);
+                }}
+              />
+            ) : (
+              <Label
+                type="default"
+                icon={SUNNYSIDE.icons.lock}
+                className="text-sm"
+              >
+                {t("world.lvl.requirement", { lvl: 2 })}
+              </Label>
+            )
+          ) : (
+            <span className="map-text text-xxs sm:text-sm">{"Halloween"}</span>
+          )}
+        </div>
+      )}
 
       {showPopup && (
         <Label
