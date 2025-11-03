@@ -63,7 +63,7 @@ interface Props {
   onAddOil: (oil: number) => void;
 }
 
-const ALLOWED_SEEDS = (
+export const ALLOWED_SEEDS = (
   bumpkin: Bumpkin,
   inventory: Inventory,
 ): CropSeedName[] => {
@@ -425,7 +425,7 @@ export const CropMachineModalContent: React.FC<Props> = ({
                                   amount: totalSeeds,
                                 },
                                 state,
-                              ) / 1000,
+                              ).milliSeconds / 1000,
                               {
                                 length: "medium",
                                 isShortFormat: true,
@@ -509,7 +509,7 @@ export const CropMachineModalContent: React.FC<Props> = ({
                               amount: selectedPack.seeds,
                             },
                             state,
-                          ) / 1000,
+                          ).milliSeconds / 1000,
                           {
                             length: "medium",
                             isShortFormat: true,

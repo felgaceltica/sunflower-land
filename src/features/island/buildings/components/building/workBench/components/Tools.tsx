@@ -26,7 +26,7 @@ import { capitalize } from "lib/utils/capitalize";
 import { IslandType, LoveAnimalItem } from "features/game/types/game";
 import { getToolPrice } from "features/game/events/landExpansion/craftTool";
 import { Restock } from "../../market/restock/Restock";
-import { hasFeatureAccess } from "lib/flags";
+import { getObjectEntries } from "features/game/expansion/lib/utils";
 
 const isLoveAnimalTool = (
   toolName: WorkbenchToolName | LoveAnimalItem,
@@ -44,22 +44,16 @@ export const Tools: React.FC = () => {
 
   const selected = isLoveAnimalTool(selectedName)
     ? LOVE_ANIMAL_TOOLS[selectedName]
-    : selectedName === "Oil Drill" && !hasFeatureAccess(state, "LEATHER_TOOLS")
-      ? {
-          ...WORKBENCH_TOOLS["Oil Drill"],
-          ingredients: {
-            Wood: new Decimal(25),
-            Iron: new Decimal(10),
-          },
-        }
-      : WORKBENCH_TOOLS[selectedName];
+    : WORKBENCH_TOOLS[selectedName];
 
   const inventory = state.inventory;
   const price = getToolPrice(selected, 1, state);
 
+  const selectedIngredients = selected.ingredients(state.bumpkin.skills);
+
   const lessIngredients = (amount = 1) =>
-    getKeys(selected.ingredients).some((name) =>
-      selected.ingredients[name]?.mul(amount).greaterThan(inventory[name] || 0),
+    getObjectEntries(selectedIngredients).some(([name, ingredients]) =>
+      ingredients?.mul(amount).greaterThan(inventory[name] || 0),
     );
 
   const lessFunds = (amount = 1) => {
@@ -174,32 +168,34 @@ export const Tools: React.FC = () => {
           limit={isLoveAnimalTool(selectedName) ? 1 : undefined}
           requirements={{
             coins: price,
-            resources: selected.ingredients,
+            resources: selectedIngredients,
           }}
           actionView={getAction()}
         />
       }
       content={
         <>
-          {getKeys(WORKBENCH_TOOLS).map((toolName) => {
-            const { requiredIsland } = WORKBENCH_TOOLS[toolName];
-            const isLocked = !hasRequiredIslandExpansion(
-              state.island.type,
-              requiredIsland,
-            );
+          {getObjectEntries(WORKBENCH_TOOLS)
+            .filter(([, tool]) => !tool.disabled)
+            .map(([toolName, tool]) => {
+              const { requiredIsland } = tool;
+              const isLocked = !hasRequiredIslandExpansion(
+                state.island.type,
+                requiredIsland,
+              );
 
-            return (
-              <Box
-                isSelected={selectedName === toolName}
-                key={toolName}
-                onClick={() => onToolClick(toolName)}
-                image={ITEM_DETAILS[toolName].image}
-                count={inventory[toolName]}
-                secondaryImage={isLocked ? SUNNYSIDE.icons.lock : undefined}
-                showOverlay={isLocked}
-              />
-            );
-          })}
+              return (
+                <Box
+                  isSelected={selectedName === toolName}
+                  key={toolName}
+                  onClick={() => onToolClick(toolName)}
+                  image={ITEM_DETAILS[toolName].image}
+                  count={inventory[toolName]}
+                  secondaryImage={isLocked ? SUNNYSIDE.icons.lock : undefined}
+                  showOverlay={isLocked}
+                />
+              );
+            })}
           {getKeys(LOVE_ANIMAL_TOOLS).map((toolName) => {
             return (
               <Box

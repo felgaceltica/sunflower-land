@@ -15,22 +15,23 @@ import classNames from "classnames";
 import { SquareIcon } from "components/ui/SquareIcon";
 import {
   Recipe,
+  RecipeCollectibleName,
   RecipeIngredient,
-  RecipeItemName,
   RECIPES,
   Recipes,
 } from "features/game/lib/crafting";
 import { getImageUrl } from "lib/utils/getImageURLS";
 import { BumpkinItem, ITEM_IDS } from "features/game/types/bumpkin";
-import Decimal from "decimal.js-light";
 import { RecipeInfoPanel } from "./RecipeInfoPanel";
-import { getKeys } from "features/game/types/decorations";
 import { CollectibleName } from "features/game/types/craftables";
 import { availableWardrobe } from "features/game/events/landExpansion/equip";
 import { getBoostedCraftingTime } from "features/game/events/landExpansion/startCrafting";
 import { COLLECTIBLE_BUFF_LABELS } from "features/game/types/collectibleItemBuffs";
 import lightningIcon from "assets/icons/lightning.png";
 import { InventoryItemName } from "features/game/types/game";
+import { getChestItems } from "features/island/hud/components/inventory/utils/inventory";
+import { getObjectEntries } from "features/game/expansion/lib/utils";
+import Decimal from "decimal.js-light";
 
 const _state = (state: MachineState) => state.context.state;
 
@@ -57,40 +58,32 @@ export const RecipesTab: React.FC<Props> = ({
 
   const filteredRecipes = useMemo(() => {
     if (!searchTerm.trim()) return recipes;
-    return Object.entries(recipes || {}).reduce((acc, [name, recipe]) => {
-      if (name.toLowerCase().includes(searchTerm.toLowerCase())) {
-        acc[name as RecipeItemName] = recipe;
-      }
-      return acc;
-    }, {} as Recipes);
+    return getObjectEntries(recipes || {}).reduce<Partial<Recipes>>(
+      (acc, [name, recipe]) => {
+        if (name.toLowerCase().includes(searchTerm.toLowerCase())) {
+          acc[name] = recipe;
+        }
+        return acc;
+      },
+      {},
+    );
   }, [recipes, searchTerm]);
 
   const sillhouetteRecipes = useMemo(() => {
-    return Object.entries(RECIPES(state)).reduce((acc, [name, recipe]) => {
-      if (!recipes[name as RecipeItemName]) {
-        acc[name as RecipeItemName] = recipe;
-      }
-      return acc;
-    }, {} as Recipes);
+    return getObjectEntries(RECIPES).reduce<Partial<Recipes>>(
+      (acc, [name, recipe]) => {
+        if (!recipes[name]) {
+          acc[name] = recipe;
+        }
+        return acc;
+      },
+      {},
+    );
   }, [recipes, searchTerm]);
 
   const remainingInventory = useMemo(() => {
-    const updatedInventory = { ...inventory };
-
-    // Removed placed items
-    getKeys(updatedInventory).forEach((itemName) => {
-      const placedCount =
-        (gameService.getSnapshot().context.state.collectibles[
-          itemName as CollectibleName
-        ]?.length ?? 0) +
-        (gameService.getSnapshot().context.state.home?.collectibles[
-          itemName as CollectibleName
-        ]?.length ?? 0);
-
-      updatedInventory[itemName] = (
-        updatedInventory[itemName] ?? new Decimal(0)
-      ).minus(placedCount);
-    });
+    const chestItems = getChestItems(state);
+    const updatedInventory = { ...inventory, ...chestItems };
 
     return updatedInventory;
   }, [inventory]);
@@ -133,6 +126,9 @@ export const RecipesTab: React.FC<Props> = ({
       return false;
     });
   };
+
+  const recipeAmount = (recipeName: RecipeCollectibleName) =>
+    remainingInventory[recipeName as RecipeCollectibleName] ?? new Decimal(0);
 
   return (
     <div className="flex flex-col">
@@ -225,6 +221,15 @@ export const RecipesTab: React.FC<Props> = ({
                             className="w-6 h-6 object-contain"
                           />
                         )}
+                        {recipeAmount(recipe.name as RecipeCollectibleName).gt(
+                          0,
+                        ) && (
+                          <div className="absolute -top-4 -right-4">
+                            <Label type="default">
+                              <p className="text-xxs">{`${recipeAmount(recipe.name as RecipeCollectibleName)}`}</p>
+                            </Label>
+                          </div>
+                        )}
                       </ButtonPanel>
                     </div>
                     <div className="flex mt-1">
@@ -316,9 +321,12 @@ export const RecipesTab: React.FC<Props> = ({
                       <div className="flex mt-1">
                         <SquareIcon
                           icon={
-                            COLLECTIBLE_BUFF_LABELS(state)[
+                            COLLECTIBLE_BUFF_LABELS[
                               recipe.name as InventoryItemName
-                            ]?.length
+                            ]?.({
+                              skills: state.bumpkin.skills,
+                              collectibles: state.collectibles,
+                            })?.length
                               ? lightningIcon
                               : SUNNYSIDE.icons.expression_confused
                           }

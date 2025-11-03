@@ -9,10 +9,7 @@ import { useSelector } from "@xstate/react";
 import { MoveableComponent } from "./MovableComponent";
 import { MachineState } from "features/game/lib/gameMachine";
 import { Context } from "features/game/GameProvider";
-import { InnerPanel } from "components/ui/Panel";
-import { SquareIcon } from "components/ui/SquareIcon";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { hasMoveRestriction } from "features/game/types/removeables";
 import {
   COLLECTIBLE_COMPONENTS,
   READONLY_COLLECTIBLES,
@@ -30,7 +27,7 @@ import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import confetti from "canvas-confetti";
 import { getInstantGems } from "features/game/events/landExpansion/speedUpRecipe";
 import { gameAnalytics } from "lib/gameAnalytics";
-import { hasFeatureAccess } from "lib/flags";
+import classNames from "classnames";
 
 export type CollectibleProps = {
   name: CollectibleName;
@@ -41,29 +38,32 @@ export type CollectibleProps = {
   y: number;
   grid: GameGrid;
   location: PlaceableLocation;
-  game: GameState;
+  skills: GameState["bumpkin"]["skills"];
+  showTimers: boolean;
   z?: number | string;
+  flipped?: boolean;
 };
 
 type Props = CollectibleProps & {
-  showTimers: boolean;
   location: PlaceableLocation;
 };
+
+const _skills = (state: MachineState) => state.context.state.bumpkin.skills;
 
 const InProgressCollectible: React.FC<Props> = ({
   name,
   id,
   readyAt,
   createdAt,
-  showTimers,
   x,
   y,
   grid,
   location,
-  game,
 }) => {
-  const { gameService, showAnimations } = useContext(Context);
+  const { gameService, showAnimations, showTimers } = useContext(Context);
   const CollectiblePlaced = COLLECTIBLE_COMPONENTS[name];
+
+  const skills = useSelector(gameService, _skills);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -104,7 +104,6 @@ const InProgressCollectible: React.FC<Props> = ({
             readyAt={readyAt}
             onClose={() => setShowModal(false)}
             onInstantBuilt={onSpeedUp}
-            state={game}
           />
         </CloseButtonPanel>
       </Modal>
@@ -120,7 +119,8 @@ const InProgressCollectible: React.FC<Props> = ({
             y={y}
             grid={grid}
             location={location}
-            game={game}
+            showTimers={showTimers}
+            skills={skills}
           />
         </div>
         {showTimers && (
@@ -148,20 +148,26 @@ const CollectibleComponent: React.FC<Props> = ({
   createdAt,
   x,
   y,
-  showTimers,
   grid,
   location,
-  game,
   z,
+  flipped,
 }) => {
+  const { gameService, showTimers } = useContext(Context);
   const CollectiblePlaced = COLLECTIBLE_COMPONENTS[name];
+  const skills = useSelector(gameService, _skills);
 
   const inProgress = readyAt > Date.now();
 
   useUiRefresher({ active: inProgress });
 
   return (
-    <div className="h-full" style={{ zIndex: z }}>
+    <div
+      className={classNames("h-full", {
+        flipped: flipped,
+      })}
+      style={{ zIndex: z }}
+    >
       {inProgress ? (
         <InProgressCollectible
           key={id}
@@ -171,10 +177,10 @@ const CollectibleComponent: React.FC<Props> = ({
           readyAt={readyAt}
           x={x}
           y={y}
-          showTimers={showTimers}
           grid={grid}
           location={location}
-          game={game}
+          skills={skills}
+          showTimers={showTimers}
         />
       ) : (
         <CollectiblePlaced
@@ -187,62 +193,25 @@ const CollectibleComponent: React.FC<Props> = ({
           y={y}
           grid={grid}
           location={location}
-          game={game}
+          skills={skills}
+          showTimers={showTimers}
         />
       )}
     </div>
   );
 };
 
-const getGameState = (state: MachineState) => state.context.state;
-
 const LandscapingCollectible: React.FC<Props> = (props) => {
-  const { gameService } = useContext(Context);
-  const [showPopover, setShowPopover] = useState(false);
-  const gameState = useSelector(gameService, getGameState);
-  const hasLandscaping = useSelector(gameService, (state) =>
-    hasFeatureAccess(state.context.state, "LANDSCAPING"),
-  );
-
   const CollectiblePlaced = READONLY_COLLECTIBLES[props.name];
-
-  const [isRestricted, restrictionReason] = hasMoveRestriction(
-    props.name,
-    props.id,
-    gameState,
-  );
-  if (isRestricted && !hasLandscaping) {
-    return (
-      <div
-        className="relative w-full h-full"
-        onMouseEnter={() => setShowPopover(true)}
-        onMouseLeave={() => setShowPopover(false)}
-      >
-        {showPopover && (
-          <div
-            className="flex justify-center absolute w-full pointer-events-none"
-            style={{
-              top: `${PIXEL_SCALE * -15}px`,
-            }}
-          >
-            <InnerPanel className="absolute whitespace-nowrap w-fit z-50">
-              <div className="flex items-center space-x-2 mx-1 p-1">
-                <SquareIcon icon={SUNNYSIDE.icons.lock} width={5} />
-                <span className="text-xxs mb-0.5">{restrictionReason}</span>
-              </div>
-            </InnerPanel>
-          </div>
-        )}
-        <div style={{ zIndex: props.z }}>
-          <CollectiblePlaced {...props} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <MoveableComponent {...(props as any)}>
-      <div style={{ zIndex: props.z }}>
+      <div
+        className={classNames({
+          flipped: props.flipped,
+        })}
+        style={{ zIndex: props.z }}
+      >
         <CollectiblePlaced {...props} />
       </div>
     </MoveableComponent>
@@ -253,25 +222,41 @@ const isLandscaping = (state: MachineState) => state.matches("landscaping");
 
 const MemorizedCollectibleComponent = React.memo(CollectibleComponent);
 
-export const Collectible: React.FC<Props> = (props) => {
-  const { gameService } = useContext(Context);
+export const Collectible: React.FC<Omit<Props, "showTimers" | "skills">> = (
+  props,
+) => {
+  const { gameService, showTimers } = useContext(Context);
   const landscaping = useSelector(gameService, isLandscaping);
+  const skills = useSelector(gameService, _skills);
 
   if (landscaping) {
-    return <LandscapingCollectible {...props} />;
+    return (
+      <LandscapingCollectible
+        {...props}
+        showTimers={showTimers}
+        skills={skills}
+      />
+    );
   }
 
-  return <MemorizedCollectibleComponent {...props} />;
+  return (
+    <MemorizedCollectibleComponent
+      {...props}
+      showTimers={showTimers}
+      skills={skills}
+    />
+  );
 };
 
 export const Building: React.FC<{
-  state: GameState;
   onClose: () => void;
   onInstantBuilt: (gems: number) => void;
   readyAt: number;
   createdAt: number;
   name: CollectibleName;
-}> = ({ state, onClose, onInstantBuilt, readyAt, createdAt, name }) => {
+}> = ({ onClose, onInstantBuilt, readyAt, createdAt, name }) => {
+  const { gameService } = useContext(Context);
+  const state = useSelector(gameService, (state) => state.context.state);
   const { t } = useAppTranslation();
   const totalSeconds = (readyAt - createdAt) / 1000;
   const secondsTillReady = (readyAt - Date.now()) / 1000;

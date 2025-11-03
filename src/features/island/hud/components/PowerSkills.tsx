@@ -1,6 +1,5 @@
 import { useSelector } from "@xstate/react";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { Button } from "components/ui/Button";
 import { Label } from "components/ui/Label";
 import { OuterPanel } from "components/ui/Panel";
 import { RequirementLabel } from "components/ui/RequirementsLabel";
@@ -30,12 +29,18 @@ import { getSkillImage } from "features/bumpkins/components/revamp/SkillPathDeta
 import tradeOffs from "src/assets/icons/tradeOffs.png";
 import { powerSkillDisabledConditions } from "features/game/events/landExpansion/skillUsed";
 import { getRelativeTime, millisecondsToString } from "lib/utils/time";
+import { ConfirmButton } from "components/ui/ConfirmButton";
 
 interface PowerSkillsProps {
   onHide: () => void;
   onBack: () => void;
+  readonly: boolean;
 }
-export const PowerSkills: React.FC<PowerSkillsProps> = ({ onHide, onBack }) => {
+export const PowerSkills: React.FC<PowerSkillsProps> = ({
+  onHide,
+  onBack,
+  readonly,
+}) => {
   const { t } = useAppTranslation();
   return (
     <CloseButtonPanel
@@ -48,14 +53,17 @@ export const PowerSkills: React.FC<PowerSkillsProps> = ({ onHide, onBack }) => {
         },
       ]}
     >
-      <PowerSkillsContent onBack={onBack} />
+      <PowerSkillsContent onBack={onBack} readonly={readonly} />
     </CloseButtonPanel>
   );
 };
 
 const _state = (state: MachineState) => state.context.state;
 
-const PowerSkillsContent: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const PowerSkillsContent: React.FC<{
+  onBack: () => void;
+  readonly: boolean;
+}> = ({ onBack, readonly }) => {
   const { t } = useAppTranslation();
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
@@ -95,16 +103,12 @@ const PowerSkillsContent: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { cooldown, items, tier } = requirements;
   const { buff, debuff } = boosts;
 
-  const [useSkillConfirmation, setUseSkillConfirmation] = useState(false);
-
   const isCropFertiliserSkill =
     skillName === "Sprout Surge" || skillName === "Root Rocket";
 
   const isFruitFertiliserSkill = skillName === "Blend-tastic";
 
   const useSkill = () => {
-    setUseSkillConfirmation(false);
-
     if (isCropFertiliserSkill) {
       Object.entries(crops).map(([id, cropPlot]) => {
         const readyToHarvest =
@@ -307,28 +311,16 @@ const PowerSkillsContent: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
           </div>
 
-          {power && (
+          {power && !readonly && (
             <div className="flex space-x-1 sm:space-x-0 sm:space-y-1 sm:flex-col w-full">
-              {useSkillConfirmation ? (
-                <>
-                  <Button
-                    className="mr-1 sm:mr-0"
-                    onClick={() => setUseSkillConfirmation(false)}
-                  >
-                    {t("cancel")}
-                  </Button>
-                  <Button disabled={disabled} onClick={useSkill}>
-                    {t("powerSkills.use")}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  disabled={disabled}
-                  onClick={() => setUseSkillConfirmation(true)}
-                >
-                  {t("powerSkills.use")}
-                </Button>
-              )}
+              <ConfirmButton
+                onConfirm={useSkill}
+                confirmLabel={t("powerSkills.use")}
+                disabled={disabled}
+                divClassName="flex-row sm:flex-col"
+              >
+                {t("powerSkills.use")}
+              </ConfirmButton>
             </div>
           )}
         </div>
@@ -373,7 +365,6 @@ const PowerSkillsContent: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       isSelected={selectedSkill === skill}
                       onClick={() => {
                         setSelectedSkill(skill);
-                        setUseSkillConfirmation(false);
                       }}
                       tier={requirements.tier}
                       npc={npc}
@@ -430,7 +421,6 @@ const PowerSkillsContent: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       isSelected={selectedSkill === skill}
                       onClick={() => {
                         setSelectedSkill(skill);
-                        setUseSkillConfirmation(false);
                       }}
                       tier={requirements.tier}
                       npc={npc}

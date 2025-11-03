@@ -46,6 +46,7 @@ import { Modal } from "components/ui/Modal";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { OuterPanel } from "components/ui/Panel";
 import { SleepingAnimalModal } from "features/barn/components/SleepingAnimalModal";
+import glow from "public/world/glow.png";
 
 export const CHICKEN_EMOTION_ICONS: Record<
   Exclude<TState["value"], "idle" | "needsLove" | "initial" | "sick">,
@@ -444,6 +445,20 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
           }}
         />
       )}
+
+      {/* Upcoming Mutant Sign */}
+      {mutantName && (
+        <img
+          src={glow}
+          className="absolute animate-pulsate pointer-events-none"
+          style={{
+            bottom: "-6px",
+            maxWidth: "85px",
+            maxHeight: "85px",
+          }}
+        />
+      )}
+
       <div
         className="relative cursor-pointer w-full h-full flex items-center justify-center"
         style={{
@@ -509,22 +524,6 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
               request={requestBubbleRequest()}
             />
           )}
-          <Modal
-            show={showAnimalDetails}
-            onHide={() => setShowAnimalDetails(false)}
-          >
-            <CloseButtonPanel
-              container={OuterPanel}
-              onClose={() => setShowAnimalDetails(false)}
-            >
-              <SleepingAnimalModal
-                id={chicken.id}
-                animal={chicken}
-                awakeAt={chicken.awakeAt}
-                onClose={() => setShowAnimalDetails(false)}
-              />
-            </CloseButtonPanel>
-          </Modal>
         </div>
         <InfoPopover
           showPopover={
@@ -537,6 +536,22 @@ export const Chicken: React.FC<{ id: string; disabled: boolean }> = ({
           </p>
         </InfoPopover>
       </div>
+      <Modal
+        show={showAnimalDetails}
+        onHide={() => setShowAnimalDetails(false)}
+      >
+        <CloseButtonPanel
+          container={OuterPanel}
+          onClose={() => setShowAnimalDetails(false)}
+        >
+          <SleepingAnimalModal
+            id={chicken.id}
+            animal={chicken}
+            awakeAt={chicken.awakeAt}
+            onClose={() => setShowAnimalDetails(false)}
+          />
+        </CloseButtonPanel>
+      </Modal>
       {/* Level Progress */}
       <LevelProgress
         animalState={chickenMachineState}

@@ -1,4 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import classNames from "classnames";
 
 import {
@@ -17,16 +24,17 @@ import Draggable from "react-draggable";
 import { detectCollision } from "features/game/expansion/placeable/lib/collisionDetection";
 import { useSelector } from "@xstate/react";
 import {
+  LandscapingPlaceable,
   MachineInterpreter,
   MachineState,
 } from "features/game/expansion/placeable/landscapingMachine";
 import {
   BUILDINGS_DIMENSIONS,
-  BuildingName,
+  Dimensions,
 } from "features/game/types/buildings";
 import { GameEventName, PlacementEvent } from "features/game/events";
 import { RESOURCES, ResourceName } from "features/game/types/resources";
-import { InventoryItemName } from "features/game/types/game";
+import { GameState } from "features/game/types/game";
 import { removePlaceable } from "./lib/placing";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { ITEM_DETAILS } from "features/game/types/images";
@@ -35,11 +43,10 @@ import { ZoomContext } from "components/ZoomProvider";
 import { RemoveKuebikoModal } from "./RemoveKuebikoModal";
 import { PlaceableLocation } from "features/game/types/collectibles";
 import { RemoveHungryCaterpillarModal } from "./RemoveHungryCaterpillarModal";
-import { HourglassType } from "./components/Hourglass";
-import { HOURGLASSES } from "features/game/events/landExpansion/burnCollectible";
-import { hasRemoveRestriction } from "features/game/types/removeables";
-import { hasFeatureAccess } from "lib/flags";
-import { InnerPanel } from "components/ui/Panel";
+import flipped from "assets/icons/flipped.webp";
+import flipIcon from "assets/icons/flip.webp";
+import debounce from "lodash.debounce";
+import { LIMITED_ITEMS } from "features/game/events/landExpansion/burnCollectible";
 
 export const RESOURCE_MOVE_EVENTS: Record<
   ResourceName,
@@ -51,6 +58,8 @@ export const RESOURCE_MOVE_EVENTS: Record<
   "Gold Rock": "gold.moved",
   "Iron Rock": "iron.moved",
   "Stone Rock": "stone.moved",
+  "Fused Stone Rock": "stone.moved",
+  "Reinforced Stone Rock": "stone.moved",
   "Crimstone Rock": "crimstone.moved",
   Boulder: "tree.moved",
   Beehive: "beehive.moved",
@@ -58,10 +67,16 @@ export const RESOURCE_MOVE_EVENTS: Record<
   "Sunstone Rock": "sunstone.moved",
   "Oil Reserve": "oilReserve.moved",
   "Lava Pit": "lavaPit.moved",
+  "Ancient Tree": "tree.moved",
+  "Sacred Tree": "tree.moved",
+  "Refined Iron Rock": "iron.moved",
+  "Tempered Iron Rock": "iron.moved",
+  "Pure Gold Rock": "gold.moved",
+  "Prime Gold Rock": "gold.moved",
 };
 
 function getMoveAction(
-  name: InventoryItemName | "Bud",
+  name: LandscapingPlaceable,
 ): GameEventName<PlacementEvent> {
   if (name in BUILDINGS_DIMENSIONS) {
     return "building.moved";
@@ -75,12 +90,8 @@ function getMoveAction(
     return "collectible.moved";
   }
 
-  if (name === "Chicken") {
-    return "chicken.moved";
-  }
-
-  if (name === "Bud") {
-    return "bud.moved";
+  if (name === "Bud" || name === "Pet") {
+    return "nft.moved";
   }
 
   throw new Error("No matching move event");
@@ -96,59 +107,64 @@ export const RESOURCES_REMOVE_ACTIONS: Record<
   "Gold Rock": "gold.removed",
   "Iron Rock": "iron.removed",
   "Stone Rock": "stone.removed",
+  "Fused Stone Rock": "stone.removed",
+  "Reinforced Stone Rock": "stone.removed",
   "Crimstone Rock": "crimstone.removed",
   Beehive: "beehive.removed",
   "Flower Bed": "flowerBed.removed",
   "Sunstone Rock": "sunstone.removed",
   "Oil Reserve": "oilReserve.removed",
   "Lava Pit": "lavaPit.removed",
+  "Ancient Tree": "tree.removed",
+  "Sacred Tree": "tree.removed",
+  "Refined Iron Rock": "iron.removed",
+  "Tempered Iron Rock": "iron.removed",
+  "Pure Gold Rock": "gold.removed",
+  "Prime Gold Rock": "gold.removed",
 };
 
 export function getRemoveAction(
-  name: InventoryItemName | "Bud",
-  hasLandscapingAccess?: boolean,
+  name: LandscapingPlaceable | undefined,
 ): GameEventName<PlacementEvent> | null {
+  if (!name) {
+    return null;
+  }
+
   if (
     name in BUILDINGS_DIMENSIONS &&
     name !== "Manor" &&
     name !== "Town Center" &&
     name !== "House" &&
-    name !== "Mansion" &&
-    ((name !== "Market" && name !== "Fire Pit" && name !== "Workbench") ||
-      hasLandscapingAccess)
+    name !== "Mansion"
   ) {
     return "building.removed";
   }
 
-  if (
-    HOURGLASSES.includes(name as HourglassType) ||
-    name === "Time Warp Totem" ||
-    name === "Super Totem"
-  ) {
+  if (LIMITED_ITEMS.includes(name as CollectibleName)) {
     return null;
-  }
-
-  if (name === "Chicken") {
-    return "chicken.removed";
   }
 
   if (name in COLLECTIBLES_DIMENSIONS) {
     return "collectible.removed";
   }
 
-  if (name === "Bud") {
-    return "bud.removed";
+  if (name === "Bud" || name === "Pet") {
+    return "nft.removed";
   }
 
-  if (name in RESOURCES_REMOVE_ACTIONS && hasLandscapingAccess) {
+  if (name in RESOURCES_REMOVE_ACTIONS) {
     return RESOURCES_REMOVE_ACTIONS[name as Exclude<ResourceName, "Boulder">];
   }
 
   return null;
 }
 
+export const isCollectible = (
+  name: LandscapingPlaceable,
+): name is CollectibleName => name in COLLECTIBLES_DIMENSIONS;
+
 export interface MovableProps {
-  name: CollectibleName | BuildingName | "Chicken" | "Bud";
+  name: LandscapingPlaceable;
   id: string;
   index: number;
   x: number;
@@ -158,12 +174,85 @@ export interface MovableProps {
 
 const getMovingItem = (state: MachineState) => state.context.moving;
 
+const onDrag = ({
+  data,
+  coordinatesX,
+  coordinatesY,
+  detect,
+  setIsDragging,
+  setPosition,
+  name,
+  id,
+  location,
+  dimensions,
+  setIsColliding,
+  state,
+}: {
+  data: Coordinates;
+  coordinatesX: number;
+  coordinatesY: number;
+  detect: (
+    coordinates: Coordinates,
+    state: GameState,
+    name: CollectibleName,
+    id: string,
+    location: PlaceableLocation,
+    dimensions: Dimensions,
+    setIsColliding: (isColliding: boolean) => void,
+  ) => void;
+  setIsDragging: (isDragging: boolean) => void;
+  setPosition: (position: Coordinates) => void;
+  name: CollectibleName;
+  id: string;
+  location: PlaceableLocation;
+  dimensions: Dimensions;
+  setIsColliding: (isColliding: boolean) => void;
+  state: GameState;
+}) => {
+  const xDiff = Math.round(data.x / GRID_WIDTH_PX);
+  const yDiff = Math.round(-data.y / GRID_WIDTH_PX);
+
+  const x = coordinatesX + xDiff;
+  const y = coordinatesY + yDiff;
+  detect({ x, y }, state, name, id, location, dimensions, setIsColliding);
+  setIsDragging(true);
+
+  setPosition({
+    x: xDiff * GRID_WIDTH_PX,
+    y: -yDiff * GRID_WIDTH_PX,
+  });
+};
+
+const detect = (
+  { x, y }: Coordinates,
+  state: GameState,
+  name: CollectibleName,
+  id: string,
+  location: PlaceableLocation,
+  dimensions: Dimensions,
+  setIsColliding: (isColliding: boolean) => void,
+) => {
+  const game = removePlaceable({
+    state,
+    id,
+    name,
+  });
+  const collisionDetected = detectCollision({
+    name: name as CollectibleName,
+    state: game,
+    location,
+    position: { x, y, ...dimensions },
+  });
+
+  setIsColliding(collisionDetected);
+  // send({ type: "UPDATE", coordinates: { x, y }, collisionDetected });
+};
+
 export const MoveableComponent: React.FC<
   React.PropsWithChildren<MovableProps>
 > = ({
   name,
   id,
-  index,
   x: coordinatesX,
   y: coordinatesY,
   children,
@@ -177,6 +266,11 @@ export const MoveableComponent: React.FC<
   const [isColliding, setIsColliding] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [counts, setCounts] = useState(0);
+  const [position, setPosition] = useState<Coordinates>({
+    x: 0,
+    y: 0,
+  });
+
   const isActive = useRef(false);
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
 
@@ -185,39 +279,34 @@ export const MoveableComponent: React.FC<
 
   const movingItem = useSelector(landscapingMachine, getMovingItem);
 
-  const isSelected = movingItem?.id === id && movingItem?.name === name;
-  const hasLandscaping = useSelector(gameService, (state) =>
-    hasFeatureAccess(state.context.state, "LANDSCAPING"),
+  const isPlacing = useSelector(landscapingMachine, (state) =>
+    state.matches({ editing: "placing" }),
   );
-  const removeAction = !isMobile && getRemoveAction(name, hasLandscaping);
+
+  const isSelected = movingItem?.id === id && movingItem?.name === name;
+
+  const removeAction = !isMobile && getRemoveAction(name);
   const hasRemovalAction = !!removeAction;
 
-  const [isRestricted, restrictionReason] = hasRemoveRestriction({
-    name,
-    state: gameService.getSnapshot().context.state,
-    id,
-  });
+  const hasFlipAction = !isMobile && isCollectible(name);
 
-  /**
-   * Deselect if clicked outside of element
-   */
-  // https://stackoverflow.com/questions/32553158/detect-click-outside-react-component
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        isSelected &&
-        (event as any).target.id === "genesisBlock" &&
-        nodeRef.current &&
-        !(nodeRef.current as any).contains(event.target)
-      ) {
-        landscapingMachine.send("BLUR");
-      }
+  const flip = () => {
+    if (isCollectible(name)) {
+      landscapingMachine.send("FLIP", { id, name, location });
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [nodeRef, isSelected]);
+  };
+
+  const isFlipped = useSelector(gameService, (state) => {
+    if (!isCollectible(name)) return false;
+    const collectibles =
+      location === "home"
+        ? state.context.state.home.collectibles
+        : state.context.state.collectibles;
+    return (
+      collectibles[name]?.find((collectible) => collectible.id === id)
+        ?.flipped ?? false
+    );
+  });
 
   const remove = () => {
     if (!removeAction) {
@@ -242,81 +331,50 @@ export const MoveableComponent: React.FC<
       setCounts((prev) => prev + 1);
       setIsColliding(false);
       setShowRemoveConfirmation(false);
+      setPosition({ x: 0, y: 0 });
       isActive.current = false;
     }
-  }, [movingItem]);
+  }, [isSelected, movingItem]);
 
-  const dimensions = {
+  const DIMENSIONS_MAP = {
     ...BUILDINGS_DIMENSIONS,
     ...COLLECTIBLES_DIMENSIONS,
     ...ANIMAL_DIMENSIONS,
     ...RESOURCE_DIMENSIONS,
-    ...{ Bud: { width: 1, height: 1 } },
-  }[name];
-
-  const detect = ({ x, y }: Coordinates) => {
-    const game = removePlaceable({
-      state: gameService.getSnapshot().context.state,
-      id,
-      name,
-    });
-    const collisionDetected = detectCollision({
-      name: name as CollectibleName,
-      state: game,
-      location,
-      position: { x, y, width: dimensions.width, height: dimensions.height },
-    });
-
-    setIsColliding(collisionDetected);
-    // send({ type: "UPDATE", coordinates: { x, y }, collisionDetected });
   };
 
-  const origin = useRef<Coordinates>({ x: 0, y: 0 });
+  const dimensions = useMemo(() => {
+    return name === "Bud"
+      ? { width: 1, height: 1 }
+      : name === "Pet"
+        ? { width: 2, height: 2 }
+        : DIMENSIONS_MAP[name];
+  }, [name]);
 
-  return (
-    <Draggable
-      key={`${coordinatesX}-${coordinatesY}-${counts}`}
-      nodeRef={nodeRef}
-      grid={[GRID_WIDTH_PX * scale.get(), GRID_WIDTH_PX * scale.get()]}
-      scale={scale.get()}
-      allowAnyClick
-      // Mobile must click first, before dragging
-      disabled={isMobile && !isSelected}
-      onMouseDown={() => {
-        // Mobile must click first, before dragging
-
-        if (isMobile && !isActive.current) {
-          isActive.current = true;
-
-          return;
-        }
-
-        landscapingMachine.send("MOVE", { name, id });
-
-        isActive.current = true;
-      }}
-      onStart={(_, data) => {
-        const x = Math.round(data.x);
-        const y = Math.round(-data.y);
-
-        if (!origin.current) {
-          origin.current = { x, y };
-        }
-      }}
-      onDrag={(_, data) => {
-        const xDiff = Math.round((origin.current.x + data.x) / GRID_WIDTH_PX);
-        const yDiff = Math.round((origin.current.y - data.y) / GRID_WIDTH_PX);
-
-        const x = coordinatesX + xDiff;
-        const y = coordinatesY + yDiff;
-        detect({ x, y });
-        setIsDragging(true);
-      }}
-      onStop={(_, data) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onStop = useCallback(
+    debounce(
+      ({
+        data,
+        coordinatesX,
+        coordinatesY,
+        id,
+        name,
+        location,
+        dimensions,
+      }: {
+        data: Coordinates;
+        coordinatesX: number;
+        coordinatesY: number;
+        id: string;
+        name: LandscapingPlaceable;
+        location: PlaceableLocation;
+        dimensions: Dimensions;
+      }) => {
         setIsDragging(false);
 
-        const xDiff = Math.round((origin.current.x + data.x) / GRID_WIDTH_PX);
-        const yDiff = Math.round((origin.current.y - data.y) / GRID_WIDTH_PX);
+        const xDiff = Math.round(data.x / GRID_WIDTH_PX);
+        const yDiff = Math.round(-data.y / GRID_WIDTH_PX);
 
         const x = coordinatesX + xDiff;
         const y = coordinatesY + yDiff;
@@ -344,16 +402,251 @@ export const MoveableComponent: React.FC<
         });
 
         if (!collisionDetected) {
+          setPosition({ x: 0, y: 0 });
           gameService.send(getMoveAction(name), {
             // Don't send name for resource events and Bud events
-            ...(name in RESOURCE_MOVE_EVENTS || name === "Bud" ? {} : { name }),
-            coordinates: { x: coordinatesX + xDiff, y: coordinatesY + yDiff },
+            ...(name in RESOURCE_MOVE_EVENTS
+              ? {}
+              : name === "Bud" || name === "Pet"
+                ? { nft: name }
+                : { name }),
+            coordinates: { x, y },
             id,
             // Resources do not require location to be passed
             location: name in RESOURCE_MOVE_EVENTS ? undefined : location,
           });
         }
+      },
+      500,
+      {
+        leading: false,
+        trailing: true,
+      },
+    ),
+    [],
+  );
+  useEffect(() => {
+    return () => {
+      onStop.flush();
+    };
+  }, [onStop]);
+
+  /**
+   * Deselect if clicked outside of element
+   */
+  // https://stackoverflow.com/questions/32553158/detect-click-outside-react-component
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        isSelected &&
+        (event as any).target.id === "genesisBlock" &&
+        nodeRef.current &&
+        !(nodeRef.current as any).contains(event.target)
+      ) {
+        landscapingMachine.send("BLUR");
+        setPosition({ x: 0, y: 0 });
+        onStop.flush();
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+  }, [nodeRef, isSelected, landscapingMachine, onStop]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Immediately return if in placing mode
+      if (isPlacing) {
+        return;
+      }
+
+      if (e.key === "ArrowUp" || e.key === "w") {
+        const newPosition = {
+          x: position.x,
+          y: position.y - GRID_WIDTH_PX,
+        };
+        onDrag({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          detect,
+          setIsDragging,
+          setPosition,
+          name: name as CollectibleName,
+          id,
+          location,
+          dimensions,
+          state: gameService.getSnapshot().context.state,
+          setIsColliding,
+        });
+        onStop({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          id,
+          name,
+          location,
+          dimensions,
+        });
+        e.preventDefault();
+      } else if (e.key === "ArrowDown" || e.key === "s") {
+        const newPosition = {
+          x: position.x,
+          y: position.y + GRID_WIDTH_PX,
+        };
+        onDrag({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          detect,
+          setIsDragging,
+          setPosition,
+          name: name as CollectibleName,
+          id,
+          location,
+          dimensions,
+          state: gameService.getSnapshot().context.state,
+          setIsColliding,
+        });
+        onStop({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          id,
+          name,
+          location,
+          dimensions,
+        });
+        e.preventDefault();
+      } else if (e.key === "ArrowLeft" || e.key === "a") {
+        const newPosition = {
+          x: position.x - GRID_WIDTH_PX,
+          y: position.y,
+        };
+        onDrag({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          detect,
+          setIsDragging,
+          setPosition,
+          name: name as CollectibleName,
+          id,
+          location,
+          dimensions,
+          state: gameService.getSnapshot().context.state,
+          setIsColliding,
+        });
+        onStop({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          id,
+          name,
+          location,
+          dimensions,
+        });
+        e.preventDefault();
+      } else if (e.key === "ArrowRight" || e.key === "d") {
+        const newPosition = {
+          x: position.x + GRID_WIDTH_PX,
+          y: position.y,
+        };
+        onDrag({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          detect,
+          setIsDragging,
+          setPosition,
+          name: name as CollectibleName,
+          id,
+          location,
+          dimensions,
+          state: gameService.getSnapshot().context.state,
+          setIsColliding,
+        });
+        onStop({
+          data: newPosition,
+          coordinatesX,
+          coordinatesY,
+          id,
+          name,
+          location,
+          dimensions,
+        });
+        e.preventDefault();
+      }
+    };
+    if (isSelected) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    coordinatesX,
+    coordinatesY,
+    dimensions,
+    gameService,
+    id,
+    isPlacing,
+    isSelected,
+    location,
+    name,
+    onStop,
+    position,
+  ]);
+
+  return (
+    <Draggable
+      key={`${coordinatesX}-${coordinatesY}-${counts}`}
+      nodeRef={nodeRef}
+      grid={[GRID_WIDTH_PX * scale.get(), GRID_WIDTH_PX * scale.get()]}
+      scale={scale.get()}
+      allowAnyClick
+      // Mobile must click first, before dragging
+      disabled={isMobile && !isSelected}
+      onMouseDown={() => {
+        // Mobile must click first, before dragging
+
+        if (isMobile && !isActive.current) {
+          isActive.current = true;
+
+          return;
+        }
+
+        landscapingMachine.send("MOVE", { name, id });
+
+        isActive.current = true;
       }}
+      onDrag={(_, data) => {
+        onDrag({
+          data,
+          coordinatesX,
+          coordinatesY,
+          detect,
+          setIsDragging,
+          setPosition,
+          name: name as CollectibleName,
+          id,
+          location,
+          dimensions,
+          state: gameService.getSnapshot().context.state,
+          setIsColliding,
+        });
+      }}
+      onStop={(_, data) =>
+        onStop({
+          data,
+          coordinatesX,
+          coordinatesY,
+          id,
+          name,
+          location,
+          dimensions,
+        })
+      }
+      position={position}
     >
       <div
         ref={nodeRef}
@@ -399,6 +692,36 @@ export const MoveableComponent: React.FC<
                 />
               )}
             </div>
+            {hasFlipAction && (
+              <div
+                className="relative mr-2"
+                style={{ width: `${PIXEL_SCALE * 18}px` }}
+                onClick={flip}
+              >
+                <img className="w-full" src={SUNNYSIDE.icons.disc} />
+                {isFlipped ? (
+                  <img
+                    className="absolute"
+                    src={flipped}
+                    style={{
+                      width: `${PIXEL_SCALE * 12}px`,
+                      right: `${PIXEL_SCALE * 3}px`,
+                      top: `${PIXEL_SCALE * 4}px`,
+                    }}
+                  />
+                ) : (
+                  <img
+                    className="absolute"
+                    src={flipIcon}
+                    style={{
+                      width: `${PIXEL_SCALE * 13}px`,
+                      right: `${PIXEL_SCALE * 2.5}px`,
+                      top: `${PIXEL_SCALE * 4}px`,
+                    }}
+                  />
+                )}
+              </div>
+            )}
             {showRemoveConfirmation && name === "Kuebiko" && (
               <RemoveKuebikoModal
                 onClose={() => setShowRemoveConfirmation(false)}
@@ -413,12 +736,10 @@ export const MoveableComponent: React.FC<
             )}
             {hasRemovalAction && (
               <div
-                className={classNames("group relative cursor-pointer", {
-                  "cursor-not-allowed": isRestricted && !hasLandscaping,
-                })}
+                className={"group relative cursor-pointer"}
                 style={{ width: `${PIXEL_SCALE * 18}px` }}
                 onClick={(e) => {
-                  if (!isRestricted || hasLandscaping) remove();
+                  remove();
                   e.preventDefault();
                 }}
               >
@@ -446,26 +767,7 @@ export const MoveableComponent: React.FC<
                         top: `${PIXEL_SCALE * 3}px`,
                       }}
                     />
-                    {isRestricted && !hasLandscaping && (
-                      <img
-                        src={SUNNYSIDE.icons.cancel}
-                        className="absolute right-0 top-0 w-1/2 h-1/2 object-contain"
-                        alt="restricted"
-                      />
-                    )}
                   </>
-                )}
-                {isRestricted && !hasLandscaping && (
-                  <div
-                    className="flex justify-center absolute w-full pointer-events-none invisible group-hover:!visible"
-                    style={{ top: `${PIXEL_SCALE * -10}px` }}
-                  >
-                    <InnerPanel className="absolute whitespace-nowrap w-fit z-50">
-                      <div className="text-xs mx-1 p-1">
-                        <span>{restrictionReason}</span>
-                      </div>
-                    </InnerPanel>
-                  </div>
                 )}
               </div>
             )}
