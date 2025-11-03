@@ -1,12 +1,46 @@
 import { CONFIG } from "lib/config";
 import { ERRORS } from "lib/errors";
 import { sanitizeHTTPResponse } from "lib/network";
-import { GameEventName, PlacementEvent, PlayingEvent } from "../events";
+import { GameEvent, GameEventName } from "../events";
 import { PastAction } from "../lib/gameMachine";
 import { makeGame } from "../lib/transforms";
 import { getSessionId } from "./loadSession";
 import Decimal from "decimal.js-light";
 import { SeedBoughtAction } from "../events/landExpansion/seedBought";
+import { GameState } from "../types/game";
+import { getObjectEntries } from "../expansion/lib/utils";
+import { hasFeatureAccess } from "lib/flags";
+import { AUTO_SAVE_INTERVAL } from "../expansion/Game";
+
+// Browser-friendly SHA-256 → hex
+export async function hashString(str: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str); // UTF-8
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return "sha256:" + hashHex;
+}
+
+type StateHash = Record<keyof GameState, string>;
+
+/**
+ * Returns a hash of each field in the gamestate
+ * { balance: "sha256:1234567890", inventory: "sha256:1234567890", ... }
+ */
+export async function getGameHash(gameState: GameState): Promise<StateHash> {
+  const hashes = {} as StateHash;
+
+  for (const [key, value] of getObjectEntries(gameState)) {
+    // TODO - sort keys or use object-hash for deeper checks and consistency
+    const stable = JSON.stringify(value);
+    hashes[key] = await hashString(stable);
+  }
+
+  return hashes;
+}
 
 type Request = {
   actions: PastAction[];
@@ -16,13 +50,12 @@ type Request = {
   fingerprint: string;
   deviceTrackerId: string;
   transactionId: string;
+  state: GameState;
 };
 
 const API_URL = CONFIG.API_URL;
 
-const EXCLUDED_EVENTS: GameEventName<PlayingEvent | PlacementEvent>[] = [
-  "bot.detected",
-];
+const EXCLUDED_EVENTS: GameEventName<GameEvent>[] = ["bot.detected"];
 
 /**
  * Squashes similar events into a single event
@@ -66,32 +99,46 @@ export function serialize(events: PastAction[]) {
 }
 
 export async function autosaveRequest(
-  request: Omit<Request, "actions"> & { actions: any[] },
+  request: Omit<Request, "actions" | "state"> & {
+    actions: any[];
+    stateHash?: Record<keyof GameState, string>;
+  },
 ) {
   const ttl = (window as any)["x-amz-ttl"];
 
   // Useful for using cached results
   const cachedKey = getSessionId();
 
-  return await window.fetch(`${API_URL}/autosave/${request.farmId}`, {
-    method: "POST",
-    headers: {
-      ...{
-        "content-type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${request.token}`,
-        "X-Fingerprint": request.fingerprint,
-        "X-Transaction-ID": request.transactionId,
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, AUTO_SAVE_INTERVAL);
+
+  try {
+    return await window.fetch(`${API_URL}/autosave/${request.farmId}`, {
+      method: "POST",
+      headers: {
+        ...{
+          "content-type": "application/json;charset=UTF-8",
+          Authorization: `Bearer ${request.token}`,
+          "X-Fingerprint": request.fingerprint,
+          "X-Transaction-ID": request.transactionId,
+        },
+        ...(ttl ? { "X-Amz-TTL": (window as any)["x-amz-ttl"] } : {}),
       },
-      ...(ttl ? { "X-Amz-TTL": (window as any)["x-amz-ttl"] } : {}),
-    },
-    body: JSON.stringify({
-      sessionId: request.sessionId,
-      actions: request.actions,
-      clientVersion: CONFIG.CLIENT_VERSION as string,
-      cachedKey,
-      deviceTrackerId: request.deviceTrackerId,
-    }),
-  });
+      body: JSON.stringify({
+        sessionId: request.sessionId,
+        actions: request.actions,
+        clientVersion: CONFIG.CLIENT_VERSION as string,
+        cachedKey,
+        deviceTrackerId: request.deviceTrackerId,
+        stateHash: request.stateHash,
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 let autosaveErrors = 0;
@@ -113,9 +160,20 @@ export async function autosave(request: Request, retries = 0) {
     await new Promise((res) => setTimeout(res, autosaveErrors * 5000));
   }
 
+  let stateHash: StateHash | undefined;
+
+  if (hasFeatureAccess(request.state, "API_PERFORMANCE")) {
+    // eslint-disable-next-line no-console
+    console.time("getGameHash");
+    stateHash = await getGameHash(request.state);
+    // eslint-disable-next-line no-console
+    console.timeEnd("getGameHash");
+  }
+
   const response = await autosaveRequest({
     ...request,
     actions,
+    stateHash,
   });
 
   if (response.status === 503) {
@@ -160,13 +218,22 @@ export async function autosave(request: Request, retries = 0) {
 
   autosaveErrors = 0;
 
-  const { farm, changeset, announcements } = await sanitizeHTTPResponse<{
+  // eslint-disable-next-line prefer-const
+  let { farm, changeset, announcements } = await sanitizeHTTPResponse<{
     farm: any;
     changeset: any;
     announcements: any;
   }>(response);
 
   farm.id = request.farmId;
+
+  // Merge the changes over the previous
+  if (hasFeatureAccess(request.state, "API_PERFORMANCE")) {
+    farm = {
+      ...request.state,
+      ...farm,
+    };
+  }
 
   const game = makeGame(farm);
 

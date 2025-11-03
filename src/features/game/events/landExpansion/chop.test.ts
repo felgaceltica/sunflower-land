@@ -1,6 +1,7 @@
 import Decimal from "decimal.js-light";
 import {
   INITIAL_BUMPKIN,
+  INITIAL_FARM,
   TEST_FARM,
   TREE_RECOVERY_TIME,
 } from "features/game/lib/constants";
@@ -11,6 +12,7 @@ import {
   LandExpansionChopAction,
   CHOP_ERRORS,
 } from "./chop";
+import { EXPIRY_COOLDOWNS } from "features/game/lib/collectibleBuilt";
 
 const GAME_STATE: GameState = {
   ...TEST_FARM,
@@ -46,6 +48,22 @@ describe("chop", () => {
         },
       }),
     ).toThrow(CHOP_ERRORS.NO_AXES);
+  });
+
+  it("throws an error if tree is not placed", () => {
+    expect(() =>
+      chop({
+        state: {
+          ...GAME_STATE,
+          trees: { 0: { x: undefined, y: undefined, wood: { choppedAt: 0 } } },
+        },
+        action: {
+          type: "timber.chopped",
+          item: "Axe",
+          index: "0",
+        },
+      }),
+    ).toThrow("Tree is not placed");
   });
 
   it("throws an error if tree is not ready", () => {
@@ -515,5 +533,48 @@ describe("getChoppedAt", () => {
 
     const treeTimeWithBoost = TREE_RECOVERY_TIME * 1000 * 0.1;
     expect(time).toEqual(now - treeTimeWithBoost);
+  });
+  it("applies the Badger Shrine boost", () => {
+    const now = Date.now();
+    const { time } = getChoppedAt({
+      game: {
+        ...INITIAL_FARM,
+        collectibles: {
+          "Badger Shrine": [
+            {
+              id: "123",
+              createdAt: now,
+              coordinates: { x: 1, y: 1 },
+              readyAt: now,
+            },
+          ],
+        },
+      },
+      createdAt: now,
+    });
+
+    expect(time).toEqual(now - TREE_RECOVERY_TIME * 0.25 * 1000);
+  });
+
+  it("does not apply the Badger Shrine boost if expired", () => {
+    const now = Date.now();
+    const { time } = getChoppedAt({
+      game: {
+        ...INITIAL_FARM,
+        collectibles: {
+          "Badger Shrine": [
+            {
+              id: "123",
+              createdAt: now - EXPIRY_COOLDOWNS["Badger Shrine"],
+              coordinates: { x: 1, y: 1 },
+              readyAt: now,
+            },
+          ],
+        },
+      },
+      createdAt: now,
+    });
+
+    expect(time).toEqual(now);
   });
 });

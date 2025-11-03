@@ -1,4 +1,5 @@
 import Decimal from "decimal.js-light";
+import { Coordinates } from "features/game/expansion/components/MapPlacement";
 import { detectCollision } from "features/game/expansion/placeable/lib/collisionDetection";
 import { trackActivity } from "features/game/types/bumpkinActivity";
 import {
@@ -9,7 +10,6 @@ import { GameState } from "features/game/types/game";
 import {
   WORKBENCH_MONUMENTS,
   WorkbenchMonumentName,
-  LOVE_CHARM_MONUMENTS,
 } from "features/game/types/monuments";
 import { produce } from "immer";
 
@@ -17,10 +17,7 @@ export type BuyMonumentAction = {
   type: "monument.bought";
   name: WorkbenchMonumentName;
   id?: string;
-  coordinates?: {
-    x: number;
-    y: number;
-  };
+  coordinates?: Coordinates;
 };
 
 type Options = {
@@ -29,11 +26,7 @@ type Options = {
   createdAt?: number;
 };
 
-export function buyMonument({
-  state,
-  action,
-  createdAt = Date.now(),
-}: Options) {
+export function buyMonument({ state, action }: Options) {
   return produce(state, (stateCopy) => {
     const { name } = action;
     const desiredItem = WORKBENCH_MONUMENTS[name];
@@ -42,19 +35,9 @@ export function buyMonument({
       throw new Error("This item is not a monument");
     }
 
-    // Convert createdAt to the start of the day (midnight UTC)
-    const createdAtDay = Math.floor(createdAt / (1000 * 60 * 60 * 24));
-    const monumentCreatedAt = stateCopy.monuments?.[name]?.createdAt;
+    const hasMonument = stateCopy.inventory[name]?.gt(0);
 
-    if (
-      monumentCreatedAt &&
-      Math.floor(monumentCreatedAt / (1000 * 60 * 60 * 24)) === createdAtDay
-    ) {
-      throw new Error("Monument already bought today");
-    }
-
-    // You can only buy one love charm monument total
-    if (name in LOVE_CHARM_MONUMENTS && !!stateCopy.monuments?.[name]) {
+    if (hasMonument) {
       throw new Error("Max monument reached");
     }
 
@@ -139,12 +122,11 @@ export function buyMonument({
       [name]: oldAmount.add(1),
     };
 
-    if (!stateCopy.monuments) {
-      stateCopy.monuments = {};
-    }
-
-    stateCopy.monuments[name] = {
-      createdAt,
+    stateCopy.socialFarming.villageProjects = {
+      ...stateCopy.socialFarming.villageProjects,
+      [name]: {
+        cheers: 0,
+      },
     };
 
     return stateCopy;

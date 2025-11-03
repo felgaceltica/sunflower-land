@@ -213,7 +213,7 @@ export const VIPItems: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             </Label>
           </div>
           <a
-            href="https://docs.sunflower-land.com/player-guides/seasons#seasonal-banners"
+            href="https://docs.sunflower-land.com/roadmap/chapters"
             className="text-xxs underline"
             target="_blank"
             rel="noreferrer"
@@ -330,6 +330,7 @@ export const VIPItems: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               }),
               icon: increaseArrow,
             },
+            { text: t("vip.benefit.cheers"), icon: ITEM_DETAILS.Cheer.image },
             { text: t("vip.benefit.competition"), icon: trophyIcon },
             ...(getCurrentSeason() === "Winds of Change"
               ? [
