@@ -8,6 +8,7 @@ export type CodexCategoryName =
   | "Bull Run"
   | "Deliveries"
   | "Chores"
+  | "Checklist"
   | "Bumpkins"
   | "Farming"
   | "Treasures"
@@ -16,7 +17,8 @@ export type CodexCategoryName =
   | "Minigames"
   | "Competition"
   | "Marks"
-  | "Chore Board";
+  | "Chore Board"
+  | "Social Points";
 
 export type CollectionGroup = "fish";
 

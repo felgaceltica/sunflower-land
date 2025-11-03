@@ -13,13 +13,12 @@ import { EXOTIC_CROPS } from "../types/beans";
 import { getValues } from "../types/decorations";
 import { FISH } from "../types/fishing";
 import { LANDSCAPING_DECORATIONS } from "../types/decorations";
-import { getActiveListedItems } from "features/island/hud/components/inventory/utils/inventory";
-import { KNOWN_IDS } from "../types";
 import { ANIMAL_FOODS } from "../types/animals";
-import { BumpkinItem, ITEM_IDS } from "../types/bumpkin";
+import { BumpkinItem } from "../types/bumpkin";
 import { MaxedItem } from "./gameMachine";
 import { SEASON_TICKET_NAME } from "../types/seasons";
 import { OFFCHAIN_ITEMS } from "./offChainItems";
+import { PET_RESOURCES } from "../types/pets";
 
 export const MAX_INVENTORY_ITEMS: Inventory = {
   ...getKeys(EXOTIC_CROPS).reduce(
@@ -137,7 +136,7 @@ export const MAX_INVENTORY_ITEMS: Inventory = {
   Wheat: new Decimal(4000),
   Turnip: new Decimal(4000),
   Artichoke: new Decimal(4000),
-  Kale: new Decimal(4000),
+  Kale: new Decimal(8000),
   Barley: new Decimal(4050),
 
   Tomato: new Decimal(1200),
@@ -148,7 +147,7 @@ export const MAX_INVENTORY_ITEMS: Inventory = {
   Banana: new Decimal(700),
 
   Olive: new Decimal(400),
-  Grape: new Decimal(400),
+  Grape: new Decimal(800),
   Rice: new Decimal(400),
   Duskberry: new Decimal(400),
   Lunara: new Decimal(400),
@@ -157,10 +156,10 @@ export const MAX_INVENTORY_ITEMS: Inventory = {
   Chicken: new Decimal(20),
   Egg: new Decimal(1700),
   Leather: new Decimal(1500),
-  Wool: new Decimal(1500),
+  Wool: new Decimal(6000),
   "Merino Wool": new Decimal(1500),
   Feather: new Decimal(3000),
-  Milk: new Decimal(1500),
+  Milk: new Decimal(3000),
 
   "Speed Chicken": new Decimal(5),
   "Rich Chicken": new Decimal(5),
@@ -232,15 +231,15 @@ export const MAX_INVENTORY_ITEMS: Inventory = {
   "Blue Clover": new Decimal(80),
 
   Sunstone: new Decimal(25),
-  Crimstone: new Decimal(500),
+  Crimstone: new Decimal(1000),
   Obsidian: new Decimal(500),
-  Gold: new Decimal(400),
-  Iron: new Decimal(800),
+  Gold: new Decimal(800),
+  Iron: new Decimal(1600),
   Stone: new Decimal(1600),
   Wood: new Decimal(8000),
   "Wild Mushroom": new Decimal(100),
   "Magic Mushroom": new Decimal(75),
-  Honey: new Decimal(350),
+  Honey: new Decimal(700),
   Oil: new Decimal(1500),
 
   "War Bond": new Decimal(500),
@@ -339,6 +338,15 @@ export const MAX_INVENTORY_ITEMS: Inventory = {
   Squirrel: new Decimal(5),
   Butterfly: new Decimal(5),
   Macaw: new Decimal(5),
+
+  // Pet resources all 300
+  ...getKeys(PET_RESOURCES).reduce(
+    (acc, name) => ({
+      ...acc,
+      [name]: new Decimal(300),
+    }),
+    {},
+  ),
 };
 /**
  * Add wearable into array if it requires a hoard limit
@@ -423,6 +431,7 @@ export const MAX_BUMPKIN_WEARABLES: BumpkinItem[] = [
   "Gift Giver",
   "Soybean Onesie",
   "Seedling Hat",
+  "Golden Seedling",
   "Pumpkin Hat",
   "Victorian Hat",
   "Bat Wings",
@@ -620,30 +629,19 @@ export function checkProgress({ state, action, farmId }: ProcessEventArgs): {
   const { inventory, wardrobe } = newState;
   const auctionBid = newState.auctioneer.bid?.ingredients ?? {};
 
-  const listedItems = getActiveListedItems(newState);
-  const listedInventoryItemNames = getKeys(listedItems).filter(
-    (name) => name in KNOWN_IDS,
-  ) as InventoryItemName[];
-  const listedWardrobeItemNames = getKeys(listedItems).filter(
-    (name) => name in ITEM_IDS,
-  ) as BumpkinItem[];
-
   // Check inventory amounts
   const validProgress = getKeys(inventory)
     .concat(getKeys(auctionBid))
-    .concat(listedInventoryItemNames)
     .filter((name) => !OFFCHAIN_ITEMS.includes(name))
     .every((name) => {
       const inventoryAmount = inventory[name] ?? new Decimal(0);
       const auctionAmount = auctionBid[name] ?? new Decimal(0);
-      const listingAmount = listedItems[name] ?? new Decimal(0);
 
       const previousInventoryAmount =
         newState.previousInventory[name] || new Decimal(0);
 
       const diff = inventoryAmount
         .add(auctionAmount)
-        .add(listingAmount)
         .minus(previousInventoryAmount);
 
       const max = MAX_INVENTORY_ITEMS[name] ?? new Decimal(0);
@@ -660,26 +658,23 @@ export function checkProgress({ state, action, farmId }: ProcessEventArgs): {
   if (!validProgress) return { valid: validProgress, maxedItem };
 
   // Check wardrobe amounts
-  const validWardrobeProgress = getKeys(wardrobe)
-    .concat(listedWardrobeItemNames)
-    .every((name) => {
-      const wardrobeAmount = wardrobe[name] ?? 0;
-      const listedAmount = listedItems[name] ?? 0;
+  const validWardrobeProgress = getKeys(wardrobe).every((name) => {
+    const wardrobeAmount = wardrobe[name] ?? 0;
 
-      const previousWardrobeAmount = newState.previousWardrobe[name] || 0;
+    const previousWardrobeAmount = newState.previousWardrobe[name] || 0;
 
-      const diff = wardrobeAmount + listedAmount - previousWardrobeAmount;
+    const diff = wardrobeAmount - previousWardrobeAmount;
 
-      const max = MAX_WEARABLES[name] || 0;
+    const max = MAX_WEARABLES[name] || 0;
 
-      if (max === 0) return true;
-      if (diff > max) {
-        maxedItem = name;
-        return false;
-      }
+    if (max === 0) return true;
+    if (diff > max) {
+      maxedItem = name;
+      return false;
+    }
 
-      return true;
-    });
+    return true;
+  });
 
   return { valid: validWardrobeProgress, maxedItem };
 }

@@ -492,6 +492,10 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Bracelet: 763,
   Coprolite: 764,
   Cheer: 765,
+  "Paw Prints Banner": 766,
+  "Pet Cookie": 767,
+  "Moon Crystal": 768,
+  "Halloween Token 2025": 769,
 
   "Australian Flag": 801,
   "Belgian Flag": 802,
@@ -607,6 +611,7 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Barn: 1021,
   "Crafting Box": 1022,
   Mansion: 1023,
+  "Pet House": 1024,
 
   // Temporary Bumpkin items
   "Chef Apron": 1101,
@@ -804,6 +809,7 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Rock Blackfish": 1546,
   Cobia: 1547,
   Tilapia: 1548,
+  "Super Star": 1549,
 
   "White Festive Fox": 2001,
   Rug: 2002,
@@ -1098,6 +1104,25 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Red Slime Balloon": 2279,
   "Blue Slime Balloon": 2280,
 
+  //Haloween Event Items:
+  "Halloween Ticket 2025": 2322,
+  Cerberus: 2323,
+  "Witch's Cauldron": 2324,
+  Raveyard: 2325,
+  "Haunted House": 2326,
+  "Mimic Egg": 2327,
+  "Haunted Tomb": 2328,
+  Guillotine: 2329,
+  "Vampire Coffin": 2330,
+
+  // Paw Prints - Items
+  "Paw Prints Rug": 2331,
+  "Pet Bed": 2332,
+  "Moon Fox Statue": 2333,
+  "Giant Acorn": 2334,
+  "Pet Bowls": 2335,
+  VIP3: 2336,
+
   // Monument Items
   "Big Orange": 2281,
   "Big Apple": 2282,
@@ -1138,6 +1163,18 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Silver Cooking Trophy": 2312,
   "Bronze Cooking Trophy": 2313,
 
+  // Pests
+  Anthill: 2314,
+  Rat: 2315,
+  Snail: 2316,
+  "Pest Net": 2317,
+
+  Poseidon: 2318,
+
+  "Giant Orange": 2319,
+  "Giant Apple": 2320,
+  "Giant Banana": 2321,
+
   // Land Biomes
   "Basic Biome": 2400,
   "Spring Biome": 2401,
@@ -1173,6 +1210,88 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   "Baby Sheep": 2526,
   "Janitor Chicken": 2527,
   "Venus Bumpkin Trap": 2528,
+  "Black Hole Flower": 2529,
+  "Sleepy Chicken": 2530,
+  "Astronaut Cow": 2531,
+  "Astronaut Sheep": 2532,
+  "Bronze Friends Trophy": 2533,
+  "Silver Friends Trophy": 2534,
+  "Gold Friends Trophy": 2535,
+
+  // Pets
+  "Pet Egg": 2600,
+  Barkley: 2601,
+  Meowchi: 2602,
+  Twizzle: 2603,
+  Burro: 2604,
+  Mudhorn: 2605,
+  Nibbles: 2606,
+  Waddles: 2607,
+  Ramsey: 2608, // Test NFT only
+  Biscuit: 2609,
+  Cloudy: 2610,
+  Butters: 2611,
+  Smokey: 2612,
+  Flicker: 2613,
+  Pippin: 2614,
+  Pinto: 2615,
+  Roan: 2616,
+  Stallion: 2617,
+  Bison: 2618,
+  Oxen: 2619,
+  Peanuts: 2620,
+  Pip: 2621,
+  Skipper: 2622,
+
+  // Pet Resources
+  Acorn: 2630,
+  Ruffroot: 2631,
+  "Chewed Bone": 2632,
+  "Heart leaf": 2633,
+  Moonfur: 2634,
+  "Fossil Shell": 2635,
+  Ribbon: 2636,
+  Dewberry: 2637,
+  "Wild Grass": 2638,
+  "Frost Pebble": 2639,
+
+  // Pet Shrines
+  "Fox Shrine": 2650,
+  "Boar Shrine": 2651,
+  "Hound Shrine": 2652,
+  "Stag Shrine": 2653,
+  "Legendary Shrine": 2654,
+  "Mole Shrine": 2655,
+  "Bear Shrine": 2656,
+  "Tortoise Shrine": 2657,
+  "Moth Shrine": 2658,
+
+  "Obsidian Shrine": 2659,
+  "Sparrow Shrine": 2660,
+  "Toucan Shrine": 2661,
+  "Collie Shrine": 2662,
+  "Badger Shrine": 2663,
+  "Bantam Shrine": 2664,
+  "Trading Shrine": 2665,
+
+  "Fused Stone Rock": 2700,
+  "Reinforced Stone Rock": 2701,
+  "Ancient Tree": 2702,
+  "Sacred Tree": 2703,
+  "Refined Iron Rock": 2704,
+  "Tempered Iron Rock": 2705,
+  "Pure Gold Rock": 2706,
+  "Prime Gold Rock": 2707,
+  "Petnip Plant": 2708,
+  "Pet Kennel": 2709,
+  "Pet Toys": 2710,
+  "Pet Playground": 2711,
+  "Fish Bowl": 2712,
+  "Giant Gold Bone": 2713,
+  "Lunar Temple": 2714,
+  "Magma Stone": 2715,
+  Cornucopia: 2716,
+  "Messy Bed": 2717,
 };
 
 // The reverse of above

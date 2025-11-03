@@ -24,6 +24,21 @@ export const STATIC_OFFLINE_FARM: GameState = {
     expiresAt: Date.now() + 31 * 24 * 60 * 60 * 1000,
   },
   inventory: {
+    "Fish Burger": new Decimal(5),
+    Ruffroot: new Decimal(100),
+    "Chewed Bone": new Decimal(100),
+    "Heart leaf": new Decimal(100),
+    Acorn: new Decimal(100),
+    "Pumpkin Soup": new Decimal(100),
+    Barkley: new Decimal(1),
+    "Black Magic": new Decimal(1),
+    "Farmer's Monument": new Decimal(1),
+    "Giant Orange": new Decimal(1),
+    "Giant Apple": new Decimal(1),
+    "Giant Banana": new Decimal(1),
+    "Giant Carrot": new Decimal(1),
+    "Basic Cooking Pot": new Decimal(1),
+    "Teamwork Monument": new Decimal(1),
     "Gold Cooking Trophy": new Decimal(1),
     Doll: new Decimal(10),
     "Petting Hand": new Decimal(1),
@@ -32,9 +47,11 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Silver Cooking Trophy": new Decimal(1),
     "Bronze Cooking Trophy": new Decimal(1),
     "Better Together Banner": new Decimal(1),
+    "Bronze Friends Trophy": new Decimal(1),
+    "Silver Friends Trophy": new Decimal(1),
+    "Gold Friends Trophy": new Decimal(1),
     Geniseed: new Decimal(400),
     Wheat: new Decimal(400),
-    Pickaxe: new Decimal(1),
     "Blue Tile": new Decimal(1000),
     "Beta Pass": new Decimal(1),
     "Colors Token 2025": new Decimal(10000),
@@ -45,8 +62,10 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Maneki Neko": new Decimal(1),
     "Nyon Statue": new Decimal(1),
     Observatory: new Decimal(1),
-    "Super Totem": new Decimal(1),
-    "Time Warp Totem": new Decimal(1),
+    "Super Totem": new Decimal(5),
+    "Time Warp Totem": new Decimal(5),
+    "Harvest Hourglass": new Decimal(5),
+    "Gourmet Hourglass": new Decimal(5),
     Wardrobe: new Decimal(1),
     "Wicker Man": new Decimal(1),
     Manor: new Decimal(1),
@@ -95,7 +114,6 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Volcano Biome": new Decimal(1),
     "Lava Pit": new Decimal(1),
     Bush: new Decimal(3),
-    Axe: new Decimal(10),
     Gem: new Decimal(4000),
     Rug: new Decimal(1),
     Shovel: new Decimal(1),
@@ -192,7 +210,12 @@ export const STATIC_OFFLINE_FARM: GameState = {
     },
   },
   lavaPits: {
-    "1": { createdAt: 0, x: -4, y: -6 },
+    "1": {
+      createdAt: 0,
+      startedAt: Date.now() - 1000 * (60 * 60 * 48),
+      x: -4,
+      y: -6,
+    },
   },
 
   fruitPatches: {
@@ -209,8 +232,89 @@ export const STATIC_OFFLINE_FARM: GameState = {
         criticalHit: { Native: 1 },
       },
       createdAt: 0,
-      x: 8,
-      y: -4,
+      x: -12,
+      y: -5,
+    },
+    1: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -12,
+      y: -6,
+    },
+    2: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -12,
+      y: -7,
+    },
+    3: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -12,
+      y: -8,
+    },
+    4: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -13,
+      y: -5,
+    },
+    5: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -13,
+      y: -6,
+    },
+    6: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -13,
+      y: -7,
+    },
+    7: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -13,
+      y: -8,
+    },
+    8: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -14,
+      y: -5,
+    },
+    9: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -14,
+      y: -6,
     },
   },
   iron: {
@@ -220,8 +324,89 @@ export const STATIC_OFFLINE_FARM: GameState = {
         criticalHit: { Native: 1 },
       },
       createdAt: 0,
-      x: 8,
-      y: -3,
+      x: -8,
+      y: -5,
+    },
+    1: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -8,
+      y: -6,
+    },
+    2: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -8,
+      y: -7,
+    },
+    3: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -8,
+      y: -8,
+    },
+    4: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -5,
+    },
+    5: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -6,
+    },
+    6: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -7,
+    },
+    7: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -8,
+    },
+    8: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -6,
+      y: -5,
+    },
+    9: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -6,
+      y: -6,
     },
   },
   stones: {
@@ -231,8 +416,89 @@ export const STATIC_OFFLINE_FARM: GameState = {
         criticalHit: { Native: 1 },
       },
       createdAt: 0,
-      x: 8,
-      y: -2,
+      x: -8,
+      y: -10,
+    },
+    1: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -8,
+      y: -11,
+    },
+    2: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -8,
+      y: -12,
+    },
+    3: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -8,
+      y: -13,
+    },
+    4: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -10,
+    },
+    5: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -11,
+    },
+    6: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -12,
+    },
+    7: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -7,
+      y: -13,
+    },
+    8: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -6,
+      y: -10,
+    },
+    9: {
+      stone: {
+        minedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      createdAt: 0,
+      x: -6,
+      y: -11,
     },
   },
   trees: {
@@ -240,17 +506,68 @@ export const STATIC_OFFLINE_FARM: GameState = {
       wood: {
         choppedAt: 0,
         criticalHit: { Native: 1 },
+        reward: {
+          coins: 200,
+        },
       },
-      x: 4,
-      y: -2,
+      x: -12,
+      y: 10,
     },
     2: {
       wood: {
         choppedAt: 0,
         criticalHit: { Native: 1 },
       },
-      x: 6,
-      y: -2,
+      x: -12,
+      y: 12,
+    },
+    3: {
+      wood: {
+        choppedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      x: -14,
+      y: 10,
+    },
+    4: {
+      wood: {
+        choppedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      x: -14,
+      y: 12,
+    },
+    5: {
+      wood: {
+        choppedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      x: -8,
+      y: 10,
+    },
+    6: {
+      wood: {
+        choppedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      x: -8,
+      y: 12,
+    },
+    7: {
+      wood: {
+        choppedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      x: -10,
+      y: 10,
+    },
+    8: {
+      wood: {
+        choppedAt: 0,
+        criticalHit: { Native: 1 },
+      },
+      x: -10,
+      y: 12,
     },
   },
   sunstones: {},
@@ -289,7 +606,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
   flower: {},
   bumpkin: {
     equipped: INITIAL_EQUIPMENT as Equipped,
-    experience: 100000,
+    experience: 10,
 
     id: 1,
     skills: {
@@ -337,7 +654,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
 
   home: {
     collectibles: {
-      "Magic Bean": [
+      "Big Apple": [
         {
           id: "1",
           createdAt: Date.now(),
@@ -478,6 +795,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     pots: {},
   },
   twitter: {
+    username: "test",
     linkedAt: Date.now(),
     followedAt: Date.now(),
     isAuthorised: true,
@@ -582,7 +900,6 @@ export const STATIC_OFFLINE_FARM: GameState = {
   },
 
   stock: INITIAL_STOCK(),
-  chickens: {},
   trades: {},
   buildings: {
     Barn: [
@@ -703,10 +1020,93 @@ export const STATIC_OFFLINE_FARM: GameState = {
       crop: {
         plantedAt: 0,
         name: "Sunflower",
+        reward: { items: [{ name: "Sunflower Seed", amount: 3 }] },
       },
     },
   },
   collectibles: {
+    "Big Orange": [
+      {
+        id: "123",
+        readyAt: 0,
+        coordinates: {
+          x: 7,
+          y: -11,
+        },
+        createdAt: 0,
+      },
+    ],
+    "Big Apple": [
+      {
+        id: "123",
+        readyAt: 0,
+        coordinates: {
+          x: 7,
+          y: -9,
+        },
+        createdAt: 0,
+      },
+    ],
+    "Big Banana": [
+      {
+        id: "123",
+        readyAt: 0,
+        coordinates: {
+          x: 7,
+          y: -7,
+        },
+        createdAt: 0,
+      },
+    ],
+    "Advanced Cooking Pot": [
+      {
+        id: "123",
+        readyAt: 0,
+        coordinates: {
+          x: 4,
+          y: -11,
+        },
+        createdAt: 0,
+      },
+    ],
+    "Expert Cooking Pot": [
+      {
+        id: "123",
+        readyAt: 0,
+        coordinates: {
+          x: 4,
+          y: -9,
+        },
+        createdAt: 0,
+      },
+    ],
+    "Basic Cooking Pot": [
+      {
+        id: "123",
+        readyAt: 0,
+        coordinates: {
+          x: 4,
+          y: -7,
+        },
+        createdAt: 0,
+      },
+    ],
+    Barkley: [
+      {
+        id: "1",
+        createdAt: Date.now(),
+        coordinates: { x: 8, y: 3 },
+        readyAt: Date.now(),
+      },
+    ],
+    Meowchi: [
+      {
+        id: "1",
+        createdAt: Date.now(),
+        coordinates: { x: 9, y: 3 },
+        readyAt: Date.now(),
+      },
+    ],
     "Magic Bean": [
       {
         id: "1",
@@ -910,9 +1310,6 @@ export const STATIC_OFFLINE_FARM: GameState = {
       vipDays: 1,
     },
   },
-  treasureIsland: {
-    holes: {},
-  },
   auctioneer: {},
   delivery: {
     fulfilledCount: 0,
@@ -996,7 +1393,39 @@ export const STATIC_OFFLINE_FARM: GameState = {
   },
   desert: {
     digging: {
-      grid: [],
+      streak: {
+        count: 0,
+        collectedAt: Date.now() - 1000 * 60 * 60 * 1,
+        totalClaimed: 0,
+      },
+      grid: [
+        [
+          {
+            x: 0,
+            y: 0,
+            dugAt: 0,
+            items: { Coprolite: 1 },
+            tool: "Sand Shovel",
+          },
+        ],
+        [
+          {
+            x: 1,
+            y: 0,
+            dugAt: 0,
+            items: { Coprolite: 1 },
+            tool: "Sand Shovel",
+          },
+
+          {
+            x: 2,
+            y: 0,
+            dugAt: 0,
+            items: { Coprolite: 1 },
+            tool: "Sand Shovel",
+          },
+        ],
+      ],
       patterns: [],
     },
   },
@@ -1108,6 +1537,12 @@ export const STATIC_OFFLINE_FARM: GameState = {
       },
     },
   },
+  roninRewards: {
+    onchain: {
+      openedAt: Date.now(),
+      pack: "Bronze Pack",
+    },
+  },
   blessing: {
     offering: {
       item: "Potato",
@@ -1116,16 +1551,26 @@ export const STATIC_OFFLINE_FARM: GameState = {
   },
   aoe: {},
   socialFarming: {
+    weeklyPoints: {
+      points: 0,
+      week: "2025-08-04",
+    },
     points: 0,
-    villageProjects: {},
+    villageProjects: {
+      "Basic Cooking Pot": { cheers: 10 },
+      "Expert Cooking Pot": { cheers: 50 },
+      "Advanced Cooking Pot": { cheers: 100 },
+      "Big Orange": { cheers: 25 },
+      "Big Apple": { cheers: 50 },
+      "Big Banana": { cheers: 200 },
+    },
     cheersGiven: {
       date: new Date().toISOString().split("T")[0],
       projects: {},
       farms: [],
     },
     cheers: {
-      cheersUsed: 0,
-      freeCheersClaimedAt: 0,
+      freeCheersClaimedAt: Date.now(),
     },
     clutter: {
       spawnedAt: 0,
@@ -1134,6 +1579,29 @@ export const STATIC_OFFLINE_FARM: GameState = {
           x: 1,
           y: 1,
           type: "Trash",
+        },
+      },
+    },
+  },
+  pets: {
+    common: {},
+    nfts: {
+      5: {
+        id: 5,
+        traits: {
+          type: "Dragon",
+          fur: "Blue",
+          accessory: "Crown",
+          bib: "Baby Bib",
+          aura: "No Aura",
+        },
+        experience: 120,
+        energy: 0,
+        name: "Pet #1",
+        pettedAt: 0,
+        requests: {
+          food: [],
+          fedAt: 0,
         },
       },
     },

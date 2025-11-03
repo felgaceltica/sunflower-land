@@ -3,6 +3,7 @@ import { SEASON_TICKET_NAME, SeasonalTicket, SEASONS } from "./seasons";
 import Decimal from "decimal.js-light";
 import { BumpkinItem } from "./bumpkin";
 import { getObjectEntries } from "../expansion/lib/utils";
+import { ClutterName } from "./clutter";
 
 export type GarbageName =
   | Extract<
@@ -22,9 +23,6 @@ export type GarbageName =
       | "Yellow Egg"
       | "Rapid Growth"
       | "Tent"
-      | "Earthworm"
-      | "Grub"
-      | "Red Wiggler"
       | SeasonalTicket
       | "Chicken"
       | "Hen House"
@@ -34,6 +32,9 @@ export type GarbageName =
       | "Colors Event Token 2025"
       | "Colors Event Ticket 2025"
       | "Easter Ticket 2025"
+      | "Halloween Token 2025"
+      | "Halloween Ticket 2025"
+      | ClutterName
     >
   | Extract<BumpkinItem, "Basic Hair">;
 
@@ -103,18 +104,6 @@ export const GARBAGE: Record<GarbageName, Garbage> = {
     sellPrice: 20,
     gems: 0,
   },
-  Earthworm: {
-    sellPrice: 0.1,
-    gems: 0,
-  },
-  Grub: {
-    sellPrice: 0.1,
-    gems: 0,
-  },
-  "Red Wiggler": {
-    sellPrice: 0.1,
-    gems: 0,
-  },
   ...getObjectEntries(SEASON_TICKET_NAME).reduce(
     (acc, [season, ticket]) => {
       return {
@@ -174,6 +163,38 @@ export const GARBAGE: Record<GarbageName, Garbage> = {
     gems: 0,
   },
   "Easter Ticket 2025": {
+    sellPrice: 1,
+    gems: 0,
+  },
+  Trash: {
+    sellPrice: 3,
+    gems: 0,
+  },
+  Dung: {
+    sellPrice: 1,
+    gems: 0,
+  },
+  Weed: {
+    sellPrice: 5,
+    gems: 0,
+  },
+  Anthill: {
+    sellPrice: 50,
+    gems: 0,
+  },
+  Rat: {
+    sellPrice: 50,
+    gems: 0,
+  },
+  Snail: {
+    sellPrice: 50,
+    gems: 0,
+  },
+  "Halloween Token 2025": {
+    sellPrice: 1,
+    gems: 0,
+  },
+  "Halloween Ticket 2025": {
     sellPrice: 1,
     gems: 0,
   },

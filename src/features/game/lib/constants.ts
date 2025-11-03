@@ -26,6 +26,7 @@ import {
   isBasicFruitSeed,
 } from "../events/landExpansion/fruitPlanted";
 import { PatchFruitSeedName } from "../types/fruits";
+import { WORKBENCH_TOOLS, WorkbenchToolName } from "../types/tools";
 
 // Our "zoom" factor
 export const PIXEL_SCALE = 2.625;
@@ -43,7 +44,7 @@ export const CHICKEN_COOP_MULTIPLIER = 1.5;
 export const POPOVER_TIME_MS = 1000;
 
 export function isBuildingReady(building: PlacedItem[]) {
-  return building.some((b) => b.readyAt <= Date.now() && b.coordinates);
+  return building.some((b) => (b.readyAt ?? 0) <= Date.now() && b.coordinates);
 }
 
 export type StockableName = Extract<
@@ -63,15 +64,13 @@ export type StockableName = Extract<
 export const INITIAL_STOCK = (
   state?: GameState,
 ): Record<StockableName, Decimal> => {
-  const tools = {
-    Axe: new Decimal(200),
-    Pickaxe: new Decimal(60),
-    "Stone Pickaxe": new Decimal(20),
-    "Iron Pickaxe": new Decimal(5),
-    "Gold Pickaxe": new Decimal(5),
-    Rod: new Decimal(50),
-    "Oil Drill": new Decimal(5),
-  };
+  const tools = Object.entries(WORKBENCH_TOOLS).reduce(
+    (acc, [toolName, tool]) => ({
+      ...acc,
+      [toolName]: tool.stock,
+    }),
+    {} as Record<WorkbenchToolName, Decimal>,
+  );
 
   // increase in 50% tool stock if you have a toolshed
   if (state?.buildings.Toolshed && isBuildingReady(state.buildings.Toolshed)) {
@@ -377,7 +376,6 @@ export const INITIAL_FARM: GameState = {
     Miffy: new Decimal(2),
     Morty: new Decimal(2),
     Mog: new Decimal(2),
-    "Lifetime Farmer Banner": new Decimal(1),
     "Town Center": new Decimal(1),
     Market: new Decimal(1),
     Workbench: new Decimal(1),
@@ -534,7 +532,6 @@ export const INITIAL_FARM: GameState = {
   },
 
   stock: INITIAL_STOCK(),
-  chickens: {},
   trades: {},
   floatingIsland: {
     schedule: [],
@@ -578,9 +575,6 @@ export const INITIAL_FARM: GameState = {
   },
   collectibles: {},
   pumpkinPlaza: {},
-  treasureIsland: {
-    holes: {},
-  },
   auctioneer: {},
   delivery: {
     fulfilledCount: 0,
@@ -678,6 +672,10 @@ export const INITIAL_FARM: GameState = {
   },
   aoe: {},
   socialFarming: {
+    weeklyPoints: {
+      points: 0,
+      week: "2025-08-04",
+    },
     points: 0,
     villageProjects: {},
     cheersGiven: {
@@ -686,10 +684,11 @@ export const INITIAL_FARM: GameState = {
       projects: {},
     },
     cheers: {
-      cheersUsed: 0,
       freeCheersClaimedAt: 0,
     },
-    dailyCollections: {},
+  },
+  pets: {
+    common: {},
   },
 };
 
@@ -749,7 +748,6 @@ export const TEST_FARM: GameState = {
   },
   stock: INITIAL_STOCK(),
   bank: { taxFreeSFL: 0, withdrawnAmount: 0 },
-  chickens: {},
   experiments: [],
   farmActivity: {},
   milestones: {},
@@ -998,6 +996,10 @@ export const TEST_FARM: GameState = {
   },
   aoe: {},
   socialFarming: {
+    weeklyPoints: {
+      points: 0,
+      week: "2025-08-04",
+    },
     points: 0,
     villageProjects: {},
     cheersGiven: {
@@ -1006,10 +1008,11 @@ export const TEST_FARM: GameState = {
       projects: {},
     },
     cheers: {
-      cheersUsed: 0,
       freeCheersClaimedAt: 0,
     },
-    dailyCollections: {},
+  },
+  pets: {
+    common: {},
   },
 };
 
@@ -1053,7 +1056,6 @@ export const EMPTY: GameState = {
   gems: {},
   flower: {},
   previousInventory: {},
-  chickens: {},
   choreBoard: INITIAL_CHORE_BOARD,
 
   stock: {},
@@ -1168,6 +1170,10 @@ export const EMPTY: GameState = {
   aoe: {},
   socialFarming: {
     points: 0,
+    weeklyPoints: {
+      points: 0,
+      week: "2025-08-04",
+    },
     villageProjects: {},
     cheersGiven: {
       date: "",
@@ -1175,9 +1181,10 @@ export const EMPTY: GameState = {
       projects: {},
     },
     cheers: {
-      cheersUsed: 0,
       freeCheersClaimedAt: 0,
     },
-    dailyCollections: {},
+  },
+  pets: {
+    common: {},
   },
 };
