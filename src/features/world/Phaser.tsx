@@ -7,7 +7,7 @@ import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-p
 import { PhaserNavMeshPlugin } from "phaser-navmesh";
 
 import * as AuthProvider from "features/auth/lib/Provider";
-import { ChatUI, Message } from "features/pumpkinPlaza/components/ChatUI";
+import { Message } from "features/pumpkinPlaza/components/ChatUI";
 
 import { Kicked } from "./ui/moderationTools/components/Kicked";
 import {
@@ -28,7 +28,6 @@ import {
 import { Context } from "features/game/GameProvider";
 import { Modal } from "components/ui/Modal";
 import { InnerPanel, Panel } from "components/ui/Panel";
-import { WoodlandsScene } from "./scenes/WoodlandsScene";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Preloader } from "./scenes/Preloader";
 import { EquipBumpkinAction } from "features/game/events/landExpansion/equip";
@@ -36,12 +35,10 @@ import { Label } from "components/ui/Label";
 import { CommunityModals } from "./ui/CommunityModalManager";
 import { CommunityToasts } from "./ui/CommunityToastManager";
 import { useNavigate } from "react-router";
-import { PlayerModals } from "./ui/player/PlayerModals";
 import { prepareAPI } from "features/community/lib/CommunitySDK";
 import { BumpkinParts } from "lib/utils/tokenUriBuilder";
 
 import SoundOffIcon from "assets/icons/sound_off.png";
-import { handleCommand } from "./lib/chatCommands";
 import { Moderation, UpdateUsernameEvent } from "features/game/lib/gameMachine";
 import { BeachScene } from "./scenes/BeachScene";
 import { Inventory } from "features/game/types/game";
@@ -67,6 +64,9 @@ import { hasFeatureAccess } from "lib/flags";
 import { WorldHud } from "features/island/hud/WorldHud";
 import { PlayerModal } from "features/social/PlayerModal";
 import { MachineState as GameMachineState } from "features/game/lib/gameMachine";
+import { RewardModal } from "features/social/RewardModal";
+import { Discovery } from "features/social/Discovery";
+import { HalloweenIslandScene } from "./scenes/HalloweenIslandScene";
 
 const _roomState = (state: MachineState) => state.value;
 const _scene = (state: MachineState) => state.context.sceneId;
@@ -131,7 +131,6 @@ export const PhaserComponent: React.FC<Props> = ({ mmoService, route }) => {
 
   const scenes = [
     Preloader,
-    new WoodlandsScene({ gameState: state }),
     BeachScene,
     PlazaScene,
     RetreatScene,
@@ -145,6 +144,7 @@ export const PhaserComponent: React.FC<Props> = ({ mmoService, route }) => {
     InfernosScene,
     StreamScene,
     LoveIslandScene,
+    HalloweenIslandScene,
   ];
 
   useEffect(() => {
@@ -447,34 +447,6 @@ export const PhaserComponent: React.FC<Props> = ({ mmoService, route }) => {
           </InnerPanel>
         )}
 
-        {!hasFeatureAccess(state, "SOCIAL_FARMING") && (
-          <ChatUI
-            farmId={loggedInFarmId}
-            gameState={state}
-            scene={scene}
-            onMessage={(m) => {
-              mmoService
-                .getSnapshot()
-                .context.server?.send(0, { text: m.text ?? "?" });
-            }}
-            onCommand={(name, args) => {
-              handleCommand(name, args).then(updateMessages);
-            }}
-            messages={messages ?? []}
-            isMuted={isMuted ? true : false}
-            onReact={(reaction) => {
-              mmoService
-                .getSnapshot()
-                .context.server?.send(0, { reaction: { reaction } });
-            }}
-            onBudPlace={(tokenId) => {
-              mmoService
-                .getSnapshot()
-                .context.server?.send(0, { budId: tokenId });
-            }}
-          />
-        )}
-
         <CommunityToasts />
 
         {mmoState === "connecting" && (
@@ -515,15 +487,13 @@ export const PhaserComponent: React.FC<Props> = ({ mmoService, route }) => {
 
       <NPCModals id={loggedInFarmId} />
       <PlayerSelectionList />
-      {hasFeatureAccess(state, "SOCIAL_FARMING") ? (
-        <PlayerModal
-          game={state}
-          loggedInFarmId={loggedInFarmId}
-          token={rawToken}
-        />
-      ) : (
-        <PlayerModals game={state} farmId={loggedInFarmId} />
-      )}
+      <PlayerModal
+        loggedInFarmId={loggedInFarmId}
+        token={rawToken}
+        hasAirdropAccess={hasFeatureAccess(state, "AIRDROP_PLAYER")}
+      />
+      <Discovery />
+      <RewardModal />
       <CommunityModals />
       <InteractableModals id={loggedInFarmId} scene={scene} key={scene} />
       <Modal

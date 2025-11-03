@@ -5,6 +5,7 @@ import { PlazaRoomState } from "./types/Room";
 
 import { CONFIG } from "lib/config";
 import { Bumpkin, FactionName, IslandType } from "features/game/types/game";
+import { Pets } from "features/game/types/pets";
 import { INITIAL_BUMPKIN } from "features/game/lib/constants";
 import { SPAWNS } from "./lib/spawn";
 import { Moderation } from "features/game/lib/gameMachine";
@@ -36,6 +37,7 @@ export type Scenes = {
   infernos: Room<PlazaRoomState> | undefined;
   stream: Room<PlazaRoomState> | undefined;
   love_island: Room<PlazaRoomState> | undefined;
+  halloween_island: Room<PlazaRoomState> | undefined;
 };
 
 export type SceneId = keyof Scenes;
@@ -145,6 +147,7 @@ export interface MMOContext {
   jwt: string;
   farmId: number;
   bumpkin: Bumpkin;
+  pets?: Pets;
   client?: Client;
   faction?: FactionName;
   availableServers: Server[];
@@ -388,6 +391,7 @@ export const mmoMachine = createMachine<MMOContext, MMOEvent, MMOState>({
             {
               jwt: context.jwt,
               bumpkin: context.bumpkin,
+              pets: context.pets,
               farmId: context.farmId,
               username: context.username,
               faction: context.faction,

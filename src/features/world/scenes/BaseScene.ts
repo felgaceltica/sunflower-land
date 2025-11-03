@@ -45,6 +45,7 @@ import { playerSelectionListManager } from "../ui/PlayerSelectionList";
 import { STREAM_REWARD_COOLDOWN } from "../ui/player/StreamReward";
 import { hasVipAccess } from "features/game/lib/vipAccess";
 import { playerModalManager } from "features/social/lib/playerModalManager";
+import { rewardModalManager } from "features/social/lib/rewardModalManager";
 
 export type NPCBumpkin = {
   x: number;
@@ -391,7 +392,16 @@ export abstract class BaseScene extends Phaser.Scene {
             return;
           }
 
-          playerModalManager.open(players[0]);
+          const player = players[0];
+
+          if (
+            player.clothing?.hat === "Streamer Hat" ||
+            player.clothing?.shirt === "Gift Giver"
+          ) {
+            rewardModalManager.open(player);
+          } else {
+            playerModalManager.open(player);
+          }
           return;
         }
 
@@ -601,65 +611,77 @@ export abstract class BaseScene extends Phaser.Scene {
         serverId: this.options.mmo.serverId,
       });
     }
+    const initialiseReactions = (server: Room<PlazaRoomState>) => {
+      const removeMessageListener = server.state.messages.onAdd((message) => {
+        // Old message
+        if (message.sentAt < Date.now() - 5000) {
+          return;
+        }
+
+        if (message.sceneId !== this.options.name) {
+          return;
+        }
+
+        if (!this.scene?.isActive()) {
+          return;
+        }
+
+        if (this.playerEntities[message.sessionId]) {
+          this.playerEntities[message.sessionId].speak(message.text);
+        } else if (message.sessionId === server.sessionId) {
+          this.currentPlayer?.speak(message.text);
+        }
+      });
+
+      const removeReactionListener = server.state.reactions.onAdd(
+        (reaction) => {
+          // Old message
+          if (reaction.sentAt < Date.now() - 5000) {
+            return;
+          }
+
+          if (reaction.sceneId !== this.options.name) {
+            return;
+          }
+
+          if (!this.scene?.isActive()) {
+            return;
+          }
+
+          if (this.playerEntities[reaction.sessionId]) {
+            this.playerEntities[reaction.sessionId].react(
+              reaction.reaction,
+              reaction.quantity,
+            );
+          } else if (reaction.sessionId === server.sessionId) {
+            this.currentPlayer?.react(reaction.reaction, reaction.quantity);
+          }
+        },
+      );
+
+      this.events.on("shutdown", () => {
+        removeMessageListener();
+        removeReactionListener();
+
+        window.removeEventListener(AUDIO_MUTED_EVENT as any, this.onAudioMuted);
+        this.input.off("pointerdown"); // clean up pointerdown event listener
+      });
+    };
 
     const server = this.mmoServer;
-    if (!server) return;
+    if (server) initialiseReactions(server);
 
-    const removeMessageListener = server.state.messages.onAdd((message) => {
-      // Old message
-      if (message.sentAt < Date.now() - 5000) {
-        return;
-      }
-
-      if (message.sceneId !== this.options.name) {
-        return;
-      }
-
-      if (!this.scene?.isActive()) {
-        return;
-      }
-
-      if (this.playerEntities[message.sessionId]) {
-        this.playerEntities[message.sessionId].speak(message.text);
-      } else if (message.sessionId === server.sessionId) {
-        this.currentPlayer?.speak(message.text);
-      }
-    });
-
-    const removeReactionListener = server.state.reactions.onAdd((reaction) => {
-      // Old message
-      if (reaction.sentAt < Date.now() - 5000) {
-        return;
-      }
-
-      if (reaction.sceneId !== this.options.name) {
-        return;
-      }
-
-      if (!this.scene?.isActive()) {
-        return;
-      }
-
-      if (this.playerEntities[reaction.sessionId]) {
-        this.playerEntities[reaction.sessionId].react(
-          reaction.reaction,
-          reaction.quantity,
-        );
-      } else if (reaction.sessionId === server.sessionId) {
-        this.currentPlayer?.react(reaction.reaction, reaction.quantity);
-      }
-    });
-
-    // send the scene player is in
-    // this.room.send()
-
-    this.events.on("shutdown", () => {
-      removeMessageListener();
-      removeReactionListener();
-
-      window.removeEventListener(AUDIO_MUTED_EVENT as any, this.onAudioMuted);
-      this.input.off("pointerdown"); // clean up pointerdown event listener
-    });
+    // If the underlying server changes, we need to re-initialise the reactions
+    this.registry.events.on(
+      "changedata-mmoServer",
+      (
+        _parent: Phaser.Data.DataManager,
+        server: Room<PlazaRoomState> | undefined,
+      ) => {
+        if (!server) return;
+        initialiseReactions(server);
+      },
+    );
   }
 
   public initialiseSounds() {
@@ -1261,9 +1283,10 @@ export abstract class BaseScene extends Phaser.Scene {
 
         if (
           now - this.lastModalOpenTime > STREAM_REWARD_COOLDOWN &&
+          !rewardModalManager.isOpen &&
           distance < 75
         ) {
-          playerModalManager.open({
+          rewardModalManager.open({
             farmId: player.farmId,
             clothing: player.clothing,
             experience: player.experience,

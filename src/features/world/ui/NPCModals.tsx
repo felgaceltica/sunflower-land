@@ -1,12 +1,13 @@
+import { useActor } from "@xstate/react";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { SpeakingModal } from "features/game/components/SpeakingModal";
 import { NPCName, NPC_WEARABLES, acknowledgeNPC } from "lib/npcs";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal } from "components/ui/Modal";
 import { DeliveryPanel } from "./deliveries/DeliveryPanel";
 
 import { Birdie } from "./npcs/Birdie";
-import { PotionHouseShopItems } from "features/helios/components/potions/component/PotionHouseShopItems";
+import { PotionMaster } from "features/helios/components/potions/component/PotionHouseShopItems";
 import { Finn } from "./npcs/Finn";
 import { Mayor } from "./npcs/Mayor";
 import { Stylist } from "./stylist/Stylist";
@@ -29,13 +30,15 @@ import { CropsAndChickens } from "./portals/CropsAndChickens";
 import { ExampleDonations } from "./donations/ExampleDonations";
 import { NPCS_WITH_ALERTS } from "../containers/BumpkinContainer";
 import { HalloweenNPC } from "./npcs/HalloweenNPC";
-import { Santa } from "./npcs/Santa";
 import { SolarForge } from "./infernos/SolarForge";
 import { WeatherShop } from "features/game/expansion/components/temperateSeason/WeatherShop";
 import { ObsidianExchange } from "./infernos/ObsidianExchange";
 import { PortalChooser } from "./portals/PortalChooser";
 import { Rocketman } from "./npcs/Rocketman";
 import { MegaBountyBoard } from "./flowerShop/MegaBountyBoard";
+import { IncineratorModal } from "features/goblins/incinerator";
+import { Context } from "features/game/GameProvider";
+import { PetShop } from "features/pets/PetShop";
 
 class NpcModalManager {
   private listener?: (npc: NPCName, isOpen: boolean) => void;
@@ -59,6 +62,12 @@ interface Props {
 
 export const NPCModals: React.FC<Props> = ({ id }) => {
   const { t } = useAppTranslation();
+  const { gameService } = useContext(Context);
+  const [
+    {
+      context: { state },
+    },
+  ] = useActor(gameService);
 
   const [npc, setNpc] = useState<NPCName>();
 
@@ -80,20 +89,7 @@ export const NPCModals: React.FC<Props> = ({ id }) => {
   return (
     <>
       <Modal show={!!npc && !isSeparateModal} onHide={closeModal}>
-        {npc === "chase" && (
-          <SpeakingModal
-            onClose={closeModal}
-            bumpkinParts={NPC_WEARABLES["chase"]}
-            message={[
-              {
-                text: t("npcDialogues.chase.intro1"),
-              },
-              {
-                text: t("npcDialogues.chase.intro2"),
-              },
-            ]}
-          />
-        )}
+        {npc === "chase" && <PetShop onClose={closeModal} />}
         {npc === "flopsy" && (
           <CloseButtonPanel
             title="Enjoying Easter?"
@@ -103,7 +99,6 @@ export const NPCModals: React.FC<Props> = ({ id }) => {
             <ExampleDonations onClose={closeModal} />
           </CloseButtonPanel>
         )}
-        {npc === "santa" && <Santa onClose={closeModal} />}
         {npc === "ginger" && (
           <SpeakingModal
             onClose={closeModal}
@@ -135,7 +130,7 @@ export const NPCModals: React.FC<Props> = ({ id }) => {
         {npc === "poppy" && <MegaBountyBoard onClose={closeModal} />}
         {npc === "stella" && <Stylist onClose={closeModal} />}
         {npc === "grubnuk" && <DeliveryPanel npc={npc} onClose={closeModal} />}
-        {npc === "garth" && <PotionHouseShopItems onClose={closeModal} />}
+        {npc === "eins" && <PotionMaster onClose={closeModal} />}
         {npc === "gunter" && <SolarForge onClose={closeModal} />}
         {npc === "gorga" && <ObsidianExchange onClose={closeModal} />}
         {npc === "hopper" && <Hopper onClose={closeModal} />}
@@ -239,7 +234,15 @@ export const NPCModals: React.FC<Props> = ({ id }) => {
         {npc === "finley" && <DeliveryPanel npc={npc} onClose={closeModal} />}
         {npc === "mayor" && <Mayor onClose={closeModal} />}
         {npc === "guria" && <DeliveryPanel npc={npc} onClose={closeModal} />}
-        {npc === "goblet" && <DeliveryPanel npc={npc} onClose={closeModal} />}
+        {npc === "goblet" && (
+          <CloseButtonPanel
+            onClose={closeModal}
+            bumpkinParts={NPC_WEARABLES.goblet}
+            container={OuterPanel}
+          >
+            <IncineratorModal />
+          </CloseButtonPanel>
+        )}
         {npc === "gordo" && <DeliveryPanel npc={npc} onClose={closeModal} />}
         {/* Kingdom NPCs */}
         {npc === "barlow" && (

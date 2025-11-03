@@ -2,7 +2,7 @@ import { Label } from "components/ui/Label";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { SpeakingModal } from "features/game/components/SpeakingModal";
 import { NPC_WEARABLES } from "lib/npcs";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { NoticeboardItems } from "../kingdom/KingdomNoticeboard";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Button } from "components/ui/Button";
@@ -12,7 +12,7 @@ import flowerIcon from "assets/icons/flower_token.webp";
 import trophyIcon from "assets/icons/trophy.png";
 import tradeIcon from "assets/icons/trade.png";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { Context, useGame } from "features/game/GameProvider";
+import { useGame } from "features/game/GameProvider";
 import { useSelector } from "@xstate/react";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { NumberInput } from "components/ui/NumberInput";
@@ -25,6 +25,7 @@ import {
 } from "features/game/events/landExpansion/exchangeFLOWER";
 import { isFaceVerified } from "features/retreat/components/personhood/lib/faceRecognition";
 import { FaceRecognition } from "features/retreat/components/personhood/FaceRecognition";
+import { hasVipAccess } from "features/game/lib/vipAccess";
 
 interface Props {
   onClose: () => void;
@@ -34,15 +35,8 @@ const _state = (state: MachineState) => state.context.state;
 export const Rocketman: React.FC<Props> = ({ onClose }) => {
   const [showIntro, setShowIntro] = useState(true);
   const { t } = useAppTranslation();
-  const { gameService } = useContext(Context);
-
-  const state = useSelector(gameService, _state);
 
   const [currentTab, setCurrentTab] = useState<"Noticeboard">("Noticeboard");
-  const loveCharmCount = useSelector(
-    gameService,
-    (state) => state.context.state.inventory["Love Charm"] ?? new Decimal(0),
-  );
 
   if (showIntro) {
     return (
@@ -65,7 +59,8 @@ export const Rocketman: React.FC<Props> = ({ onClose }) => {
       tabs={[
         {
           icon: SUNNYSIDE.icons.stopwatch,
-          name: "Noticeboard",
+          name: t("noticeboard"),
+          id: "Noticeboard",
         },
       ]}
       currentTab={currentTab}
@@ -118,7 +113,7 @@ const RocketmanNoticeboard: React.FC = () => {
         className="mr-1"
         onClick={() => {
           window.open(
-            "https://docs.sunflower-land.com/getting-started/usdflower-erc20/schedule",
+            "https://docs.sunflower-land.com/getting-started/usdflower-erc20",
             "_blank",
           );
         }}
@@ -158,6 +153,25 @@ export const FlowerExchange: React.FC<FlowerExchangeProps> = ({ onClose }) => {
 
   if (!isFaceVerified({ game: state })) {
     return <FaceRecognition />;
+  }
+
+  const isVIP = hasVipAccess({ game: state });
+  if (!isVIP) {
+    return (
+      <div className="p-1">
+        <Label type="danger" icon={flowerIcon}>
+          {t("goblinTrade.vipRequired")}
+        </Label>
+        <p className="text-sm  my-2">{t("rocketman.vip")}</p>
+        <Button
+          onClick={() => {
+            onClose();
+          }}
+        >
+          {t("close")}
+        </Button>
+      </div>
+    );
   }
 
   if (showConfirmation) {

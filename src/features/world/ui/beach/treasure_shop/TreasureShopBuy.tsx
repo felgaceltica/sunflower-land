@@ -34,7 +34,7 @@ import { getToolPrice } from "features/game/events/landExpansion/craftTool";
 import { Keys } from "features/game/types/game";
 import { isMobile } from "mobile-device-detect";
 import { Restock } from "features/island/buildings/components/building/market/restock/Restock";
-import { hasFeatureAccess } from "lib/flags";
+import { getObjectEntries } from "features/game/expansion/lib/utils";
 
 interface ToolContentProps {
   selectedName: TreasureToolName;
@@ -48,17 +48,7 @@ const ToolContent: React.FC<ToolContentProps> = ({ selectedName }) => {
   const state = useSelector(gameService, (state) => state.context.state);
 
   const stock = state.stock[selectedName] || new Decimal(0);
-  const selected =
-    selectedName === "Sand Drill" && !hasFeatureAccess(state, "LEATHER_TOOLS")
-      ? {
-          ...TREASURE_TOOLS[selectedName],
-          ingredients: {
-            Oil: new Decimal(1),
-            Crimstone: new Decimal(1),
-            Wood: new Decimal(5),
-          },
-        }
-      : TREASURE_TOOLS[selectedName];
+  const selected = TREASURE_TOOLS[selectedName];
   const inventory = state.inventory;
   const bulkToolCraftAmount = makeBulkBuyTools(stock);
   const price = getToolPrice(selected, 1, state);
@@ -68,9 +58,10 @@ const ToolContent: React.FC<ToolContentProps> = ({ selectedName }) => {
 
     return state.coins < price * amount;
   };
+  const selectedIngredients = selected.ingredients(state.bumpkin.skills);
   const lessIngredients = (amount = 1) =>
-    getKeys(selected.ingredients).some((name) =>
-      selected.ingredients[name]?.mul(amount).greaterThan(inventory[name] || 0),
+    getObjectEntries(selectedIngredients).some(([name, ingredients]) =>
+      ingredients?.mul(amount).greaterThan(inventory[name] || 0),
     );
 
   const craft = (event: SyntheticEvent, amount: number) => {
@@ -90,7 +81,7 @@ const ToolContent: React.FC<ToolContentProps> = ({ selectedName }) => {
       details={{ item: selectedName }}
       requirements={{
         coins: price,
-        resources: selected.ingredients,
+        resources: selectedIngredients,
       }}
       actionView={
         <>
@@ -157,7 +148,10 @@ const CollectibleContent: React.FC<CollectibleContentProps> = ({
       selected.ingredients[name]?.greaterThan(inventory[name] || 0),
     );
   const isAlreadyCrafted = inventory[selectedName]?.greaterThanOrEqualTo(1);
-  const isBoost = COLLECTIBLE_BUFF_LABELS(state)[selectedName];
+  const isBoost = COLLECTIBLE_BUFF_LABELS[selectedName]?.({
+    skills: state.bumpkin.skills,
+    collectibles: state.collectibles,
+  });
 
   const craft = () => {
     gameService.send("collectible.crafted", {
@@ -403,7 +397,12 @@ export const TreasureShopBuy: React.FC = () => {
                 isSelected={selectedName === name}
                 secondaryImage={SUNNYSIDE.icons.stopwatch}
                 alternateIcon={
-                  COLLECTIBLE_BUFF_LABELS(state)[name] ? lightning : undefined
+                  COLLECTIBLE_BUFF_LABELS[name]?.({
+                    skills: state.bumpkin.skills,
+                    collectibles: state.collectibles,
+                  })
+                    ? lightning
+                    : undefined
                 }
                 key={name}
                 onClick={() => setSelectedName(name)}
@@ -417,7 +416,12 @@ export const TreasureShopBuy: React.FC = () => {
                   isSelected={selectedName === name}
                   key={name}
                   alternateIcon={
-                    COLLECTIBLE_BUFF_LABELS(state)[name] ? lightning : undefined
+                    COLLECTIBLE_BUFF_LABELS[name]?.({
+                      skills: state.bumpkin.skills,
+                      collectibles: state.collectibles,
+                    })
+                      ? lightning
+                      : undefined
                   }
                   onClick={() => setSelectedName(name)}
                   count={inventory[name]}
@@ -465,7 +469,12 @@ export const TreasureShopBuy: React.FC = () => {
                   isSelected={selectedName === name}
                   key={name}
                   alternateIcon={
-                    COLLECTIBLE_BUFF_LABELS(state)[name] ? lightning : undefined
+                    COLLECTIBLE_BUFF_LABELS[name]?.({
+                      skills: state.bumpkin.skills,
+                      collectibles: state.collectibles,
+                    })
+                      ? lightning
+                      : undefined
                   }
                   onClick={() => setSelectedName(name)}
                   count={inventory[name]}
