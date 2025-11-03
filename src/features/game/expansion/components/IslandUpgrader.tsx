@@ -13,12 +13,12 @@ import { SUNNYSIDE } from "assets/sunnyside";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { Label } from "components/ui/Label";
 import { Panel } from "components/ui/Panel";
-import { useActor } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import { ISLAND_UPGRADE } from "features/game/events/landExpansion/upgradeFarm";
 import { CollectibleName, getKeys } from "features/game/types/craftables";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
-import { GameState, IslandType } from "features/game/types/game";
+import { IslandType } from "features/game/types/game";
 import { Section, useScrollIntoView } from "lib/utils/hooks/useScrollIntoView";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Transition } from "@headlessui/react";
@@ -26,17 +26,7 @@ import { formatDateTime } from "lib/utils/time";
 import { translate } from "lib/i18n/translate";
 import { Loading } from "features/auth/components";
 import { EXPIRY_COOLDOWNS } from "features/game/lib/collectibleBuilt";
-import { NoticeboardItems } from "features/world/ui/kingdom/KingdomNoticeboard";
-import {
-  areAnyCookingBuildingWorking,
-  areAnyCrimstonesMined,
-  areAnyCropsGrowing,
-  areAnyFruitsGrowing,
-  areAnyOilReservesDrilled,
-  areFlowersGrowing,
-} from "features/game/types/removeables";
-import { hasRequiredIslandExpansion } from "features/game/lib/hasRequiredIslandExpansion";
-import { areBeehivesEmpty } from "./resources/beehive/beehiveMachine";
+import { MachineState } from "features/game/lib/gameMachine";
 
 const UPGRADE_DATES: Record<IslandType, number | null> = {
   basic: new Date(0).getTime(),
@@ -98,74 +88,6 @@ const IslandUpgraderModal: React.FC<{
         <div className="p-2">
           <p className="text-sm">{t("islandupgrade.confirmUpgrade")}</p>
           <p className="text-xs mt-2">{t("islandupgrade.warning1")}</p>
-        </div>
-
-        <div>
-          <NoticeboardItems
-            items={[
-              {
-                text: t("islandupgrade.empty.cropPlots"),
-                icon: areAnyCropsGrowing(gameState.context.state)[0]
-                  ? SUNNYSIDE.icons.cancel
-                  : SUNNYSIDE.icons.confirm,
-              },
-
-              {
-                text: t("islandupgrade.ready.cookingBuildings"),
-                icon: areAnyCookingBuildingWorking(gameState.context.state)[0]
-                  ? SUNNYSIDE.icons.cancel
-                  : SUNNYSIDE.icons.confirm,
-              },
-
-              ...(hasRequiredIslandExpansion(island.type, "spring")
-                ? [
-                    {
-                      text: t("islandupgrade.empty.fruitPatches"),
-                      icon: areAnyFruitsGrowing(gameState.context.state)[0]
-                        ? SUNNYSIDE.icons.cancel
-                        : SUNNYSIDE.icons.confirm,
-                    },
-                    {
-                      text: t("islandupgrade.empty.flowerbeds"),
-                      icon: areFlowersGrowing(gameState.context.state)[0]
-                        ? SUNNYSIDE.icons.cancel
-                        : SUNNYSIDE.icons.confirm,
-                    },
-                    {
-                      text: t("islandupgrade.empty.beehives"),
-                      icon: areBeehivesEmpty(gameState.context.state)
-                        ? SUNNYSIDE.icons.confirm
-                        : SUNNYSIDE.icons.cancel,
-                    },
-                    {
-                      text: t("islandupgrade.ready.crimstoneRocks"),
-                      icon: areAnyCrimstonesMined(gameState.context.state)[0]
-                        ? SUNNYSIDE.icons.cancel
-                        : SUNNYSIDE.icons.confirm,
-                    },
-                  ]
-                : []),
-
-              ...(hasRequiredIslandExpansion(island.type, "desert")
-                ? [
-                    {
-                      text: t("islandupgrade.ready.oilReserves"),
-                      icon: areAnyOilReservesDrilled(gameState.context.state)[0]
-                        ? SUNNYSIDE.icons.cancel
-                        : SUNNYSIDE.icons.confirm,
-                    },
-                  ]
-                : []),
-            ]}
-          />
-        </div>
-
-        <div className="p-2 mb-1">
-          <p className="text-xs">
-            {hasRequiredIslandExpansion(island.type, "spring")
-              ? t("islandupgrade.warning2")
-              : t("islandupgrade.warning3")}
-          </p>
         </div>
 
         <div className="flex">
@@ -295,20 +217,25 @@ const IslandUpgraderModal: React.FC<{
 };
 
 interface Props {
-  gameState: GameState;
   offset: number;
 }
-export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
+
+const _islandType = (state: MachineState) =>
+  state.context.state.island?.type ?? "basic";
+const _expansionCount = (state: MachineState) =>
+  state.context.state.inventory["Basic Land"]?.toNumber() ?? 3;
+
+export const IslandUpgrader: React.FC<Props> = ({ offset }) => {
   const { t } = useAppTranslation();
 
   const { gameService, showAnimations } = useContext(Context);
 
-  const [showModal, setShowModal] = useState(false);
+  const islandType = useSelector(gameService, _islandType);
+  const expansionCount = useSelector(gameService, _expansionCount);
 
+  const [showModal, setShowModal] = useState(false);
   const [showTravelAnimation, setShowTravelAnimation] = useState(false);
   const [showUpgraded, setShowUpgraded] = useState(false);
-
-  const island = gameState.island.type ?? "basic";
 
   const [scrollIntoView] = useScrollIntoView();
 
@@ -331,17 +258,16 @@ export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
 
     gameService.send("PLAY");
 
-    scrollIntoView(Section.Home, "auto");
+    scrollIntoView(Section.GenesisBlock, "auto");
 
     setShowTravelAnimation(false);
     if (showAnimations) confetti();
   };
 
-  const nextExpansion =
-    (gameState.inventory["Basic Land"]?.toNumber() ?? 3) + 1;
+  const nextExpansion = expansionCount + 1;
 
   const getPosition = () => {
-    if (island === "basic") {
+    if (islandType === "basic") {
       switch (nextExpansion) {
         case 10:
           return { x: 1, y: -5 };
@@ -376,7 +302,7 @@ export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
       }
     }
 
-    if (island === "spring") {
+    if (islandType === "spring") {
       switch (nextExpansion) {
         case 17:
           return { x: -26, y: 14 };
@@ -390,7 +316,7 @@ export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
           return { x: -28, y: -10 };
       }
     }
-    if (island === "desert" && nextExpansion === 26) {
+    if (islandType === "desert" && nextExpansion === 26) {
       return { x: 1, y: -11 };
     }
 
@@ -404,8 +330,8 @@ export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
     setShowModal(false);
   };
 
-  const upgradeRaft = UPGRADE_RAFTS[island];
-  const preview = UPGRADE_PREVIEW[island];
+  const upgradeRaft = UPGRADE_RAFTS[islandType];
+  const preview = UPGRADE_PREVIEW[islandType];
 
   return (
     <>
@@ -437,12 +363,8 @@ export const IslandUpgrader: React.FC<Props> = ({ gameState, offset }) => {
       <Modal show={showUpgraded}>
         <CloseButtonPanel bumpkinParts={NPC_WEARABLES.grubnuk}>
           <div className="p-2">
-            <p className="text-sm mb-2">
-              {UPGRADE_MESSAGES[gameState.island.type]}
-            </p>
-            <p className="text-xs mb-2">
-              {UPGRADE_DESCRIPTIONS[gameState.island.type]}
-            </p>
+            <p className="text-sm mb-2">{UPGRADE_MESSAGES[islandType]}</p>
+            <p className="text-xs mb-2">{UPGRADE_DESCRIPTIONS[islandType]}</p>
             {preview && (
               <img src={preview} className="w-full rounded-md mb-2" />
             )}

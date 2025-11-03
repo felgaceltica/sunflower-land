@@ -1,11 +1,12 @@
 import Decimal from "decimal.js-light";
 import { Recipe, RecipeIngredient, Recipes } from "features/game/lib/crafting";
-import { CollectibleName } from "features/game/types/craftables";
 import { BoostName, GameState } from "features/game/types/game";
 import { produce } from "immer";
-import { availableWardrobe } from "./equip";
 import { isWearableActive } from "features/game/lib/wearables";
 import { updateBoostUsed } from "features/game/types/updateBoostUsed";
+import { getCountAndType } from "features/island/hud/components/inventory/utils/inventory";
+import { isTemporaryCollectibleActive } from "features/game/lib/collectibleBuilt";
+import { COMPETITION_POINTS } from "features/game/types/competitions";
 
 export type StartCraftingAction = {
   type: "crafting.started";
@@ -21,9 +22,11 @@ type Options = {
 export function getBoostedCraftingTime({
   game,
   time,
+  createdAt = Date.now(),
 }: {
   game: GameState;
   time: number;
+  createdAt?: number;
 }) {
   let seconds = time;
   const boostsUsed: BoostName[] = [];
@@ -32,6 +35,31 @@ export function getBoostedCraftingTime({
   if (isWearableActive({ name: "Sol & Luna", game })) {
     seconds *= 0.5;
     boostsUsed.push("Sol & Luna");
+  }
+
+  if (isWearableActive({ name: "Architect Ruler", game })) {
+    seconds *= 0.75;
+    boostsUsed.push("Architect Ruler");
+  }
+
+  if (
+    isTemporaryCollectibleActive({ name: "Fox Shrine", game }) &&
+    createdAt > COMPETITION_POINTS.BUILDING_FRIENDSHIPS.endAt
+  ) {
+    seconds *= 0.75;
+    boostsUsed.push("Fox Shrine");
+  }
+
+  if (
+    isTemporaryCollectibleActive({ name: "Time Warp Totem", game }) ||
+    isTemporaryCollectibleActive({ name: "Super Totem", game })
+  ) {
+    seconds *= 0.5;
+    if (isTemporaryCollectibleActive({ name: "Time Warp Totem", game })) {
+      boostsUsed.push("Time Warp Totem");
+    } else if (isTemporaryCollectibleActive({ name: "Super Totem", game })) {
+      boostsUsed.push("Super Totem");
+    }
   }
 
   return { seconds, boostsUsed };
@@ -50,7 +78,9 @@ export function startCrafting({
     }
 
     // Check if player has the Crafting Box
-    const isBuildingBuilt = (copy.buildings["Crafting Box"]?.length ?? 0) > 0;
+    const isBuildingBuilt = copy.buildings["Crafting Box"]?.some(
+      (building) => !!building.coordinates,
+    );
     if (!isBuildingBuilt) {
       throw new Error("You do not have a Crafting Box");
     }
@@ -79,13 +109,12 @@ export function startCrafting({
           const inventoryCount =
             copy.inventory[ingredient.collectible] ?? new Decimal(0);
 
-          const placedCount =
-            (copy.collectibles[ingredient.collectible as CollectibleName]
-              ?.length ?? 0) +
-            (copy.home?.collectibles[ingredient.collectible as CollectibleName]
-              ?.length ?? 0);
+          const { count: availableCollectibleCount } = getCountAndType(
+            copy,
+            ingredient.collectible,
+          );
 
-          if (inventoryCount.sub(placedCount).lt(1)) {
+          if (availableCollectibleCount.lt(1)) {
             throw new Error(
               "You do not have the ingredients to craft this item",
             );
@@ -95,10 +124,12 @@ export function startCrafting({
 
         if (ingredient.wearable) {
           const wardrobeCount = copy.wardrobe[ingredient.wearable] ?? 0;
-          const available = availableWardrobe(copy);
-          const availableWardrobeCount = available[ingredient.wearable] ?? 0;
+          const { count: availableWardrobeCount } = getCountAndType(
+            copy,
+            ingredient.wearable,
+          );
 
-          if (availableWardrobeCount < 1) {
+          if (availableWardrobeCount.lt(1)) {
             throw new Error(
               "You do not have the ingredients to craft this item",
             );
@@ -111,6 +142,7 @@ export function startCrafting({
     const { seconds: recipeTime, boostsUsed } = getBoostedCraftingTime({
       game: state,
       time: recipe.time,
+      createdAt,
     });
 
     copy.craftingBox = {

@@ -79,8 +79,6 @@ import { CompetitionModal } from "features/competition/CompetitionBoard";
 import { SeasonChanged } from "./components/temperateSeason/SeasonChanged";
 import { CalendarEvent } from "./components/temperateSeason/CalendarEvent";
 import { DailyReset } from "../components/DailyReset";
-import { RoninWelcomePack } from "./components/RoninWelcomePack";
-import { ClaimRoninAirdrop } from "./components/onChainAirdrops/ClaimRoninAirdrop";
 import { FLOWERTeaserContent } from "../components/FLOWERTeaser";
 import { RoninJinClaim } from "./components/RoninJinClaim";
 import {
@@ -94,6 +92,11 @@ import { RewardBox } from "features/rewardBoxes/RewardBox";
 import { ClaimBlessingReward } from "features/loveIsland/blessings/ClaimBlessing";
 import { Cheering } from "./components/Cheering";
 import { SystemMessageWidget } from "features/announcements/SystemMessageWidget";
+import { News } from "features/farming/mail/components/News";
+import { CloseButtonPanel } from "../components/CloseablePanel";
+import { TradesCleared } from "./components/TradesCleared";
+import { ClaimRoninPack } from "./components/onChainAirdrops/ClaimRoninPack";
+import { RevealPets } from "features/island/pets/RevealPets";
 
 function camelToDotCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, "$1.$2").toLowerCase() as string;
@@ -104,6 +107,18 @@ const land = SUNNYSIDE.land.island;
 const getModalStatesForEffects = () =>
   Object.values({
     ...STATE_MACHINE_EFFECTS,
+  }).reduce(
+    (states, stateName) => ({
+      ...states,
+      [stateName]: true,
+      [`${stateName}Failed`]: true,
+      [`${stateName}Success`]: true,
+    }),
+    {} as Record<BlockchainState["value"], boolean>,
+  );
+
+const getModalStatesForVisitingEffects = () =>
+  Object.values({
     ...STATE_MACHINE_VISIT_EFFECTS,
   }).reduce(
     (states, stateName) => ({
@@ -115,13 +130,31 @@ const getModalStatesForEffects = () =>
     {} as Record<BlockchainState["value"], boolean>,
   );
 
+const checkForActiveEffectState = (
+  state: MachineState,
+  type?: "Success" | "Failed",
+) => {
+  const visitEffectActive = Object.values(STATE_MACHINE_VISIT_EFFECTS).some(
+    (stateName) => state.matches(`${stateName}${type ?? ""}`),
+  );
+  const effectEffectActive = Object.values(STATE_MACHINE_EFFECTS).some(
+    (stateName) => state.matches(`${stateName}${type ?? ""}`),
+  );
+
+  return visitEffectActive || effectEffectActive;
+};
+
 export const AUTO_SAVE_INTERVAL = 1000 * 60; // autosave every 60 seconds
 const SHOW_MODAL: Record<StateValues, boolean> = {
   ...getModalStatesForEffects(),
+  ...getModalStatesForVisitingEffects(),
   // Hide these modals
   depositingFlower: false,
   depositingFlowerSuccess: false,
   depositingFlowerFailed: false,
+  depositingSFL: false,
+  depositingSFLSuccess: false,
+  depositingSFLFailed: false,
   changingUsername: false,
   changingUsernameSuccess: false,
   changingUsernameFailed: false,
@@ -173,11 +206,11 @@ const SHOW_MODAL: Record<StateValues, boolean> = {
   airdrop: true,
   offers: true,
   marketplaceSale: true,
+  tradesCleared: true,
   portalling: true,
   sellMarketResource: false,
   somethingArrived: true,
   seasonChanged: false,
-  roninWelcomePack: true,
   roninAirdrop: true,
   jinAirdrop: true,
   investigating: true,
@@ -245,35 +278,35 @@ const hasVipNotification = (state: MachineState) => state.matches("vip");
 const isPlaying = (state: MachineState) => state.matches("playing");
 const somethingArrived = (state: MachineState) =>
   state.matches("somethingArrived");
+
 const isEffectPending = (state: MachineState) =>
-  Object.values({
-    ...STATE_MACHINE_EFFECTS,
-    ...STATE_MACHINE_VISIT_EFFECTS,
-  }).some((stateName) => state.matches(stateName));
+  checkForActiveEffectState(state);
+
 const isEffectSuccess = (state: MachineState) =>
-  Object.values({
-    ...STATE_MACHINE_EFFECTS,
-    ...STATE_MACHINE_VISIT_EFFECTS,
-  }).some((stateName) => state.matches(`${stateName}Success`));
+  checkForActiveEffectState(state, "Success");
+
 const isEffectFailed = (state: MachineState) =>
-  Object.values({
-    ...STATE_MACHINE_EFFECTS,
-    ...STATE_MACHINE_VISIT_EFFECTS,
-  }).some((stateName) => state.matches(`${stateName}Failed`));
+  checkForActiveEffectState(state, "Failed");
+
 const hasMarketplaceSales = (state: MachineState) =>
   state.matches("marketplaceSale");
+const isTradesCleared = (state: MachineState) => state.matches("tradesCleared");
 const isCompetition = (state: MachineState) => state.matches("competition");
 const isSeasonChanged = (state: MachineState) => state.matches("seasonChanged");
 const isCalendarEvent = (state: MachineState) => state.matches("calendarEvent");
-const isRoninWelcomePack = (state: MachineState) =>
-  state.matches("roninWelcomePack");
+
 const isRoninAirdrop = (state: MachineState) => state.matches("roninAirdrop");
 const isJinAirdrop = (state: MachineState) => state.matches("jinAirdrop");
 const isCheers = (state: MachineState) => state.matches("cheers");
+const isNews = (state: MachineState) => state.matches("news");
+const _isVisiting = (state: MachineState) =>
+  state.context.visitorId !== undefined;
 
-const GameContent: React.FC<{ isVisiting: boolean }> = ({ isVisiting }) => {
+const GameContent: React.FC = () => {
   const { gameService } = useContext(Context);
   useSound("desert", true);
+
+  const isVisiting = useSelector(gameService, _isVisiting);
 
   const landToVisitNotFound = useSelector(gameService, isLandToVisitNotFound);
   const { t } = useAppTranslation();
@@ -372,10 +405,10 @@ const GameContent: React.FC<{ isVisiting: boolean }> = ({ isVisiting }) => {
   );
 };
 
-export const Game: React.FC<{ isVisiting: boolean }> = ({ isVisiting }) => {
+export const Game: React.FC = () => {
   return (
     <GameWrapper>
-      <GameContent isVisiting={isVisiting} />
+      <GameContent />
     </GameWrapper>
   );
 };
@@ -439,15 +472,16 @@ export const GameWrapper: React.FC<React.PropsWithChildren> = ({
   const competition = useSelector(gameService, isCompetition);
   const seasonChanged = useSelector(gameService, isSeasonChanged);
   const calendarEvent = useSelector(gameService, isCalendarEvent);
-  const roninWelcomePack = useSelector(gameService, isRoninWelcomePack);
   const roninAirdrop = useSelector(gameService, isRoninAirdrop);
   const jinAirdrop = useSelector(gameService, isJinAirdrop);
   const showPWAInstallPrompt = useSelector(authService, _showPWAInstallPrompt);
   const investigating = useSelector(gameService, isInvestigating);
   const blessing = useSelector(gameService, isBlessing);
   const cheers = useSelector(gameService, isCheers);
-
+  const news = useSelector(gameService, isNews);
+  const tradesCleared = useSelector(gameService, isTradesCleared);
   const { t } = useAppTranslation();
+
   useInterval(() => {
     gameService.send("SAVE");
   }, AUTO_SAVE_INTERVAL);
@@ -635,12 +669,12 @@ export const GameWrapper: React.FC<React.PropsWithChildren> = ({
             {airdrop && <AirdropPopup />}
             {showOffers && <OffersAcceptedPopup />}
             {showSales && <MarketplaceSalesPopup />}
+            {tradesCleared && <TradesCleared />}
             {vip && <VIPOffer />}
             {hasSomethingArrived && <SomethingArrived />}
             {hasBBs && <Gems />}
             {hasCommunityCoin && <LoveCharm />}
-            {roninWelcomePack && <RoninWelcomePack />}
-            {roninAirdrop && <ClaimRoninAirdrop />}
+            {roninAirdrop && <ClaimRoninPack />}
             {jinAirdrop && <RoninJinClaim />}
             {showReferralRewards && <ClaimReferralRewards />}
             {investigating && <SoftBan />}
@@ -660,9 +694,19 @@ export const GameWrapper: React.FC<React.PropsWithChildren> = ({
         {competition && (
           <Modal show onHide={() => gameService.send("ACKNOWLEDGE")}>
             <CompetitionModal
-              competitionName="PEGGYS_COOKOFF"
+              competitionName="BUILDING_FRIENDSHIPS"
               onClose={() => gameService.send("ACKNOWLEDGE")}
             />
+          </Modal>
+        )}
+        {news && (
+          <Modal show onHide={() => gameService.send("ACKNOWLEDGE")}>
+            <CloseButtonPanel onClose={() => gameService.send("ACKNOWLEDGE")}>
+              <Label type="default" className="mb-2">
+                {t("news.title")}
+              </Label>
+              <News />
+            </CloseButtonPanel>
           </Modal>
         )}
 
@@ -670,6 +714,7 @@ export const GameWrapper: React.FC<React.PropsWithChildren> = ({
         <NewMail />
 
         <RewardBox />
+        <RevealPets />
 
         {children}
       </ToastProvider>

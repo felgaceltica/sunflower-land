@@ -3,7 +3,10 @@ import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { Label } from "components/ui/Label";
 import { useTranslation } from "react-i18next";
 import { getKeys } from "features/game/types/craftables";
-import { LAVA_PIT_REQUIREMENTS } from "features/game/events/landExpansion/startLavaPit";
+import {
+  getLavaPitRequirements,
+  getLavaPitTime,
+} from "features/game/events/landExpansion/startLavaPit";
 import { useSelector } from "@xstate/react";
 import { MachineState } from "features/game/lib/gameMachine";
 import { Context } from "features/game/GameProvider";
@@ -16,10 +19,7 @@ import { InnerPanel, OuterPanel } from "components/ui/Panel";
 import Decimal from "decimal.js-light";
 import useUiRefresher from "lib/utils/hooks/useUiRefresher";
 import { secondsToString } from "lib/utils/time";
-import {
-  getLavaPitTime,
-  getObsidianYield,
-} from "features/game/events/landExpansion/collectLavaPit";
+import { getObsidianYield } from "features/game/events/landExpansion/collectLavaPit";
 import { SEASON_ICONS } from "features/island/buildings/components/building/market/SeasonalSeeds";
 import { RequirementLabel } from "components/ui/RequirementsLabel";
 import { IngredientsPopover } from "components/ui/IngredientsPopover";
@@ -59,7 +59,9 @@ export const LavaPitModalContent: React.FC<Props> = ({ onClose, id }) => {
     gameService.send("lavaPit.collected", { id });
   };
 
-  const requirements = LAVA_PIT_REQUIREMENTS[season.season];
+  const { requirements } = getLavaPitRequirements(
+    gameService.state.context.state,
+  );
 
   const hasIngredients = getKeys(requirements).every((itemName) =>
     (inventory[itemName] ?? new Decimal(0)).gte(
@@ -68,7 +70,7 @@ export const LavaPitModalContent: React.FC<Props> = ({ onClose, id }) => {
   );
 
   const lavaPitInProgress = lavaPit?.startedAt !== undefined;
-  const timeRemaining = lavaPitTime - (Date.now() - (lavaPit?.startedAt ?? 0));
+  const timeRemaining = Math.max(0, (lavaPit.readyAt ?? 0) - Date.now());
   const canCollect = lavaPitInProgress && timeRemaining <= 0;
   const wasRecentlyCollected = Date.now() - (lavaPit?.collectedAt ?? 0) < 1000;
 

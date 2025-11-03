@@ -1,15 +1,10 @@
 import { trackActivity } from "features/game/types/bumpkinActivity";
-import { CollectibleName, getKeys } from "features/game/types/craftables";
+import { CollectibleName } from "features/game/types/craftables";
 import { GameState, PlacedItem, PlacedLamp } from "features/game/types/game";
 
 import { PlaceableLocation } from "features/game/types/collectibles";
 import { produce } from "immer";
-import { HourglassType } from "features/island/collectibles/components/Hourglass";
-import { HOURGLASSES } from "./burnCollectible";
-import { hasFeatureAccess } from "lib/flags";
-import { FLOWER_SEEDS } from "features/game/types/flowers";
-import { REMOVAL_RESTRICTIONS } from "features/game/types/removeables";
-import { SEEDS } from "features/game/types/seeds";
+import { LIMITED_ITEMS } from "./burnCollectible";
 
 export enum REMOVE_COLLECTIBLE_ERRORS {
   INVALID_COLLECTIBLE = "This collectible does not exist",
@@ -90,36 +85,7 @@ export function removeCollectible({
       }
     }
 
-    if (!hasFeatureAccess(stateCopy, "LANDSCAPING")) {
-      const removalRestriction = REMOVAL_RESTRICTIONS[action.name];
-      if (removalRestriction) {
-        const [restricted] = removalRestriction(state);
-        if (restricted)
-          throw new Error(REMOVE_COLLECTIBLE_ERRORS.COLLECTIBLE_IN_USE);
-      }
-
-      if (action.name === "Kuebiko") {
-        getKeys(SEEDS).forEach((seed) => {
-          if (stateCopy.inventory[seed]) {
-            delete stateCopy.inventory[seed];
-          }
-        });
-      }
-
-      if (action.name === "Hungry Caterpillar") {
-        getKeys(FLOWER_SEEDS).forEach((seed) => {
-          if (stateCopy.inventory[seed]) {
-            delete stateCopy.inventory[seed];
-          }
-        });
-      }
-    }
-
-    if (
-      HOURGLASSES.includes(action.name as HourglassType) ||
-      action.name === "Time Warp Totem" ||
-      action.name === "Super Totem"
-    ) {
+    if (LIMITED_ITEMS.includes(action.name)) {
       const collectible: PlacedItem = collectibleToRemove;
       if (collectible) {
         throw new Error(REMOVE_COLLECTIBLE_ERRORS.LIMITED_ITEM_IN_USE);
