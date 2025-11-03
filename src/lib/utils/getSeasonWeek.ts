@@ -59,7 +59,7 @@ export function getSeasonChangeover({
 /**
  * The days that Bumpkins are on holiday (no deliveries)
  */
-const HOLIDAYS: string[] = [
+export const HOLIDAYS: string[] = [
   "2024-11-01",
   "2024-11-02",
   "2024-11-03",
@@ -90,6 +90,15 @@ const HOLIDAYS: string[] = [
   "2025-08-08",
   "2025-08-09",
   "2025-08-10",
+
+  // Start of Paw Prints
+  "2025-11-03",
+  "2025-11-04",
+  "2025-11-05",
+  "2025-11-06",
+  "2025-11-07",
+  "2025-11-08",
+  "2025-11-09",
 ];
 
 export function getBumpkinHoliday({ now = Date.now() }: { now?: number }) {

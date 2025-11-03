@@ -1,7 +1,7 @@
-import { COMPETITION_POINTS } from "features/game/types/competitions";
 import type { GameState } from "features/game/types/game";
-import { SEASONS } from "features/game/types/seasons";
 import { CONFIG } from "lib/config";
+
+export const RONIN_AIRDROP_ENDDATE = new Date("2025-11-04T00:00:00Z");
 
 export const adminFeatureFlag = ({ wardrobe, inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" ||
@@ -14,10 +14,12 @@ const usernameFeatureFlag = (game: GameState) => {
       "adam",
       "tango",
       "elias",
+      "Aeon",
       "dcol",
       "birb",
       "Celinhotv",
       "LittleEins",
+      "Labochi",
       "Craig",
       "Spencer",
     ]
@@ -44,6 +46,10 @@ const timeBasedFeatureFlag = (date: Date) => () => {
 
 const betaTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
   return defaultFeatureFlag(game) || Date.now() > date.getTime();
+};
+
+const adminTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
+  return adminFeatureFlag(game) || Date.now() > date.getTime();
 };
 
 const timePeriodFeatureFlag =
@@ -89,6 +95,12 @@ const FEATURE_FLAGS = {
   // For testing
   JEST_TEST: defaultFeatureFlag,
 
+  RONIN_AIRDROP: (game: GameState) => {
+    if (Date.now() > RONIN_AIRDROP_ENDDATE.getTime()) return false;
+
+    return betaTimeBasedFeatureFlag(new Date("2025-10-21T00:00:00Z"))(game);
+  },
+
   // Permanent Feature Flags
   AIRDROP_PLAYER: adminFeatureFlag,
   HOARDING_CHECK: defaultFeatureFlag,
@@ -107,9 +119,9 @@ const FEATURE_FLAGS = {
     betaTimeBasedFeatureFlag(new Date("2025-04-21T00:00:00Z"))(game) &&
     Date.now() < new Date("2025-04-29T00:00:00Z").getTime(),
 
-  FESTIVALOFCOLORS: (game) =>
-    betaTimeBasedFeatureFlag(new Date("2025-06-30T00:00:00Z"))(game) &&
-    Date.now() < new Date("2025-07-08T00:00:00Z").getTime(),
+  HALLOWEEN: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-10-28T00:00:00Z"))(game) &&
+    Date.now() < new Date("2025-11-05T00:00:00Z").getTime(),
 
   STREAM_STAGE_ACCESS: adminFeatureFlag,
 
@@ -121,30 +133,32 @@ const FEATURE_FLAGS = {
   MODERATOR: (game) =>
     !!((game.wardrobe.Halo ?? 0) > 0) && !!game.inventory["Beta Pass"]?.gt(0),
 
-  POTION_HOUSE_UPDATES: timeBasedFeatureFlag(new Date("2025-08-01T00:00:00Z")),
   BLESSING: () => true,
-  MINE_WHACK_BETA: defaultFeatureFlag,
 
-  // Better Together Chapter
-  SOCIAL_FARMING: betaTimeBasedFeatureFlag(
-    SEASONS["Better Together"].startDate,
-  ),
-  MONUMENTS: betaTimeBasedFeatureFlag(new Date("2025-08-04T00:00:00.000Z")),
-  LANDSCAPING: betaTimeBasedFeatureFlag(new Date("2025-08-04T00:00:00.000Z")),
-  LANDSCAPING_SHOP: betaTimeBasedFeatureFlag(
-    SEASONS["Better Together"].startDate,
-  ),
-  WARDROBE: betaTimeBasedFeatureFlag(SEASONS["Better Together"].startDate),
-  CRAFTING: betaTimeBasedFeatureFlag(SEASONS["Better Together"].startDate),
-  LEATHER_TOOLS: testnetFeatureFlag,
-  CLUTTER: betaTimeBasedFeatureFlag(new Date("2025-08-04T00:00:00.000Z")),
+  PETS: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(game),
+  PET_HOUSE: testnetFeatureFlag,
+  FLOWER_INSTA_GROW: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(game),
 
-  PEGGYS_COOKOFF: () =>
-    timePeriodFeatureFlag({
-      start: new Date(COMPETITION_POINTS.PEGGYS_COOKOFF.startAt),
-      end: new Date(COMPETITION_POINTS.PEGGYS_COOKOFF.endAt),
-    })(),
-  CHEERS: betaTimeBasedFeatureFlag(new Date("2025-08-04T00:00:00Z")),
+  API_PERFORMANCE: () => true,
+
+  OBSIDIAN_EXCHANGE: () =>
+    timeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(),
+  GASLESS_AUCTIONS: () => true,
+  NODE_FORGING: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(game),
+  DEPOSIT_SFL: () =>
+    Date.now() < new Date("2025-10-28T00:00:00.000Z").getTime(),
+  RONIN_FLOWER: betaTimeBasedFeatureFlag(new Date("2025-10-21T00:00:00Z")),
+  MEMORY_BETA: defaultFeatureFlag,
+  PET_NFT_DEPOSIT: () =>
+    timeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(),
+  PET_NFT_MARKETPLACE: () =>
+    timeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(),
+  BUILDING_FRIENDSHIPS: betaTimeBasedFeatureFlag(
+    new Date("2025-10-13T00:00:00Z"),
+  ),
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;

@@ -6,6 +6,7 @@ export type NPCName =
   | "cluck e cheese"
   | "felga" // Fruit dash
   | "minewhack" // Mine Whack
+  | "memory" // Memory portal
   | "digby"
   | "portaller"
   | "gambit"
@@ -178,6 +179,17 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     body: "Beige Farmer Potion",
     shoes: "Yellow Boots",
     tool: "Grave Diggers Shovel",
+  },
+  memory: {
+    background: "Farm Background",
+    hair: "Greyed Glory",
+    body: "Beige Farmer Potion",
+    shirt: "Blue Blossom Shirt",
+    beard: "Wise Beard",
+    pants: "Blue Suspenders",
+    shoes: "Bumpkin Boots",
+    tool: "Kama",
+    hat: "Straw Hat",
   },
   pharaoh: {
     body: "Light Brown Farmer Potion",
@@ -847,12 +859,13 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
   },
   eins: {
     body: "Beige Farmer Potion",
-    hair: "Explorer Hair",
-    pants: "Farmer Overalls",
-    shirt: "SFL T-Shirt",
-    tool: "Hammer",
+    hair: "Brush Back Hair",
+    beard: "Moustache",
+    pants: "Wise Slacks",
+    shirt: "Diamond Patterned Vest",
+    tool: "Chemist Potion",
     background: "Farm Background",
-    shoes: "Black Farmer Boots",
+    shoes: "Leather Shoes",
   },
   garth: {
     body: "Infernal Goblin Potion",

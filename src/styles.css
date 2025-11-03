@@ -207,6 +207,12 @@ input {
   color: #3e2731;
 }
 
+input::placeholder {
+  color: black;
+  opacity: 0.3;
+  padding-left: 2px;
+}
+
 button:disabled {
   cursor: not-allowed;
 }
@@ -1528,4 +1534,14 @@ th {
   100% {
     opacity: 0.5;
   }
+}
+
+/* Classes to flip a collectible image */
+.flipped img {
+  transform: scaleX(-1);
+}
+
+.flipped img.absolute.left-1\/2.-translate-x-1\/2,
+.flipped img.absolute.left-1\/2.transform.-translate-x-1\/2 {
+  transform: scaleX(-1) translateX(50%);
 }
