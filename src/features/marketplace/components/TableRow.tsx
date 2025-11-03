@@ -8,7 +8,7 @@ import { NPCIcon } from "features/island/bumpkin/components/NPC";
 import { interpretTokenUri } from "lib/utils/tokenUriBuilder";
 import { TradeableDisplay } from "../lib/tradeables";
 import { formatNumber } from "lib/utils/formatNumber";
-import { Checkbox } from "components/ui/Checkbox";
+//import { Checkbox } from "components/ui/Checkbox";
 
 export type TableItem = {
   id: string;
@@ -142,12 +142,12 @@ export const TableRow: React.FC<RowProps> = ({
       )}
       {isBulkBuy && (
         <div className="p-1 flex items-center justify-end w-[65px] mr-2">
-          {createdBy.id !== farmId && (
-            <Checkbox
-              checked={isSelected}
-              onChange={(checked) => onBulkListingSelect?.(id, checked)}
-            />
-          )}
+          {/* {createdBy.id !== farmId && (
+            // <Checkbox
+            //   checked={isSelected}
+            //   onChange={(checked: boolean) => onBulkListingSelect?.(id, checked)}
+            // />
+          )} */}
         </div>
       )}
     </div>

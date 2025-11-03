@@ -35,7 +35,7 @@ import { ChoreBoard } from "./pages/ChoreBoard";
 import { CompetitionDetails } from "features/competition/CompetitionBoard";
 import { MachineState } from "features/game/lib/gameMachine";
 import { ANIMALS } from "features/game/types/animals";
-import { Checklist, checklistCount } from "components/ui/CheckList";
+// import { Checklist, checklistCount } from "components/ui/CheckList";
 import { getBumpkinLevel } from "features/game/lib/level";
 import trophyIcon from "assets/icons/trophy.png";
 import { hasFeatureAccess } from "lib/flags";
@@ -150,11 +150,11 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
       icon: ITEM_DETAILS[getSeasonalTicket()].image,
       count: incompleteMegaBountiesCount,
     },
-    {
-      name: "Checklist",
-      icon: SUNNYSIDE.ui.board,
-      count: checklistCount(state, bumpkinLevel),
-    },
+    // {
+    //   name: "Checklist",
+    //   icon: SUNNYSIDE.ui.board,
+    //   count: checklistCount(state, bumpkinLevel),
+    // },
     {
       name: "Fish",
       icon: SUNNYSIDE.icons.fish,
@@ -265,7 +265,7 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
                 farmId={farmId}
               />
             )}
-            {currentTab === "Checklist" && <Checklist />}
+            {/* {currentTab === "Checklist" && <Checklist />} */}
             {currentTab === "Fish" && (
               <Fish onMilestoneReached={handleMilestoneReached} state={state} />
             )}
