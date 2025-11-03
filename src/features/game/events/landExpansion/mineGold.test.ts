@@ -41,6 +41,22 @@ describe("mineGold", () => {
     ).toThrow("No iron pickaxes left");
   });
 
+  it("throws an error if gold is not placed", () => {
+    expect(() =>
+      mineGold({
+        state: {
+          ...GAME_STATE,
+          bumpkin: GAME_STATE.bumpkin,
+          gold: {
+            0: { ...GAME_STATE.gold[0], x: undefined, y: undefined },
+          },
+        },
+        action: { type: "goldRock.mined", index: "0" },
+        createdAt: Date.now(),
+      }),
+    ).toThrow("Gold rock is not placed");
+  });
+
   it("throws an error if gold does not exist", () => {
     expect(() =>
       mineGold({
@@ -971,6 +987,28 @@ describe("mineGold", () => {
     expect(time).toEqual({
       time: now - GOLD_RECOVERY_TIME * 1000 * 0.1,
       boostsUsed: ["Midas Sprint"],
+    });
+  });
+
+  it("applies a boost of -10% recovery time when Pickaxe Shark is equipped", () => {
+    const now = Date.now();
+    const time = getMinedAt({
+      game: {
+        ...INITIAL_FARM,
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin.equipped,
+            tool: "Pickaxe Shark",
+          },
+        },
+      },
+      createdAt: now,
+    });
+
+    expect(time).toEqual({
+      time: now - GOLD_RECOVERY_TIME * 1000 * 0.15,
+      boostsUsed: ["Pickaxe Shark"],
     });
   });
 

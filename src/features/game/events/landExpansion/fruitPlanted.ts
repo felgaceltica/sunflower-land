@@ -1,6 +1,6 @@
 import Decimal from "decimal.js-light";
 import {
-  isCollectibleActive,
+  isTemporaryCollectibleActive,
   isCollectibleBuilt,
 } from "features/game/lib/collectibleBuilt";
 import { trackActivity } from "features/game/types/bumpkinActivity";
@@ -91,18 +91,18 @@ export const isAdvancedFruitSeed = (
 /**
  * Generic boost for all fruit types - normal + greenhouse
  */
-export function getFruitTime({
-  game,
-  name,
-}: {
-  game: GameState;
-  name: GreenHouseFruitSeedName | PatchFruitSeedName;
-}): { multiplier: number; boostsUsed: BoostName[] } {
+export function getFruitTime({ game }: { game: GameState }): {
+  multiplier: number;
+  boostsUsed: BoostName[];
+} {
   let seconds = 1;
   const boostsUsed: BoostName[] = [];
 
-  const hasSuperTotem = isCollectibleActive({ name: "Super Totem", game });
-  const hasTimeWarpTotem = isCollectibleActive({
+  const hasSuperTotem = isTemporaryCollectibleActive({
+    name: "Super Totem",
+    game,
+  });
+  const hasTimeWarpTotem = isTemporaryCollectibleActive({
     name: "Time Warp Totem",
     game,
   });
@@ -110,17 +110,6 @@ export function getFruitTime({
     seconds = seconds * 0.5;
     if (hasSuperTotem) boostsUsed.push("Super Totem");
     if (hasTimeWarpTotem) boostsUsed.push("Time Warp Totem");
-  }
-
-  if (isCollectibleActive({ name: "Orchard Hourglass", game })) {
-    seconds = seconds * 0.75;
-    boostsUsed.push("Orchard Hourglass");
-  }
-
-  // Vine Velocity: 10% reduction
-  if (name === "Grape Seed" && game.bumpkin.skills["Vine Velocity"]) {
-    seconds = seconds * 0.9;
-    boostsUsed.push("Vine Velocity");
   }
 
   return { multiplier: seconds, boostsUsed };
@@ -136,10 +125,7 @@ export const getFruitPatchTime = (
   const { bumpkin } = game;
   let seconds = PATCH_FRUIT_SEEDS[patchFruitSeedName]?.plantSeconds ?? 0;
 
-  const { multiplier: baseMultiplier, boostsUsed } = getFruitTime({
-    game,
-    name: patchFruitSeedName,
-  });
+  const { multiplier: baseMultiplier, boostsUsed } = getFruitTime({ game });
   seconds *= baseMultiplier;
 
   // Squirrel Monkey: 50% reduction
@@ -167,6 +153,12 @@ export const getFruitPatchTime = (
   ) {
     seconds = seconds * 0.8;
     boostsUsed.push("Banana Onesie");
+  }
+
+  // Fruit Tune Box: 20% reduction
+  if (isCollectibleBuilt({ name: "Fruit Tune Box", game })) {
+    seconds = seconds * 0.8;
+    boostsUsed.push("Fruit Tune Box");
   }
 
   // Lemon Tea Bath: 50% reduction
@@ -230,6 +222,16 @@ export const getFruitPatchTime = (
     boostsUsed.push("Short Pickings");
   }
 
+  if (isTemporaryCollectibleActive({ name: "Orchard Hourglass", game })) {
+    seconds *= 0.75;
+    boostsUsed.push("Orchard Hourglass");
+  }
+
+  if (isTemporaryCollectibleActive({ name: "Toucan Shrine", game })) {
+    seconds *= 0.75;
+    boostsUsed.push("Toucan Shrine");
+  }
+
   return { seconds, boostsUsed };
 };
 
@@ -257,6 +259,10 @@ export function plantFruit({
 
     if (!patch) {
       throw new Error("Fruit patch does not exist");
+    }
+
+    if (patch.x === undefined && patch.y === undefined) {
+      throw new Error("Fruit patch is not placed");
     }
 
     if (patch.fruit?.plantedAt) {

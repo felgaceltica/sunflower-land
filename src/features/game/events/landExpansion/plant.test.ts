@@ -4,6 +4,7 @@ import { INITIAL_FARM } from "../../lib/constants";
 import { GameState, CropPlot } from "../../types/game";
 import { getCropPlotTime, plant } from "./plant";
 import { TEST_BUMPKIN } from "features/game/lib/bumpkinData";
+import { EXPIRY_COOLDOWNS } from "features/game/lib/collectibleBuilt";
 
 const FARM_WITH_PLOTS: GameState = {
   ...INITIAL_FARM,
@@ -64,6 +65,27 @@ describe("plant", () => {
         },
       }),
     ).toThrow("Plot does not exist");
+  });
+
+  it("does not plant if plot is not placed", () => {
+    expect(() =>
+      plant({
+        state: {
+          ...GAME_STATE,
+          bumpkin: TEST_BUMPKIN,
+          crops: {
+            0: { ...GAME_STATE.crops[0], x: undefined, y: undefined },
+          },
+        },
+        createdAt: dateNow,
+        action: {
+          type: "seed.planted",
+          cropId: "123",
+          index: "0",
+          item: "Sunflower Seed",
+        },
+      }),
+    ).toThrow("Plot is not placed");
   });
 
   it("does not plant if crop already exists", () => {
@@ -656,6 +678,48 @@ describe("plant", () => {
     expect((plots as Record<number, CropPlot>)[0].crop?.plantedAt).toEqual(
       dateNow - 0.1 * CROPS.Parsnip.harvestSeconds * 1000,
     );
+  });
+  it("grows turnip twice as fast with Giant Turnip placed.", () => {
+    const state = plant({
+      state: {
+        ...GAME_STATE,
+        bumpkin: TEST_BUMPKIN,
+        inventory: {
+          "Turnip Seed": new Decimal(1),
+          "Giant Turnip": new Decimal(1),
+        },
+        season: {
+          season: "winter",
+          startedAt: 0,
+        },
+        collectibles: {
+          "Giant Turnip": [
+            {
+              id: "123",
+              createdAt: dateNow,
+              coordinates: { x: 1, y: 1 },
+              readyAt: dateNow - 100,
+            },
+          ],
+        },
+      },
+      createdAt: dateNow,
+      action: {
+        type: "seed.planted",
+        cropId: "123",
+        index: Object.keys(GAME_STATE.crops)[0],
+        item: "Turnip Seed",
+      },
+    });
+
+    const turnipTime = CROPS.Turnip.harvestSeconds * 1000;
+
+    const crops = state.crops;
+
+    expect(crops).toBeDefined();
+    const plantedAt = crops[firstId].crop?.plantedAt || 0;
+
+    expect(plantedAt).toBe(dateNow - turnipTime * 0.5);
   });
 
   describe("getCropTime", () => {
@@ -1289,6 +1353,54 @@ describe("plant", () => {
       });
 
       expect(time).toEqual(baseHarvestSeconds * 0.5);
+    });
+
+    it("applies the Sparrow Shrine boost", () => {
+      const baseHarvestSeconds = CROPS["Sunflower"].harvestSeconds;
+      const { time } = getCropPlotTime({
+        crop: "Sunflower",
+        game: {
+          ...FARM_WITH_PLOTS,
+          collectibles: {
+            "Sparrow Shrine": [
+              {
+                id: "123",
+                coordinates: { x: -1, y: -1 },
+                createdAt: dateNow - 100,
+                readyAt: dateNow - 100,
+              },
+            ],
+          },
+        },
+        plot: { ...plot, x: 0, y: -3 },
+        createdAt: dateNow,
+      });
+
+      expect(time).toEqual(baseHarvestSeconds * 0.75);
+    });
+
+    it("does not apply the Sparrow Shrine boost if expired", () => {
+      const baseHarvestSeconds = CROPS["Sunflower"].harvestSeconds;
+      const { time } = getCropPlotTime({
+        crop: "Sunflower",
+        game: {
+          ...FARM_WITH_PLOTS,
+          collectibles: {
+            "Sparrow Shrine": [
+              {
+                id: "123",
+                coordinates: { x: -1, y: -1 },
+                createdAt: dateNow - EXPIRY_COOLDOWNS["Sparrow Shrine"],
+                readyAt: dateNow - 100,
+              },
+            ],
+          },
+        },
+        plot: { ...plot, x: 0, y: -3 },
+        createdAt: dateNow,
+      });
+
+      expect(time).toEqual(baseHarvestSeconds);
     });
   });
 

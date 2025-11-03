@@ -93,6 +93,30 @@ describe("fruitPlanted", () => {
     ).toThrow("Fruit is already planted");
   });
 
+  it("does not plant if patch is not placed", () => {
+    expect(() =>
+      plantFruit({
+        state: {
+          ...GAME_STATE,
+          fruitPatches: {
+            ...GAME_STATE.fruitPatches,
+            1: {
+              ...GAME_STATE.fruitPatches[1],
+              x: undefined,
+              y: undefined,
+            },
+          },
+        },
+        createdAt: dateNow,
+        action: {
+          type: "fruit.planted",
+          index: "1",
+          seed: "Apple Seed",
+        },
+      }),
+    ).toThrow("Fruit patch is not placed");
+  });
+
   it("does not plant an invalid seed", () => {
     expect(() =>
       plantFruit({
@@ -761,6 +785,25 @@ describe("getFruitTime", () => {
 
           onesie: "Banana Onesie",
         },
+      },
+    });
+    expect(time).toEqual(orangePlantSeconds * 0.8);
+  });
+
+  it("applies a 20% speed boost with Fruit Tune Box", () => {
+    const seed = "Banana Plant";
+    const orangePlantSeconds = PATCH_FRUIT_SEEDS[seed].plantSeconds;
+    const { seconds: time } = getFruitPatchTime(seed, {
+      ...TEST_FARM,
+      collectibles: {
+        "Fruit Tune Box": [
+          {
+            coordinates: { x: 0, y: 0 },
+            createdAt: 0,
+            id: "123",
+            readyAt: 0,
+          },
+        ],
       },
     });
     expect(time).toEqual(orangePlantSeconds * 0.8);
