@@ -35,15 +35,14 @@ import { GameProvider } from "features/game/GameProvider";
 import { FlowerDashboard } from "features/flowerDashboard/FlowerDashboard";
 import { ModalProvider } from "features/game/components/modal/ModalProvider";
 import { FeedProvider } from "features/social/FeedContext";
+import {
+  GameRoninAirdrop,
+  RoninAirdrop,
+} from "features/roninAirdrop/RoninAirdrop";
 
 // Lazy load routes
 const World = lazy(() =>
   import("features/world/World").then((m) => ({ default: m.World })),
-);
-const CommunityTools = lazy(() =>
-  import("features/world/ui/CommunityTools").then((m) => ({
-    default: m.CommunityTools,
-  })),
 );
 
 const selectState = (state: AuthMachineState) => ({
@@ -109,6 +108,7 @@ export const Navigation: React.FC = () => {
           <Routes>
             {/* Public routes that don't require authentication */}
             <Route path="/flower-dashboard" element={<FlowerDashboard />} />
+            <Route path="/ronin" element={<RoninAirdrop />} />
 
             {/* Protected routes that require authentication */}
             <Route
@@ -167,21 +167,9 @@ export const Navigation: React.FC = () => {
                                 />
                                 <Route
                                   path="/visit/*"
-                                  element={
-                                    <LandExpansion
-                                      key="visit"
-                                      isVisiting={true}
-                                    />
-                                  }
+                                  element={<LandExpansion key="visit" />}
                                 />
-                                {CONFIG.NETWORK === "amoy" && (
-                                  <Route
-                                    path="/community-tools"
-                                    element={
-                                      <CommunityTools key="community-tools" />
-                                    }
-                                  />
-                                )}
+
                                 {CONFIG.NETWORK === "amoy" && (
                                   <Route
                                     path="/builder"
@@ -204,13 +192,12 @@ export const Navigation: React.FC = () => {
                                   element={<FlowerDashboard />}
                                 />
                                 <Route
+                                  path="/game/ronin"
+                                  element={<GameRoninAirdrop />}
+                                />
+                                <Route
                                   path="*"
-                                  element={
-                                    <LandExpansion
-                                      key="land"
-                                      isVisiting={false}
-                                    />
-                                  }
+                                  element={<LandExpansion key="land" />}
                                 />
                               </Routes>
                             </ModalProvider>
