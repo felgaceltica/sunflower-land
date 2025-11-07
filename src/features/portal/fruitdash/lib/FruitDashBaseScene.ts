@@ -184,6 +184,7 @@ export abstract class FruitDashBaseScene extends Phaser.Scene {
         }
       }, 5000);
     const playerclothing = this.gameState.bumpkin?.equipped as BumpkinParts;
+    playerclothing.aura = undefined;
     if (this.IS_EASTER) playerclothing.onesie = "Bunny Onesie";
     this.createPlayer({
       x: window.innerWidth / 2,
