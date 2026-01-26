@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { Modal } from "components/ui/Modal";
 import { Button } from "components/ui/Button";
@@ -44,6 +44,8 @@ import { SEASON_ICONS } from "../market/SeasonalSeeds";
 import { RecipeInfoPanel } from "../craftingBox/components/RecipeInfoPanel";
 import { secondsTillWeekReset } from "features/game/lib/factions";
 import { getFruitfulBlendBuff } from "features/game/events/landExpansion/fertiliseFruitPatch";
+import { useNow } from "lib/utils/hooks/useNow";
+import { useCountdown } from "lib/utils/hooks/useCountdown";
 
 const WORM_OUTPUT: Record<ComposterName, { min: number; max: number }> = {
   "Compost Bin": { min: 2, max: 4 },
@@ -87,6 +89,11 @@ function getWormOutput({
   if (skills["Composting Revamp"]) {
     min -= 3;
     max -= 3;
+  }
+
+  if (isWearableActive({ name: "Saw Fish", game: state })) {
+    min += 1;
+    max += 1;
   }
 
   // If min/max somehow goes negative, show as 0
@@ -141,21 +148,7 @@ function hasRead() {
 }
 
 const Timer: React.FC<{ readyAt: number }> = ({ readyAt }) => {
-  const [secondsLeft, setSecondsLeft] = useState((readyAt - Date.now()) / 1000);
-
-  const active = readyAt >= Date.now();
-
-  useEffect(() => {
-    // Reset secondsLeft when readyAt changes (e.g., due to boost)
-    setSecondsLeft((readyAt - Date.now()) / 1000);
-
-    if (active) {
-      const interval = setInterval(() => {
-        setSecondsLeft((readyAt - Date.now()) / 1000);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [active, readyAt]);
+  const { totalSeconds: secondsLeft } = useCountdown(readyAt);
 
   return (
     <div className="flex items-center mb-2">
@@ -235,8 +228,11 @@ const ComposterModalContent: React.FC<{
 
   const state = useSelector(gameService, (state) => state.context.state);
 
-  const { inventory, bumpkin, buildings } = state;
+  const now = useNow({ live: !!readyAt, autoEndAt: readyAt ?? 0 });
+  const composting = !!readyAt && readyAt >= now;
+  const isReady = readyAt && readyAt <= now;
 
+  const { inventory, bumpkin, buildings } = state;
   const { produce, worm } = composterDetails[composterName];
 
   const { resourceBoostMilliseconds } = getSpeedUpTime({
@@ -256,9 +252,6 @@ const ComposterModalContent: React.FC<{
     gameState: state,
     composter: composterName,
   });
-
-  const composting = !!readyAt && readyAt > Date.now();
-  const isReady = readyAt && readyAt < Date.now();
 
   const produces = buildings[composterName]?.[0].producing?.items ?? {};
 
@@ -596,15 +589,11 @@ export const ComposterModal: React.FC<Props> = ({
   onCollect,
   onBoost,
 }) => {
-  const [tab, setTab] = useState(0);
-
+  type Tab = "composter" | "guide";
+  const [tab, setTab] = useState<Tab>(
+    showModal && !hasRead() ? "guide" : "composter",
+  );
   const { t } = useAppTranslation();
-
-  useEffect(() => {
-    if (showModal && !hasRead()) {
-      setTab(1);
-    }
-  }, [showModal]);
 
   return (
     <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -613,8 +602,9 @@ export const ComposterModal: React.FC<Props> = ({
           setShowModal(false);
         }}
         tabs={[
-          { icon: compost, name: "Composter" },
+          { id: "composter", icon: compost, name: "Composter" },
           {
+            id: "guide",
             icon: SUNNYSIDE.icons.expression_confused,
             name: t("guide"),
           },
@@ -622,7 +612,7 @@ export const ComposterModal: React.FC<Props> = ({
         currentTab={tab}
         setCurrentTab={setTab}
       >
-        {tab === 0 && (
+        {tab === "composter" && (
           <ComposterModalContent
             composterName={composterName}
             startComposter={startComposter}
@@ -631,7 +621,7 @@ export const ComposterModal: React.FC<Props> = ({
             onBoost={onBoost}
           />
         )}
-        {tab === 1 && (
+        {tab === "guide" && (
           <>
             <div className="p-2">
               <img
@@ -699,7 +689,7 @@ export const ComposterModal: React.FC<Props> = ({
             <Button
               className="text-xxs sm:text-sm mt-1 whitespace-nowrap"
               onClick={() => {
-                setTab(0);
+                setTab("composter");
                 acknowledgeRead();
               }}
             >

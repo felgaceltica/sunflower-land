@@ -38,7 +38,7 @@ import oilBarrel from "assets/icons/oil_barrel.webp";
 import { Button } from "components/ui/Button";
 import Decimal from "decimal.js-light";
 import { CROP_SEEDS, CropSeedName } from "features/game/types/crops";
-import { useActor, useSelector } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { _paused, _running, _idle } from "./CropMachine";
 import { Context } from "features/game/GameProvider";
 import { MachineState } from "features/game/lib/gameMachine";
@@ -50,6 +50,7 @@ import { OilTank } from "./components/OilTank";
 import { formatNumber, setPrecision } from "lib/utils/formatNumber";
 import { isMobile } from "mobile-device-detect";
 import { getPackYieldAmount } from "features/game/events/landExpansion/harvestCropMachine";
+import { useNow } from "lib/utils/hooks/useNow";
 
 interface Props {
   show: boolean;
@@ -85,6 +86,8 @@ export const ALLOWED_SEEDS = (
 const _growingCropPackIndex = (state: CropMachineState) =>
   state.context.growingCropPackIndex;
 const _inventory = (state: MachineState) => state.context.state.inventory;
+const _state = (state: MachineState) => state.context.state;
+const _farmId = (state: MachineState) => state.context.farmId;
 export const CropMachineModalContent: React.FC<Props> = ({
   show,
   queue,
@@ -96,13 +99,9 @@ export const CropMachineModalContent: React.FC<Props> = ({
   onAddOil,
 }) => {
   const { gameService } = useContext(Context);
-
-  const [
-    {
-      context: { state },
-    },
-  ] = useActor(gameService);
-
+  const state = useSelector(gameService, _state);
+  const now = useNow();
+  const farmId = useSelector(gameService, _farmId);
   const growingCropPackIndex = useSelector(service, _growingCropPackIndex);
   const idle = useSelector(service, _idle);
   const running = useSelector(service, _running);
@@ -116,17 +115,20 @@ export const CropMachineModalContent: React.FC<Props> = ({
   const [showOverlayScreen, setShowOverlayScreen] = useState<boolean>(false);
   const [totalSeeds, setTotalSeeds] = useState(0);
   const [totalOil, setTotalOil] = useState(0);
-  const [tab, setTab] = useState(0);
+  type Tab = "cropMachine";
+  const [tab, setTab] = useState<Tab>("cropMachine");
 
   const { t } = useAppTranslation();
 
   useLayoutEffect(() => {
     if (show) {
+      // We intentionally reset modal UI state when it opens / active pack changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedPackIndex(growingCropPackIndex ?? 0);
       setSelectedSeed(undefined);
       setTotalSeeds(0);
     }
-  }, [show]);
+  }, [show, growingCropPackIndex]);
 
   const getProjectedOilTimeMillis = () => {
     const projectedOilTime = getOilTimeInMillis(totalOil, state);
@@ -188,21 +190,6 @@ export const CropMachineModalContent: React.FC<Props> = ({
     return <Label type="default">{t("cropMachine.idle")}</Label>;
   };
 
-  const getQueueItemCountLabelType = (
-    packIndex: number,
-    itemReady: boolean,
-  ) => {
-    if (itemReady) return "success";
-
-    if (packIndex === growingCropPackIndex && paused) {
-      return "danger";
-    }
-
-    if (packIndex === growingCropPackIndex) return "info";
-
-    return "default";
-  };
-
   const canIncrementSeeds = () => {
     if (!selectedSeed) return false;
 
@@ -247,11 +234,6 @@ export const CropMachineModalContent: React.FC<Props> = ({
     setTotalSeeds(0);
   };
 
-  const handleHide = () => {
-    setShowOverlayScreen(false);
-    onClose();
-  };
-
   const selectedPack = queue[selectedPackIndex];
   const stackedQueue: (CropMachineQueueItem | null)[] = [
     ...queue,
@@ -259,13 +241,30 @@ export const CropMachineModalContent: React.FC<Props> = ({
   ];
 
   const allowedSeeds = ALLOWED_SEEDS(state.bumpkin, inventory);
+  const initialCounter = useSelector(gameService, (state) => {
+    const cropName = selectedPack?.crop;
+    if (!cropName) return 0;
+    return state.context.state.farmActivity[`${cropName} Harvested`] ?? 0;
+  });
   const cropYield = selectedPack
-    ? selectedPack.amount ?? getPackYieldAmount(state, selectedPack).amount
+    ? (selectedPack.amount ??
+      getPackYieldAmount({
+        state,
+        pack: selectedPack,
+        createdAt: now,
+        prngArgs: { farmId, initialCounter },
+      }).amount)
     : 0;
 
   return (
     <CloseButtonPanel
-      tabs={[{ icon: SUNNYSIDE.icons.seedling, name: t("cropMachine.name") }]}
+      tabs={[
+        {
+          id: "cropMachine",
+          icon: SUNNYSIDE.icons.seedling,
+          name: t("cropMachine.name"),
+        },
+      ]}
       currentTab={tab}
       setCurrentTab={setTab}
       onClose={onClose}
@@ -539,39 +538,15 @@ export const CropMachineModalContent: React.FC<Props> = ({
             }}
           >
             {stackedQueue.map((item, index) => {
-              if (item === null)
-                return (
-                  <Box
-                    key={index}
-                    image={add}
-                    onClick={() => setSelectedPackIndex(index)}
-                    isSelected={index === selectedPackIndex}
-                  />
-                );
-
-              const isReady = item.readyAt && item.readyAt < Date.now();
-
               return (
-                <Box
-                  key={`${item.startTime}-${index}`}
-                  isSelected={index === selectedPackIndex}
-                  image={ITEM_DETAILS[`${item.crop} Seed`].image}
-                  count={!isReady ? new Decimal(item.seeds) : undefined}
-                  countLabelType={getQueueItemCountLabelType(index, !!isReady)}
-                  overlayIcon={
-                    <img
-                      src={SUNNYSIDE.icons.confirm}
-                      alt="confirm"
-                      className="object-contain absolute z-10"
-                      style={{
-                        width: `${PIXEL_SCALE * 8}px`,
-                        bottom: `${0.5}px`,
-                        right: `${0.5}px`,
-                      }}
-                    />
-                  }
-                  showOverlay={!!isReady}
-                  onClick={() => setSelectedPackIndex(index)}
+                <PackBox
+                  key={index}
+                  item={item}
+                  index={index}
+                  growingCropPackIndex={growingCropPackIndex}
+                  paused={paused}
+                  selectedPackIndex={selectedPackIndex}
+                  setSelectedPackIndex={setSelectedPackIndex}
                 />
               );
             })}
@@ -728,3 +703,71 @@ export const CropMachineModal: React.FC<Props> = ({
     />
   </Modal>
 );
+
+const PackBox: React.FC<{
+  item: CropMachineQueueItem | null;
+  index: number;
+  growingCropPackIndex?: number;
+  paused: boolean;
+  selectedPackIndex: number;
+  setSelectedPackIndex: (index: number) => void;
+}> = ({
+  item,
+  index,
+  growingCropPackIndex,
+  paused,
+  selectedPackIndex,
+  setSelectedPackIndex,
+}) => {
+  const now = useNow({ live: true, autoEndAt: item?.readyAt });
+  const getQueueItemCountLabelType = (
+    packIndex: number,
+    itemReady: boolean,
+  ) => {
+    if (itemReady) return "success";
+
+    if (packIndex === growingCropPackIndex && paused) {
+      return "danger";
+    }
+
+    if (packIndex === growingCropPackIndex) return "info";
+
+    return "default";
+  };
+
+  if (item === null)
+    return (
+      <Box
+        key={index}
+        image={add}
+        onClick={() => setSelectedPackIndex(index)}
+        isSelected={index === selectedPackIndex}
+      />
+    );
+
+  const isReady = item.readyAt && item.readyAt < now;
+
+  return (
+    <Box
+      key={`${item.startTime}-${index}`}
+      isSelected={index === selectedPackIndex}
+      image={ITEM_DETAILS[`${item.crop} Seed`].image}
+      count={!isReady ? new Decimal(item.seeds) : undefined}
+      countLabelType={getQueueItemCountLabelType(index, !!isReady)}
+      overlayIcon={
+        <img
+          src={SUNNYSIDE.icons.confirm}
+          alt="confirm"
+          className="object-contain absolute z-10"
+          style={{
+            width: `${PIXEL_SCALE * 8}px`,
+            bottom: `${0.5}px`,
+            right: `${0.5}px`,
+          }}
+        />
+      }
+      showOverlay={!!isReady}
+      onClick={() => setSelectedPackIndex(index)}
+    />
+  );
+};
