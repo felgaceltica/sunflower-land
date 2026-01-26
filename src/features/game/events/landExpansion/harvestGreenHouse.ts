@@ -1,8 +1,4 @@
-import {
-  BoostName,
-  CriticalHitName,
-  GameState,
-} from "features/game/types/game";
+import { BoostName, GameState } from "features/game/types/game";
 import { isGreenhouseCrop, MAX_POTS } from "./plantGreenhouse";
 import {
   GREENHOUSE_CROPS,
@@ -13,14 +9,15 @@ import {
   GreenHouseFruitName,
 } from "features/game/types/fruits";
 import Decimal from "decimal.js-light";
-import {
-  BumpkinActivityName,
-  trackActivity,
-} from "features/game/types/bumpkinActivity";
+
 import { produce } from "immer";
 import { getFruitYield } from "./fruitHarvested";
 import { getCropYieldAmount } from "./harvest";
 import { updateBoostUsed } from "features/game/types/updateBoostUsed";
+import {
+  FarmActivityName,
+  trackFarmActivity,
+} from "features/game/types/farmActivity";
 
 export const GREENHOUSE_CROP_TIME_SECONDS: Record<
   GreenHouseCropName | GreenHouseFruitName,
@@ -47,24 +44,24 @@ export function getGreenhouseCropYieldAmount({
   crop,
   game,
   createdAt,
-  criticalDrop = () => false,
+  prngArgs,
 }: {
   crop: GreenHouseCropName | GreenHouseFruitName;
   game: GameState;
   createdAt: number;
-  criticalDrop?: (name: CriticalHitName) => boolean;
+  prngArgs?: { farmId: number; counter: number };
 }): { amount: number; boostsUsed: BoostName[] } {
   if (isGreenhouseCrop(crop)) {
     const { amount, boostsUsed } = getCropYieldAmount({
       crop,
       game,
-      criticalDrop,
       createdAt,
+      prngArgs,
     });
     return { amount, boostsUsed };
   }
 
-  return getFruitYield({ name: crop, game, criticalDrop });
+  return getFruitYield({ name: crop, game, prngArgs });
 }
 
 export type HarvestGreenhouseAction = {
@@ -76,12 +73,14 @@ type Options = {
   state: Readonly<GameState>;
   action: HarvestGreenhouseAction;
   createdAt?: number;
+  farmId: number;
 };
 
 export function harvestGreenHouse({
   state,
   action,
   createdAt = Date.now(),
+  farmId,
 }: Options): GameState {
   return produce(state, (game) => {
     // Requires Greenhouse exists
@@ -112,22 +111,23 @@ export function harvestGreenHouse({
     }
 
     // Harvests Crop
+    const counter = game.farmActivity[`${pot.plant.name} Harvested`] ?? 0;
     const { amount: greenhouseProduce, boostsUsed } = pot.plant.amount
       ? { amount: pot.plant.amount, boostsUsed: [] }
       : getGreenhouseCropYieldAmount({
           crop: pot.plant.name,
           game,
           createdAt,
-          criticalDrop: (name) => !!(pot.plant?.criticalHit?.[name] ?? 0),
+          prngArgs: { farmId, counter },
         });
 
     const previousAmount = game.inventory[pot.plant.name] ?? new Decimal(0);
     game.inventory[pot.plant.name] = previousAmount.add(greenhouseProduce);
 
     // Tracks Analytics
-    const activityName: BumpkinActivityName = `${pot.plant.name} Harvested`;
+    const activityName: FarmActivityName = `${pot.plant.name} Harvested`;
 
-    game.bumpkin.activity = trackActivity(activityName, game.bumpkin.activity);
+    game.farmActivity = trackFarmActivity(activityName, game.farmActivity);
 
     game.boostsUsedAt = updateBoostUsed({
       game,

@@ -1,5 +1,9 @@
 import Decimal from "decimal.js-light";
-import { INITIAL_BUMPKIN, TEST_FARM } from "features/game/lib/constants";
+import {
+  INITIAL_BUMPKIN,
+  INITIAL_FARM,
+  TEST_FARM,
+} from "features/game/lib/constants";
 import { COOKABLES } from "features/game/types/consumables";
 import { GameState } from "features/game/types/game";
 import {
@@ -9,6 +13,7 @@ import {
   getReadyAt,
 } from "./cook";
 import { EXPIRY_COOLDOWNS } from "features/game/lib/collectibleBuilt";
+import { getCookingTime } from "features/game/expansion/lib/boosts";
 
 const GAME_STATE: GameState = {
   ...TEST_FARM,
@@ -31,6 +36,7 @@ describe("cook", () => {
           item: "Boiled Eggs",
           buildingId: "123",
         },
+        farmId: 1,
         createdAt,
       }),
     ).toThrow(`Required building does not exist`);
@@ -57,6 +63,7 @@ describe("cook", () => {
           item: "Boiled Eggs",
           buildingId: "123",
         },
+        farmId: 1,
         createdAt,
       }),
     ).toThrow(`Required building does not exist`);
@@ -81,22 +88,18 @@ describe("cook", () => {
                   {
                     name: "Boiled Eggs",
                     readyAt: createdAt + 60 * 1000,
-                    amount: 1,
                   },
                   {
                     name: "Boiled Eggs",
                     readyAt: createdAt + 60 * 1000,
-                    amount: 1,
                   },
                   {
                     name: "Boiled Eggs",
                     readyAt: createdAt + 60 * 1000,
-                    amount: 1,
                   },
                   {
                     name: "Boiled Eggs",
                     readyAt: createdAt + 60 * 1000,
-                    amount: 1,
                   },
                 ],
               },
@@ -108,6 +111,7 @@ describe("cook", () => {
           item: "Boiled Eggs",
           buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
         },
+        farmId: 1,
         createdAt,
       }),
     ).toThrow("No available slots");
@@ -138,6 +142,7 @@ describe("cook", () => {
           item: "Boiled Eggs",
           buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
         },
+        farmId: 1,
         createdAt,
       }),
     ).toThrow("Insufficient ingredient: Egg");
@@ -167,6 +172,7 @@ describe("cook", () => {
         item: "Boiled Eggs",
         buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -201,6 +207,7 @@ describe("cook", () => {
         item: "Boiled Eggs",
         buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -234,6 +241,7 @@ describe("cook", () => {
         item: "Boiled Eggs",
         buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -272,6 +280,7 @@ describe("cook", () => {
         item: "Boiled Eggs",
         buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -308,6 +317,7 @@ describe("cook", () => {
         item: "Fancy Fries",
         buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -352,6 +362,7 @@ describe("cook", () => {
         item: "Boiled Eggs",
         buildingId: "64eca77c-10fb-4088-a71f-3743b2ef6b16",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -381,7 +392,6 @@ describe("cook", () => {
                 {
                   name: "Boiled Eggs",
                   readyAt: createdAt + 60 * 1000,
-                  amount: 1,
                 },
               ],
             },
@@ -393,6 +403,7 @@ describe("cook", () => {
         item: "Mashed Potato",
         buildingId: "blah",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -430,7 +441,6 @@ describe("cook", () => {
                 {
                   name: "Boiled Eggs",
                   readyAt: createdAt + 60 * 1000,
-                  amount: 1,
                 },
               ],
             },
@@ -442,6 +452,7 @@ describe("cook", () => {
         item: "Mashed Potato",
         buildingId: "blah",
       },
+      farmId: 1,
       createdAt,
     });
 
@@ -475,7 +486,6 @@ describe("cook", () => {
                 {
                   name: "Boiled Eggs",
                   readyAt: createdAt - 60 * 60 * 1000, // Finished 1 hour ago
-                  amount: 1,
                 },
               ],
             },
@@ -487,12 +497,136 @@ describe("cook", () => {
         item: "Mashed Potato",
         buildingId: "blah",
       },
+      farmId: 1,
       createdAt,
     });
 
     expect(state.buildings["Fire Pit"]?.[0].crafting?.[1].readyAt).toBeCloseTo(
       createdAt + COOKABLES["Mashed Potato"].cookingSeconds * 1000,
     );
+  });
+
+  it("cooks instant fish recipes instantly", () => {
+    const state = cook({
+      state: {
+        ...GAME_STATE,
+        inventory: {
+          "Fish Flake": new Decimal(1),
+          Seaweed: new Decimal(1),
+        },
+        buildings: {
+          "Fire Pit": [
+            {
+              coordinates: { x: 2, y: 3 },
+              readyAt: 1000,
+              createdAt: 1000,
+              id: "blah",
+              oil: 0,
+            },
+          ],
+        },
+      },
+      action: {
+        type: "recipe.cooked",
+        item: "Furikake Sprinkle",
+        buildingId: "blah",
+      },
+      farmId: 1,
+      createdAt,
+    });
+
+    expect(state.inventory["Furikake Sprinkle"]).toEqual(new Decimal(1));
+    expect(state.inventory["Fish Flake"]).toEqual(new Decimal(0));
+    expect(state.inventory["Seaweed"]).toEqual(new Decimal(0));
+  });
+
+  it("gives you double the produce with Double Nom skill", () => {
+    const state = cook({
+      state: {
+        ...GAME_STATE,
+        inventory: {
+          "Fish Flake": new Decimal(2),
+          Seaweed: new Decimal(2),
+        },
+        bumpkin: {
+          ...INITIAL_BUMPKIN,
+          skills: { "Double Nom": 1 },
+        },
+        buildings: {
+          "Fire Pit": [
+            {
+              coordinates: { x: 2, y: 3 },
+              readyAt: 1000,
+              createdAt: 1000,
+              id: "blah",
+              oil: 0,
+            },
+          ],
+        },
+      },
+      action: {
+        type: "recipe.cooked",
+        item: "Furikake Sprinkle",
+        buildingId: "blah",
+      },
+      farmId: 1,
+      createdAt,
+    });
+
+    expect(state.inventory["Furikake Sprinkle"]).toEqual(new Decimal(2));
+    expect(state.inventory["Fish Flake"]).toEqual(new Decimal(0));
+    expect(state.inventory["Seaweed"]).toEqual(new Decimal(0));
+  });
+
+  it("cooks an instant recipe even if the slots are full", () => {
+    const state = cook({
+      state: {
+        ...GAME_STATE,
+        inventory: {
+          "Fish Flake": new Decimal(1),
+          Seaweed: new Decimal(1),
+        },
+        buildings: {
+          "Fire Pit": [
+            {
+              coordinates: { x: 0, y: 0 },
+              createdAt: Date.now(),
+              id: "1",
+              readyAt: 0,
+              crafting: [
+                {
+                  name: "Boiled Eggs",
+                  readyAt: Date.now() + 60 * 1000,
+                },
+                {
+                  name: "Boiled Eggs",
+                  readyAt: Date.now() + 60 * 1000 * 2,
+                },
+                {
+                  name: "Boiled Eggs",
+                  readyAt: Date.now() + 60 * 1000 * 3,
+                },
+                {
+                  name: "Boiled Eggs",
+                  readyAt: Date.now() + 60 * 1000 * 4,
+                },
+              ],
+            },
+          ],
+        },
+      },
+      action: {
+        type: "recipe.cooked",
+        item: "Furikake Sprinkle",
+        buildingId: "1",
+      },
+      farmId: 1,
+      createdAt: Date.now(),
+    });
+
+    expect(state.inventory["Furikake Sprinkle"]).toEqual(new Decimal(1));
+    expect(state.inventory["Fish Flake"]).toEqual(new Decimal(0));
+    expect(state.inventory["Seaweed"]).toEqual(new Decimal(0));
   });
 });
 
@@ -553,6 +687,41 @@ describe("getReadyAt", () => {
       now + (COOKABLES["Boiled Eggs"].cookingSeconds - boost) * 1000;
 
     expect(time).toEqual(readyAt);
+  });
+
+  it("applies a -15% cooking time boost when Master Chef's Cleaver is equipped", () => {
+    const now = createdAt;
+
+    const state: GameState = {
+      ...INITIAL_FARM,
+      bumpkin: {
+        ...INITIAL_FARM.bumpkin,
+        equipped: {
+          ...INITIAL_FARM.bumpkin.equipped,
+          tool: "Master Chef's Cleaver",
+        },
+      },
+      buildings: {
+        Deli: [
+          {
+            coordinates: { x: 0, y: 0 },
+            createdAt: now,
+            id: "1",
+            readyAt: 0,
+            oil: 24,
+          },
+        ],
+      },
+    };
+
+    const time = getCookingTime({
+      seconds: COOKABLES["Fermented Fish"].cookingSeconds,
+      item: "Fermented Fish",
+      game: state,
+      cookStartAt: now,
+    }).reducedSecs;
+
+    expect(time).toEqual(COOKABLES["Fermented Fish"].cookingSeconds * 0.85);
   });
 
   it("does not apply 25% speed boost with Faction Medallion when pledged in different Faction", () => {
@@ -1072,6 +1241,7 @@ describe("getReadyAt", () => {
       COOKABLES["Mashed Potato"].cookingSeconds * 1000;
 
     const state = cook({
+      farmId: 1,
       state: {
         ...TEST_FARM,
         vip: {
@@ -1092,7 +1262,6 @@ describe("getReadyAt", () => {
                 {
                   name: "Boiled Eggs",
                   readyAt: eggReadyAt,
-                  amount: 1,
                 },
               ],
             },
@@ -1127,7 +1296,6 @@ describe("getReadyAt", () => {
     expect(building?.crafting?.[0]).toEqual({
       name: "Boiled Eggs",
       readyAt: eggReadyAt,
-      amount: 1,
     });
   });
 
@@ -1139,6 +1307,7 @@ describe("getReadyAt", () => {
     const cookTimeMs = COOKABLES["Boiled Eggs"].cookingSeconds * 1000;
 
     const state = cook({
+      farmId: 1,
       state: {
         ...TEST_FARM,
         inventory: {
@@ -1159,7 +1328,6 @@ describe("getReadyAt", () => {
                 {
                   name: "Boiled Eggs",
                   readyAt: now + 29 * 60 * 1000, // Ready in 29 minutes
-                  amount: 1,
                 },
               ],
             },
@@ -1268,182 +1436,6 @@ describe("getCookingOilBoost", () => {
     const time = getCookingOilBoost("Boiled Eggs", game, "1").timeToCook;
 
     expect(time).toEqual(60 * 60 * 0.8);
-  });
-
-  it("applies the 50% cooking boost for valid Ronin NFTs", () => {
-    const now = createdAt;
-    const cookTimeMs = COOKABLES["Boiled Eggs"].cookingSeconds * 1000;
-
-    const state = cook({
-      state: {
-        ...TEST_FARM,
-        inventory: {
-          Egg: new Decimal(100),
-        },
-        nfts: {
-          ronin: {
-            tokenId: 1,
-            name: "Sunflower Land Platinum Pass",
-            expiresAt: now + 31 * 24 * 60 * 60 * 1000,
-          },
-        },
-        buildings: {
-          "Fire Pit": [
-            {
-              coordinates: { x: 0, y: 0 },
-              createdAt: 0,
-              id: "1",
-              readyAt: 0,
-            },
-          ],
-        },
-      },
-      action: {
-        type: "recipe.cooked",
-        item: "Boiled Eggs",
-        buildingId: "1",
-      },
-      createdAt: now,
-    });
-
-    const building = state.buildings["Fire Pit"]?.[0];
-    const eggRecipe = building?.crafting?.find((r) => r.name === "Boiled Eggs");
-
-    expect(eggRecipe?.readyAt).toBeCloseTo(now + cookTimeMs * 0.5, 0);
-  });
-
-  it("does not apply the 50% cooking boost for Bronze Season Pass (Ronin NFT)", () => {
-    const now = createdAt;
-    const cookTimeMs = COOKABLES["Boiled Eggs"].cookingSeconds * 1000;
-
-    const state = cook({
-      state: {
-        ...TEST_FARM,
-        inventory: {
-          Egg: new Decimal(100),
-        },
-        nfts: {
-          ronin: {
-            tokenId: 1,
-            name: "Sunflower Land Bronze Pass",
-            expiresAt: now + 31 * 24 * 60 * 60 * 1000,
-          },
-        },
-        buildings: {
-          "Fire Pit": [
-            {
-              coordinates: { x: 0, y: 0 },
-              createdAt: 0,
-              id: "1",
-              readyAt: 0,
-            },
-          ],
-        },
-      },
-      action: {
-        type: "recipe.cooked",
-        item: "Boiled Eggs",
-        buildingId: "1",
-      },
-      createdAt: now,
-    });
-
-    const building = state.buildings["Fire Pit"]?.[0];
-    const eggRecipe = building?.crafting?.find((r) => r.name === "Boiled Eggs");
-
-    expect(eggRecipe?.readyAt).toEqual(now + cookTimeMs);
-  });
-
-  it("does not apply the 50% cooking boost to a queue item that starts after the Ronin NFT expires", () => {
-    const now = createdAt;
-    const cookTimeMs = COOKABLES["Boiled Eggs"].cookingSeconds * 1000;
-
-    const state = cook({
-      state: {
-        ...TEST_FARM,
-        inventory: {
-          Egg: new Decimal(100),
-        },
-        nfts: {
-          ronin: {
-            tokenId: 1,
-            name: "Sunflower Land Platinum Pass",
-            expiresAt: now + cookTimeMs,
-            acknowledgedAt: new Date("2025-03-02T00:00:00Z").getTime(),
-          },
-        },
-        buildings: {
-          "Fire Pit": [
-            {
-              coordinates: { x: 0, y: 0 },
-              createdAt: 0,
-              id: "1",
-              readyAt: 0,
-              crafting: [
-                {
-                  name: "Boiled Eggs",
-                  readyAt: now + cookTimeMs,
-                  amount: 1,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      action: {
-        type: "recipe.cooked",
-        item: "Boiled Eggs",
-        buildingId: "1",
-      },
-      createdAt: now,
-    });
-
-    const building = state.buildings["Fire Pit"]?.[0];
-    const eggRecipe = building?.crafting?.find((r) => r.name === "Boiled Eggs");
-
-    expect(eggRecipe?.readyAt).toEqual(now + cookTimeMs);
-  });
-
-  it("does not apply the 50% cooking boost on an expired Ronin NFT", () => {
-    const now = createdAt;
-    const cookTimeMs = COOKABLES["Boiled Eggs"].cookingSeconds * 1000;
-
-    const state = cook({
-      state: {
-        ...TEST_FARM,
-        inventory: {
-          Egg: new Decimal(100),
-        },
-        nfts: {
-          ronin: {
-            tokenId: 1,
-            name: "Sunflower Land Platinum Pass",
-            expiresAt: now - cookTimeMs,
-          },
-        },
-        buildings: {
-          "Fire Pit": [
-            {
-              coordinates: { x: 0, y: 0 },
-              createdAt: 0,
-              id: "1",
-              readyAt: 0,
-            },
-          ],
-        },
-      },
-      action: {
-        type: "recipe.cooked",
-        item: "Boiled Eggs",
-        buildingId: "1",
-      },
-      createdAt: now,
-    });
-
-    const building = state.buildings["Fire Pit"]?.[0];
-    const eggRecipe = building?.crafting?.find((r) => r.name === "Boiled Eggs");
-
-    expect(eggRecipe?.readyAt).toEqual(now + cookTimeMs);
   });
 });
 

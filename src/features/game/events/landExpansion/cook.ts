@@ -1,8 +1,11 @@
 import Decimal from "decimal.js-light";
-import { CookableName, COOKABLES } from "features/game/types/consumables";
+import {
+  CookableName,
+  COOKABLES,
+  isInstantFishRecipe,
+} from "features/game/types/consumables";
 import {
   BuildingProduct,
-  Bumpkin,
   GameState,
   Inventory,
   InventoryItemName,
@@ -18,6 +21,8 @@ import { produce } from "immer";
 import { BUILDING_DAILY_OIL_CAPACITY } from "./supplyCookingOil";
 import { hasVipAccess } from "features/game/lib/vipAccess";
 import { updateBoostUsed } from "features/game/types/updateBoostUsed";
+import { getCookingAmount } from "./collectRecipe";
+import { trackFarmActivity } from "features/game/types/farmActivity";
 
 export type RecipeCookedAction = {
   type: "recipe.cooked";
@@ -29,6 +34,7 @@ type Options = {
   state: Readonly<GameState>;
   action: RecipeCookedAction;
   createdAt?: number;
+  farmId: number;
 };
 
 type GetReadyAtArgs = {
@@ -161,26 +167,12 @@ export function getCookingRequirements({
   return ingredients;
 }
 
-export const getCookingAmount = (
-  building: BuildingName,
-  recipe: { name: CookableName; amount: number },
-  bumpkin: Bumpkin,
-): number => {
-  let amount = recipe.amount;
-
-  // Double Nom - Guarantee +1 food
-  if (bumpkin.skills["Double Nom"] && isCookingBuilding(building)) {
-    amount += 1;
-  }
-
-  return amount;
-};
-
 export const MAX_COOKING_SLOTS = 4;
 
 export function cook({
   state,
   action,
+  farmId,
   createdAt = Date.now(),
 }: Options): GameState {
   return produce(state, (stateCopy) => {
@@ -215,7 +207,7 @@ export function cook({
 
     const crafting = (building.crafting ?? []) as BuildingProduct[];
 
-    if (crafting.length >= availableSlots) {
+    if (!isInstantFishRecipe(item) && crafting.length >= availableSlots) {
       throw new Error(translate("error.noAvailableSlots"));
     }
 
@@ -238,11 +230,30 @@ export function cook({
       stateCopy.inventory,
     );
 
-    const amount = getCookingAmount(
-      requiredBuilding,
-      { name: item, amount: 1 },
-      bumpkin,
-    );
+    if (isInstantFishRecipe(item)) {
+      const amount = getCookingAmount({
+        building: requiredBuilding,
+        game: stateCopy,
+        recipe: {
+          name: item,
+          boost: {},
+          skills: { "Double Nom": !!bumpkin.skills["Double Nom"] },
+          readyAt: createdAt,
+        },
+        farmId,
+        counter: stateCopy.farmActivity[`${item} Cooked`] || 0,
+      });
+      stateCopy.inventory[item] = stateCopy.inventory[item] ?? new Decimal(0);
+      stateCopy.inventory[item] = stateCopy.inventory[item].add(amount);
+
+      stateCopy.farmActivity = trackFarmActivity(
+        `${item} Cooked`,
+        stateCopy.farmActivity,
+      );
+
+      return stateCopy;
+    }
+
     // Start the new recipe when the last recipe is ready or now (createdAt)
     let recipeStartAt = createdAt;
     const lastRecipeReadyAt =
@@ -267,14 +278,15 @@ export function cook({
         // Marks whether the Double Nom skill was applied at the time of cooking
         skills: { "Double Nom": !!bumpkin.skills["Double Nom"] },
         readyAt,
-        // Placeholder - can be different from backend
-        amount,
       },
     ];
 
     const previousOilRemaining = building.oil || 0;
 
     building.oil = previousOilRemaining - oilConsumed;
+
+    // Delete cancelled property since no longer used
+    delete building.cancelled;
 
     stateCopy.boostsUsedAt = updateBoostUsed({
       game: stateCopy,
