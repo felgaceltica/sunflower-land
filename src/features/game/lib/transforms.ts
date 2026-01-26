@@ -60,9 +60,11 @@ export function makeGame(farm: any): GameState {
     bumpkin: farm.bumpkin,
     buildings: farm.buildings,
     fishing: farm.fishing ?? { wharf: {}, beach: {} },
+    crabTraps: farm.crabTraps ?? { trapSpots: {} },
     farmActivity: farm.farmActivity ?? {},
     milestones: farm.milestones ?? {},
     airdrops: farm.airdrops,
+    raffle: farm.raffle,
     collectibles: farm.collectibles,
     warCollectionOffer: farm.warCollectionOffer,
     mysteryPrizes: farm.mysteryPrizes,
@@ -71,6 +73,7 @@ export function makeGame(farm: any): GameState {
     auctioneer: farm.auctioneer ?? {},
     minigames: farm.minigames,
     kingdomChores: farm.kingdomChores,
+    buffs: farm.buffs,
     chores: farm.chores,
     tradedAt: farm.tradedAt,
     trees: farm.trees ?? {},
@@ -131,5 +134,6 @@ export function makeGame(farm: any): GameState {
     boostsUsedAt: farm.boostsUsedAt,
     socialFarming: farm.socialFarming,
     pets: farm.pets,
+    prototypes: farm.prototypes,
   };
 }
