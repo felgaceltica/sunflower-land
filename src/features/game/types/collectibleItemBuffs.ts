@@ -5,20 +5,24 @@ import lightning from "assets/icons/lightning.png";
 import helpIcon from "assets/icons/help.webp";
 import chefHat from "assets/icons/chef_hat.png";
 import tradeIcon from "assets/icons/trade.png";
+import bee from "assets/icons/bee.webp";
 import { CROP_LIFECYCLE } from "features/island/plots/lib/plant";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { ITEM_DETAILS } from "./images";
 import { translate } from "lib/i18n/translate";
-import {
-  getCurrentSeason,
-  getSeasonalTicket,
-  hasSeasonEnded,
-  SEASONS,
-} from "./seasons";
+import { getChapterTicket, CHAPTERS, getCurrentChapter } from "./chapters";
 import { CHAPTER_TICKET_BOOST_ITEMS } from "../events/landExpansion/completeNPCChore";
 import { TranslationKeys } from "lib/i18n/dictionaries/types";
 import { isCollectible } from "../events/landExpansion/garbageSold";
 import { getObjectEntries } from "../expansion/lib/utils";
+
+export type AdditionalBoostInfo = {
+  boostType?: "yield" | "time" | "other";
+  boostValue?: string;
+  boostOn?: "crops" | "greenhouse" | "crop machine" | "fruits" | "flowers";
+};
+
+export type AdditionalBoostInfoBuffLabel = BuffLabel & AdditionalBoostInfo;
 
 export const COLLECTIBLE_BUFF_LABELS: Partial<
   Record<
@@ -29,7 +33,7 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     }: {
       skills: GameState["bumpkin"]["skills"];
       collectibles: GameState["collectibles"];
-    }) => BuffLabel[]
+    }) => AdditionalBoostInfoBuffLabel[]
   >
 > = {
   // Crop Boosts
@@ -40,6 +44,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
         : translate("description.basic.scarecrow.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: skills["Chonky Scarecrow"] ? "-30%" : "-20%",
+      boostOn: "crops",
     },
     {
       shortDescription: skills["Chonky Scarecrow"]
@@ -47,6 +54,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
         : translate("description.basic.scarecrow.boost.aoe"),
       labelType: "vibrant",
       boostTypeIcon: lightning,
+      boostType: "other",
+      boostValue: skills["Chonky Scarecrow"] ? "AOE 7x7" : "AOE 3x3",
+      boostOn: "crops",
     },
   ],
   "Scary Mike": ({ skills }) => [
@@ -86,6 +96,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.nancy.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-15%",
+      boostOn: "crops",
     },
     {
       shortDescription: translate("description.nancy.warning"),
@@ -97,6 +110,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.nancy.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-15%",
+      boostOn: "crops",
     },
     {
       shortDescription: translate("description.scarecrow.boost"),
@@ -113,6 +129,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.nancy.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-15%",
+      boostOn: "crops",
     },
     {
       shortDescription: translate("description.scarecrow.boost"),
@@ -158,6 +177,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.lunar.calendar.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-10%",
+      boostOn: "crops",
     },
   ],
   "Peeled Potato": () => [
@@ -216,6 +238,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: CROP_LIFECYCLE["Basic Biome"].Cabbage.crop,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "crops",
     },
   ],
   Karkinos: ({ collectibles }) => [
@@ -248,6 +273,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: CROP_LIFECYCLE["Basic Biome"].Parsnip.crop,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "crops",
     },
   ],
   "Purple Trail": () => [
@@ -264,6 +292,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: CROP_LIFECYCLE["Basic Biome"].Eggplant.crop,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "crops",
     },
   ],
   Maximus: () => [
@@ -288,6 +319,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: CROP_LIFECYCLE["Basic Biome"].Corn.crop,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "crops",
     },
   ],
   "Queen Cornelia": () => [
@@ -332,6 +366,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.turbo.sprout.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "greenhouse",
     },
   ],
 
@@ -393,6 +430,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Orange.image,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "fruits",
     },
   ],
   "Lady Bug": () => [
@@ -417,6 +457,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Banana.image,
+      boostType: "time",
+      boostValue: "-10%",
+      boostOn: "fruits",
     },
   ],
 
@@ -959,7 +1002,7 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate(
         "description.time.warp.totem.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -985,9 +1028,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
   "Flower Fox": () => [
     {
       shortDescription: translate("description.flower.fox.boost"),
-      labelType: "vibrant",
-      boostTypeIcon: lightning,
-      boostedItemIcon: ITEM_DETAILS.Honey.image,
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: ITEM_DETAILS["Red Pansy"].image,
+      boostType: "time",
+      boostValue: "-10%",
+      boostOn: "flowers",
     },
   ],
 
@@ -1011,7 +1057,7 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate(
         "description.gourmet.hourglass.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1020,12 +1066,15 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.harvest.hourglass.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "crops",
     },
     {
       shortDescription: translate(
         "description.harvest.hourglass.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1039,7 +1088,7 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate(
         "description.timber.hourglass.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1051,7 +1100,7 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
     },
     {
       shortDescription: translate("description.ore.hourglass.boost.effectTime"),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1060,12 +1109,15 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.orchard.hourglass.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "fruits",
     },
     {
       shortDescription: translate(
         "description.orchard.hourglass.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1079,7 +1131,7 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate(
         "description.fishers.hourglass.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1088,12 +1140,15 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.blossom.hourglass.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "flowers",
     },
     {
       shortDescription: translate(
         "description.blossom.hourglass.boost.effectTime",
       ),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1126,6 +1181,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Lemon.image,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "fruits",
     },
   ],
   "Tomato Clown": () => [
@@ -1134,6 +1192,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Tomato.image,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "fruits",
     },
   ],
   Cannonball: () => [
@@ -1142,6 +1203,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Tomato.image,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "fruits",
     },
   ],
   "Tomato Bombard": () => [
@@ -1180,6 +1244,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Lemon.image,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "fruits",
     },
   ],
   "Stone Beetle": () => [
@@ -1316,10 +1383,13 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.superTotem.boost"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "crops",
     },
     {
       shortDescription: translate("description.superTotem.boost.effectTime"),
-      labelType: "info",
+      labelType: "danger",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
     },
   ],
@@ -1338,30 +1408,6 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostTypeIcon: powerup,
       boostedItemIcon: SUNNYSIDE.resource.stone,
     },
-  ],
-  Igloo: () => [
-    ...(hasSeasonEnded("Winds of Change")
-      ? []
-      : ([
-          {
-            shortDescription: translate("description.bonusTimeshard.boost"),
-            labelType: "success",
-            boostTypeIcon: powerup,
-            boostedItemIcon: ITEM_DETAILS.Timeshard.image,
-          },
-        ] as BuffLabel[])),
-  ],
-  Hammock: () => [
-    ...(hasSeasonEnded("Winds of Change")
-      ? []
-      : ([
-          {
-            shortDescription: translate("description.bonusTimeshard.boost"),
-            labelType: "success",
-            boostTypeIcon: powerup,
-            boostedItemIcon: ITEM_DETAILS.Timeshard.image,
-          },
-        ] as BuffLabel[])),
   ],
 
   Mammoth: () => [
@@ -1439,9 +1485,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
   "Giant Zucchini": () => [
     {
       shortDescription: translate("description.giantZucchini.boost"),
-      labelType: "success",
+      labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Zucchini.image,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "crops",
     },
   ],
   "Giant Kale": () => [
@@ -1569,6 +1618,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS["Crop Machine"].image,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "crop machine",
     },
   ],
   "Giant Onion": () => [
@@ -1585,6 +1637,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS["Turnip"].image,
+      boostType: "time",
+      boostValue: "-50%",
+      boostOn: "crops",
     },
   ],
   "Baby Cow": () => [
@@ -1617,6 +1672,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS["Fruit Patch"].image,
+      boostType: "time",
+      boostValue: "-20%",
+      boostOn: "fruits",
     },
   ],
   "Double Bed": () => [
@@ -1669,6 +1727,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS["Crafting Box"].image,
     },
+    {
+      shortDescription: translate("description.foxShrine.buff.2"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+      boostedItemIcon: ITEM_DETAILS["Crafting Box"].image,
+    },
   ],
   "Boar Shrine": () => [
     {
@@ -1699,12 +1763,21 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Oil.image,
     },
+    {
+      shortDescription: translate("description.stagShrine.buff.2"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Oil.image,
+    },
   ],
   "Sparrow Shrine": () => [
     {
       shortDescription: translate("description.sparrowShrine.buff"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "crops",
     },
   ],
   "Toucan Shrine": () => [
@@ -1712,6 +1785,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.toucanShrine.buff"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "fruits",
     },
   ],
   "Collie Shrine": () => [
@@ -1726,6 +1802,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: SUNNYSIDE.animals.sheepSleeping,
+    },
+    {
+      shortDescription: translate("description.collieShrine.buff.3"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: SUNNYSIDE.animalFoods.kernel_blend,
     },
   ],
   "Badger Shrine": () => [
@@ -1766,6 +1848,18 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostTypeIcon: powerup,
       boostedItemIcon: ITEM_DETAILS.Stone.image,
     },
+    {
+      shortDescription: translate("description.legendaryShrine.buff.5"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS["Red Pansy"].image,
+    },
+    {
+      shortDescription: translate("description.legendaryShrine.buff.6"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: chefHat,
+    },
   ],
   "Obsidian Shrine": () => [
     {
@@ -1801,6 +1895,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS.Honey.image,
     },
+    {
+      shortDescription: translate("description.bearShrine.buff.2"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+      boostedItemIcon: bee,
+    },
   ],
   "Tortoise Shrine": () => [
     {
@@ -1808,12 +1908,18 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS["Greenhouse"].image,
+      boostType: "time",
+      boostValue: "-33%",
+      boostOn: "greenhouse",
     },
     {
       shortDescription: translate("description.tortoiseShrine.buff.2"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: ITEM_DETAILS["Crop Machine"].image,
+      boostType: "time",
+      boostValue: "-10%",
+      boostOn: "crop machine",
     },
   ],
   "Moth Shrine": () => [
@@ -1821,6 +1927,15 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.mothShrine.buff"),
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: ITEM_DETAILS["Red Pansy"].image,
+      boostType: "time",
+      boostValue: "-25%",
+      boostOn: "flowers",
+    },
+    {
+      shortDescription: translate("description.mothShrine.buff.2"),
+      labelType: "success",
+      boostTypeIcon: powerup,
       boostedItemIcon: ITEM_DETAILS["Red Pansy"].image,
     },
   ],
@@ -1830,6 +1945,12 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       labelType: "info",
       boostTypeIcon: SUNNYSIDE.icons.stopwatch,
       boostedItemIcon: SUNNYSIDE.animals.chickenAsleep,
+    },
+    {
+      shortDescription: translate("description.bantamShrine.buff.2"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: SUNNYSIDE.animalFoods.kernel_blend,
     },
   ],
   "Trading Shrine": () => [
@@ -1950,9 +2071,9 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
 
   ...Object.fromEntries(
     getObjectEntries(CHAPTER_TICKET_BOOST_ITEMS)
-      .filter(([chapter]) => getCurrentSeason() === chapter)
+      .filter(([chapter]) => getCurrentChapter(Date.now()) === chapter)
       .flatMap(([chapter, items]) => {
-        const ticket = getSeasonalTicket(new Date(SEASONS[chapter].startDate));
+        const ticket = getChapterTicket(CHAPTERS[chapter].startDate.getTime());
         const translationKey =
           `description.bonus${ticket.replace(/\s+/g, "")}.boost` as TranslationKeys;
 
