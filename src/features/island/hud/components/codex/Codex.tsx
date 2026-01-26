@@ -1,22 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
-import { OuterPanel } from "components/ui/Panel";
+import { InnerPanel, OuterPanel } from "components/ui/Panel";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 
 import { Modal } from "components/ui/Modal";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { SquareIcon } from "components/ui/SquareIcon";
 
-// Section Icons
-import { Fish } from "./pages/Fish";
 import { CodexCategory, CodexCategoryName } from "features/game/types/codex";
 import { MilestoneReached } from "./components/MilestoneReached";
 import { MilestoneName } from "features/game/types/milestones";
+import { Fish } from "./pages/Fish";
+import { Crustaceans } from "./pages/Crustaceans";
 import { Flowers } from "./pages/Flowers";
+import { Deliveries } from "./pages/Deliveries";
+import { ChoreBoard } from "./pages/ChoreBoard";
+import { Chapter } from "./pages/Chapter";
+import { FactionLeaderboard } from "./pages/FactionLeaderboard";
+import { LeagueLeaderboard } from "./pages/LeaguesLeaderboard";
+import { ChapterCollections } from "./pages/ChapterCollections";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { Context } from "features/game/GameProvider";
 import { useSelector } from "@xstate/react";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
-import { Deliveries } from "./pages/Deliveries";
 import { Label } from "components/ui/Label";
 import classNames from "classnames";
 import { useSound } from "lib/utils/hooks/useSound";
@@ -25,20 +30,20 @@ import factions from "assets/icons/factions.webp";
 import chores from "assets/icons/chores.webp";
 import { Leaderboards } from "features/game/expansion/components/leaderboard/actions/cache";
 import { fetchLeaderboardData } from "features/game/expansion/components/leaderboard/actions/leaderboard";
-import { FactionLeaderboard } from "./pages/FactionLeaderboard";
-import { Season } from "./pages/Season";
 import {
-  getCurrentSeason,
-  getSeasonalTicket,
-} from "features/game/types/seasons";
-import { ChoreBoard } from "./pages/ChoreBoard";
+  getCurrentChapter,
+  getChapterTicket,
+} from "features/game/types/chapters";
 import { CompetitionDetails } from "features/competition/CompetitionBoard";
 import { MachineState } from "features/game/lib/gameMachine";
 import { ANIMALS } from "features/game/types/animals";
-// import { Checklist, checklistCount } from "components/ui/CheckList";
+import { Checklist, checklistCount } from "components/ui/CheckList";
 import { getBumpkinLevel } from "features/game/lib/level";
 import trophyIcon from "assets/icons/trophy.png";
 import { hasFeatureAccess } from "lib/flags";
+import { AuthMachineState } from "features/auth/lib/authMachine";
+import * as AuthProvider from "features/auth/lib/Provider";
+import { useNow } from "lib/utils/hooks/useNow";
 
 interface Props {
   show: boolean;
@@ -47,12 +52,19 @@ interface Props {
 
 const _farmId = (state: MachineState) => state.context.farmId;
 const _state = (state: MachineState) => state.context.state;
+const _token = (state: AuthMachineState) =>
+  state.context.user.rawToken as string;
 
 export const Codex: React.FC<Props> = ({ show, onHide }) => {
   const { t } = useAppTranslation();
   const { gameService } = useContext(Context);
+  const { authService } = useContext(AuthProvider.Context);
   const farmId = useSelector(gameService, _farmId);
   const state = useSelector(gameService, _state);
+  const token = useSelector(authService, _token);
+  const now = useNow();
+  const chapter = getCurrentChapter(now);
+  const chapterTicket = getChapterTicket(now);
 
   const bumpkinLevel = getBumpkinLevel(state.bumpkin?.experience ?? 0);
 
@@ -73,7 +85,7 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
 
     const fetchLeaderboards = async () => {
       try {
-        const data = await fetchLeaderboardData(farmId);
+        const data = await fetchLeaderboardData(farmId, token);
         setData(data);
       } catch (e) {
         // eslint-disable-next-line no-console
@@ -105,20 +117,16 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
     setMilestoneName(undefined);
   };
 
-  const id = username ?? String(farmId);
-
+  // Use Set for O(1) lookup instead of Object.keys().includes()
+  const animalNamesSet = new Set(Object.keys(ANIMALS));
   const incompleteMegaBounties = bounties.requests.filter(
-    (deal) => !Object.keys(ANIMALS).includes(deal.name),
+    (deal) => !animalNamesSet.has(deal.name),
   );
-  const incompleteMegaBountiesCount = incompleteMegaBounties.reduce(
-    (count, deal) => {
-      const isSold = !!bounties.completed.find(
-        (request) => request.id === deal.id,
-      );
-      return isSold ? count - 1 : count;
-    },
-    incompleteMegaBounties.length,
-  );
+  // Optimize: Use Set for O(1) lookup instead of array.find()
+  const completedBountyIds = new Set(bounties.completed.map((r) => r.id));
+  const incompleteMegaBountiesCount = incompleteMegaBounties.filter(
+    (deal) => !completedBountyIds.has(deal.id),
+  ).length;
 
   const incompleteDeliveries = delivery.orders.filter(
     (order) => !order.completedAt,
@@ -133,6 +141,12 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
       (chore) => chore.startedAt && !chore.completedAt && !chore.skippedAt,
     ).length ?? 0;
 
+  // Pre-calculate checklist count once
+  const checklistCountValue = checklistCount(state, bumpkinLevel, now);
+  const hasLeagues =
+    hasFeatureAccess(state, "LEAGUES") && state.prototypes?.leagues;
+
+  // Build categories array more efficiently
   const categories: CodexCategory[] = [
     {
       name: "Deliveries",
@@ -144,32 +158,40 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
       icon: chores,
       count: incompleteChores,
     },
-
     {
       name: "Leaderboard",
-      icon: ITEM_DETAILS[getSeasonalTicket()].image,
+      icon: ITEM_DETAILS[chapterTicket].image,
       count: incompleteMegaBountiesCount,
     },
-    // {
-    //   name: "Checklist",
-    //   icon: SUNNYSIDE.ui.board,
-    //   count: checklistCount(state, bumpkinLevel),
-    // },
+    {
+      name: "Checklist",
+      icon: SUNNYSIDE.ui.board,
+      count: checklistCountValue,
+    },
     {
       name: "Fish",
       icon: SUNNYSIDE.icons.fish,
       count: 0,
     },
+    ...(hasFeatureAccess(state, "CRUSTACEANS")
+      ? [
+          {
+            name: "Crustaceans" as const,
+            icon: ITEM_DETAILS["Crab Pot"].image,
+            count: 0,
+          },
+        ]
+      : []),
     {
       name: "Flowers",
       icon: ITEM_DETAILS["Red Pansy"].image,
       count: 0,
     },
-    ...(hasFeatureAccess(state, "BUILDING_FRIENDSHIPS")
+    ...(hasFeatureAccess(state, "CHAPTER_COLLECTIONS")
       ? [
           {
-            name: "Competition" as const,
-            icon: trophyIcon,
+            name: "Collections" as const,
+            icon: SUNNYSIDE.icons.treasure,
             count: 0,
           },
         ]
@@ -180,6 +202,15 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
             name: "Marks" as const,
             icon: factions,
             count: inCompleteKingdomChores,
+          },
+        ]
+      : []),
+    ...(hasLeagues
+      ? [
+          {
+            name: "Leagues" as const,
+            icon: trophyIcon,
+            count: 0,
           },
         ]
       : []),
@@ -215,9 +246,9 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
             {/* Tabs */}
             <div className="absolute top-1.5 left-0">
               <div className="flex flex-col">
-                {categories.map((tab, index) => (
+                {categories.map((tab) => (
                   <OuterPanel
-                    key={`${tab}-${index}`}
+                    key={tab.name}
                     className={classNames(
                       "flex items-center relative p-0.5 mb-1 cursor-pointer",
                     )}
@@ -245,46 +276,40 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
                 ))}
               </div>
             </div>
-            {/* Content */}
-            {/* <InnerPanel
-              className={classNames("flex flex-col h-full overflow-hidden", {
-                "overflow-y-auto scrollable": currentTab !== 5,
-              })}
-            > */}
             {currentTab === "Deliveries" && (
               <Deliveries onClose={onHide} state={state} />
             )}
             {currentTab === "Chore Board" && <ChoreBoard state={state} />}
             {currentTab === "Leaderboard" && (
-              <Season
-                id={id}
+              <Chapter
                 isLoading={data?.tickets === undefined}
                 data={data?.tickets ?? null}
-                season={getCurrentSeason()}
+                chapter={chapter}
                 state={state}
                 farmId={farmId}
               />
             )}
-            {/* {currentTab === "Checklist" && <Checklist />} */}
+            {currentTab === "Checklist" && <Checklist />}
             {currentTab === "Fish" && (
               <Fish onMilestoneReached={handleMilestoneReached} state={state} />
             )}
+            {currentTab === "Crustaceans" && <Crustaceans state={state} />}
             {currentTab === "Flowers" && (
               <Flowers
                 onMilestoneReached={handleMilestoneReached}
                 state={state}
               />
             )}
-
+            {currentTab === "Collections" && (
+              <ChapterCollections state={state} />
+            )}
             {currentTab === "Marks" && faction && (
               <FactionLeaderboard
                 leaderboard={data?.kingdom ?? null}
                 isLoading={data?.kingdom === undefined}
-                playerId={id}
                 faction={faction.name}
               />
             )}
-
             {currentTab === "Competition" && (
               <div
                 className={classNames(
@@ -295,10 +320,20 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
                   competitionName="BUILDING_FRIENDSHIPS"
                   state={state}
                   hideLeaderboard={
-                    Date.now() < new Date("2025-10-20T00:00:00Z").getTime()
+                    now < new Date("2025-10-20T00:00:00Z").getTime()
                   }
                 />
               </div>
+            )}
+            {currentTab === "Leagues" && state.prototypes?.leagues && (
+              <InnerPanel>
+                <LeagueLeaderboard
+                  data={data?.leagues ?? null}
+                  isLoading={data === undefined}
+                  username={username}
+                  farmId={farmId}
+                />
+              </InnerPanel>
             )}
           </div>
         </OuterPanel>

@@ -15,7 +15,7 @@ import { getImageUrl } from "lib/utils/getImageURLS";
 import { useCountdown } from "lib/utils/hooks/useCountdown";
 import React, { useContext, useState } from "react";
 
-import { getSeasonalTicket } from "features/game/types/seasons";
+import { getChapterTicket } from "features/game/types/chapters";
 import { ITEM_DETAILS } from "features/game/types/images";
 import {
   getChoreProgress,
@@ -36,6 +36,7 @@ import { CHORE_DIALOGUES } from "features/game/types/stories";
 import { isMobile } from "mobile-device-detect";
 import { Context } from "features/game/GameProvider";
 import { formatNumber } from "lib/utils/formatNumber";
+import { useNow } from "lib/utils/hooks/useNow";
 
 interface Props {
   state: GameState;
@@ -44,6 +45,7 @@ interface Props {
 export const ChoreBoard: React.FC<Props> = ({ state }) => {
   const { gameService } = useContext(Context);
   const { t } = useAppTranslation();
+  const now = useNow();
 
   const [selectedId, setSelectedId] = useState<NPCName>();
 
@@ -51,6 +53,7 @@ export const ChoreBoard: React.FC<Props> = ({ state }) => {
   const { chores } = choreBoard;
 
   const end = useCountdown(weekResetsAt());
+  const level = getBumpkinLevel(bumpkin.experience ?? 0);
 
   const previewNpc = selectedId ?? getKeys(chores)[0];
   const previewChore = chores[previewNpc];
@@ -60,8 +63,6 @@ export const ChoreBoard: React.FC<Props> = ({ state }) => {
   // Pick random message based on day of week
   const dayOfWeek = new Date().getDate();
   const dialogue = messages?.[dayOfWeek % messages.length];
-
-  const level = getBumpkinLevel(bumpkin.experience ?? 0);
 
   const nextUnlock = getKeys(NPC_CHORE_UNLOCKS)
     .filter((name) => name in chores)
@@ -78,6 +79,7 @@ export const ChoreBoard: React.FC<Props> = ({ state }) => {
   const unlockedChores = getKeys(chores).filter(
     (npc) => level >= NPC_CHORE_UNLOCKS[npc as NPCName],
   );
+  const chapterTicket = getChapterTicket(now);
 
   return (
     <div className="flex md:flex-row flex-col-reverse md:mr-1 items-start h-full">
@@ -102,9 +104,7 @@ export const ChoreBoard: React.FC<Props> = ({ state }) => {
         </div>
 
         <p className="text-xs mb-2 px-2">
-          {t("chores.completeChoresToEarn", {
-            seasonalTicket: getSeasonalTicket(),
-          })}
+          {t("chores.completeChoresToEarn", { chapterTicket })}
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 w-full mt-1">
@@ -360,14 +360,17 @@ export const ChoreRewardLabel: React.FC<{
   chore: NpcChore;
   state: GameState;
 }> = ({ chore, state }) => {
-  if (chore.reward.items[getSeasonalTicket()]) {
+  const now = useNow();
+  const ticket = getChapterTicket(now);
+
+  if (chore.reward.items[ticket]) {
     return (
-      <Label type={"warning"} icon={ITEM_DETAILS[getSeasonalTicket()].image}>
+      <Label type={"warning"} icon={ITEM_DETAILS[ticket].image}>
         {generateChoreRewards({
           game: state,
           chore,
           now: new Date(),
-        })[getSeasonalTicket()] ?? 0}
+        })[ticket] ?? 0}
       </Label>
     );
   }

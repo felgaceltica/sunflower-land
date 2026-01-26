@@ -27,6 +27,7 @@ import {
   BumpkinSkillRevamp,
   getPowerSkills,
 } from "features/game/types/bumpkinSkills";
+import { getSkillCooldown } from "features/game/events/landExpansion/skillUsed";
 
 const DIMENSIONS = {
   original: 80,
@@ -81,7 +82,7 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
 }) => {
   const { showAnimations } = useContext(Context);
 
-  const progressBarEl = useRef<SpriteSheetInstance>();
+  const progressBarEl = useRef<SpriteSheetInstance>(undefined);
 
   const experience = bumpkin?.experience ?? 0;
   const level = getBumpkinLevel(experience);
@@ -205,7 +206,7 @@ export const BumpkinAvatar: React.FC<AvatarProps> = ({
 };
 
 export const BumpkinProfile: React.FC = () => {
-  const progressBarEl = useRef<SpriteSheetInstance>();
+  const progressBarEl = useRef<SpriteSheetInstance>(undefined);
   const [viewSkillsTab, setViewSkillsTab] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -275,9 +276,13 @@ export const BumpkinProfile: React.FC = () => {
       return !fertiliserSkill.includes(skill.name as BumpkinRevampSkillName);
     })
     .some((skill: BumpkinSkillRevamp) => {
+      const boostedCooldown = getSkillCooldown({
+        cooldown: skill.requirements.cooldown ?? 0,
+        state,
+      });
       const nextSkillUse =
         (previousPowerUseAt?.[skill.name as BumpkinRevampSkillName] ?? 0) +
-        (skill.requirements.cooldown ?? 0);
+        boostedCooldown;
       return nextSkillUse < Date.now();
     });
 
@@ -286,7 +291,7 @@ export const BumpkinProfile: React.FC = () => {
       {/* Bumpkin modal */}
       <Modal show={showModal} onHide={handleHideModal} size="lg">
         <BumpkinModal
-          initialTab={viewSkillsTab ? 2 : 0}
+          initialTab={viewSkillsTab ? "skills" : "info"}
           onClose={handleHideModal}
           readonly={gameState.matches("visiting")}
           bumpkin={gameState.context.state.bumpkin as Bumpkin}
