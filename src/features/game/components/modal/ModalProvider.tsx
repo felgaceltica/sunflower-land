@@ -16,9 +16,7 @@ import { ReferralContent } from "features/island/hud/components/referral/Referra
 import { CloseButtonPanel } from "../CloseablePanel";
 import { DiscordBonus } from "features/game/expansion/components/DiscordBoat";
 import { Streams } from "./components/Streams";
-import { Merkl } from "./components/Merkl";
 import { Rewards } from "features/island/hud/components/referral/Rewards";
-import { DailyRewardChest } from "features/game/expansion/components/dailyReward/DailyReward";
 type GlobalModal =
   | "BUY_GEMS"
   | "DISCORD"
@@ -36,7 +34,6 @@ type GlobalModal =
   | "TWITTER"
   | "REFERRAL"
   | "STREAMS"
-  | "MERKL"
   | "DEPOSIT"
   | "DAILY_REWARD"
   | "EARN";
@@ -114,10 +111,6 @@ export const ModalProvider: FC<React.PropsWithChildren> = ({ children }) => {
 
       <Modal show={opened === "STREAMS"} onHide={handleClose}>
         <Streams onClose={handleClose} />
-      </Modal>
-
-      <Modal show={opened === "MERKL"} onHide={handleClose}>
-        <Merkl onClose={handleClose} />
       </Modal>
 
       <Modal show={opened === "FIRST_EXPANSION"}>
@@ -215,12 +208,6 @@ export const ModalProvider: FC<React.PropsWithChildren> = ({ children }) => {
       </Modal>
 
       <Rewards show={opened === "EARN"} onHide={handleClose} tab={"Earn"} />
-
-      <DailyRewardChest
-        show={opened === "DAILY_REWARD"}
-        onHide={handleClose}
-        tab={0}
-      />
     </ModalContext.Provider>
   );
 };
