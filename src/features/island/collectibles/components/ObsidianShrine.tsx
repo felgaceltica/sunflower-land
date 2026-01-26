@@ -4,13 +4,12 @@ import classNames from "classnames";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { CollectibleProps } from "../Collectible";
 import { SUNNYSIDE } from "assets/sunnyside";
-import { LiveProgressBar } from "components/ui/ProgressBar";
+import { ProgressBar } from "components/ui/ProgressBar";
 import { Context } from "features/game/GameProvider";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { Label } from "components/ui/Label";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { EXPIRY_COOLDOWNS } from "features/game/lib/collectibleBuilt";
-import { PetShrineName } from "features/game/types/pets";
 import { Modal } from "components/ui/Modal";
 import { Button } from "components/ui/Button";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
@@ -27,81 +26,112 @@ import { secondsToString } from "lib/utils/time";
 import { getCropPlotTime } from "features/game/events/landExpansion/plant";
 import { getAvailablePlots } from "features/game/events/landExpansion/bulkPlant";
 import { getCropsToHarvest } from "features/game/events/landExpansion/bulkHarvest";
+import { useCountdown } from "lib/utils/hooks/useCountdown";
+import { useNow } from "lib/utils/hooks/useNow";
+import { useVisiting } from "lib/utils/visitUtils";
+import { RenewPetShrine } from "features/game/components/RenewPetShrine";
+import { PET_SHRINE_DIMENSIONS_STYLES } from "./PetShrine";
 
 export const ObsidianShrine: React.FC<CollectibleProps> = ({
   createdAt,
   id,
   location,
-  name,
 }) => {
   const { t } = useAppTranslation();
-  const { gameService, showTimers } = useContext(Context);
+  const { gameService, showTimers, showAnimations } = useContext(Context);
+  const { isVisiting } = useVisiting();
+  const [showRenewalModal, setShowRenewalModal] = useState(false);
 
   const [show, setShow] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  type Tab = "harvest" | "plant";
+  const [activeTab, setActiveTab] = useState<Tab>("harvest");
   const [showPopover, setShowPopover] = useState(false);
-  const [, setRender] = useState(0);
 
-  const expiresAt = createdAt + (EXPIRY_COOLDOWNS[name as PetShrineName] ?? 0);
+  const expiresAt = createdAt + (EXPIRY_COOLDOWNS["Obsidian Shrine"] ?? 0);
 
-  const hasExpired = Date.now() > expiresAt;
+  const { totalSeconds: secondsToExpire } = useCountdown(expiresAt);
+  const durationSeconds = EXPIRY_COOLDOWNS["Obsidian Shrine"] ?? 0;
+  const percentage = 100 - (secondsToExpire / durationSeconds) * 100;
+  const hasExpired = secondsToExpire <= 0;
+
+  const now = useNow({ live: !hasExpired, autoEndAt: expiresAt });
 
   const state = useSelector(gameService, (state) => state.context.state);
 
-  const handleRemove = () => {
-    gameService.send("collectible.burned", {
-      name,
-      location,
-      id,
-    });
-  };
-
   const availablePlots = getAvailablePlots(state);
-  const { readyCrops } = getCropsToHarvest(state);
+  const { readyCrops } = getCropsToHarvest(state, now);
   const hasReadyCrops = Object.keys(readyCrops).length > 0;
   const hasAvailablePlots = availablePlots.length > 0;
 
   const harvestAll = () => {
     gameService.send("crops.bulkHarvested", {});
-    setActiveTab(1);
+    setActiveTab("plant");
   };
+
+  const handleRenewClick = () => {
+    setShowRenewalModal(true);
+  };
+
+  const shrineDimensions = PET_SHRINE_DIMENSIONS_STYLES["Obsidian Shrine"];
 
   if (hasExpired) {
     return (
-      <div onClick={handleRemove}>
+      <>
+        <div
+          onClick={isVisiting ? undefined : handleRenewClick}
+          className="absolute"
+          style={{ ...shrineDimensions, bottom: 0 }}
+        >
+          <img
+            src={ITEM_DETAILS["Obsidian Shrine"].image}
+            style={{
+              ...shrineDimensions,
+              bottom: 0,
+              filter: "grayscale(100%)",
+            }}
+            className="absolute cursor-pointer"
+            alt={"Obsidian Shrine"}
+          />
+        </div>
         {showTimers && (
-          <div className="absolute bottom-0 left-0">
-            <LiveProgressBar
-              startAt={createdAt}
-              endAt={expiresAt}
+          <div
+            className="absolute left-1/2"
+            style={{
+              width: `${PIXEL_SCALE * 15}px`,
+              transform: "translateX(-50%)",
+              bottom: `${PIXEL_SCALE * -3}px`,
+            }}
+          >
+            <ProgressBar
+              seconds={secondsToExpire}
               formatLength="medium"
               type="error"
-              onComplete={() => setRender((r) => r + 1)}
+              percentage={percentage}
             />
           </div>
         )}
-
-        <img
-          className="absolute cursor-pointer group-hover:img-highlight z-30 animate-pulsate"
-          src={SUNNYSIDE.icons.dig_icon}
+        <div
+          className="flex justify-center absolute w-full pointer-events-none z-30"
           style={{
-            width: `${PIXEL_SCALE * 18}px`,
-            right: `${PIXEL_SCALE * -8}px`,
-            top: `${PIXEL_SCALE * -8}px`,
+            top: `${PIXEL_SCALE * -20}px`,
           }}
+        >
+          <img
+            src={SUNNYSIDE.icons.expression_alerted}
+            className={showAnimations ? "ready" : ""}
+            style={{
+              width: `${PIXEL_SCALE * 4}px`,
+            }}
+          />
+        </div>
+        <RenewPetShrine
+          show={showRenewalModal}
+          onHide={() => setShowRenewalModal(false)}
+          name={"Obsidian Shrine"}
+          id={id}
+          location={location}
         />
-
-        <img
-          src={ITEM_DETAILS[name].image}
-          style={{
-            width: `${PIXEL_SCALE * 16}px`,
-            bottom: `${PIXEL_SCALE * 0}px`,
-            left: `${PIXEL_SCALE * 1}px`,
-          }}
-          className="absolute cursor-pointer"
-          alt={name}
-        />
-      </div>
+      </>
     );
   }
 
@@ -112,16 +142,16 @@ export const ObsidianShrine: React.FC<CollectibleProps> = ({
   const handleShrineClick = () => {
     if (hasReadyCrops || hasAvailablePlots) {
       setShow(true);
-      setActiveTab(hasReadyCrops ? 0 : 1);
+      setActiveTab(hasReadyCrops ? "harvest" : "plant");
     }
   };
 
   return (
     <>
       <div
-        onClick={handleShrineClick}
-        className={classNames({
-          "absolute cursor-pointer hover:img-highlight":
+        onClick={isVisiting ? undefined : handleShrineClick}
+        className={classNames("absolute", {
+          "cursor-pointer hover:img-highlight":
             hasReadyCrops || hasAvailablePlots,
           "cursor-not-allowed": !hasReadyCrops && !hasAvailablePlots,
         })}
@@ -129,24 +159,28 @@ export const ObsidianShrine: React.FC<CollectibleProps> = ({
           !hasReadyCrops && !hasAvailablePlots && setShowPopover(true)
         }
         onMouseLeave={() => setShowPopover(false)}
+        style={{ ...shrineDimensions, bottom: 0 }}
       >
         <img
-          src={ITEM_DETAILS[name].image}
-          style={{
-            width: `${PIXEL_SCALE * 16}px`,
-            bottom: `${PIXEL_SCALE * 0}px`,
-            left: `${PIXEL_SCALE * 1}px`,
-          }}
-          alt={name}
+          src={ITEM_DETAILS["Obsidian Shrine"].image}
+          style={{ ...shrineDimensions, bottom: 0 }}
+          className="absolute cursor-pointer"
+          alt={"Obsidian Shrine"}
         />
         {showTimers && (
-          <div className="absolute bottom-0 left-0">
-            <LiveProgressBar
-              startAt={createdAt}
-              endAt={expiresAt}
+          <div
+            className="absolute left-1/2"
+            style={{
+              width: `${PIXEL_SCALE * 15}px`,
+              transform: "translateX(-50%)",
+              bottom: `${PIXEL_SCALE * -3}px`,
+            }}
+          >
+            <ProgressBar
+              seconds={secondsToExpire}
               formatLength="medium"
-              type={"buff"}
-              onComplete={() => setRender((r) => r + 1)}
+              type={"progress"}
+              percentage={percentage}
             />
           </div>
         )}
@@ -156,10 +190,12 @@ export const ObsidianShrine: React.FC<CollectibleProps> = ({
         <CloseButtonPanel
           tabs={[
             {
+              id: "harvest",
               icon: SUNNYSIDE.icons.seeds,
               name: "Harvest",
             },
             {
+              id: "plant",
               icon: SUNNYSIDE.icons.plant,
               name: "Plant",
             },
@@ -169,10 +205,10 @@ export const ObsidianShrine: React.FC<CollectibleProps> = ({
           onClose={close}
           container={OuterPanel}
         >
-          {activeTab === 0 && (
+          {activeTab === "harvest" && (
             <HarvestAll readyCrops={readyCrops} harvestAll={harvestAll} />
           )}
-          {activeTab === 1 && (
+          {activeTab === "plant" && (
             <PlantAll
               availablePlots={availablePlots}
               state={state}
@@ -189,7 +225,7 @@ export const ObsidianShrine: React.FC<CollectibleProps> = ({
           >
             <span className="text-xs">
               {t("time.remaining", {
-                time: secondsToString((expiresAt - Date.now()) / 1000, {
+                time: secondsToString(secondsToExpire, {
                   length: "medium",
                   isShortFormat: true,
                   removeTrailingZeros: true,
@@ -203,7 +239,7 @@ export const ObsidianShrine: React.FC<CollectibleProps> = ({
       {hasReadyCrops && (
         <img
           src={SUNNYSIDE.icons.expression_alerted}
-          className="absolute animate-float z-10 left-4 -top-2"
+          className="absolute animate-float z-10 left-4 -top-12"
           style={{
             width: `${PIXEL_SCALE * 4}px`,
           }}
@@ -265,6 +301,21 @@ const HarvestAll: React.FC<{
   );
 };
 
+const getPlantSeconds = (
+  selectedSeed: CropSeedName,
+  state: GameState,
+  createdAt: number,
+) => {
+  const yields = SEEDS[selectedSeed as SeedName].yield;
+
+  const { time } = getCropPlotTime({
+    crop: yields as CropName,
+    game: state,
+    createdAt,
+  });
+  return time;
+};
+
 const PlantAll: React.FC<{
   availablePlots: [string, CropPlot][];
   state: GameState;
@@ -275,6 +326,8 @@ const PlantAll: React.FC<{
   const [selectedSeed, setSelectedSeed] = useState<CropSeedName | null>(
     localStorage.getItem("obsidianShrineSeed") as CropSeedName | null,
   );
+
+  const now = useNow({ live: true });
 
   const currentSeason = state.season.season;
   const seasonalSeeds = SEASONAL_SEEDS[currentSeason].filter(
@@ -316,17 +369,6 @@ const PlantAll: React.FC<{
     setSelectedSeed(seed);
   };
 
-  const getPlantSeconds = () => {
-    const yields = SEEDS[selectedSeed as SeedName].yield;
-
-    const { time } = getCropPlotTime({
-      crop: yields as CropName,
-      game: state,
-      createdAt: Date.now(),
-    });
-    return time;
-  };
-
   return (
     <InnerPanel>
       {Object.keys(availableSeeds).length > 0 ? (
@@ -360,7 +402,7 @@ const PlantAll: React.FC<{
                   {selectedSeed}
                 </Label>
                 <Label type="info" secondaryIcon={SUNNYSIDE.icons.stopwatch}>
-                  {secondsToString(getPlantSeconds(), {
+                  {secondsToString(getPlantSeconds(selectedSeed, state, now), {
                     length: "medium",
                     removeTrailingZeros: true,
                   })}

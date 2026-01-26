@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Balances } from "components/Balances";
 import { useActor, useSelector } from "@xstate/react";
 import { Context } from "features/game/GameProvider";
@@ -28,6 +28,7 @@ import { CollectibleName, getKeys } from "features/game/types/craftables";
 import { ITEM_DETAILS } from "features/game/types/images";
 import {
   getRemoveAction,
+  getSelectedCollectible,
   isCollectible,
 } from "../collectibles/MovableComponent";
 import { RemoveKuebikoModal } from "../collectibles/RemoveKuebikoModal";
@@ -40,6 +41,8 @@ import { RoundButton } from "components/ui/RoundButton";
 import { CraftDecorationsModal } from "./components/decorations/CraftDecorationsModal";
 import { RemoveAllConfirmation } from "../collectibles/RemoveAllConfirmation";
 import { NFTName } from "features/game/events/landExpansion/placeNFT";
+import { useNow } from "lib/utils/hooks/useNow";
+import { PET_SHRINES } from "features/game/types/pets";
 
 const compareBalance = (prev: Decimal, next: Decimal) => {
   return prev.eq(next);
@@ -93,18 +96,30 @@ const LandscapingHudComponent: React.FC<{ location: PlaceableLocation }> = ({
 
   const selectedItem = useSelector(child, selectMovingItem);
   const idle = useSelector(child, isIdle);
+  const isShrine =
+    selectedItem?.name &&
+    (selectedItem.name in PET_SHRINES ||
+      selectedItem.name === "Obsidian Shrine");
 
-  const showRemove =
-    isMobile && selectedItem && getRemoveAction(selectedItem.name);
+  const now = useNow({ live: isShrine });
+  const selectedCollectible = useSelector(
+    gameService,
+    getSelectedCollectible(selectedItem?.name, selectedItem?.id, location),
+  );
+
+  const removeAction = getRemoveAction(
+    selectedItem?.name,
+    now,
+    selectedCollectible,
+  );
+
+  const showRemove = isMobile && selectedItem && removeAction;
 
   const showFlip = isMobile && selectedItem && isCollectible(selectedItem.name);
 
-  useEffect(() => {
-    setShowRemoveConfirmation(false);
-  }, [selectedItem]);
-
   const remove = () => {
-    const action = getRemoveAction(selectedItem?.name);
+    const action = selectedItem && removeAction;
+
     if (!action) {
       return;
     }
@@ -116,6 +131,7 @@ const LandscapingHudComponent: React.FC<{ location: PlaceableLocation }> = ({
         name: selectedItem?.name,
         location,
       });
+      setShowRemoveConfirmation(false);
     } else {
       setShowRemoveConfirmation(true);
     }
