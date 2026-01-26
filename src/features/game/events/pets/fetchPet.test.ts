@@ -1,14 +1,18 @@
 /* eslint-disable no-var */
 import { INITIAL_FARM } from "features/game/lib/constants";
-import { fetchPet } from "./fetchPet";
+import { fetchPet, getFetchPercentage } from "./fetchPet";
 import Decimal from "decimal.js-light";
-import { prng } from "lib/prng";
+import { KNOWN_IDS } from "features/game/types";
+import { prngChance } from "lib/prng";
+import { getPetLevel } from "features/game/types/pets";
 
 describe("fetchPet", () => {
   const now = Date.now();
+  const farmId = 1;
   it("throws an error if pet is not found", () => {
     expect(() => {
       fetchPet({
+        farmId,
         state: { ...INITIAL_FARM },
         action: { type: "pet.fetched", petId: "Barkley", fetch: "Acorn" },
         createdAt: now,
@@ -18,6 +22,7 @@ describe("fetchPet", () => {
   it("throws an error if pet is napping", () => {
     expect(() => {
       fetchPet({
+        farmId,
         state: {
           ...INITIAL_FARM,
           pets: {
@@ -41,6 +46,7 @@ describe("fetchPet", () => {
   it("throws an error if pet is neglected", () => {
     expect(() => {
       fetchPet({
+        farmId,
         state: {
           ...INITIAL_FARM,
           pets: {
@@ -49,7 +55,7 @@ describe("fetchPet", () => {
                 name: "Barkley",
                 requests: { food: [], fedAt: now - 4 * 24 * 60 * 60 * 1000 },
                 energy: 100,
-                experience: 0,
+                experience: 10,
                 pettedAt: now,
               },
             },
@@ -64,6 +70,7 @@ describe("fetchPet", () => {
   it("throws an error if fetch is not found", () => {
     expect(() => {
       fetchPet({
+        farmId,
         state: {
           ...INITIAL_FARM,
           pets: {
@@ -86,6 +93,7 @@ describe("fetchPet", () => {
   it("throws an error if pet level doesn't match fetch required level", () => {
     expect(() => {
       fetchPet({
+        farmId,
         state: {
           ...INITIAL_FARM,
           pets: {
@@ -108,6 +116,7 @@ describe("fetchPet", () => {
   it("throws an error if pet doesn't have enough energy", () => {
     expect(() => {
       fetchPet({
+        farmId,
         state: {
           ...INITIAL_FARM,
           pets: {
@@ -129,6 +138,7 @@ describe("fetchPet", () => {
   });
   it("fetches the item for the pet and deducts the energy", () => {
     const state = fetchPet({
+      farmId,
       state: {
         ...INITIAL_FARM,
         pets: {
@@ -152,12 +162,29 @@ describe("fetchPet", () => {
   });
 
   it("fetches a boost yield", () => {
-    do {
-      var seed = Math.random() * (2 ** 31 - 1);
-      var { value: prngValue } = prng(seed);
-    } while (prngValue * 100 >= 10);
+    function getCounter() {
+      let counter = 0;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (
+          prngChance({
+            farmId,
+            itemId: KNOWN_IDS.Acorn,
+            counter,
+            chance: 10,
+            criticalHitName: "Native",
+          })
+        ) {
+          return counter;
+        }
+        counter++;
+      }
+    }
+
+    const counter = getCounter();
 
     const state = fetchPet({
+      farmId,
       state: {
         ...INITIAL_FARM,
         pets: {
@@ -165,12 +192,14 @@ describe("fetchPet", () => {
             Barkley: {
               name: "Barkley",
               requests: { food: [], fedAt: now },
-              fetchSeeds: { Acorn: seed },
               energy: 100,
               experience: 10_500,
               pettedAt: now,
             },
           },
+        },
+        farmActivity: {
+          "Acorn Fetched": counter,
         },
       },
       action: { type: "pet.fetched", petId: "Barkley", fetch: "Acorn" },
@@ -181,12 +210,7 @@ describe("fetchPet", () => {
     expect(state.inventory["Acorn"]).toEqual(new Decimal(2));
   });
 
-  it("sets the next seed", () => {
-    do {
-      var seed = Math.random() * (2 ** 31 - 1);
-      var { value: prngValue, nextSeed } = prng(seed);
-    } while (prngValue * 100 >= 10);
-
+  it("fetches +1 Acron if Squirrel Onesie is equipped", () => {
     const state = fetchPet({
       state: {
         ...INITIAL_FARM,
@@ -195,10 +219,102 @@ describe("fetchPet", () => {
             Barkley: {
               name: "Barkley",
               requests: { food: [], fedAt: now },
-              fetchSeeds: { Acorn: seed },
+              energy: 100,
+              experience: 0,
+              pettedAt: now,
+            },
+          },
+        },
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin.equipped,
+            onesie: "Squirrel Onesie",
+          },
+        },
+      },
+      action: { type: "pet.fetched", petId: "Barkley", fetch: "Acorn" },
+      farmId,
+      createdAt: now,
+    });
+    expect(state.inventory["Acorn"]).toEqual(new Decimal(2));
+    expect(state.boostsUsedAt?.["Squirrel Onesie"]).toBe(now);
+  });
+
+  it("increments the counter for the fetch, regardless of the yield", () => {
+    const state = fetchPet({
+      state: {
+        ...INITIAL_FARM,
+        pets: {
+          common: {
+            Barkley: {
+              name: "Barkley",
+              requests: { food: [], fedAt: now },
+              energy: 100,
+              experience: 0,
+              pettedAt: now,
+            },
+          },
+        },
+        bumpkin: {
+          ...INITIAL_FARM.bumpkin,
+          equipped: {
+            ...INITIAL_FARM.bumpkin.equipped,
+            onesie: "Squirrel Onesie",
+          },
+        },
+      },
+      action: { type: "pet.fetched", petId: "Barkley", fetch: "Acorn" },
+      farmId,
+      createdAt: now,
+    });
+
+    expect(state.farmActivity["Acorn Fetched"]).toBe(1);
+  });
+
+  it("gives +1 if pet level is >= 15 and fetch is Acorn", () => {
+    const itemId = KNOWN_IDS.Acorn;
+
+    function getCounter(petLevel: number) {
+      let counter = 0;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (
+          prngChance({
+            farmId,
+            itemId,
+            counter,
+            chance: getFetchPercentage({
+              petLevel,
+              fetchResource: "Acorn",
+              isPetNFT: false,
+            }),
+            criticalHitName: "Native",
+          })
+        ) {
+          return counter;
+        }
+        counter++;
+      }
+    }
+
+    const counter = getCounter(getPetLevel(10_500).level);
+
+    const state = fetchPet({
+      farmId,
+      state: {
+        ...INITIAL_FARM,
+        pets: {
+          common: {
+            Barkley: {
+              name: "Barkley",
+              requests: { food: [], fedAt: now },
               energy: 100,
               experience: 10_500,
               pettedAt: now,
+              fetches: {
+                Acorn: counter,
+              },
             },
           },
         },
@@ -206,7 +322,8 @@ describe("fetchPet", () => {
       action: { type: "pet.fetched", petId: "Barkley", fetch: "Acorn" },
       createdAt: now,
     });
-    const BarkleyData = state.pets?.common?.Barkley;
-    expect(BarkleyData?.fetchSeeds?.Acorn).toBe(nextSeed);
+
+    expect(state.inventory["Acorn"]).toEqual(new Decimal(2));
+    expect(state.pets?.common?.Barkley?.fetches?.Acorn).toBe(counter + 1);
   });
 });

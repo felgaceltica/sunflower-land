@@ -4,7 +4,7 @@ import { CookableName } from "features/game/types/consumables";
 import { feedPet, getPetFoodRequests } from "./feedPet";
 import { getPetLevel, Pet } from "features/game/types/pets";
 import { GameState } from "features/game/types/game";
-import { SEASONS } from "features/game/types/seasons";
+import { CHAPTERS } from "features/game/types/chapters";
 
 describe("feedPet", () => {
   afterEach(() => jest.useRealTimers());
@@ -62,7 +62,7 @@ describe("feedPet", () => {
                   fedAt: now - 4 * 24 * 60 * 60 * 1000,
                 },
                 energy: 100,
-                experience: 0,
+                experience: 10,
                 pettedAt: now,
               },
             },
@@ -389,7 +389,7 @@ describe("feedPet", () => {
                   aura: "No Aura",
                 },
                 energy: 100,
-                experience: 0,
+                experience: 10,
                 pettedAt: now,
                 requests: {
                   food: ["Pumpkin Soup", "Bumpkin Salad", "Antipasto"],
@@ -408,7 +408,7 @@ describe("feedPet", () => {
                   aura: "No Aura",
                 },
                 energy: 100,
-                experience: 0,
+                experience: 10,
                 pettedAt: now,
                 requests: {
                   food: ["Pumpkin Soup", "Bumpkin Salad", "Antipasto"],
@@ -1007,7 +1007,7 @@ describe("feedPet", () => {
 
   it("gives energy boost for vip during paw prints season", () => {
     jest.useFakeTimers();
-    jest.setSystemTime(SEASONS["Paw Prints"].startDate);
+    jest.setSystemTime(CHAPTERS["Paw Prints"].startDate);
     const now = Date.now();
 
     const state = feedPet({

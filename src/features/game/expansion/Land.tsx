@@ -21,7 +21,6 @@ import { MachineState } from "../lib/gameMachine";
 import { getGameGrid } from "./placeable/lib/makeGrid";
 import { LandscapingHud } from "features/island/hud/LandscapingHud";
 import { Mushroom } from "features/island/mushrooms/Mushroom";
-import { useFirstRender } from "lib/utils/hooks/useFirstRender";
 import { MUSHROOM_DIMENSIONS, RESOURCE_DIMENSIONS } from "../types/resources";
 import { GRID_WIDTH_PX, PIXEL_SCALE } from "../lib/constants";
 import { Bud } from "features/island/buds/Bud";
@@ -45,6 +44,8 @@ import {
 } from "./lib/utils";
 import { Clutter } from "features/island/clutter/Clutter";
 import { PetNFT } from "features/island/pets/PetNFT";
+import { WaterTrapSpot } from "features/island/fisherman/WaterTrapSpot";
+import { hasFeatureAccess } from "lib/flags";
 
 export const LAND_WIDTH = 6;
 
@@ -228,12 +229,30 @@ const _airdropPositions = (state: MachineState) => {
   };
 };
 
+const _waterTrapPositions = (state: MachineState) => {
+  const waterTraps = state.context.state.crabTraps.trapSpots;
+
+  if (!waterTraps) return { positions: [] };
+
+  return {
+    waterTraps,
+    positions: getObjectEntries(waterTraps).flatMap(([, waterTrap]) => {
+      return {
+        x: waterTrap.x,
+        y: waterTrap.y,
+      };
+    }),
+  };
+};
+
 export const LandComponent: React.FC = () => {
   const { gameService } = useContext(Context);
   const { pathname } = useLocation();
 
   const showMarketplace = pathname.includes("marketplace");
   const showFlowerDashboard = pathname.includes("flower-dashboard");
+  const showEconomyDashboard = pathname.includes("economy-dashboard");
+  const showRetentionDashboard = pathname.includes("retention-dashboard");
 
   const paused = useSelector(gameService, isPaused);
   const island = useSelector(gameService, _island);
@@ -248,13 +267,8 @@ export const LandComponent: React.FC = () => {
   const { collectibles, positions: collectiblePositions } = useSelector(
     gameService,
     _collectiblePositions,
-    comparePositions,
   );
-  const { buildings } = useSelector(
-    gameService,
-    _buildingPositions,
-    comparePositions,
-  );
+  const { buildings } = useSelector(gameService, _buildingPositions);
   const { stones } = useSelector(
     gameService,
     _stonePositions,
@@ -319,6 +333,11 @@ export const LandComponent: React.FC = () => {
     _airdropPositions,
     comparePositions,
   );
+  const { waterTraps } = useSelector(
+    gameService,
+    _waterTrapPositions,
+    comparePositions,
+  );
   const landscaping = useSelector(gameService, isLandscaping);
 
   // As the land gets bigger, expand the gameboard
@@ -335,8 +354,6 @@ export const LandComponent: React.FC = () => {
   useLayoutEffect(() => {
     scrollIntoView(Section.GenesisBlock, "auto");
   }, []);
-
-  const isFirstRender = useFirstRender();
 
   // memorize game grid and only update it when the stringified value changes
   const gameGrid = useMemo(() => {
@@ -455,7 +472,7 @@ export const LandComponent: React.FC = () => {
 
     return getKeys(buildings)
       .filter((name) => buildings[name])
-      .flatMap((name, nameIndex) => {
+      .flatMap((name) => {
         const items = buildings[name]!;
         return items
           .filter((building) => building.coordinates !== undefined)
@@ -465,7 +482,7 @@ export const LandComponent: React.FC = () => {
 
             return (
               <MapPlacement
-                key={`building-${nameIndex}`}
+                key={`building-${name}-${building.id}`}
                 x={x}
                 y={y}
                 height={height}
@@ -795,16 +812,11 @@ export const LandComponent: React.FC = () => {
           width={MUSHROOM_DIMENSIONS.width}
           z={99999}
         >
-          <Mushroom
-            key={`mushroom-${id}`}
-            id={id}
-            isFirstRender={isFirstRender}
-            name={mushroom.name}
-          />
+          <Mushroom key={`mushroom-${id}`} id={id} name={mushroom.name} />
         </MapPlacement>
       );
     });
-  }, [mushrooms, isFirstRender]);
+  }, [mushrooms]);
 
   const clutterElements = useMemo(() => {
     if (!visiting || !clutter) {
@@ -888,6 +900,28 @@ export const LandComponent: React.FC = () => {
     );
   }, [airdrops]);
 
+  const waterTrapElements = useMemo(() => {
+    if (
+      !waterTraps ||
+      !hasFeatureAccess(gameService.getSnapshot().context.state, "CRUSTACEANS")
+    )
+      return [];
+
+    return Object.entries(waterTraps).map(([id, waterTrap]) => {
+      return (
+        <MapPlacement
+          key={`water-trap-${id}`}
+          x={waterTrap.x}
+          y={waterTrap.y}
+          height={1}
+          width={1}
+        >
+          <WaterTrapSpot key={`water-trap-${id}`} id={id} />
+        </MapPlacement>
+      );
+    });
+  }, [waterTraps]);
+
   // Memoize island elements with enhanced performance tracking
   const islandElements = useMemo(() => {
     const elements = [
@@ -910,6 +944,7 @@ export const LandComponent: React.FC = () => {
       budElements,
       petNFTElements,
       airdropElements,
+      waterTrapElements,
     ].flat();
 
     const sortedIslandElements = elements.slice().sort((a, b) => {
@@ -953,6 +988,7 @@ export const LandComponent: React.FC = () => {
     petNFTElements,
     airdropElements,
     mushroomElements,
+    waterTrapElements,
   ]);
 
   return (
@@ -1038,7 +1074,10 @@ export const LandComponent: React.FC = () => {
 
       {!landscaping && !visiting && <Hud isFarming={true} location="farm" />}
 
-      {(showMarketplace || showFlowerDashboard) &&
+      {(showMarketplace ||
+        showFlowerDashboard ||
+        showEconomyDashboard ||
+        showRetentionDashboard) &&
         createPortal(
           <div
             data-html2canvas-ignore="true"
