@@ -1,6 +1,6 @@
 # CommitEmLotes.ps1
 param(
-    [int]$TamanhoLote = 75,
+    [int]$TamanhoLote = 50,
     [string]$Mensagem = "Commit em lotes"
 )
 
