@@ -21,11 +21,11 @@ import {
   GiantFruitBounty,
 } from "features/game/types/game";
 import {
-  getCurrentSeason,
-  getSeasonalTicket,
-} from "features/game/types/seasons";
+  getCurrentChapter,
+  getChapterTicket,
+} from "features/game/types/chapters";
 import {
-  SELLABLE_TREASURE,
+  SELLABLE_TREASURES,
   BeachBountyTreasure,
 } from "features/game/types/treasure";
 import { produce } from "immer";
@@ -47,7 +47,7 @@ export const BOUNTY_CATEGORIES = {
           crop !== "Giant Orange",
       )
       .includes(bounty.name) ||
-    getKeys(SELLABLE_TREASURE).includes(bounty.name as BeachBountyTreasure) ||
+    getKeys(SELLABLE_TREASURES).includes(bounty.name as BeachBountyTreasure) ||
     FULL_MOON_FRUITS.includes(bounty.name as FullMoonFruit) ||
     bounty.name in RECIPE_CRAFTABLES,
   "Giant Fruit Bounties": (bounty: BountyRequest): bounty is GiantFruitBounty =>
@@ -83,13 +83,13 @@ export function generateBountyTicket({
   bounty: BountyRequest;
   now?: number;
 }) {
-  let amount = bounty.items?.[getSeasonalTicket(new Date(now))] ?? 0;
+  let amount = bounty.items?.[getChapterTicket(now)] ?? 0;
 
   if (!amount) {
     return 0;
   }
 
-  const chapter = getCurrentSeason(new Date(now));
+  const chapter = getCurrentChapter(now);
   const chapterBoost = CHAPTER_TICKET_BOOST_ITEMS[chapter];
 
   Object.values(chapterBoost).forEach((item) => {
@@ -183,8 +183,8 @@ export function sellBounty({
 
     getKeys(request.items ?? {}).forEach((name) => {
       const previous = draft.inventory[name] ?? new Decimal(0);
-      const seasonalTicket = getSeasonalTicket();
-      if (tickets > 0 && seasonalTicket === name) {
+      const chapterTicket = getChapterTicket(createdAt);
+      if (tickets > 0 && chapterTicket === name) {
         draft.inventory[name] = previous.add(tickets ?? 0);
       } else draft.inventory[name] = previous.add(request.items?.[name] ?? 0);
     });
@@ -204,6 +204,14 @@ export function sellBounty({
       `${request.name} Bountied`,
       draft.farmActivity,
     );
+
+    if (tickets > 0) {
+      draft.farmActivity = trackFarmActivity(
+        `${getChapterTicket(createdAt)} Collected`,
+        draft.farmActivity,
+        new Decimal(tickets ?? 0),
+      );
+    }
 
     return draft;
   });

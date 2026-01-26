@@ -3,7 +3,7 @@ import { getAnimalLevel } from "features/game/lib/animals";
 import { getKeys } from "features/game/types/decorations";
 import { trackFarmActivity } from "features/game/types/farmActivity";
 import { Animal, BountyRequest, GameState } from "features/game/types/game";
-import { getSeasonalTicket } from "features/game/types/seasons";
+import { getChapterTicket } from "features/game/types/chapters";
 import { produce } from "immer";
 import { generateBountyTicket, generateBountyCoins } from "./sellBounty";
 
@@ -106,12 +106,18 @@ export function sellAnimal({
       const previous = game.inventory[name] ?? new Decimal(0);
       let amount = request.items?.[name] ?? 0;
 
-      if (name === getSeasonalTicket(new Date(createdAt))) {
+      if (name === getChapterTicket(createdAt)) {
         amount = generateBountyTicket({
           game,
           bounty: request,
           now: createdAt,
         });
+
+        game.farmActivity = trackFarmActivity(
+          `${getChapterTicket(createdAt)} Collected`,
+          game.farmActivity,
+          new Decimal(amount ?? 0),
+        );
       }
 
       game.inventory[name] = previous.add(

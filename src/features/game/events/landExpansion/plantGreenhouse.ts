@@ -11,10 +11,7 @@ import {
   GreenHouseFruitSeedName,
 } from "features/game/types/fruits";
 import Decimal from "decimal.js-light";
-import {
-  BumpkinActivityName,
-  trackActivity,
-} from "features/game/types/bumpkinActivity";
+
 import { GREENHOUSE_CROP_TIME_SECONDS } from "./harvestGreenHouse";
 import {
   isTemporaryCollectibleActive,
@@ -25,6 +22,10 @@ import { getFruitTime } from "./fruitPlanted";
 import { Resource } from "features/game/lib/getBudYieldBoosts";
 import { produce } from "immer";
 import { updateBoostUsed } from "features/game/types/updateBoostUsed";
+import {
+  FarmActivityName,
+  trackFarmActivity,
+} from "features/game/types/farmActivity";
 
 export type PlantGreenhouseAction = {
   type: "greenhouse.planted";
@@ -36,6 +37,7 @@ type Options = {
   state: Readonly<GameState>;
   action: PlantGreenhouseAction;
   createdAt?: number;
+  farmId: number;
 };
 
 type GreenhouseSeed = GreenHouseCropSeedName | GreenHouseFruitSeedName;
@@ -79,9 +81,10 @@ type GetPlantedAtArgs = {
   crop: GreenHouseCropName | GreenHouseFruitName;
   game: GameState;
   createdAt: number;
+  prngArgs?: { farmId: number; counter: number };
 };
 
-function getPlantedAt({ crop, game, createdAt }: GetPlantedAtArgs): {
+function getPlantedAt({ crop, game, createdAt, prngArgs }: GetPlantedAtArgs): {
   plantedAt: number;
   boostsUsed: BoostName[];
 } {
@@ -92,6 +95,7 @@ function getPlantedAt({ crop, game, createdAt }: GetPlantedAtArgs): {
   const { seconds: boostedTime, boostsUsed } = getGreenhouseCropTime({
     crop,
     game,
+    prngArgs,
   });
 
   const offset = cropTime - boostedTime;
@@ -102,9 +106,11 @@ function getPlantedAt({ crop, game, createdAt }: GetPlantedAtArgs): {
 export const getGreenhouseCropTime = ({
   crop,
   game,
+  prngArgs,
 }: {
   crop: GreenHouseCropName | GreenHouseFruitName;
   game: GameState;
+  prngArgs?: { farmId: number; counter: number };
 }): { seconds: number; boostsUsed: BoostName[] } => {
   let seconds = GREENHOUSE_CROP_TIME_SECONDS[crop];
   const boostsUsed: BoostName[] = [];
@@ -113,6 +119,7 @@ export const getGreenhouseCropTime = ({
       getCropTime({
         game,
         crop,
+        prngArgs,
       });
     seconds *= baseMultiplier;
     boostsUsed.push(...cropBoostsUsed);
@@ -129,7 +136,7 @@ export const getGreenhouseCropTime = ({
   }
 
   if (isTemporaryCollectibleActive({ name: "Tortoise Shrine", game })) {
-    seconds *= 0.75;
+    seconds *= 2 / 3; // -33% growth time
     boostsUsed.push("Tortoise Shrine");
   }
 
@@ -201,6 +208,7 @@ export function plantGreenhouse({
   state,
   action,
   createdAt = Date.now(),
+  farmId,
 }: Options): GameState {
   return produce(state, (game) => {
     // Requires Greenhouse exists
@@ -246,10 +254,12 @@ export function plantGreenhouse({
     }
 
     const plantName = SEED_TO_PLANT[action.seed];
+    const counter = game.farmActivity[`${plantName} Planted`] ?? 0;
     const { plantedAt, boostsUsed } = getPlantedAt({
       createdAt,
       crop: plantName,
       game,
+      prngArgs: { farmId, counter },
     });
     // Plants
     game.greenhouse.pots[potId] = {
@@ -266,9 +276,9 @@ export function plantGreenhouse({
     game.greenhouse.oil -= oilUsage;
 
     // Tracks Analytics
-    const activityName: BumpkinActivityName = `${plantName} Planted`;
+    const activityName: FarmActivityName = `${plantName} Planted`;
 
-    game.bumpkin.activity = trackActivity(activityName, game.bumpkin.activity);
+    game.farmActivity = trackFarmActivity(activityName, game.farmActivity);
 
     game.boostsUsedAt = updateBoostUsed({
       game,
