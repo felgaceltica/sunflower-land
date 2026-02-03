@@ -1,8 +1,8 @@
 import { Equipped } from "features/game/types/bumpkin";
-import { hasSeasonEnded } from "features/game/types/seasons";
 
 export type NPCName =
   | "richie"
+  | "streamer"
   | "cluck e cheese"
   | "felga" // Fruit dash
   | "minewhack" // Mine Whack
@@ -114,9 +114,22 @@ export type NPCName =
   | "gunter"
   | "gorga"
   | "rocket man"
-  | "bailey"; // weatherman
+  | "new year pete"
+  | "bailey" // weatherman
+  | "neville"; // fish market
 
 export const NPC_WEARABLES: Record<NPCName, Equipped> = {
+  streamer: {
+    body: "Beige Farmer Potion",
+    background: "Farm Background",
+    hair: "Basic Hair",
+    shirt: "Hawaiian Shirt",
+    pants: "Farmer Pants",
+    onesie: "Rocket Onesie",
+    shoes: "Black Farmer Boots",
+    tool: "Auction Megaphone",
+    aura: "Coin Aura",
+  },
   "rocket man": {
     body: "Beige Farmer Potion",
     background: "Farm Background",
@@ -684,23 +697,14 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     body: "Beige Farmer Potion",
     background: "Pumpkin Plaza Background",
     hair: "Brown Long Hair",
-    shirt: hasSeasonEnded("Pharaoh's Treasure")
-      ? "Merino Jumper"
-      : "Explorer Shirt",
-    pants: hasSeasonEnded("Pharaoh's Treasure")
-      ? "Cowgirl Skirt"
-      : "Oil Overalls",
+    shirt: "Merino Jumper",
+    pants: "Cowgirl Skirt",
     hat: "Flower Mask",
-    tool: hasSeasonEnded("Pharaoh's Treasure")
-      ? "Shepherd Staff"
-      : "Ancient Shovel",
-    necklace: hasSeasonEnded("Pharaoh's Treasure") ? "Dream Scarf" : undefined,
-    coat: hasSeasonEnded("Pharaoh's Treasure") ? "Milk Apron" : undefined,
-    secondaryTool: hasSeasonEnded("Pharaoh's Treasure")
-      ? undefined
-      : "Lemon Shield",
+    tool: "Shepherd Staff",
+    necklace: "Dream Scarf",
+    coat: "Milk Apron",
     shoes: "Black Farmer Boots",
-    wings: hasSeasonEnded("Pharaoh's Treasure") ? "Sol & Luna" : "Scarab Wings",
+    wings: "Sol & Luna",
   },
   // Old loving grandma of the game
   buttons: {
@@ -1279,6 +1283,28 @@ export const NPC_WEARABLES: Record<NPCName, Equipped> = {
     pants: "Cowboy Trouser",
     shirt: "Cowboy Shirt",
     tool: "Infernal Bullwhip",
+    background: "Pumpkin Plaza Background",
+    shoes: "Cowboy Boots",
+  },
+  "new year pete": {
+    body: "Light Brown Farmer Potion",
+    background: "Pumpkin Plaza Background",
+    hair: "Buzz Cut",
+    hat: "2026 Tiara",
+    shirt: "Yellow Farmer Shirt",
+    pants: "Lumberjack Overalls",
+    shoes: "Black Farmer Boots",
+    tool: "Farmer Pitchfork",
+  },
+  neville: {
+    body: "Dark Brown Farmer Potion",
+    hat: "Boater Hat",
+    coat: "Chef Apron",
+    hair: "Greyed Glory",
+    beard: "Hoary Chin",
+    pants: "Fishing Pants",
+    shirt: "Fresh Catch Vest",
+    tool: "Skinning Knife",
     background: "Pumpkin Plaza Background",
     shoes: "Cowboy Boots",
   },
