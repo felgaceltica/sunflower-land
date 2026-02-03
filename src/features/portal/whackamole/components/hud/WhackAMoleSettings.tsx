@@ -6,8 +6,6 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 
 import { SUNNYSIDE } from "assets/sunnyside";
 import { useSound } from "lib/utils/hooks/useSound";
-// import { useIsDarkMode } from "lib/utils/hooks/useIsDarkMode";
-// import darkModeIcon from "assets/icons/dark_mode.png";
 import { PortalContext } from "../../lib/PortalProvider";
 import { PortalMachineState } from "../../lib/WhackAMoleMachine";
 import { useSelector } from "@xstate/react";
@@ -44,6 +42,9 @@ export const WhackAMoleSettings: React.FC = () => {
 
   const isJoystickActive = useSelector(portalService, _isJoystickActive);
 
+  // ✅ valor efetivo: joystick ativo sempre "fecha" sem setState em effect
+  const effectiveShowMoreButtons = showMoreButtons && !isJoystickActive;
+
   const button = useSound("button");
 
   const cogRef = useRef<HTMLDivElement>(null);
@@ -63,15 +64,16 @@ export const WhackAMoleSettings: React.FC = () => {
 
   useEffect(() => {
     if (isJoystickActive) {
-      setShowMoreButtons(false);
-      cogRef.current?.blur();
+      // ❌ não mexe em state aqui (eslint reclama)
+      // ✅ só efeito externo
+      (cogRef.current as any)?.blur?.();
     }
   }, [isJoystickActive]);
 
   const settingButton = (
     index: number,
     onClick: () => void,
-    children: JSX.Element,
+    children: React.ReactNode,
   ) => {
     const rightMargin = 8;
 
@@ -87,7 +89,7 @@ export const WhackAMoleSettings: React.FC = () => {
           height: `${buttonHeight}px`,
           transition: "transform 250ms ease",
           transform: "translateX(0)",
-          ...(showMoreButtons && {
+          ...(effectiveShowMoreButtons && {
             transform: `translateX(-${(buttonWidth + rightMargin) * index}px)`,
           }),
         }}
@@ -121,6 +123,7 @@ export const WhackAMoleSettings: React.FC = () => {
         }}
       />,
     );
+
   const musicButton = (index: number) =>
     settingButton(
       index,
@@ -163,7 +166,7 @@ export const WhackAMoleSettings: React.FC = () => {
       index,
       () => {
         button.play();
-        setShowMoreButtons(!showMoreButtons);
+        setShowMoreButtons((v) => !v);
       },
       <img
         src={settings}

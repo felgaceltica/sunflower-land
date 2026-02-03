@@ -167,7 +167,7 @@ export class FarmerFootballScene extends BaseScene {
         this.positionTag.name = "positionTag";
         this.positionTag.setPosition(
           0,
-          16 + (this.currentPlayer.list.length - 3) * 4
+          16 + (this.currentPlayer.list.length - 3) * 4,
         );
 
         this.currentPlayer.add(this.positionTag);
@@ -237,10 +237,10 @@ export class FarmerFootballScene extends BaseScene {
       })
       .setDepth(99999999);
 
-    (this.goalSound = this.sound.add("goal")),
+    ((this.goalSound = this.sound.add("goal")),
       (this.whistle1Sound = this.sound.add("whistle1")),
       (this.whistle2Sound = this.sound.add("whistle2")),
-      (this.bounceSound = this.sound.add("kick"));
+      (this.bounceSound = this.sound.add("kick")));
     if (this.debugMode) {
       this.pingTimer = this.time.addEvent({
         callback: this.PingServer,
@@ -550,11 +550,11 @@ export class FarmerFootballScene extends BaseScene {
     this.lastBallChanged = server.state.ballChanged;
     this.ball.setPosition(
       ballPosition.ballPositionX,
-      ballPosition.ballPositionY
+      ballPosition.ballPositionY,
     );
     this.ball.body.setVelocity(
       ballPosition.ballVelocityX,
-      ballPosition.ballVelocityY
+      ballPosition.ballVelocityY,
     );
     if (server.state.matchState == "playing") {
       if (this.bounceSound) this.bounceSound.play();
@@ -662,14 +662,14 @@ export class FarmerFootballScene extends BaseScene {
   stopPlayer() {
     if (this.currentPlayer) {
       (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
-        false
+        false,
       );
     }
   }
   bounceBall() {
     if (this.currentPlayer) {
       (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
-        true
+        true,
       );
     }
     //this.sendBallPositionToServer();
@@ -677,7 +677,7 @@ export class FarmerFootballScene extends BaseScene {
   bounceBallSound() {
     if (this.currentPlayer) {
       (this.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
-        true
+        true,
       );
     }
     if (this.bounceSound) this.bounceSound.play();
@@ -685,19 +685,19 @@ export class FarmerFootballScene extends BaseScene {
   }
   setupBasicPhysics(scene: FarmerFootballScene) {
     scene.physics.world.setBounds(16, 16, 16 * 20, 16 * 12);
+
     if (scene.currentPlayer) {
-      (scene.currentPlayer.body as Phaser.Physics.Arcade.Body).setImmovable(
-        true
+      // enable no GameObject (Container/Sprite/etc)
+      scene.physics.world.enable(
+        scene.currentPlayer as Phaser.GameObjects.GameObject,
+        Phaser.Physics.Arcade.DYNAMIC_BODY,
       );
-      (scene.currentPlayer.body as Phaser.Physics.Arcade.Body)
-        .setCircle(7)
-        .setBounce(1, 1)
-        .setOffset(2, 3);
+
+      const body = scene.currentPlayer.body as Phaser.Physics.Arcade.Body;
+
+      body.setImmovable(true).setCircle(7).setBounce(1, 1).setOffset(2, 3);
     }
-    scene.physics.world.enable(
-      scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      Phaser.Physics.Arcade.DYNAMIC_BODY
-    );
+
     scene.add
       .line(0, 0, 16 * 11 + 0.5, 16 * 5, 16 * 11 + 0.5, 16 * 13, 0xffffff, 1)
       .setLineWidth(0.5, 0.5);
@@ -716,7 +716,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBallSound,
       undefined,
-      scene
+      scene,
     );
     this.ball.setDepth(9999);
   }
@@ -727,7 +727,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 1.5,
       16 * 1.5,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rectblueteam, true);
     scene.physics.add.collider(
@@ -735,7 +735,7 @@ export class FarmerFootballScene extends BaseScene {
       rectblueteam as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rectbluebox = this.add.rectangle(
@@ -744,7 +744,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 1,
       16 * 1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rectbluebox, true);
     scene.physics.add.collider(
@@ -752,7 +752,7 @@ export class FarmerFootballScene extends BaseScene {
       rectbluebox as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rectredteam = this.add.rectangle(
@@ -761,7 +761,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 1.5,
       16 * 1.5,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rectredteam, true);
     scene.physics.add.collider(
@@ -769,7 +769,7 @@ export class FarmerFootballScene extends BaseScene {
       rectredteam as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rectredbox = this.add.rectangle(
@@ -778,7 +778,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 1,
       16 * 1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rectredbox, true);
     scene.physics.add.collider(
@@ -786,7 +786,7 @@ export class FarmerFootballScene extends BaseScene {
       rectredbox as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
   }
   drawField(scene: FarmerFootballScene) {
@@ -838,7 +838,7 @@ export class FarmerFootballScene extends BaseScene {
         4,
         Phaser.Math.DegToRad(0),
         Phaser.Math.DegToRad(90),
-        false
+        false,
       )
       .strokePath();
     scene.add
@@ -851,7 +851,7 @@ export class FarmerFootballScene extends BaseScene {
         4,
         Phaser.Math.DegToRad(270),
         Phaser.Math.DegToRad(0),
-        false
+        false,
       )
       .strokePath();
     scene.add
@@ -864,7 +864,7 @@ export class FarmerFootballScene extends BaseScene {
         4,
         Phaser.Math.DegToRad(90),
         Phaser.Math.DegToRad(180),
-        false
+        false,
       )
       .strokePath();
     scene.add
@@ -877,7 +877,7 @@ export class FarmerFootballScene extends BaseScene {
         4,
         Phaser.Math.DegToRad(180),
         Phaser.Math.DegToRad(270),
-        false
+        false,
       )
       .strokePath();
     scene.add
@@ -905,14 +905,14 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBall,
       undefined,
-      scene
+      scene,
     );
     scene.physics.add.collider(
       rect as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rect1 = this.add.rectangle(
@@ -921,7 +921,7 @@ export class FarmerFootballScene extends BaseScene {
       0.1,
       43.5,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rect1, true);
     scene.physics.add.collider(
@@ -929,14 +929,14 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBall,
       undefined,
-      scene
+      scene,
     );
     scene.physics.add.collider(
       rect1 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rect2 = this.add.rectangle(16 * 2, 16 * 7.58, 0.1, 43.5, 0xffffff, 0);
@@ -946,14 +946,14 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBall,
       undefined,
-      scene
+      scene,
     );
     scene.physics.add.collider(
       rect2 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rect3 = this.add.rectangle(
@@ -962,7 +962,7 @@ export class FarmerFootballScene extends BaseScene {
       0.1,
       43.5,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rect3, true);
     scene.physics.add.collider(
@@ -970,14 +970,14 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBall,
       undefined,
-      scene
+      scene,
     );
     scene.physics.add.collider(
       rect3 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rect5 = this.add.rectangle(
@@ -986,7 +986,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 20,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rect5, true);
     scene.physics.add.collider(
@@ -994,14 +994,14 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBall,
       undefined,
-      scene
+      scene,
     );
     scene.physics.add.collider(
       rect5 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rect6 = this.add.rectangle(
@@ -1010,7 +1010,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 18,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rect6, true);
     scene.physics.add.collider(
@@ -1018,14 +1018,14 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.bounceBall,
       undefined,
-      scene
+      scene,
     );
     scene.physics.add.collider(
       rect6 as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     const rect7 = this.add.rectangle(
@@ -1034,7 +1034,7 @@ export class FarmerFootballScene extends BaseScene {
       16 * 20,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rect7, true);
     scene.physics.add.collider(
@@ -1042,7 +1042,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.currentPlayer as Phaser.Types.Physics.Arcade.ArcadeColliderType,
       scene.stopPlayer,
       undefined,
-      scene
+      scene,
     );
 
     // const rect8 = this.add.rectangle(
@@ -1118,7 +1118,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.addRightGoal,
       undefined,
-      scene
+      scene,
     );
     const leftgoal1 = this.add.rectangle(
       16 * 1.6,
@@ -1126,7 +1126,7 @@ export class FarmerFootballScene extends BaseScene {
       6,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(leftgoal1, true);
     scene.physics.add.overlap(
@@ -1134,7 +1134,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.addRightGoal,
       undefined,
-      scene
+      scene,
     );
     const leftgoal2 = this.add.rectangle(
       16 * 1.6,
@@ -1142,7 +1142,7 @@ export class FarmerFootballScene extends BaseScene {
       6,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(leftgoal2, true);
     scene.physics.add.overlap(
@@ -1150,7 +1150,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.addRightGoal,
       undefined,
-      scene
+      scene,
     );
 
     const rightgoal = this.add.rectangle(
@@ -1159,7 +1159,7 @@ export class FarmerFootballScene extends BaseScene {
       0.1,
       40,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rightgoal, true);
     scene.physics.add.overlap(
@@ -1167,7 +1167,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.addLeftGoal,
       undefined,
-      scene
+      scene,
     );
     const rightgoal1 = this.add.rectangle(
       16 * 20.4,
@@ -1175,7 +1175,7 @@ export class FarmerFootballScene extends BaseScene {
       6,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rightgoal1, true);
     scene.physics.add.overlap(
@@ -1183,7 +1183,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.addLeftGoal,
       undefined,
-      scene
+      scene,
     );
     const rightgoal2 = this.add.rectangle(
       16 * 20.4,
@@ -1191,7 +1191,7 @@ export class FarmerFootballScene extends BaseScene {
       6,
       0.1,
       0xffffff,
-      0
+      0,
     );
     scene.physics.add.existing(rightgoal2, true);
     scene.physics.add.overlap(
@@ -1199,7 +1199,7 @@ export class FarmerFootballScene extends BaseScene {
       scene.ball,
       scene.addLeftGoal,
       undefined,
-      scene
+      scene,
     );
   }
 

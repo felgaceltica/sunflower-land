@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Game, AUTO } from "phaser";
 import NinePatchPlugin from "phaser3-rex-plugins/plugins/ninepatch-plugin.js";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
@@ -13,11 +13,10 @@ export const FarmerFootballPhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const [portalState] = useActor(portalService);
 
-  const [loaded, setLoaded] = useState(false);
-  const game = useRef<Game>();
+  const gameRef = useRef<Game | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const scene = "farmer_football";
-
   const scenes = [Preloader, FarmerFootballScene];
 
   useEffect(() => {
@@ -28,9 +27,6 @@ export const FarmerFootballPhaser: React.FC = () => {
         smoothStep: true,
       },
       transparent: true,
-      //backgroundColor: "#000000",
-      parent: "phaser-example",
-
       autoRound: true,
       pixelArt: true,
       plugins: {
@@ -49,7 +45,6 @@ export const FarmerFootballPhaser: React.FC = () => {
       },
       width: window.innerWidth,
       height: window.innerHeight,
-
       physics: {
         default: "arcade",
         arcade: {
@@ -63,29 +58,29 @@ export const FarmerFootballPhaser: React.FC = () => {
       },
     };
 
-    game.current = new Game({
+    const game = new Game({
       ...config,
       parent: "game-content",
     });
 
-    game.current.registry.set("initialScene", scene);
-    game.current.registry.set("gameState", portalState.context.state);
-    game.current.registry.set("id", portalState.context.id);
-    game.current.registry.set("mmoServer", portalState.context.mmoServer);
+    game.registry.set("initialScene", scene);
+    game.registry.set("gameState", portalState.context.state);
+    game.registry.set("id", portalState.context.id);
+    game.registry.set("mmoServer", portalState.context.mmoServer);
 
-    setLoaded(true);
+    gameRef.current = game;
 
     return () => {
-      game.current?.destroy(true);
+      gameRef.current?.destroy(true);
+      gameRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <div>
-      <div id="game-content" ref={ref} />
-      {<InteractableModals scene="plaza" id={portalState.context.id} />}
+      <div id="game-content" ref={containerRef} />
+      <InteractableModals scene="plaza" id={portalState.context.id} />
     </div>
   );
 };

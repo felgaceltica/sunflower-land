@@ -28,14 +28,16 @@ export const IrrigateRulesPanel: React.FC<Props> = ({
     <CloseButtonPanel
       className="overflow-y-hidden"
       bumpkinParts={IRRIGATE_NPC_WEREABLES["Felga"]}
-      currentTab={tab}
-      setCurrentTab={setTab}
+      //currentTab={tab}
+      //setCurrentTab={setTab}
       tabs={[
         {
+          id: "mission",
           icon: SUNNYSIDE.icons.plant,
           name: t("irrigate.mission"),
         },
         {
+          id: "donate",
           icon: SUNNYSIDE.icons.heart,
           name: t("donate"),
         },

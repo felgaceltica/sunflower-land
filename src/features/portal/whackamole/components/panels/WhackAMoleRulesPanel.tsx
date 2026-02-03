@@ -28,14 +28,16 @@ export const WhackAMoleRulesPanel: React.FC<Props> = ({
     <CloseButtonPanel
       className="overflow-y-hidden"
       bumpkinParts={WhackAMole_NPC_WEREABLES["WhackaMole"]}
-      currentTab={tab}
-      setCurrentTab={setTab}
+      //currentTab={tab}
+      //setCurrentTab={setTab}
       tabs={[
         {
+          id: "mission",
           icon: SUNNYSIDE.icons.plant,
           name: t("whackamole.mission"),
         },
         {
+          id: "donate",
           icon: SUNNYSIDE.icons.heart,
           name: t("donate"),
         },

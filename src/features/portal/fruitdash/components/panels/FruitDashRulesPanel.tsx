@@ -31,14 +31,16 @@ export const FruitDashRulesPanel: React.FC<Props> = ({
     <CloseButtonPanel
       className="overflow-y-hidden"
       bumpkinParts={FRUIT_DASH_NPC_WEREABLES[FRUIT_DASH_NPC_NAME]}
-      currentTab={tab}
-      setCurrentTab={setTab}
+      //currentTab={tab}
+      //setCurrentTab={setTab}
       tabs={[
         {
+          id: "mission",
           icon: SUNNYSIDE.icons.plant,
           name: t("fruit-dash.mission"),
         },
         {
+          id: "donate",
           icon: SUNNYSIDE.icons.heart,
           name: t("donate"),
         },

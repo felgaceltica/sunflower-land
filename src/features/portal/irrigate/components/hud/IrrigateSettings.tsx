@@ -25,7 +25,7 @@ const _isJoystickActive = (state: PortalMachineState) =>
 
 export const IrrigateSettings: React.FC = () => {
   const { portalService } = useContext(PortalContext);
-  //const { isDarkMode, toggleDarkMode } = useIsDarkMode();
+  // const { isDarkMode, toggleDarkMode } = useIsDarkMode();
 
   const { isAudioMuted, toggleAudioMuted } = useIsAudioMuted();
 
@@ -36,6 +36,9 @@ export const IrrigateSettings: React.FC = () => {
   const [showMoreButtons, setShowMoreButtons] = useState(false);
 
   const isJoystickActive = useSelector(portalService, _isJoystickActive);
+
+  // ✅ valor efetivo: joystick ativo sempre "fecha" sem setState em effect
+  const effectiveShowMoreButtons = showMoreButtons && !isJoystickActive;
 
   const button = useSound("button");
 
@@ -56,15 +59,16 @@ export const IrrigateSettings: React.FC = () => {
 
   useEffect(() => {
     if (isJoystickActive) {
-      setShowMoreButtons(false);
-      cogRef.current?.blur();
+      // ❌ não mexe em state aqui (eslint reclama)
+      // ✅ só efeito externo
+      (cogRef.current as any)?.blur?.();
     }
   }, [isJoystickActive]);
 
   const settingButton = (
     index: number,
     onClick: () => void,
-    children: JSX.Element,
+    children: React.ReactNode,
   ) => {
     const rightMargin = 8;
 
@@ -80,7 +84,7 @@ export const IrrigateSettings: React.FC = () => {
           height: `${buttonHeight}px`,
           transition: "transform 250ms ease",
           transform: "translateX(0)",
-          ...(showMoreButtons && {
+          ...(effectiveShowMoreButtons && {
             transform: `translateX(-${(buttonWidth + rightMargin) * index}px)`,
           }),
         }}
@@ -138,7 +142,7 @@ export const IrrigateSettings: React.FC = () => {
       index,
       () => {
         button.play();
-        setShowMoreButtons(!showMoreButtons);
+        setShowMoreButtons((v) => !v);
       },
       <img
         src={settings}

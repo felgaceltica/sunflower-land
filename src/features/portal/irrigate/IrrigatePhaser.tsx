@@ -13,7 +13,7 @@ export const IrrigatePhaser: React.FC = () => {
   const { portalService } = useContext(PortalContext);
   const [portalState] = useActor(portalService);
 
-  const game = useRef<Game>();
+  const game = useRef<Game>(undefined);
 
   // This must match the key of your scene [PortalExampleScene]
   const scene = MINIGAME_NAME;

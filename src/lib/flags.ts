@@ -7,31 +7,31 @@ export const adminFeatureFlag = ({ wardrobe, inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" ||
   (!!((wardrobe["Gift Giver"] ?? 0) > 0) && !!inventory["Beta Pass"]?.gt(0));
 
-const usernameFeatureFlag = (game: GameState) => {
-  return (
-    testnetFeatureFlag() ||
-    [
-      "adam",
-      "tango",
-      "elias",
-      "Aeon",
-      "dcol",
-      "birb",
-      "Celinhotv",
-      "LittleEins",
-      "Labochi",
-      "Craig",
-      "Spencer",
-    ]
-      .map((name) => name.toLowerCase())
-      .includes(game.username?.toLowerCase() ?? "")
-  );
-};
+// const usernameFeatureFlag = (game: GameState) => {
+//   return (
+//     testnetFeatureFlag() ||
+//     [
+//       "adam",
+//       "tango",
+//       "elias",
+//       "Aeon",
+//       "dcol",
+//       "birb",
+//       "Celinhotv",
+//       "LittleEins",
+//       "Labochi",
+//       "Craig",
+//       "Spencer",
+//     ]
+//       .map((name) => name.toLowerCase())
+//       .includes(game.username?.toLowerCase() ?? "")
+//   );
+// };
 
 const defaultFeatureFlag = ({ inventory }: GameState) =>
   CONFIG.NETWORK === "amoy" || !!inventory["Beta Pass"]?.gt(0);
 
-const testnetFeatureFlag = () => CONFIG.NETWORK === "amoy";
+export const testnetFeatureFlag = () => CONFIG.NETWORK === "amoy";
 
 const localStorageFeatureFlag = (key: string) =>
   !!localStorage.getItem(key) === true;
@@ -81,7 +81,6 @@ export const ADMIN_IDS = [1, 3, 39488, 128727];
 export const MANAGER_IDS = [...ADMIN_IDS, 29, 130170, 7841];
 
 export type FeatureFlag = (game: GameState) => boolean;
-
 export type ExperimentName = "ONBOARDING_CHALLENGES" | "GEM_BOOSTS";
 
 /*
@@ -94,12 +93,6 @@ export type ExperimentName = "ONBOARDING_CHALLENGES" | "GEM_BOOSTS";
 const FEATURE_FLAGS = {
   // For testing
   JEST_TEST: defaultFeatureFlag,
-
-  RONIN_AIRDROP: (game: GameState) => {
-    if (Date.now() > RONIN_AIRDROP_ENDDATE.getTime()) return false;
-
-    return betaTimeBasedFeatureFlag(new Date("2025-10-21T00:00:00Z"))(game);
-  },
 
   // Permanent Feature Flags
   AIRDROP_PLAYER: adminFeatureFlag,
@@ -118,47 +111,34 @@ const FEATURE_FLAGS = {
   EASTER: (game) =>
     betaTimeBasedFeatureFlag(new Date("2025-04-21T00:00:00Z"))(game) &&
     Date.now() < new Date("2025-04-29T00:00:00Z").getTime(),
+  LEAGUES: () => false,
 
-  HALLOWEEN: (game) =>
-    betaTimeBasedFeatureFlag(new Date("2025-10-28T00:00:00Z"))(game) &&
-    Date.now() < new Date("2025-11-05T00:00:00Z").getTime(),
+  HOLIDAYS_EVENT_FLAG: (game) =>
+    betaTimeBasedFeatureFlag(new Date("2025-12-23T00:00:00Z"))(game) &&
+    Date.now() < new Date("2026-01-05T00:00:00Z").getTime(),
 
   STREAM_STAGE_ACCESS: adminFeatureFlag,
-
-  WITHDRAWAL_THRESHOLD: timePeriodFeatureFlag({
-    start: new Date("2025-05-08T00:00:00Z"),
-    end: new Date("2025-06-20T00:00:00.000Z"),
-  }),
 
   MODERATOR: (game) =>
     !!((game.wardrobe.Halo ?? 0) > 0) && !!game.inventory["Beta Pass"]?.gt(0),
 
-  BLESSING: () => true,
-
-  PETS: (game) =>
-    betaTimeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(game),
   PET_HOUSE: testnetFeatureFlag,
-  FLOWER_INSTA_GROW: (game) =>
-    betaTimeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(game),
 
-  API_PERFORMANCE: () => true,
-
-  OBSIDIAN_EXCHANGE: () =>
-    timeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(),
-  GASLESS_AUCTIONS: () => true,
-  NODE_FORGING: (game) =>
-    betaTimeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(game),
-  DEPOSIT_SFL: () =>
-    Date.now() < new Date("2025-10-28T00:00:00.000Z").getTime(),
-  RONIN_FLOWER: betaTimeBasedFeatureFlag(new Date("2025-10-21T00:00:00Z")),
+  FISHING_PUZZLE: defaultFeatureFlag,
   MEMORY_BETA: defaultFeatureFlag,
-  PET_NFT_DEPOSIT: () =>
-    timeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(),
-  PET_NFT_MARKETPLACE: () =>
-    timeBasedFeatureFlag(new Date("2025-11-03T00:00:00Z"))(),
-  BUILDING_FRIENDSHIPS: betaTimeBasedFeatureFlag(
-    new Date("2025-10-13T00:00:00Z"),
-  ),
+  CRUSTACEANS: defaultFeatureFlag,
+  VERSION_UPDATES: defaultFeatureFlag,
+  DAILY_BOXES: defaultFeatureFlag,
+  MICRO_INTERACTIONS: defaultFeatureFlag,
+  MULTI_CAST: defaultFeatureFlag,
+  FISH_MARKET: defaultFeatureFlag,
+  MAP_PIECES: defaultFeatureFlag,
+  INSTANT_RECIPES: defaultFeatureFlag,
+  SHOW_BOOSTS: defaultFeatureFlag,
+  PET_GUIDE: defaultFeatureFlag,
+  AUCTION_RAFFLES: defaultFeatureFlag,
+  CHAPTER_TRACKS: defaultFeatureFlag,
+  CHAPTER_COLLECTIONS: defaultFeatureFlag,
 } satisfies Record<string, FeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;

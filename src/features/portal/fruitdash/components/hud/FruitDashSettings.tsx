@@ -45,6 +45,9 @@ export const FruitDashSettings: React.FC = () => {
 
   const isJoystickActive = useSelector(portalService, _isJoystickActive);
 
+  // ✅ valor efetivo: quando joystick ativo, força "false" sem setState em effect
+  const effectiveShowMoreButtons = showMoreButtons && !isJoystickActive;
+
   const button = useSound("button");
 
   const cogRef = useRef<HTMLDivElement>(null);
@@ -64,15 +67,16 @@ export const FruitDashSettings: React.FC = () => {
 
   useEffect(() => {
     if (isJoystickActive) {
-      setShowMoreButtons(false);
-      cogRef.current?.blur();
+      // ❌ não mexe em state aqui (eslint reclama)
+      // ✅ só efeito externo
+      (cogRef.current as any)?.blur?.();
     }
   }, [isJoystickActive]);
 
   const settingButton = (
     index: number,
     onClick: () => void,
-    children: JSX.Element,
+    children: React.ReactNode,
   ) => {
     const rightMargin = 8;
 
@@ -88,7 +92,7 @@ export const FruitDashSettings: React.FC = () => {
           height: `${buttonHeight}px`,
           transition: "transform 250ms ease",
           transform: "translateX(0)",
-          ...(showMoreButtons && {
+          ...(effectiveShowMoreButtons && {
             transform: `translateX(-${(buttonWidth + rightMargin) * index}px)`,
           }),
         }}
@@ -122,6 +126,7 @@ export const FruitDashSettings: React.FC = () => {
         }}
       />,
     );
+
   const musicButton = (index: number) =>
     settingButton(
       index,
@@ -139,6 +144,7 @@ export const FruitDashSettings: React.FC = () => {
         }}
       />,
     );
+
   const halloweenModeButton = (index: number) =>
     settingButton(
       index,
@@ -163,7 +169,8 @@ export const FruitDashSettings: React.FC = () => {
       index,
       () => {
         button.play();
-        setShowMoreButtons(!showMoreButtons);
+        // se joystick ativo, não abre (continua fechado na prática)
+        setShowMoreButtons((v) => !v);
       },
       <img
         src={settings}
@@ -178,6 +185,7 @@ export const FruitDashSettings: React.FC = () => {
 
   // list of buttons to show in the HUD from right to left in order
   const buttons = [gearButton, musicButton, audioButton, halloweenModeButton];
+
   return (
     <div
       className="fixed z-50 flex flex-col justify-between"

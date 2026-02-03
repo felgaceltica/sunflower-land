@@ -65,7 +65,7 @@ export class GoblinInvasionLevel1 extends BaseScene {
   update(t: number, dt: number) {
     this.updatePlayer();
     if (this.enemies.length > 0) {
-      const nextEnemy = this.enemies.at(0);
+      const nextEnemy = this.enemies[0];
       if (nextEnemy.time + this.startTime <= t) {
         this.enemies1.push(
           new GoblinInvasionEnemy(this, nextEnemy.level, this.path),

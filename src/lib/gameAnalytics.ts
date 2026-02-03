@@ -55,7 +55,7 @@ class GameAnalyticTracker {
         "SFL",
         "BlockBuck",
         "Gem",
-        "SeasonalTicket",
+        "ChapterTicket",
         // TODO add future seasonal tickets
       ]);
 
@@ -187,6 +187,25 @@ class GameAnalyticTracker {
     );
 
     GameAnalytics.addDesignEvent("Beach:Digging:OutputCoins", outputCoins);
+  }
+
+  /**
+   * Tracks the time taken for a player to return and claim a daily reward.
+   * Reports are grouped by day number (D1, D2, D3, etc) with the value as days since last claim (ceiled).
+   */
+  public trackDailyRewardReturn({
+    totalClaimed,
+    daysSinceLastClaim,
+  }: {
+    totalClaimed: number;
+    daysSinceLastClaim: number;
+  }) {
+    if (totalClaimed < 1) return;
+
+    GameAnalytics.addDesignEvent(
+      `DailyReward:Return:Box${totalClaimed}`,
+      Math.max(0, daysSinceLastClaim),
+    );
   }
 }
 
