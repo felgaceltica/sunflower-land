@@ -13,6 +13,7 @@ import { OPEN_SEA_WEARABLES } from "metadata/metadata";
 import { translate } from "lib/i18n/translate";
 import { PetNFTName } from "features/game/types/pets";
 import { getPetImageForMarketplace } from "features/island/pets/lib/petShared";
+import { getWearableImage } from "features/game/lib/getWearableImage";
 
 export type TradeableDisplay = {
   name: MarketplaceTradeableName;
@@ -20,16 +21,20 @@ export type TradeableDisplay = {
   image: string;
   type: CollectionName;
   buffs: BuffLabel[];
+  experience?: number;
+  translatedName?: string;
 };
 
 export function getTradeableDisplay({
   id,
   type,
   state,
+  experience,
 }: {
   id: number;
   type: CollectionName;
   state: GameState;
+  experience?: number;
 }): TradeableDisplay {
   if (type === "wearables") {
     const name = ITEM_NAMES[id];
@@ -38,7 +43,7 @@ export function getTradeableDisplay({
     return {
       name,
       description: details.description, // TODO support translation
-      image: new URL(`/src/assets/wearables/${id}.webp`, import.meta.url).href,
+      image: getWearableImage(name),
       buffs: getItemBuffs({ state, item: name, collection: "wearables" }),
       type,
     };
@@ -65,6 +70,7 @@ export function getTradeableDisplay({
       image: getPetImageForMarketplace(id),
       type,
       buffs: getItemBuffs({ state, item: name, collection: "pets" }),
+      experience,
     };
   }
 
@@ -74,6 +80,7 @@ export function getTradeableDisplay({
 
   return {
     name,
+    translatedName: details.translatedName,
     description: details.description,
     image: details.image,
     buffs: getItemBuffs({ state, item: name, collection: "collectibles" }),

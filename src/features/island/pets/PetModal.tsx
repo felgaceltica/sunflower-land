@@ -25,15 +25,20 @@ import { useSelector } from "@xstate/react";
 import { CookableName } from "features/game/types/consumables";
 import { ResetFoodRequests } from "./ResetFoodRequests";
 import { PetFeed } from "./PetFeed";
-
-import levelUp from "assets/icons/level_up.png";
-import xpIcon from "assets/icons/xp.png";
 import { PetFetch } from "./PetFetch";
 import { ModalOverlay } from "components/ui/ModalOverlay";
 import { ChestRewardsList } from "components/ui/ChestRewardsList";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { PetTypeFed } from "./PetTypeFed";
 import { getPetImage } from "./lib/petShared";
+import classNames from "classnames";
+
+import levelUp from "assets/icons/level_up.png";
+import xpIcon from "assets/icons/xp.png";
+import { Checkbox } from "components/ui/Checkbox";
+import { PetGuide, PetGuideButton } from "features/pets/petGuide/PetGuide";
+import { getObjectEntries } from "features/game/expansion/lib/utils";
+import { capitalize } from "lib/utils/capitalize";
 
 interface Props {
   show: boolean;
@@ -44,7 +49,7 @@ interface Props {
   petType?: PetType;
 }
 
-const _game = (state: MachineState) => state.context.state;
+const _inventory = (state: MachineState) => state.context.state.inventory;
 
 export const PetModal: React.FC<Props> = ({
   show,
@@ -55,10 +60,13 @@ export const PetModal: React.FC<Props> = ({
   const { gameService } = useContext(Context);
   const { t } = useAppTranslation();
   const [display, setDisplay] = useState<
-    "feeding" | "fetching" | "resetting" | "typeFed"
+    "feeding" | "fetching" | "resetting" | "typeFed" | "guide"
   >(isTypeFed ? "typeFed" : "feeding");
+  const [previousDisplay, setPreviousDisplay] = useState<
+    "feeding" | "fetching" | "resetting"
+  >("feeding");
   const [showRewards, setShowRewards] = useState(false);
-  const game = useSelector(gameService, _game);
+  const inventory = useSelector(gameService, _inventory);
   const isNFTPet = isPetNFT(data);
   const petId = isNFTPet ? data.id : data?.name;
 
@@ -91,35 +99,65 @@ export const PetModal: React.FC<Props> = ({
   const petCategory = PET_CATEGORIES[type];
   const { level, percentage, currentProgress, experienceBetweenLevels } =
     getPetLevel(data.experience);
-  const todayDate = new Date(Date.now()).toISOString().split("T")[0];
+  const todayDate = new Date().toISOString().split("T")[0];
 
   return (
     <Modal show={show} onHide={onClose}>
       <OuterPanel className="flex flex-col gap-1">
         <div className="flex items-center p-1 justify-between">
-          <Label type="default">
-            <span className="text-sm px-0.5 pb-0.5">{data.name}</span>
-          </Label>
-          <img
-            onClick={onClose}
-            src={SUNNYSIDE.icons.close}
-            alt={data.name}
-            style={{
-              width: `${PIXEL_SCALE * 11}px`,
-            }}
-          />
+          <div className="flex flex-row gap-2 items-center">
+            <Label type="default">
+              <span className="text-sm px-0.5 pb-0.5">{data.name}</span>
+            </Label>
+            {isNFTPet && (
+              <div className="flex flex-row gap-2 items-center">
+                <Checkbox
+                  checked={!!data.walking}
+                  onChange={() => gameService.send("pet.walked", { petId })}
+                />
+                <p className="text-xs">{t("pets.follow")}</p>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-row gap-2 items-center justify-end">
+            {display !== "guide" && (
+              <PetGuideButton
+                onShow={() => {
+                  if (
+                    display === "feeding" ||
+                    display === "fetching" ||
+                    display === "resetting"
+                  ) {
+                    setPreviousDisplay(display);
+                  }
+                  setDisplay("guide");
+                }}
+              />
+            )}
+            <img
+              onClick={onClose}
+              src={SUNNYSIDE.icons.close}
+              alt={data.name}
+              style={{
+                width: `${PIXEL_SCALE * 11}px`,
+              }}
+            />
+          </div>
         </div>
         {/* Pet Information Panel */}
         <InnerPanel>
           <div className="flex px-4 py-3 gap-4 w-full items-center">
-            <div className="flex justify-center w-1/4 items-center gap-2">
+            <div className="flex flex-col justify-center w-1/4 items-center gap-2">
               <img
                 src={image}
                 alt={data.name}
-                className="w-16 object-contain"
+                className={classNames("object-contain", {
+                  "w-16": !isNFTPet,
+                  "w-24": isNFTPet,
+                })}
               />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col w-2/3">
               {/* Pet Type and Categories */}
               <div className="flex flex-wrap gap-1 mb-2">
                 <Label type="info" className="text-xs">
@@ -138,6 +176,15 @@ export const PetModal: React.FC<Props> = ({
                     {petCategory.tertiary}
                   </Label>
                 )}
+                {isNFTPet &&
+                  data.traits &&
+                  getObjectEntries(data.traits)
+                    .filter(([key]) => key !== "type")
+                    .map(([key, value]) => (
+                      <Label type="default" className="text-xs" key={key}>
+                        {`${value} ${key !== "aura" ? capitalize(key) : ""}`}
+                      </Label>
+                    ))}
               </div>
 
               {/* Level and Experience */}
@@ -211,7 +258,7 @@ export const PetModal: React.FC<Props> = ({
         {display === "resetting" && (
           <ResetFoodRequests
             petData={data}
-            inventory={game.inventory}
+            inventory={inventory}
             todayDate={todayDate}
             handleResetRequests={handleResetRequests}
             onAcknowledged={() => {
@@ -222,6 +269,9 @@ export const PetModal: React.FC<Props> = ({
         )}
         {/* Type Fed UI */}
         {display === "typeFed" && <PetTypeFed type={type} onClose={onClose} />}
+        {display === "guide" && (
+          <PetGuide onClose={() => setDisplay(previousDisplay)} />
+        )}
       </OuterPanel>
       <ModalOverlay
         show={showRewards}
