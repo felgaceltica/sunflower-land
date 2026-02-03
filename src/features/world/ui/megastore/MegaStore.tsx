@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { ITEM_IDS } from "features/game/types/bumpkin";
 import { BUMPKIN_ITEM_BUFF_LABELS } from "features/game/types/bumpkinItemBuffs";
@@ -16,14 +16,18 @@ import {
 import shopIcon from "assets/icons/shop.png";
 import { getImageUrl } from "lib/utils/getImageURLS";
 import { MachineState } from "features/game/lib/gameMachine";
-import { SeasonalStore } from "./SeasonalStore";
+import { ChapterStore } from "./ChapterStore";
 import { Context } from "features/game/GameProvider";
 import { useSelector } from "@xstate/react";
 import {
-  getCurrentSeason,
-  getSeasonalTicket,
-} from "features/game/types/seasons";
+  getCurrentChapter,
+  getChapterTicket,
+} from "features/game/types/chapters";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
+import { useNow } from "lib/utils/hooks/useNow";
+import { ChapterTracks } from "../tracks/ChapterTracks";
+import { InnerPanel, OuterPanel } from "components/ui/Panel";
+import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   onClose: () => void;
@@ -69,14 +73,15 @@ const _state = (state: MachineState) => state.context.state;
 export const MegaStore: React.FC<Props> = ({ onClose }) => {
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
-
-  const icon = ITEM_DETAILS[getSeasonalTicket()].image ?? shopIcon;
+  const now = useNow();
+  const [tab, setTab] = useState<"chapter" | "tracks">("chapter");
+  const icon = ITEM_DETAILS[getChapterTicket(now)].image ?? shopIcon;
   const { t } = useAppTranslation();
 
   // If no season is found, use "Chapter"
   let chapter: string;
   try {
-    chapter = getCurrentSeason();
+    chapter = getCurrentChapter(now);
   } catch {
     chapter = "Chapter";
   }
@@ -85,10 +90,29 @@ export const MegaStore: React.FC<Props> = ({ onClose }) => {
   return (
     <CloseButtonPanel
       bumpkinParts={NPC_WEARABLES.stella}
-      tabs={[{ icon, name: t("chapterStore.title", { chapter }) }]}
+      currentTab={tab}
+      setCurrentTab={setTab}
+      tabs={[
+        { icon, name: t("chapterStore.title", { chapter }), id: "chapter" },
+        ...(hasFeatureAccess(state, "CHAPTER_TRACKS")
+          ? [
+              {
+                icon: shopIcon,
+                name: t("chapterStore.tracks", { chapter }),
+                id: "tracks" as const,
+              },
+            ]
+          : []),
+      ]}
       onClose={onClose}
+      container={OuterPanel}
     >
-      <SeasonalStore state={state} />
+      {tab === "chapter" && (
+        <InnerPanel>
+          <ChapterStore state={state} />
+        </InnerPanel>
+      )}
+      {tab === "tracks" && <ChapterTracks onClose={onClose} />}
     </CloseButtonPanel>
   );
 };
