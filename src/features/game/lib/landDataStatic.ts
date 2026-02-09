@@ -41,9 +41,14 @@ export const STATIC_OFFLINE_FARM: GameState = {
     Nautilus: new Decimal(1),
     Dollocaris: new Decimal(1),
     // "Lifetime Farmer Banner": new Decimal(1),
+    Barkley: new Decimal(1),
+    Meowchi: new Decimal(1),
+    "Pet House": new Decimal(1),
   },
   previousInventory: {},
-  wardrobe: {},
+  wardrobe: {
+    "Paw Aura": 1,
+  },
   previousWardrobe: {},
   bank: { taxFreeSFL: 0, withdrawnAmount: 0 },
 
@@ -63,6 +68,10 @@ export const STATIC_OFFLINE_FARM: GameState = {
   bumpkin: {
     ...INITIAL_BUMPKIN,
     experience: 1000000,
+    equipped: {
+      ...INITIAL_BUMPKIN.equipped,
+      aura: "Paw Aura",
+    },
   },
 
   minigames: {
@@ -91,6 +100,11 @@ export const STATIC_OFFLINE_FARM: GameState = {
       },
     ],
     requests: [
+      {
+        id: "21",
+        name: "Red Balloon Flower",
+        items: { "Pet Cookie": 15 },
+      },
       {
         id: "1",
         name: "Cow",
@@ -199,6 +213,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
     "Starlight Tuna Map Piece Found": 8,
     "Daily Reward Collected": 1,
     "Pet Cookie Collected": 2250,
+    "Paw Prints Points Earned": 930,
     "Paw Prints free Milestone Claimed": 4,
   },
 
@@ -301,15 +316,15 @@ export const STATIC_OFFLINE_FARM: GameState = {
       {
         createdAt: Date.now(),
         readyAt: Date.now(),
-        from: "grimbly",
+        from: "tywin",
         reward: {
-          items: {},
-          coins: 48,
+          items: {
+            "Pet Cookie": 1,
+          },
+          coins: 0,
         },
         id: "3",
-        items: {
-          "Mashed Potato": 2,
-        },
+        items: {},
       },
     ],
     milestone: {

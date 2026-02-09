@@ -553,6 +553,14 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostedItemIcon: SUNNYSIDE.resource.egg,
     },
   ],
+  "Squid Chicken": () => [
+    {
+      shortDescription: translate("description.squidChicken.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SUNNYSIDE.resource.egg,
+    },
+  ],
   "El Pollo Veloz": () => [
     {
       shortDescription: translate("description.el.pollo.veloz.boost"),
@@ -1362,6 +1370,14 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostedItemIcon: SUNNYSIDE.resource.wool,
     },
   ],
+  "Mermaid Sheep": () => [
+    {
+      shortDescription: translate("description.mermaidSheep.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SUNNYSIDE.animalFoods.kernel_blend,
+    },
+  ],
   Mootant: () => [
     {
       shortDescription: translate("description.mootant.boost"),
@@ -1428,6 +1444,14 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
   Jellyfish: () => [
     {
       shortDescription: translate("description.jellyfish.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SUNNYSIDE.icons.fish,
+    },
+  ],
+  "Anemone Flower": () => [
+    {
+      shortDescription: translate("description.anemoneFlower.boost"),
       labelType: "success",
       boostTypeIcon: powerup,
       boostedItemIcon: SUNNYSIDE.icons.fish,
@@ -2040,6 +2064,56 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       boostTypeIcon: powerup,
     },
   ],
+  Oaken: () => [
+    {
+      shortDescription: translate("description.oaken.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SUNNYSIDE.resource.acorn,
+    },
+  ],
+  Meerkat: () => [
+    {
+      shortDescription: translate("description.meerkat.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: SUNNYSIDE.tools.sand_shovel,
+    },
+    {
+      shortDescription: translate("description.meerkat.boost.two"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Sand.image,
+    },
+  ],
+  "Poseidon's Throne": () => [
+    {
+      shortDescription: translate("description.poseidonsThrone.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Weed.image,
+    },
+  ],
+  "Crimstone Clam": () => [
+    {
+      shortDescription: translate("description.crimstoneClam.boost"),
+      labelType: "info",
+      boostTypeIcon: SUNNYSIDE.icons.stopwatch,
+      boostedItemIcon: ITEM_DETAILS.Crimstone.image,
+    },
+    {
+      shortDescription: translate("description.crimstoneClam.boost.two"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+    },
+  ],
+  "Pearl Bed": () => [
+    {
+      shortDescription: translate("description.pearlBed.boost"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+    },
+  ],
   "Messy Bed": () => [
     {
       shortDescription: translate("description.messyBed.buff"),
@@ -2066,6 +2140,14 @@ export const COLLECTIBLE_BUFF_LABELS: Partial<
       shortDescription: translate("description.cornucopia.buff"),
       labelType: "success",
       boostTypeIcon: powerup,
+    },
+  ],
+  Nautilus: () => [
+    {
+      shortDescription: translate("description.nautilus.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS["Rod"].image,
     },
   ],
 

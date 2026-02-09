@@ -194,6 +194,14 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<
       boostedItemIcon: CROP_LIFECYCLE["Basic Biome"].Corn.crop,
     },
   ],
+  "Corn Silk Hair": [
+    {
+      shortDescription: translate("description.cornSilkHair.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: CROP_LIFECYCLE["Basic Biome"].Corn.crop,
+    },
+  ],
   "Sunflower Rod": [
     {
       shortDescription: translate("bumpkinItemBuff.sunflower.rod.boost"),
@@ -1032,6 +1040,35 @@ export const BUMPKIN_ITEM_BUFF_LABELS: Partial<
       labelType: "success",
       boostTypeIcon: powerup,
       boostedItemIcon: SUNNYSIDE.resource.acorn,
+    },
+  ],
+  "Crimstone Spikes Hair": [
+    {
+      shortDescription: translate("description.crimstoneSpikesHair.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+      boostedItemIcon: ITEM_DETAILS.Crimstone.image,
+    },
+  ],
+  "Paw Aura": [
+    {
+      shortDescription: translate("description.pawAura.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
+    },
+  ],
+  "Victoria's Apron": [
+    {
+      shortDescription: translate("description.victoriasApron.boost"),
+      labelType: "vibrant",
+      boostTypeIcon: lightning,
+    },
+  ],
+  "Beast Shoes": [
+    {
+      shortDescription: translate("description.beastShoes.boost"),
+      labelType: "success",
+      boostTypeIcon: powerup,
     },
   ],
   ...SPECIAL_ITEM_LABELS,

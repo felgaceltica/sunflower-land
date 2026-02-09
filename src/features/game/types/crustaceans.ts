@@ -1,6 +1,7 @@
 import { translate } from "lib/i18n/translate";
 import { InventoryItemName } from "./game";
 import { getKeys } from "../lib/crafting";
+import { SUNNYSIDE } from "assets/sunnyside";
 
 export type WaterTrapName = "Crab Pot" | "Mariner Pot";
 
@@ -10,23 +11,26 @@ type WaterTrap = {
   chums: CrustaceanChum[];
 };
 
-export type CrustaceanName =
-  | "Isopod"
-  | "Blue Crab"
-  | "Lobster"
-  | "Hermit Crab"
-  | "Shrimp"
-  | "Mussel"
-  | "Oyster"
-  | "Anemone"
-  | "Barnacle"
-  | "Sea Slug"
-  | "Sea Snail"
-  | "Garden Eel"
-  | "Sea Grapes"
-  | "Octopus"
-  | "Sea Urchin"
-  | "Horseshoe Crab";
+export const CRUSTACEANS = [
+  "Isopod",
+  "Blue Crab",
+  "Lobster",
+  "Hermit Crab",
+  "Shrimp",
+  "Mussel",
+  "Oyster",
+  "Anemone",
+  "Barnacle",
+  "Sea Slug",
+  "Sea Snail",
+  "Garden Eel",
+  "Sea Grapes",
+  "Octopus",
+  "Sea Urchin",
+  "Horseshoe Crab",
+] as const;
+
+export type CrustaceanName = (typeof CRUSTACEANS)[number];
 
 export type MarinerPotChum = Extract<
   InventoryItemName,
@@ -58,7 +62,7 @@ export type CrabPotChum = Extract<
 
 export type CrustaceanChum = CrabPotChum | MarinerPotChum;
 
-export const CRUSTACEANS: Record<CrustaceanName, string> = {
+export const CRUSTACEANS_DESCRIPTIONS: Record<CrustaceanName, string> = {
   Isopod: translate("description.isopod"),
   "Blue Crab": translate("description.blueCrab"),
   Lobster: translate("description.lobster"),
@@ -119,4 +123,9 @@ export const WATER_TRAP: Record<WaterTrapName, WaterTrap> = {
     requiredBumpkinLevel: 24,
     chums: getKeys(MARINER_POT_CHUMS),
   },
+};
+
+export const WATER_TRAP_ANIMATIONS: Record<WaterTrapName, string> = {
+  "Crab Pot": SUNNYSIDE.tools.crab_pot_placed,
+  "Mariner Pot": SUNNYSIDE.tools.mariner_pot_placed,
 };

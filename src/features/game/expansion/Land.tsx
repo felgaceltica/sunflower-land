@@ -45,7 +45,6 @@ import {
 import { Clutter } from "features/island/clutter/Clutter";
 import { PetNFT } from "features/island/pets/PetNFT";
 import { WaterTrapSpot } from "features/island/fisherman/WaterTrapSpot";
-import { hasFeatureAccess } from "lib/flags";
 
 export const LAND_WIDTH = 6;
 
@@ -901,11 +900,7 @@ export const LandComponent: React.FC = () => {
   }, [airdrops]);
 
   const waterTrapElements = useMemo(() => {
-    if (
-      !waterTraps ||
-      !hasFeatureAccess(gameService.getSnapshot().context.state, "CRUSTACEANS")
-    )
-      return [];
+    if (!waterTraps) return [];
 
     return Object.entries(waterTraps).map(([id, waterTrap]) => {
       return (
@@ -944,7 +939,6 @@ export const LandComponent: React.FC = () => {
       budElements,
       petNFTElements,
       airdropElements,
-      waterTrapElements,
     ].flat();
 
     const sortedIslandElements = elements.slice().sort((a, b) => {
@@ -988,7 +982,6 @@ export const LandComponent: React.FC = () => {
     petNFTElements,
     airdropElements,
     mushroomElements,
-    waterTrapElements,
   ]);
 
   return (
@@ -1055,6 +1048,9 @@ export const LandComponent: React.FC = () => {
         </div>
 
         {!landscaping && <Fisherman />}
+
+        {/* Water trap spots - rendered after Fisherman to ensure they appear on top */}
+        {!landscaping && waterTrapElements}
 
         {/* Background darkens in landscaping */}
         <div

@@ -32,7 +32,7 @@ export type ChapterName =
   | "Paw Prints"
   | "Crabs and Traps";
 
-type ChapterDates = { startDate: Date; endDate: Date };
+type ChapterDates = { startDate: Date; endDate: Date; tasksBegin?: Date };
 
 export const CHAPTERS: Record<ChapterName, ChapterDates> = {
   "Solar Flare": {
@@ -86,6 +86,7 @@ export const CHAPTERS: Record<ChapterName, ChapterDates> = {
   "Crabs and Traps": {
     startDate: new Date("2026-02-02T00:00:00.000Z"),
     endDate: new Date("2026-05-04T00:00:00.000Z"),
+    tasksBegin: new Date("2026-02-09T00:00:00.000Z"), // Visual only
   },
 };
 
@@ -144,19 +145,19 @@ export const CHAPTER_TICKET_NAME: Record<ChapterName, ChapterTicket> = {
 
 export const CHAPTER_RAFFLE_TICKET_NAME: Record<
   ChapterName,
-  ChapterRaffleTicket
+  ChapterRaffleTicket | undefined
 > = {
-  "Solar Flare": "Paw Prints Raffle Ticket",
-  "Dawn Breaker": "Paw Prints Raffle Ticket",
-  "Witches' Eve": "Paw Prints Raffle Ticket",
-  "Catch the Kraken": "Paw Prints Raffle Ticket",
-  "Spring Blossom": "Paw Prints Raffle Ticket",
-  "Clash of Factions": "Paw Prints Raffle Ticket",
-  "Pharaoh's Treasure": "Paw Prints Raffle Ticket",
-  "Bull Run": "Paw Prints Raffle Ticket",
-  "Winds of Change": "Paw Prints Raffle Ticket",
-  "Great Bloom": "Paw Prints Raffle Ticket",
-  "Better Together": "Paw Prints Raffle Ticket",
+  "Solar Flare": undefined,
+  "Dawn Breaker": undefined,
+  "Witches' Eve": undefined,
+  "Catch the Kraken": undefined,
+  "Spring Blossom": undefined,
+  "Clash of Factions": undefined,
+  "Pharaoh's Treasure": undefined,
+  "Bull Run": undefined,
+  "Winds of Change": undefined,
+  "Great Bloom": undefined,
+  "Better Together": undefined,
   "Paw Prints": "Paw Prints Raffle Ticket",
   "Crabs and Traps": "Crabs and Traps Raffle Ticket",
 };
@@ -230,7 +231,13 @@ export function getChapterRaffleTicket(
 ): ChapterRaffleTicket {
   const currentChapter = getCurrentChapter(now);
 
-  return CHAPTER_RAFFLE_TICKET_NAME[currentChapter];
+  const ticket = CHAPTER_RAFFLE_TICKET_NAME[currentChapter];
+
+  if (!ticket) {
+    throw new Error("No raffle ticket found");
+  }
+
+  return ticket;
 }
 
 export function getChapterArtefact(now: number) {
