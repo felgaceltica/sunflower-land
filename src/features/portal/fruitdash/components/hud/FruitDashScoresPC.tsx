@@ -25,6 +25,8 @@ export const FruitDashScoresPC: React.FC = () => {
           className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
           style={{
             height: "56px",
+            top: "6px",
+            bottom: "-3px",
           }}
         />
         <div
@@ -33,6 +35,7 @@ export const FruitDashScoresPC: React.FC = () => {
             width: "160px",
             paddingTop: "10px",
             paddingLeft: "4px",
+            position: "relative",
           }}
         >
           <span>
@@ -60,6 +63,7 @@ export const FruitDashScoresPC: React.FC = () => {
           className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
           style={{
             height: "56px",
+            top: "6px",
           }}
         />
         <div
@@ -68,6 +72,7 @@ export const FruitDashScoresPC: React.FC = () => {
             width: "160px",
             paddingTop: "10px",
             paddingLeft: "4px",
+            position: "relative",
           }}
         >
           <span>

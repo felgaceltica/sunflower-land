@@ -37,6 +37,8 @@ export const WhackAMoleScores: React.FC = () => {
           className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
           style={{
             height: "62px",
+            top: "6px",
+            bottom: "-3px",
           }}
         />
         <div
@@ -45,6 +47,7 @@ export const WhackAMoleScores: React.FC = () => {
             width: "200px",
             paddingTop: "10px",
             paddingLeft: "4px",
+            position: "relative",
           }}
         >
           <span>

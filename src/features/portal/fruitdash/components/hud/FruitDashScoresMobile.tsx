@@ -16,13 +16,21 @@ export const FruitDashScoresMobile: React.FC = () => {
   return (
     <>
       <div className="relative">
-        <div className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse" />
+        <div
+          className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
+          style={{
+            height: "-webkit-fill-available",
+            top: "6px",
+            bottom: "-3px",
+          }}
+        />
         <div
           className="flex items-center space-x-2 text-xs text-white text-shadow"
           style={{
             width: "160px",
             paddingTop: "7px",
             paddingLeft: "3px",
+            position: "relative",
           }}
         >
           <span
@@ -36,13 +44,21 @@ export const FruitDashScoresMobile: React.FC = () => {
         </div>
       </div>
       <div className="relative">
-        <div className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse" />
+        <div
+          className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
+          style={{
+            height: "-webkit-fill-available",
+            top: "6px",
+            bottom: "-3px",
+          }}
+        />
         <div
           className="flex items-center space-x-2 text-xs text-white text-shadow"
           style={{
             width: "160px",
             paddingTop: "7px",
             paddingLeft: "3px",
+            position: "relative",
           }}
         >
           <span
