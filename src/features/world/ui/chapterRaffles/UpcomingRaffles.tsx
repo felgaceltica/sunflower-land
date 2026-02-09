@@ -5,6 +5,7 @@ import { useActor } from "@xstate/react";
 
 import { SUNNYSIDE } from "assets/sunnyside";
 import petEggNFT from "assets/icons/pet_nft_egg.png";
+import budSeedling from "assets/icons/bud_seedling.png";
 import { Button } from "components/ui/Button";
 import { ButtonPanel } from "components/ui/Panel";
 import { Label } from "components/ui/Label";
@@ -30,6 +31,7 @@ import { InventoryItemName, Wardrobe } from "features/game/types/game";
 import { PetNFTName } from "features/game/types/pets";
 import { ChapterRaffleResult } from "./ChapterRaffleResult";
 import { translate } from "lib/i18n/translate";
+import { RafflePrizeTable } from "features/retreat/components/auctioneer/RaffleLeaderboardTable";
 
 export const UpcomingRaffles: React.FC = () => {
   const { t } = useAppTranslation();
@@ -326,45 +328,15 @@ export const UpcomingRaffles: React.FC = () => {
             </div>
           </div>
 
-          <div className="mb-2">
-            <Label type="default" className="mb-1">
-              {t("auction.raffle.prizes")}
-            </Label>
-            <p className="text-xs mb-2">
-              {t("auction.raffle.prizePool", {
-                count: Object.keys(selectedRaffle.prizes).length,
-              })}
-            </p>
-            <div className="flex flex-col flex-wrap gap-x-3 text-xs">
-              {nfts.map((nft) => (
-                <div key={nft} className="flex items-center">
-                  <img src={petEggNFT} className="w-4 mr-1" />
-                  <span className="text-xs">{nft}</span>
-                </div>
-              ))}
-              {getKeys(items).map((item) => (
-                <div key={item} className="flex items-center">
-                  <img src={ITEM_DETAILS[item].image} className="w-4 mr-1" />
-                  <span className="text-xs">{`${items[item]} x ${item}`}</span>
-                </div>
-              ))}
-              {getKeys(wearables).map((wearable) => (
-                <div key={wearable} className="flex items-center">
-                  <img
-                    src={getImageUrl(ITEM_IDS[wearable])}
-                    className="w-4 mr-1"
-                  />
-                  <span className="text-xs">
-                    {`${wearables[wearable]} x ${wearable}`}
-                  </span>
-                </div>
-              ))}
+          <div>
+            <div className="max-h-48 overflow-y-auto scrollable pr-1">
+              <RafflePrizeTable prizes={selectedRaffle.prizes} />
             </div>
           </div>
 
           {isActiveRaffle && (
             <>
-              <div className="flex items-center justify-between mt-4 ">
+              <div className="flex items-center justify-between mt-2 ">
                 <Label type={raffleEntries > 0 ? "success" : "formula"}>
                   {t("auction.raffle.entriesLabel", { count: raffleEntries })}
                 </Label>
@@ -425,10 +397,10 @@ const formatRaffleDate = (timestamp: number) => {
   return `${hour.substring(0, 2)}:${minute.substring(0, 2).padStart(2, "0")} ${day} ${month}`;
 };
 
-const formatRaffleWindow = (raffle: RaffleDefinition) =>
+export const formatRaffleWindow = (raffle: RaffleDefinition) =>
   `${formatRaffleDate(raffle.startAt)} - ${formatRaffleDate(raffle.endAt)}`;
 
-const getPrizeDisplay = ({
+export const getPrizeDisplay = ({
   prize,
   raffle,
 }: {
@@ -442,9 +414,10 @@ const getPrizeDisplay = ({
   const nft = raffle.prizes[prize].nft;
 
   if (nft) {
+    const isBud = nft.includes("Bud");
     return {
-      name: `${nft}`,
-      image: petEggNFT,
+      name: isBud ? "Bud NFT ?" : "Pet NFT ?",
+      image: isBud ? budSeedling : petEggNFT,
       type: "nft" as const,
     };
   }

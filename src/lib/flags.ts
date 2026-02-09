@@ -40,8 +40,8 @@ const testnetLocalStorageFeatureFlag = (key: string) => () => {
   return testnetFeatureFlag() || localStorageFeatureFlag(key);
 };
 
-const timeBasedFeatureFlag = (date: Date) => () => {
-  return testnetFeatureFlag() || Date.now() > date.getTime();
+const timeBasedFeatureFlag = (date: Date) => (now: number) => {
+  return testnetFeatureFlag() || now >= date.getTime();
 };
 
 const betaTimeBasedFeatureFlag = (date: Date) => (game: GameState) => {
@@ -123,23 +123,11 @@ const FEATURE_FLAGS = {
     !!((game.wardrobe.Halo ?? 0) > 0) && !!game.inventory["Beta Pass"]?.gt(0),
 
   PET_HOUSE: testnetFeatureFlag,
-
-  FISHING_PUZZLE: defaultFeatureFlag,
-  MEMORY_BETA: defaultFeatureFlag,
-  CRUSTACEANS: defaultFeatureFlag,
-  VERSION_UPDATES: defaultFeatureFlag,
-  DAILY_BOXES: defaultFeatureFlag,
-  MICRO_INTERACTIONS: defaultFeatureFlag,
-  MULTI_CAST: defaultFeatureFlag,
-  FISH_MARKET: defaultFeatureFlag,
-  MAP_PIECES: defaultFeatureFlag,
-  INSTANT_RECIPES: defaultFeatureFlag,
-  SHOW_BOOSTS: defaultFeatureFlag,
-  PET_GUIDE: defaultFeatureFlag,
-  AUCTION_RAFFLES: defaultFeatureFlag,
-  CHAPTER_TRACKS: defaultFeatureFlag,
-  CHAPTER_COLLECTIONS: defaultFeatureFlag,
 } satisfies Record<string, FeatureFlag>;
+
+const TIME_BASED_FEATURE_FLAGS = {
+  PET_CHAPTER_COMPLETE: timeBasedFeatureFlag(new Date("2026-02-02T00:00:00Z")),
+} satisfies Record<string, TimeBasedFeatureFlag>;
 
 export type FeatureName = keyof typeof FEATURE_FLAGS;
 
@@ -148,3 +136,13 @@ export const hasFeatureAccess = (game: GameState, featureName: FeatureName) => {
 };
 
 export const TIMED_EVENT_NAME = "EASTER";
+export type TimeBasedFeatureFlag = (now: number) => boolean;
+
+export type TimeBasedFeatureName = keyof typeof TIME_BASED_FEATURE_FLAGS;
+
+export const hasTimeBasedFeatureAccess = (
+  featureName: TimeBasedFeatureName,
+  now: number,
+) => {
+  return TIME_BASED_FEATURE_FLAGS[featureName](now);
+};

@@ -10,7 +10,6 @@ import { CodexCategory, CodexCategoryName } from "features/game/types/codex";
 import { MilestoneReached } from "./components/MilestoneReached";
 import { MilestoneName } from "features/game/types/milestones";
 import { Fish } from "./pages/Fish";
-import { Crustaceans } from "./pages/Crustaceans";
 import { Flowers } from "./pages/Flowers";
 import { Deliveries } from "./pages/Deliveries";
 import { ChoreBoard } from "./pages/ChoreBoard";
@@ -103,10 +102,6 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
     setCurrentTab(index);
   };
 
-  const handleHide = () => {
-    onHide();
-  };
-
   const handleMilestoneReached = (milestoneName: MilestoneName) => {
     setMilestoneName(milestoneName);
     setShowMilestoneReached(true);
@@ -173,29 +168,16 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
       icon: SUNNYSIDE.icons.fish,
       count: 0,
     },
-    ...(hasFeatureAccess(state, "CRUSTACEANS")
-      ? [
-          {
-            name: "Crustaceans" as const,
-            icon: ITEM_DETAILS["Crab Pot"].image,
-            count: 0,
-          },
-        ]
-      : []),
     {
       name: "Flowers",
       icon: ITEM_DETAILS["Red Pansy"].image,
       count: 0,
     },
-    ...(hasFeatureAccess(state, "CHAPTER_COLLECTIONS")
-      ? [
-          {
-            name: "Collections" as const,
-            icon: SUNNYSIDE.icons.treasure,
-            count: 0,
-          },
-        ]
-      : []),
+    {
+      name: "Collections" as const,
+      icon: SUNNYSIDE.icons.treasure,
+      count: 0,
+    },
     ...(faction
       ? [
           {
@@ -218,7 +200,7 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
 
   return (
     // TODO feat/marks-leaderboard ADD SHOW
-    <Modal show={show} onHide={handleHide} dialogClassName="md:max-w-3xl">
+    <Modal show={show} onHide={onHide} dialogClassName="md:max-w-3xl">
       <div className="h-[500px] relative">
         {/* Header */}
         <OuterPanel className="flex flex-col h-full">
@@ -230,7 +212,7 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
             <img
               src={SUNNYSIDE.icons.close}
               className="float-right cursor-pointer z-20 ml-3"
-              onClick={handleHide}
+              onClick={onHide}
               style={{
                 width: `${PIXEL_SCALE * 11}px`,
               }}
@@ -293,7 +275,6 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
             {currentTab === "Fish" && (
               <Fish onMilestoneReached={handleMilestoneReached} state={state} />
             )}
-            {currentTab === "Crustaceans" && <Crustaceans state={state} />}
             {currentTab === "Flowers" && (
               <Flowers
                 onMilestoneReached={handleMilestoneReached}
@@ -301,7 +282,7 @@ export const Codex: React.FC<Props> = ({ show, onHide }) => {
               />
             )}
             {currentTab === "Collections" && (
-              <ChapterCollections state={state} />
+              <ChapterCollections state={state} onClose={onHide} />
             )}
             {currentTab === "Marks" && faction && (
               <FactionLeaderboard

@@ -27,7 +27,6 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { useNow } from "lib/utils/hooks/useNow";
 import { ChapterTracks } from "../tracks/ChapterTracks";
 import { InnerPanel, OuterPanel } from "components/ui/Panel";
-import { hasFeatureAccess } from "lib/flags";
 
 interface Props {
   onClose: () => void;
@@ -94,25 +93,21 @@ export const MegaStore: React.FC<Props> = ({ onClose }) => {
       setCurrentTab={setTab}
       tabs={[
         { icon, name: t("chapterStore.title", { chapter }), id: "chapter" },
-        ...(hasFeatureAccess(state, "CHAPTER_TRACKS")
-          ? [
-              {
-                icon: shopIcon,
-                name: t("chapterStore.tracks", { chapter }),
-                id: "tracks" as const,
-              },
-            ]
-          : []),
+        {
+          icon: shopIcon,
+          name: t("chapterStore.tracks", { chapter }),
+          id: "tracks",
+        },
       ]}
       onClose={onClose}
       container={OuterPanel}
     >
       {tab === "chapter" && (
-        <InnerPanel>
+        <InnerPanel className="min-h-[240px]">
           <ChapterStore state={state} />
         </InnerPanel>
       )}
-      {tab === "tracks" && <ChapterTracks onClose={onClose} />}
+      {tab === "tracks" && <ChapterTracks />}
     </CloseButtonPanel>
   );
 };

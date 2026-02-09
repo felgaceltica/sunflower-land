@@ -1,4 +1,4 @@
-import React, { useContext, useLayoutEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useMemo, useState } from "react";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { Label } from "components/ui/Label";
 import Decimal from "decimal.js-light";
@@ -17,9 +17,9 @@ import { MachineState } from "features/game/lib/gameMachine";
 import {
   getCurrentChapter,
   getChapterTicket,
+  CHAPTERS,
 } from "features/game/types/chapters";
 import confetti from "canvas-confetti";
-import { BumpkinItem } from "features/game/types/bumpkin";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { useNow } from "lib/utils/hooks/useNow";
 import {
@@ -27,7 +27,6 @@ import {
   ChapterStoreCollectible,
   ChapterStoreItem,
   ChapterStoreWearable,
-  ChapterTierItemName,
 } from "features/game/types/megastore";
 import { getItemDescription } from "../ChapterStore";
 import { getKeys } from "features/game/types/craftables";
@@ -35,6 +34,7 @@ import { ARTEFACT_SHOP_KEYS } from "features/game/types/collectibles";
 import { SFLDiscount } from "features/game/lib/SFLDiscount";
 import {
   getChapterItemsCrafted,
+  isBoughtWithinCurrentChapter,
   isKeyBoughtWithinChapter,
 } from "features/game/events/landExpansion/buyChapterItem";
 import { REWARD_BOXES } from "features/game/types/rewardBoxes";
@@ -43,11 +43,17 @@ import {
   BUMPKIN_RELEASES,
   INVENTORY_RELEASES,
 } from "features/game/types/withdrawables";
+import {
+  MEGASTORE_MONUMENTS,
+  MonumentName,
+  REQUIRED_CHEERS,
+} from "features/game/types/monuments";
+import helpIcon from "assets/icons/help.webp";
 
 import lockIcon from "assets/icons/lock.png";
 
 interface ItemOverlayProps {
-  item: ChapterStoreItem | null;
+  item: ChapterStoreItem;
   image: string;
   isWearable: boolean;
   buff?: BuffLabel[];
@@ -111,11 +117,9 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   const seasonalItemsCrafted =
     seasonalCollectiblesCrafted + seasonalWearablesCrafted;
 
-  const itemName = item
-    ? isWearable
-      ? (item as ChapterStoreWearable).wearable
-      : (item as ChapterStoreCollectible).collectible
-    : undefined;
+  const itemName = isWearable
+    ? (item as ChapterStoreWearable)?.wearable
+    : (item as ChapterStoreCollectible)?.collectible;
 
   const isKey = (name: InventoryItemName): name is Keys =>
     name in ARTEFACT_SHOP_KEYS;
@@ -131,11 +135,38 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
     tier === "mega" &&
     seasonalItemsCrafted - reduction >= seasonalStore.mega.requirement;
 
-  const boughtAt = state.megastore?.boughtAt[itemName as Keys] ?? 0;
+  const boughtAt = state.megastore?.boughtAt[itemName] ?? 0;
   const itemInCooldown = !!boughtAt && boughtAt + (item?.cooldownMs ?? 0) > now;
 
-  const itemCrafted =
-    state.farmActivity[`${itemName as ChapterTierItemName} Bought`];
+  const itemCrafted = state.farmActivity[`${itemName} Bought`];
+
+  // Check if Pet Egg was already bought this chapter
+  const petEggBoughtAt = state.megastore?.boughtAt["Pet Egg"];
+  const petEggPurchaseCount = state.farmActivity["Pet Egg Bought"] ?? 0;
+
+  const isPetEggBoughtThisChapter = useMemo(() => {
+    if (itemName !== "Pet Egg") return false;
+
+    // Primary check: boughtAt timestamp is within current chapter
+    if (isBoughtWithinCurrentChapter(petEggBoughtAt, now)) {
+      return true;
+    }
+
+    // Fallback for legacy data: if farmActivity shows a purchase but boughtAt is missing,
+    // and we're in the chapter where Pet Egg was introduced, treat conservatively
+    if (!petEggBoughtAt && petEggPurchaseCount > 0) {
+      const petEggChapter = CHAPTERS["Paw Prints"];
+      const nowDate = new Date(now);
+      const isInPetEggChapter =
+        nowDate >= petEggChapter.startDate && nowDate <= petEggChapter.endDate;
+
+      if (isInPetEggChapter) {
+        return true;
+      }
+    }
+
+    return false;
+  }, [itemName, petEggBoughtAt, petEggPurchaseCount, now]);
 
   const description = getItemDescription(item);
   const { sfl = 0 } = item?.cost || {};
@@ -162,6 +193,11 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   const canBuy = () => {
     if (!item) return false;
 
+    // Pet Egg: one per chapter limit
+    if (isPetEggBoughtThisChapter) {
+      return false;
+    }
+
     if (item.cooldownMs) {
       if (itemInCooldown) return false;
     }
@@ -172,7 +208,12 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
       if (tier === "mega" && !isMegaUnlocked) return false;
     }
 
-    if (!item.cooldownMs && !isKey(itemName as InventoryItemName)) {
+    // For non-cooldown items (except keys and Pet Egg), check if already crafted
+    if (
+      !item.cooldownMs &&
+      !isKey(itemName as InventoryItemName) &&
+      itemName !== "Pet Egg"
+    ) {
       if (itemCrafted) {
         return false;
       }
@@ -208,8 +249,8 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
           ? (item.cost?.items[chapterTicket] ?? 0)
           : sfl;
     const itemName = isWearable
-      ? ((item as ChapterStoreWearable).wearable as BumpkinItem)
-      : ((item as ChapterStoreCollectible).collectible as InventoryItemName);
+      ? (item as ChapterStoreWearable).wearable
+      : (item as ChapterStoreCollectible).collectible;
 
     gameAnalytics.trackSink({
       currency,
@@ -219,8 +260,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
     });
 
     if (!isWearable) {
-      const itemName = (item as ChapterStoreCollectible)
-        .collectible as InventoryItemName;
+      const itemName = (item as ChapterStoreCollectible).collectible;
       const count = inventory[itemName]?.toNumber() ?? 1;
       gameAnalytics.trackMilestone({
         event: `Crafting:Collectible:${itemName}${count}`,
@@ -229,7 +269,7 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
   };
   const { t } = useAppTranslation();
   const handleBuy = () => {
-    if (!item) return;
+    if (!item || !itemName) return;
 
     gameService.send("chapterItem.bought", {
       name: itemName,
@@ -343,9 +383,30 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                         )}
                       </div>
                     )}
-                    <span className="text-xs leading-none">{description}</span>
-
-                    {itemName && item?.cooldownMs ? (
+                    {!isWearable &&
+                      itemName in MEGASTORE_MONUMENTS &&
+                      REQUIRED_CHEERS[itemName as MonumentName] && (
+                        <Label type="info" className="text-xxs" icon={helpIcon}>
+                          {t("megastore.monument.helpsNeeded", {
+                            count: REQUIRED_CHEERS[itemName as MonumentName],
+                          })}
+                        </Label>
+                      )}
+                    {description && (
+                      <span className="text-xs leading-none">
+                        {description}
+                      </span>
+                    )}
+                    {itemName === "Pet Egg" ? (
+                      <Label
+                        type={isPetEggBoughtThisChapter ? "danger" : "default"}
+                        className="text-xxs"
+                      >
+                        {isPetEggBoughtThisChapter
+                          ? t("season.megastore.crafting.limit", { limit: 1 })
+                          : t("season.megastore.crafting.limit", { limit: 0 })}
+                      </Label>
+                    ) : itemName && item?.cooldownMs ? (
                       <Label
                         type={itemInCooldown ? "danger" : "default"}
                         className="text-xxs"
@@ -371,7 +432,6 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                         })}
                       </Label>
                     )}
-
                     {!isTradeable && (
                       <Label
                         type="formula"
@@ -381,7 +441,6 @@ export const ItemDetail: React.FC<ItemOverlayProps> = ({
                         {t("season.megastore.nonTradeable")}
                       </Label>
                     )}
-
                     {itemReq && (
                       <div className="flex flex-1 content-start flex-col flex-wrap gap-1">
                         {getKeys(itemReq).map((itemName, index) => {

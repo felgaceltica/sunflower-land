@@ -1,14 +1,12 @@
 import { SUNNYSIDE } from "assets/sunnyside";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import {
-  CHAPTER_TICKET_NAME,
   ChapterName,
   getCurrentChapter,
-  secondsLeftInChapter,
+  getChapterTicket,
 } from "features/game/types/chapters";
 import { useNow } from "lib/utils/hooks/useNow";
-import { secondsToString } from "lib/utils/time";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Label } from "components/ui/Label";
 import { useGame } from "features/game/GameProvider";
 import { hasVipAccess } from "features/game/lib/vipAccess";
@@ -19,8 +17,9 @@ import premiumTrackIcon from "assets/icons/premium_track.webp";
 import ticketIcon from "assets/icons/free_track.png";
 import medalMilestone from "assets/icons/medal_side_grey.webp";
 import medalMilestoneRed from "assets/icons/red_medal.webp";
-import medalMilestoneComplete from "assets/icons/track_complete.webp";
+import medalMilestoneComplete from "assets/icons/medals_completed.webp";
 import giftIcon from "assets/icons/gift.png";
+import vipIcon from "assets/icons/vip.webp";
 import {
   CHAPTER_TRACKS,
   MilestoneRewards,
@@ -41,6 +40,7 @@ import confetti from "canvas-confetti";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { ModalContext } from "features/game/components/modal/ModalProvider";
 import { NaturalImage } from "components/ui/NaturalImage";
+import { gameAnalytics } from "lib/gameAnalytics";
 
 type TrackProgress = {
   points: number;
@@ -60,8 +60,7 @@ export function getTrackProgress({
   state: GameState;
   chapter: ChapterName;
 }): TrackProgress {
-  const points =
-    state.farmActivity[`${CHAPTER_TICKET_NAME[chapter]} Collected`] ?? 0;
+  const points = state.farmActivity[`${chapter} Points Earned`] ?? 0;
 
   const premium =
     state.farmActivity[`${chapter} premium Milestone Claimed`] ?? 0;
@@ -101,14 +100,13 @@ export function getTrackProgress({
   return progress;
 }
 
-export const ChapterTracks: React.FC<{ onClose: () => void }> = ({
-  onClose,
-}) => {
+export const ChapterTracks: React.FC = () => {
   const { t } = useAppTranslation();
   const { gameState } = useGame();
   const state = gameState.context.state;
   const now = useNow();
   const { openModal } = useContext(ModalContext);
+  const hasTrackedRef = useRef<ChapterName | null>(null);
 
   const [selected, setSelected] = useState<
     | {
@@ -133,72 +131,141 @@ export const ChapterTracks: React.FC<{ onClose: () => void }> = ({
   const hasVip = hasVipAccess({ game: state });
 
   const chapter = getCurrentChapter(now);
+  const chapterTicket = getChapterTicket(now);
 
   const track = CHAPTER_TRACKS[chapter];
 
   const progress = getTrackProgress({ state, chapter });
 
-  const isComplete =
-    progress.milestone.number >= (track?.milestones.length ?? 0);
+  const finalMilestonePoints =
+    track?.milestones[track?.milestones.length - 1]?.points ?? 0;
+
+  const isComplete = progress.points >= finalMilestonePoints;
+
+  useEffect(() => {
+    const nowMs = Date.now();
+    const lastInteractionKey = `chapterTracks:lastInteractionAt:${chapter}`;
+    const premiumActivatedKey = `chapterTracks:premiumActivated:${chapter}`;
+
+    if (hasTrackedRef.current === chapter) {
+      return;
+    }
+    hasTrackedRef.current = chapter;
+
+    gameAnalytics.trackTracksViewed({ chapter, hasVip });
+
+    try {
+      const lastInteractionAt = localStorage.getItem(lastInteractionKey);
+
+      if (lastInteractionAt) {
+        const inactiveDays = Math.floor(
+          (nowMs - Number(lastInteractionAt)) / (24 * 60 * 60 * 1000),
+        );
+
+        if (inactiveDays > 0) {
+          gameAnalytics.trackTracksReturn({
+            chapter,
+            lastTier: progress.milestone.number,
+            inactiveDays,
+          });
+        }
+      }
+
+      localStorage.setItem(lastInteractionKey, String(nowMs));
+
+      if (hasVip && !localStorage.getItem(premiumActivatedKey)) {
+        gameAnalytics.trackTracksPremiumActivated({ chapter });
+        localStorage.setItem(premiumActivatedKey, "true");
+      }
+    } catch {
+      // no-op
+    }
+  }, [chapter, hasVip]);
 
   return (
     <>
-      <InnerPanel className="flex flex-wrap justify-between mb-1">
-        <div className="flex items-center">
-          <img src={SUNNYSIDE.icons.stopwatch} className="h-8 mr-1" />
-          <div>
-            <Label type="info" className="text-xs">
-              {t("tracks.chapterEnds")}
-            </Label>
-            <p className="text-xxs ml-1">
-              {secondsToString(secondsLeftInChapter(now), {
-                length: "medium",
+      <InnerPanel className="mb-1">
+        <div className="flex flex-wrap justify-between items-start">
+          {/* <div className="flex items-start">
+            <img src={SUNNYSIDE.icons.stopwatch} className="w-6 mr-1" />
+            <div>
+              <Label type="info" className="text-xs">
+                {t("tracks.chapterEnds")}
+              </Label>
+              <p className="text-xxs ml-1">
+                {secondsToString(secondsLeftInChapter(now), {
+                  length: "medium",
+                })}
+              </p>
+            </div>
+          </div> */}
+          <div className="flex">
+            <img src={giftIcon} className="h-9 mr-1" />
+            <div>
+              <Label type="warning">{t("rewards")}</Label>
+              <p className="text-xxs ml-1">
+                {t("chapterDashboard.tracksEarnPoints")}
+              </p>
+            </div>
+          </div>
+          {isComplete ? (
+            <img src={medalMilestoneComplete} className="h-8" />
+          ) : (
+            <>
+              <div className="flex  items-end relative">
+                <div className="flex flex-col items-end">
+                  <ResizableBar
+                    percentage={
+                      (progress.milestone.progress /
+                        progress.milestone.requirement) *
+                      100
+                    }
+                    outerDimensions={{ width: 30, height: 8 }}
+                    type="progress"
+                  />
+                  <p className="text-xs pr-4">
+                    {`${progress.milestone.progress}/${progress.milestone.requirement}`}
+                  </p>
+                </div>
+
+                <img
+                  src={medalMilestone}
+                  style={{
+                    height: "40px",
+                    zIndex: "10",
+                    marginLeft: "-13px",
+                  }}
+                />
+                <div
+                  className="absolute text-center"
+                  style={{
+                    right: "16px",
+                    zIndex: "10",
+                    top: "11px",
+                    width: "32px",
+                  }}
+                >
+                  <p className="yield-text">{progress.milestone.number}</p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        {/* <div
+          className="flex items-center pt-1 mt-1"
+          style={{
+            borderTop: "1px solid #c28569",
+          }}
+        >
+          <img src={chapterPointsIcon} className="w-6 mr-[8px]" />
+          <div className="flex-1">
+            <p className="text-xxs">
+              {t("tracks.completeTasksToEarnPoints", {
+                chapter: chapterTicket,
               })}
             </p>
           </div>
-        </div>
-        {isComplete ? (
-          <img src={medalMilestoneComplete} className="h-8" />
-        ) : (
-          <>
-            <div className="flex  items-end relative">
-              <div className="flex flex-col items-end">
-                <ResizableBar
-                  percentage={
-                    (progress.milestone.progress /
-                      progress.milestone.requirement) *
-                    100
-                  }
-                  outerDimensions={{ width: 30, height: 8 }}
-                  type="progress"
-                />
-                <p className="text-xs pr-4">
-                  {`${progress.milestone.progress}/${progress.milestone.requirement}`}
-                </p>
-              </div>
-
-              <img
-                src={medalMilestone}
-                style={{
-                  height: "40px",
-                  zIndex: "10",
-                  marginLeft: "-13px",
-                }}
-              />
-              <div
-                className="absolute text-center"
-                style={{
-                  right: "16px",
-                  zIndex: "10",
-                  top: "11px",
-                  width: "32px",
-                }}
-              >
-                <p className="yield-text">{progress.milestone.number}</p>
-              </div>
-            </div>
-          </>
-        )}
+        </div> */}
       </InnerPanel>
 
       <div className="justify-center h-[330px] sm:h-auto gap-x-2  sm:overflow-y-visible overflow-y-scroll overflow-x-visible sm:overflow-x-scroll scrollable w-full flex sm:flex-col flex-row">
@@ -207,6 +274,7 @@ export const ChapterTracks: React.FC<{ onClose: () => void }> = ({
             className="sm:-20 sm:min-w-20 h-20 min-h-20 flex flex-col items-center justify-center cursor-pointer"
             onClick={() => {
               if (!hasVip) {
+                gameAnalytics.trackTracksPremiumUpsellOpened({ chapter });
                 openModal("VIP_ITEMS");
               }
             }}
@@ -489,5 +557,231 @@ export const MilestoneDetails: React.FC<{
         </Button>
       )}
     </CloseButtonPanel>
+  );
+};
+
+// A smaller widget based track used for mobile.
+export const ChapterTracksPreview: React.FC = () => {
+  const { t } = useAppTranslation();
+  const { gameState } = useGame();
+  const state = gameState.context.state;
+  const now = useNow();
+  const { openModal } = useContext(ModalContext);
+  const hasTrackedRef = useRef<ChapterName | null>(null);
+
+  const [selected, setSelected] = useState<
+    | {
+        milestone: number;
+        reward: MilestoneRewards;
+        points: number;
+        track: "free" | "premium";
+      }
+    | undefined
+  >();
+
+  const hasVip = hasVipAccess({ game: state });
+
+  const chapter = getCurrentChapter(now);
+  const chapterTicket = getChapterTicket(now);
+
+  const track = CHAPTER_TRACKS[chapter];
+
+  const progress = getTrackProgress({ state, chapter });
+
+  const finalMilestonePoints =
+    track?.milestones[track?.milestones.length - 1]?.points ?? 0;
+
+  const isComplete = progress.points >= finalMilestonePoints;
+
+  if (isComplete) {
+    return (
+      <InnerPanel className="flex flex-wrap justify-between ">
+        <Label type="success">{t("completed")}</Label>
+        <img src={medalMilestoneComplete} className="h-8" />
+      </InnerPanel>
+    );
+  }
+  if (!track) {
+    return null;
+  }
+  const rewards = track.milestones[progress.milestone.number];
+  if (!rewards) {
+    return null;
+  }
+
+  const { items, wearables, coins, flower } = rewards.free;
+  const freeImages: string[] = [];
+  const freeText: string[] = [];
+
+  let amount = 0;
+
+  if (items) {
+    freeImages.push(...getKeys(items).map((item) => ITEM_DETAILS[item].image));
+    amount += Object.values(items).reduce((acc, curr) => acc + curr, 0);
+    freeText.push(...getKeys(items).map((item) => `${items[item]} x ${item}`));
+  }
+
+  if (wearables) {
+    freeImages.push(
+      ...getKeys(wearables).map((wearable) => getImageUrl(ITEM_IDS[wearable])),
+    );
+    amount += Object.values(wearables).reduce((acc, curr) => acc + curr, 0);
+    freeText.push(
+      ...getKeys(wearables).map(
+        (wearable) => `${wearables[wearable]} x ${wearable}`,
+      ),
+    );
+  }
+
+  if (coins) {
+    freeImages.push(coinsIcon);
+    amount += coins;
+    freeText.push(`${coins}`);
+  }
+
+  if (flower) {
+    freeImages.push(flowerIcon);
+    amount += flower;
+    freeText.push(`${flower}`);
+  }
+
+  const premiumImages: string[] = [];
+  const premiumText: string[] = [];
+
+  if (items) {
+    premiumImages.push(
+      ...getKeys(items).map((item) => ITEM_DETAILS[item].image),
+    );
+    amount += Object.values(items).reduce((acc, curr) => acc + curr, 0);
+    premiumText.push(
+      ...getKeys(items).map((item) => `${items[item]} x ${item}`),
+    );
+  }
+
+  if (wearables) {
+    premiumImages.push(
+      ...getKeys(wearables).map((wearable) => getImageUrl(ITEM_IDS[wearable])),
+    );
+    amount += Object.values(wearables).reduce((acc, curr) => acc + curr, 0);
+    premiumText.push(
+      ...getKeys(wearables).map(
+        (wearable) => `${wearables[wearable]} x ${wearable}`,
+      ),
+    );
+  }
+
+  if (coins) {
+    premiumImages.push(coinsIcon);
+    amount += coins;
+    premiumText.push(`${coins} coins`);
+  }
+
+  if (flower) {
+    premiumImages.push(flowerIcon);
+    amount += flower;
+    premiumText.push(`${flower} FLOWER`);
+  }
+
+  const images = [...freeImages, ...premiumImages];
+
+  return (
+    <>
+      <InnerPanel>
+        <div className="flex flex-wrap justify-between items-start">
+          <Label type="warning">{t("chapterDashboard.nextReward")}</Label>
+
+          <>
+            <div className="flex  items-end relative">
+              <div className="flex flex-col items-end">
+                <ResizableBar
+                  percentage={
+                    (progress.milestone.progress /
+                      progress.milestone.requirement) *
+                    100
+                  }
+                  outerDimensions={{ width: 30, height: 8 }}
+                  type="progress"
+                />
+                <p className="text-xs pr-4">
+                  {`${progress.milestone.progress}/${progress.milestone.requirement}`}
+                </p>
+              </div>
+
+              <img
+                src={medalMilestone}
+                style={{
+                  height: "40px",
+                  zIndex: "10",
+                  marginLeft: "-13px",
+                }}
+              />
+              <div
+                className="absolute text-center"
+                style={{
+                  right: "16px",
+                  zIndex: "10",
+                  top: "11px",
+                  width: "32px",
+                }}
+              >
+                <p className="yield-text">{progress.milestone.number}</p>
+              </div>
+            </div>
+          </>
+        </div>
+        <div className="flex items-center">
+          <div className="w-16 min-w-16 h-16 relative mr-2">
+            <img
+              src={SUNNYSIDE.ui.grey_background}
+              className="w-full h-full rounded-md"
+            />
+            <img
+              src={freeImages[0]}
+              className="absolute left-2 top-2 w-10 max-h-8 object-contain"
+            />
+            <img
+              src={premiumImages[0]}
+              className="absolute right-2 bottom-2 w-10 max-h-8 object-contain"
+            />
+          </div>
+          <div className="flex-1 min-w-0 mb-1">
+            {freeText.map((text, index) => (
+              <div
+                className="flex items-center w-full min-w-0 overflow-hidden"
+                key={`${text}-${index}`}
+              >
+                <p className="text-xs truncate mr-1 flex-1 min-w-0">{text}</p>
+                <div className="flex w-16 justify-end shrink-0">
+                  <Label type="success">{t("free")}</Label>
+                </div>
+              </div>
+            ))}
+            {freeText.map((text, index) => (
+              <div
+                className="flex items-center w-full min-w-0 overflow-hidden"
+                key={`${text}-vip-${index}`}
+              >
+                <p className="text-xs truncate mr-1 flex-1 min-w-0">{text}</p>
+
+                <div className="flex w-16 justify-end shrink-0">
+                  <img src={vipIcon} className="h-5 mr-0.5" />
+                  {!hasVip && <img src={lockIcon} className="h-5 " />}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </InnerPanel>
+
+      <Button
+        className="w-full relative mt-1"
+        onClick={() => openModal("CHAPTER_TRACKS")}
+      >
+        <span className="flex items-center justify-center gap-2 w-full">
+          <span>{t("chapter.open")}</span>
+          <img src={giftIcon} className="h-5" />
+        </span>
+      </Button>
+    </>
   );
 };
