@@ -5,11 +5,13 @@ import { CHAPTER_TRACKS, TrackName } from "features/game/types/tracks";
 import {
   getChapterTicket,
   getCurrentChapter,
+  CHAPTERS,
 } from "features/game/types/chapters";
 import { trackFarmActivity } from "features/game/types/farmActivity";
 import { hasVipAccess } from "features/game/lib/vipAccess";
 import { BumpkinItem } from "features/game/types/bumpkin";
 import { getObjectEntries } from "features/game/expansion/lib/utils";
+import { gameAnalytics } from "lib/gameAnalytics";
 
 export type ClaimTrackMilestoneAction = {
   type: "trackMilestone.claimed";
@@ -33,7 +35,7 @@ export function claimTrackMilestone({
     const nextMilestone =
       game.farmActivity[`${chapter} ${action.track} Milestone Claimed`] ?? 0;
 
-    const points = game.farmActivity[`${ticket} Collected`] ?? 0;
+    const points = game.farmActivity[`${chapter} Points Earned`] ?? 0;
 
     const chapterTrack = CHAPTER_TRACKS[chapter];
 
@@ -90,6 +92,17 @@ export function claimTrackMilestone({
       `${chapter} ${action.track} Milestone Claimed`,
       game.farmActivity,
     );
+
+    const daysSinceStart =
+      (createdAt - CHAPTERS[chapter].startDate.getTime()) /
+      (24 * 60 * 60 * 1000);
+
+    gameAnalytics.trackTracksMilestoneClaimed({
+      chapter,
+      track: action.track,
+      milestone: nextMilestone + 1,
+      daysSinceStart,
+    });
 
     return game;
   });

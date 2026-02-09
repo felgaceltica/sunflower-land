@@ -88,11 +88,6 @@ import {
   removeCollectible,
   RemoveCollectibleAction,
 } from "./landExpansion/removeCollectible";
-import {
-  collectCropReward,
-  CollectCropRewardAction,
-} from "./landExpansion/collectCropReward";
-
 import { plantFruit, PlantFruitAction } from "./landExpansion/fruitPlanted";
 import {
   harvestFruit,
@@ -238,7 +233,6 @@ import {
 } from "./landExpansion/completeSpecialEventTask";
 import { claimGift, ClaimGiftAction } from "./landExpansion/claimBumpkinGift";
 import { giftFlowers, GiftFlowersAction } from "./landExpansion/giftFlowers";
-import { enterRaffle, EnterRaffleAction } from "./landExpansion/enterRaffle";
 
 import {
   exchangeSFLtoCoins,
@@ -541,6 +535,7 @@ import {
   instantGrowProject,
   InstantGrowProjectAction,
 } from "./landExpansion/instaGrowProject";
+import { startProject, StartProjectAction } from "./landExpansion/startProject";
 import {
   instaGrowFlower,
   InstaGrowFlowerAction,
@@ -623,7 +618,6 @@ export type PlayingEvent =
   | BuyDecorationAction
   | BuyMonumentAction
   | SellCropAction
-  | CollectCropRewardAction
   | PlantFruitAction
   | HarvestFruitAction
   | RemoveFruitTreeAction
@@ -670,7 +664,6 @@ export type PlayingEvent =
   | CompleteSpecialEventTaskAction
   | GiftFlowersAction
   | ClaimGiftAction
-  | EnterRaffleAction
   | ExchangeSFLtoCoinsAction
   | DrillOilReserveAction
   | ClaimMinigamePrizeAction
@@ -732,6 +725,7 @@ export type PlayingEvent =
   | RetryFishAction
   | BurnClutterAction
   | InstantGrowProjectAction
+  | StartProjectAction
   | InstaGrowFlowerAction
   | UpgradeRockAction
   | UpgradeTreeAction
@@ -887,7 +881,6 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "monument.bought": buyMonument,
   "crop.sold": sellCrop,
 
-  "cropReward.collected": collectCropReward,
   "fruit.planted": plantFruit,
   "fruit.harvested": harvestFruit,
   "fruitTree.removed": removeFruitTree,
@@ -933,7 +926,6 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "specialEvent.taskCompleted": completeSpecialEventTask,
   "flowers.gifted": giftFlowers,
   "gift.claimed": claimGift,
-  "raffle.entered": enterRaffle,
   "sfl.exchanged": exchangeSFLtoCoins,
   "faction.joined": joinFaction,
   "oilReserve.drilled": drillOilReserve,
@@ -991,6 +983,7 @@ export const PLAYING_EVENTS: Handlers<PlayingEvent> = {
   "bumpkin.wave": bumpkinWave,
   "clutter.burned": burnClutter,
   "project.instantGrow": instantGrowProject,
+  "project.started": startProject,
   "rock.upgraded": upgradeRock,
   "tree.upgraded": upgradeTree,
   "fish.retried": retryFish,

@@ -21,6 +21,9 @@ import {
 } from "features/game/types/megastore";
 import { isCollectible } from "./garbageSold";
 import { trackFarmActivity } from "features/game/types/farmActivity";
+import { getChapterTaskPoints } from "features/game/types/tracks";
+import { FlowerBox } from "../landExpansion/buyChapterItem";
+import { handleChapterAnalytics } from "features/game/lib/trackAnalytics";
 
 export type CompleteNPCChoreAction = {
   type: "chore.fulfilled";
@@ -36,9 +39,9 @@ type Options = {
 export const CHAPTER_TICKET_BOOST_ITEMS: Record<
   ChapterName,
   {
-    basic: Exclude<ChapterTierItemName, MegastoreKeys>;
-    rare: Exclude<ChapterTierItemName, MegastoreKeys>;
-    epic: Exclude<ChapterTierItemName, MegastoreKeys>;
+    basic: Exclude<ChapterTierItemName, MegastoreKeys | FlowerBox | "Pet Egg">;
+    rare: Exclude<ChapterTierItemName, MegastoreKeys | FlowerBox | "Pet Egg">;
+    epic: Exclude<ChapterTierItemName, MegastoreKeys | FlowerBox | "Pet Egg">;
   }
 > = {
   "Solar Flare": {
@@ -105,9 +108,9 @@ export const CHAPTER_TICKET_BOOST_ITEMS: Record<
   },
   // TODO: Add Crabs and Traps items
   "Crabs and Traps": {
-    basic: "Cow Scratcher",
-    rare: "Cow Scratcher",
-    epic: "Cow Scratcher",
+    basic: "Fish Hook Hat",
+    rare: "Fish Hook Vest",
+    epic: "Fish Hook Waders",
   },
 };
 
@@ -179,10 +182,28 @@ export function completeNPCChore({
     const amount = items[ticket] ?? 0;
 
     if (amount > 0) {
+      const chapter = getCurrentChapter(createdAt);
+      const pointsAwarded = getChapterTaskPoints({
+        task: "chore",
+        points: amount,
+      });
+      handleChapterAnalytics({
+        task: "chore",
+        points: amount,
+        farmActivity: draft.farmActivity,
+        createdAt,
+      });
+
       draft.farmActivity = trackFarmActivity(
         `${ticket} Collected`,
         draft.farmActivity,
         new Decimal(amount),
+      );
+
+      draft.farmActivity = trackFarmActivity(
+        `${chapter} Points Earned`,
+        draft.farmActivity,
+        new Decimal(pointsAwarded),
       );
     }
 
@@ -199,6 +220,8 @@ export function generateChoreRewards({
   chore: NpcChore;
   now: Date;
 }) {
+  if (!chore) return {};
+
   const items = Object.assign({}, chore.reward.items) ?? {};
 
   const ticket = getChapterTicket(now.getTime());
