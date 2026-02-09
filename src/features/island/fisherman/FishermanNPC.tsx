@@ -25,7 +25,7 @@ import {
   FishName,
   FISH_DIFFICULTY,
   MarineMarvelName,
-  MAP_PIECES,
+  MAP_PIECE_MARVELS,
 } from "features/game/types/fishing";
 import { MachineState } from "features/game/lib/gameMachine";
 import { gameAnalytics } from "lib/gameAnalytics";
@@ -35,10 +35,9 @@ import { ITEM_DETAILS } from "features/game/types/images";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import classNames from "classnames";
 import { isFishFrenzy, isFullMoon } from "features/game/types/calendar";
-import { hasFeatureAccess } from "lib/flags";
 import { FishermanPuzzle } from "features/island/fisherman/FishingPuzzle";
 import { Panel } from "components/ui/Panel";
-import { FishingChallenge } from "./FishingChallenge";
+import { Coordinates } from "features/game/expansion/components/MapPlacement";
 
 type SpriteFrames = { startAt: number; endAt: number };
 
@@ -94,7 +93,7 @@ const _state = (state: MachineState) => state.context.state;
 const _marvel = (state: MachineState) => {
   const game = state.context.state;
   // If there is a ready marvel to be caught;
-  const ready = getKeys(MAP_PIECES).find(
+  const ready = MAP_PIECE_MARVELS.find(
     (marvel) =>
       !game.farmActivity[`${marvel} Caught`] &&
       (game.farmActivity[`${marvel} Map Piece Found`] ?? 0) >= 9,
@@ -112,14 +111,13 @@ export const FishermanNPC: React.FC<Props> = ({ onClick }) => {
   const [showLockedModal, setShowLockedModal] = useState(false);
   const [showCaughtModal, setShowCaughtModal] = useState(false);
   const [showChallenge, setShowChallenge] = useState(false);
-  const [challengeDifficulty, setChallengeDifficulty] = useState(1);
   const [difficultCatch, setDifficultCatch] = useState<DifficultCatch[]>([]);
 
   const { gameService } = useContext(Context);
   const state = useSelector(gameService, _state);
   const canFish = useSelector(gameService, _canFish);
   const readyMarvel = useSelector(gameService, _marvel);
-  const { fishing, farmActivity } = state;
+  const { fishing, farmActivity, island } = state;
 
   // Catches cases where players try reset their fishing challenge
   useEffect(() => {
@@ -182,10 +180,6 @@ export const FishermanNPC: React.FC<Props> = ({ onClick }) => {
     (fish): fish is FishName | MarineMarvelName => fish in FISH,
   );
 
-  const getMostDifficultFish = (difficultCatch: DifficultCatch[]) => {
-    return difficultCatch.sort((a, b) => b.difficulty - a.difficulty)[0];
-  };
-
   const reelIn = () => {
     const difficultCatch = caughtFish
       .map((name) => {
@@ -197,16 +191,8 @@ export const FishermanNPC: React.FC<Props> = ({ onClick }) => {
 
     setDifficultCatch(difficultCatch);
 
-    const mostDifficultFish = getMostDifficultFish(difficultCatch);
-
-    const hasMapAccess = hasFeatureAccess(state, "MAP_PIECES");
-
     const maps = getKeys(fishing.wharf.maps ?? {});
-    if (maps.length > 0 && hasMapAccess) {
-      setShowChallenge(true);
-    } else if (mostDifficultFish && !hasMapAccess) {
-      // Show fishing challenge
-      setChallengeDifficulty(mostDifficultFish.difficulty);
+    if (maps.length > 0) {
       setShowChallenge(true);
     } else {
       // Instantly reel in
@@ -237,11 +223,7 @@ export const FishermanNPC: React.FC<Props> = ({ onClick }) => {
     spriteRef.current?.setStartAt(FISHING_FRAMES.caught.startAt);
     spriteRef.current?.setEndAt(FISHING_FRAMES.caught.endAt);
 
-    if (hasFeatureAccess(state, "MAP_PIECES")) {
-      gameService.send("map.missed");
-    } else {
-      gameService.send("fish.missed");
-    }
+    gameService.send("map.missed");
     gameService.send("SAVE");
   };
 
@@ -285,13 +267,47 @@ export const FishermanNPC: React.FC<Props> = ({ onClick }) => {
     onClick();
   };
 
+  const fishermanPosition = (): Coordinates => {
+    if (island.type === "volcano") {
+      return {
+        x: 53,
+        y: 44,
+      };
+    }
+
+    if (island.type === "desert") {
+      return {
+        x: 34,
+        y: 30,
+      };
+    }
+
+    if (island.type === "spring") {
+      return {
+        x: 20,
+        y: 29,
+      };
+    }
+
+    return {
+      x: 0,
+      y: 0,
+    };
+  };
+
+  const { x, y } = fishermanPosition();
+
   return (
     <>
       <div
-        className={classNames("absolute w-full h-full", {
+        className={classNames("absolute z-50 w-full h-full", {
           "cursor-pointer hover:img-highlight": !fishing.wharf.castedAt,
         })}
         onClick={handleClick}
+        style={{
+          left: `${PIXEL_SCALE * x}px`,
+          top: `${PIXEL_SCALE * y}px`,
+        }}
       >
         {!canFish && (
           <>
@@ -480,21 +496,12 @@ export const FishermanNPC: React.FC<Props> = ({ onClick }) => {
 
       <Modal show={showChallenge}>
         <Panel>
-          {hasFeatureAccess(state, "FISHING_PUZZLE") ? (
-            <FishermanPuzzle
-              onCatch={onChallengeWon}
-              onMiss={onChallengeLost}
-              onRetry={onChallengeRetry}
-              maps={fishing.wharf.maps ?? {}}
-            />
-          ) : (
-            <FishingChallenge
-              difficulty={challengeDifficulty}
-              onCatch={onChallengeWon}
-              onMiss={onChallengeLost}
-              fishName={getMostDifficultFish(difficultCatch)?.name}
-            />
-          )}
+          <FishermanPuzzle
+            onCatch={onChallengeWon}
+            onMiss={onChallengeLost}
+            onRetry={onChallengeRetry}
+            maps={fishing.wharf.maps ?? {}}
+          />
         </Panel>
       </Modal>
     </>

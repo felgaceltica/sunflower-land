@@ -10,8 +10,20 @@ import { useCountdown } from "lib/utils/hooks/useCountdown";
 import { ProgressBar } from "components/ui/ProgressBar";
 import { SUNNYSIDE } from "assets/sunnyside";
 import classNames from "classnames";
-import { CrustaceanChum, WaterTrapName } from "features/game/types/crustaceans";
+import {
+  CRUSTACEAN_CHUM_AMOUNTS,
+  CrustaceanChum,
+  WATER_TRAP_ANIMATIONS,
+  WaterTrapName,
+} from "features/game/types/crustaceans";
 import { useAuth } from "features/auth/lib/Provider";
+import { TimerPopover } from "features/island/common/TimerPopover";
+import { ITEM_DETAILS } from "features/game/types/images";
+import crabSpot1 from "assets/wharf/crab_spot_1.webp";
+import crabSpot2 from "assets/wharf/crab_spot_2.webp";
+import { getKeys } from "features/game/types/decorations";
+import Spritesheet from "components/animation/SpriteAnimator";
+import { ZoomContext } from "components/ZoomProvider";
 
 const _crabTraps = (state: MachineState) => state.context.state.crabTraps;
 const _isVisiting = (state: MachineState) => state.matches("visiting");
@@ -23,9 +35,11 @@ interface Props {
 export const WaterTrapSpot: React.FC<Props> = ({ id }) => {
   const { gameService, showTimers } = useContext(Context);
   const { authState } = useAuth();
+  const { scale } = useContext(ZoomContext);
   const crabTraps = useSelector(gameService, _crabTraps);
   const isVisiting = useSelector(gameService, _isVisiting);
   const [showModal, setShowModal] = useState(false);
+  const [showTimerPopover, setShowTimerPopover] = useState(false);
 
   const waterTrap = crabTraps.trapSpots?.[id]?.waterTrap;
 
@@ -48,6 +62,8 @@ export const WaterTrapSpot: React.FC<Props> = ({ id }) => {
 
   const handleClick = () => {
     if (isVisiting) return;
+    // In progress: only hover popover, no modal
+    if (isPlaced) return;
     setShowModal(true);
   };
 
@@ -82,60 +98,121 @@ export const WaterTrapSpot: React.FC<Props> = ({ id }) => {
     }
   };
 
+  const crabSpotImage = Number(id) > 2 ? crabSpot2 : crabSpot1;
+
+  const caughtItem = waterTrap?.caught
+    ? getKeys(waterTrap.caught)[0]
+    : undefined;
+  const placedPotDimensions =
+    waterTrap?.type === "Crab Pot"
+      ? { width: 13, height: 15 }
+      : { width: 15, height: 17 };
+
   return (
     <>
       <div
-        className={classNames("relative w-full h-full cursor-pointer", {
-          "pointer-events-none": isVisiting,
-        })}
+        className={classNames(
+          "relative w-full h-full cursor-pointer hover:img-highlight",
+          {
+            "pointer-events-none": isVisiting,
+          },
+        )}
         onClick={handleClick}
+        onMouseEnter={() => {
+          if (isPlaced) setShowTimerPopover(true);
+        }}
+        onMouseLeave={() => setShowTimerPopover(false)}
       >
-        <>
+        {isPlaced && waterTrap && (
           <div
-            className="absolute inset-0 bg-brown-600 border-2 border-brown-800"
+            className="flex justify-center absolute w-full pointer-events-none"
+            style={{ top: `${PIXEL_SCALE * -18}px` }}
+          >
+            <TimerPopover
+              image={
+                caughtItem
+                  ? ITEM_DETAILS[caughtItem].image
+                  : SUNNYSIDE.icons.expression_confused
+              }
+              description={caughtItem ? caughtItem : ""}
+              showPopover={showTimerPopover}
+              timeLeft={secondsLeft}
+              secondaryImage={
+                waterTrap.chum != null
+                  ? ITEM_DETAILS[waterTrap.chum].image
+                  : undefined
+              }
+              secondaryDescription={
+                waterTrap.chum != null
+                  ? `${CRUSTACEAN_CHUM_AMOUNTS[waterTrap.chum]} ${waterTrap.chum}`
+                  : undefined
+              }
+            />
+          </div>
+        )}
+        {isReady && (
+          <>
+            <img
+              src={SUNNYSIDE.fx.sparkle}
+              className="absolute w-4 h-4 z-[100]"
+            />
+            <img
+              src={SUNNYSIDE.icons.expression_alerted}
+              className="absolute -top-8 right-3.5"
+              style={{
+                width: `${PIXEL_SCALE * 4}px`,
+              }}
+            />
+          </>
+        )}
+        <div className="absolute inset-0 flex items-center justify-center">
+          {waterTrap ? (
+            <Spritesheet
+              className="absolute pointer-events-none"
+              style={{
+                width: `${PIXEL_SCALE * placedPotDimensions.width}px`,
+                height: `${PIXEL_SCALE * placedPotDimensions.height}px`,
+                imageRendering: "pixelated",
+              }}
+              image={WATER_TRAP_ANIMATIONS[waterTrap.type]}
+              widthFrame={placedPotDimensions.width}
+              heightFrame={placedPotDimensions.height}
+              zoomScale={scale}
+              fps={3}
+              steps={2}
+              direction="forward"
+              autoplay
+              loop
+            />
+          ) : (
+            <img
+              src={crabSpotImage}
+              alt={`Crab Spot ${id}`}
+              width={PIXEL_SCALE * 15}
+              height={PIXEL_SCALE * 20}
+            />
+          )}
+        </div>
+        {showTimers && isPlaced && readyAt && (
+          <div
+            className="flex justify-center absolute pointer-events-none"
             style={{
-              borderRadius: `${2 * PIXEL_SCALE}px`,
+              bottom: `${PIXEL_SCALE * 4}px`,
+              left: "50%",
+              transform: "translateX(-50%)",
             }}
           >
-            {isReady ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <img
-                  src={SUNNYSIDE.icons.happy}
-                  className="w-4 h-4"
-                  alt="Ready"
-                />
-              </div>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <img
-                  src={SUNNYSIDE.resource.crab}
-                  className="w-4 h-4"
-                  alt="In Progress"
-                />
-              </div>
-            )}
-            {showTimers && isPlaced && readyAt && (
-              <div
-                className="flex justify-center absolute pointer-events-none"
-                style={{
-                  bottom: `${PIXEL_SCALE * 4}px`,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                }}
-              >
-                <ProgressBar
-                  percentage={percentage}
-                  type="progress"
-                  formatLength="short"
-                  seconds={secondsLeft}
-                  style={{
-                    width: `${PIXEL_SCALE * 14}px`,
-                  }}
-                />
-              </div>
-            )}
+            <ProgressBar
+              percentage={percentage}
+              type="progress"
+              formatLength="short"
+              seconds={secondsLeft}
+              style={{
+                width: `${PIXEL_SCALE * 14}px`,
+              }}
+            />
           </div>
-        </>
+        )}
       </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <WaterTrapModal

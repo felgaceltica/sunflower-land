@@ -758,6 +758,54 @@ export const COLLECTIBLE_COMPONENTS: Record<
   "Skill Shrimpy": SkillShrimpy,
   "Soil Krabby": SoilKrabby,
   Nana: Nana,
+  "Speckled Kissing Fish": () => (
+    <TemplateCollectible name="Speckled Kissing Fish" />
+  ),
+  "Dark Eyed Kissing Fish": () => (
+    <TemplateCollectible name="Dark Eyed Kissing Fish" />
+  ),
+  "Fisherman's Boat": () => <TemplateCollectible name="Fisherman's Boat" />,
+  "Sea Arch": () => <TemplateCollectible name="Sea Arch" />,
+  "Crabs and Fish Rug": () => <TemplateCollectible name="Crabs and Fish Rug" />,
+  "Fish Flags": () => <TemplateCollectible name="Fish Flags" />,
+  "Fish Drying Rack": () => <TemplateCollectible name="Fish Drying Rack" />,
+  "Yellow Submarine Trophy": () => (
+    <TemplateCollectible name="Yellow Submarine Trophy" />
+  ),
+  Oaken: () => <TemplateCollectible name="Oaken" />,
+  Meerkat: () => <TemplateCollectible name="Meerkat" />,
+  "Pearl Bed": () => <TemplateCollectible name="Pearl Bed" />,
+  "Crimstone Clam": () => <TemplateCollectible name="Crimstone Clam" />,
+  "Poseidon's Throne": (props: CollectibleProps) => (
+    <Monument
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 49}px`,
+        bottom: `${PIXEL_SCALE * 0}px`,
+        left: `${PIXEL_SCALE * -0.5}px`,
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 49}px`,
+      }}
+      alt="Poseidon's Throne"
+      project="Poseidon's Throne"
+    />
+  ),
+  "Fish Kite": (props: CollectibleProps) => (
+    <ImageStyle
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 24}px`,
+        bottom: `${PIXEL_SCALE * 0}px`,
+        left: `${PIXEL_SCALE * 4}px`,
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 24}px`,
+      }}
+      image={ITEM_DETAILS["Fish Kite"].image}
+      alt="Fish Kite"
+    />
+  ),
   "Crim Peckster": CrimPeckster,
   "Knight Chicken": KnightChicken,
   "Pharaoh Chicken": PharaohChicken,
@@ -2767,6 +2815,22 @@ export const COLLECTIBLE_COMPONENTS: Record<
       }}
       image={ITEM_DETAILS["Crabs and Traps Banner"].image}
       alt="Crabs and Traps Banner"
+    />
+  ),
+  "Diving Helmet": (props: CollectibleProps) => (
+    <ImageStyle
+      {...props}
+      divStyle={{
+        width: `${PIXEL_SCALE * 18}px`,
+        bottom: `${PIXEL_SCALE * 0}px`,
+        left: `50%`,
+        transform: "translatex(-50%)",
+      }}
+      imgStyle={{
+        width: `${PIXEL_SCALE * 18}px`,
+      }}
+      image={ITEM_DETAILS["Diving Helmet"].image}
+      alt="Diving Helmet"
     />
   ),
   "Paw Prints Rug": (props: CollectibleProps) => (

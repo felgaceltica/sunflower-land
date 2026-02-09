@@ -49,10 +49,11 @@ import { WeatherShopItem } from "./calendar";
 import { PetShopItemName } from "./petShop";
 import { MonumentName } from "./monuments";
 import { BumpkinItem } from "./bumpkin";
-import { WaterTrapName } from "./crustaceans";
-import { ProcessedFood } from "./processedFood";
+import { CrustaceanName, WaterTrapName } from "./crustaceans";
+import { ProcessedResource } from "./processedFood";
 import { ChapterName, ChapterTicket } from "./chapters";
 import { TrackName } from "./tracks";
+import { BonusName } from "./bonuses";
 
 export type CaughtEvent = `${InventoryItemName} Caught`;
 export type HarvestedEvent = `${FlowerName} Harvested`;
@@ -66,7 +67,8 @@ export type BountiedEvent = `${
   | FullMoonFruit
   | RecipeCraftableName
   | DollName
-  | "Mark"} Bountied`;
+  | "Mark"
+  | CrustaceanName} Bountied`;
 
 export type ResourceBought = `${ResourceName} Bought`;
 export type BiomeBought = `${LandBiomeName} Bought`;
@@ -96,7 +98,7 @@ type SellableName =
   | "Love Charm";
 
 type Recipes = Food | CookableName;
-type ProcessedEvent = `${ProcessedFood} Processed`;
+type ProcessedEvent = `${ProcessedResource} Processed`;
 type Edibles = Food | ConsumableName;
 
 export type HarvestEvent = `${
@@ -225,7 +227,9 @@ export type FarmActivityName =
   | `${MarineMarvelName} Map Piece Found`
   | "Map Missed"
   | `${ChapterTicket} Collected`
-  | `${ChapterName} ${TrackName} Milestone Claimed`;
+  | `${ChapterName} Points Earned`
+  | `${ChapterName} ${TrackName} Milestone Claimed`
+  | `${BonusName} Bonus Claimed`;
 
 export function trackFarmActivity(
   activityName: FarmActivityName,

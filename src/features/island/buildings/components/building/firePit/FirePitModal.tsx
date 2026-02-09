@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 
 import { Modal } from "components/ui/Modal";
 
@@ -10,7 +10,6 @@ import {
   CookableName,
   FIRE_PIT_COOKABLES,
   isFishCookable,
-  isInstantFishRecipe,
 } from "features/game/types/consumables";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { OuterPanel, Panel } from "components/ui/Panel";
@@ -20,8 +19,9 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { BuildingProduct } from "features/game/types/game";
 import { CHAPTERS, getCurrentChapter } from "features/game/types/chapters";
 import { useNow } from "lib/utils/hooks/useNow";
-import { hasFeatureAccess } from "lib/flags";
 import { Context } from "features/game/GameProvider";
+import { getCookingRequirements } from "features/game/events/landExpansion/cook";
+import { InventoryItemName } from "features/game/types/game";
 
 const host = window.location.host.replace(/^www\./, "");
 const LOCAL_STORAGE_KEY = `bruce-read.${host}-${window.location.pathname}`;
@@ -61,29 +61,77 @@ export const FirePitModal: React.FC<Props> = ({
     live: true,
     autoEndAt: CHAPTERS["Paw Prints"].endDate.getTime(),
   });
-  const firePitRecipes = Object.values(FIRE_PIT_COOKABLES)
-    .filter((recipe) => {
-      if (getCurrentChapter(now) === "Paw Prints") return true;
 
-      return !isFishCookable(recipe.name);
-    })
-    .filter((recipe) => {
-      if (isInstantFishRecipe(recipe.name)) {
-        return hasFeatureAccess(
-          gameService?.getSnapshot().context.state ?? {},
-          "INSTANT_RECIPES",
-        );
-      }
-      return true;
-    })
-    .sort(
-      (a, b) => a.experience - b.experience, // Sorts Foods based on their cooking time
+  const getGame = useCallback(() => {
+    return gameService.getSnapshot().context.state;
+  }, [gameService]);
+
+  const firePitRecipes = useMemo(() => {
+    return Object.values(FIRE_PIT_COOKABLES)
+      .filter((recipe) => {
+        if (getCurrentChapter(now) === "Paw Prints") return true;
+
+        return !isFishCookable(recipe.name);
+      })
+      .sort(
+        (a, b) => a.experience - b.experience, // "Lowest entry" == first in this order
+      );
+  }, [now]);
+
+  /**
+   * Stored selection is intentionally session-only (component state).
+   * If no selection exists yet (first open this session), choose the first recipe
+   * the player can currently cook; otherwise default to the first entry.
+   */
+  const getDefaultSelection = useCallback((): Cookable | undefined => {
+    const game = getGame();
+
+    const inProgress = firePitRecipes.find(
+      (recipe) => recipe.name === itemInProgress,
     );
+    if (inProgress) return inProgress;
 
-  const [selected, setSelected] = useState<Cookable>(
-    firePitRecipes.find((recipe) => recipe.name === itemInProgress) ||
-      firePitRecipes[0],
+    const canCook = (recipe: Cookable) => {
+      const requirements = getCookingRequirements({
+        state: game,
+        item: recipe.name,
+      });
+
+      return !Object.entries(requirements).some(([name, amount]) =>
+        amount.greaterThan(game.inventory[name as InventoryItemName] ?? 0),
+      );
+    };
+
+    return firePitRecipes.find(canCook) ?? firePitRecipes[0];
+  }, [firePitRecipes, getGame, itemInProgress]);
+
+  const [selected, setSelected] = useState<Cookable | undefined>(undefined);
+
+  const setSelectedCookable = useCallback<
+    React.Dispatch<React.SetStateAction<Cookable>>
+  >(
+    (next) => {
+      setSelected((prev) => {
+        const fallback = getDefaultSelection() ?? firePitRecipes[0];
+        const current = prev ?? fallback;
+
+        return typeof next === "function" ? next(current) : next;
+      });
+    },
+    [firePitRecipes, getDefaultSelection],
   );
+
+  const effectiveSelected = useMemo(() => {
+    if (!firePitRecipes.length) return undefined;
+
+    const isValidSelection =
+      !!selected && firePitRecipes.some((r) => r.name === selected.name);
+
+    if (isValidSelection) return selected;
+    if (!isOpen) return selected; // don't "select" while closed
+
+    return getDefaultSelection();
+  }, [firePitRecipes, getDefaultSelection, isOpen, selected]);
 
   return (
     <Modal show={isOpen} onHide={onClose}>
@@ -113,18 +161,20 @@ export const FirePitModal: React.FC<Props> = ({
           bumpkinParts={NPC_WEARABLES.bruce}
           container={OuterPanel}
         >
-          <Recipes
-            selected={selected}
-            setSelected={setSelected}
-            recipes={firePitRecipes}
-            onCook={onCook}
-            onClose={onClose}
-            cooking={cooking}
-            buildingName="Fire Pit"
-            buildingId={buildingId}
-            queue={queue}
-            readyRecipes={readyRecipes}
-          />
+          {!!effectiveSelected && (
+            <Recipes
+              selected={effectiveSelected}
+              setSelected={setSelectedCookable}
+              recipes={firePitRecipes}
+              onCook={onCook}
+              onClose={onClose}
+              cooking={cooking}
+              buildingName="Fire Pit"
+              buildingId={buildingId}
+              queue={queue}
+              readyRecipes={readyRecipes}
+            />
+          )}
         </CloseButtonPanel>
       )}
     </Modal>

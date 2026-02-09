@@ -109,6 +109,20 @@ import krakenHead from "assets/sfts/kraken_head.webp";
 import skillShrimpy from "assets/sfts/skill_shrimpy.webp";
 import soilKrabby from "assets/sfts/soil_krabby.webp";
 import nana from "assets/sfts/nana.webp";
+import speckledKissingFish from "assets/sfts/speckled_kissing_fish.webp";
+import darkEyedKissingFish from "assets/sfts/dark_eyed_kissing_fish.webp";
+import fishermansBoat from "assets/sfts/fishermans_boat.webp";
+import seaArch from "assets/sfts/sea_arch.webp";
+import crabsAndFishRug from "assets/sfts/crabs_and_fish_rug.webp";
+import fishFlags from "assets/sfts/fish_flags.webp";
+import fishDryingRack from "assets/sfts/fish_drying_rack.webp";
+import yellowSubmarineTrophy from "assets/sfts/yellow_submarine_trophy.webp";
+import oaken from "assets/sfts/oaken.webp";
+import meerkat from "assets/sfts/meerkat.webp";
+import pearlBed from "assets/sfts/pearl_bed.webp";
+import crimstoneClam from "assets/sfts/crimstone_clam.webp";
+import poseidonsThrone from "assets/sfts/poseidons_throne.webp";
+import fishKite from "assets/sfts/fish_kite.webp";
 import hummingBird from "assets/sfts/hummingbird.webp";
 import queenBee from "assets/sfts/queen_bee.webp";
 import flowerFox from "assets/sfts/flower_fox.webp";
@@ -1111,6 +1125,7 @@ import toucanShrine from "assets/sfts/shrines/toucan_shrine.webp";
 import legendaryShrine from "assets/sfts/shrines/legendary_shrine.webp";
 import obsidianShrine from "assets/sfts/shrines/obsidian_shrine.webp";
 import tradingShrine from "assets/sfts/shrines/trading_shrine.webp";
+import divingHelmet from "assets/sfts/diving_helmet.webp";
 
 import { COUPONS, EASTER_EGG, FERTILISERS, InventoryItemName } from "./game";
 
@@ -1151,7 +1166,7 @@ import { LANDSCAPING_DECORATIONS } from "./decorations";
 import { SELLABLE_TREASURES } from "./treasure";
 import { TREASURE_COLLECTIBLE_ITEM } from "./collectibles";
 import { ANIMAL_FOODS } from "./animals";
-import { PROCESSED_FOODS } from "./processedFood";
+import { PROCESSED_RESOURCES } from "./processedFood";
 
 export interface ItemDetails {
   description: string;
@@ -1791,11 +1806,11 @@ export const ITEM_DETAILS: Items = {
     translatedName: translate("tool.oilDrill"),
   },
   "Crab Pot": {
-    image: SUNNYSIDE.icons.expression_confused,
+    image: SUNNYSIDE.tools.crab_pot,
     description: TOOLS["Crab Pot"].description,
   },
   "Mariner Pot": {
-    image: SUNNYSIDE.icons.expression_confused,
+    image: SUNNYSIDE.tools.mariner_pot,
     description: TOOLS["Mariner Pot"].description,
   },
   "Petting Hand": {
@@ -3671,19 +3686,19 @@ export const ITEM_DETAILS: Items = {
   },
   "Fish Flake": {
     image: fishFlake,
-    description: PROCESSED_FOODS["Fish Flake"].description,
+    description: PROCESSED_RESOURCES["Fish Flake"].description,
   },
   "Fish Stick": {
     image: fishStick,
-    description: PROCESSED_FOODS["Fish Stick"].description,
+    description: PROCESSED_RESOURCES["Fish Stick"].description,
   },
   "Fish Oil": {
     image: fishOil,
-    description: PROCESSED_FOODS["Fish Oil"].description,
+    description: PROCESSED_RESOURCES["Fish Oil"].description,
   },
   "Crab Stick": {
     image: crabStick,
-    description: PROCESSED_FOODS["Crab Stick"].description,
+    description: PROCESSED_RESOURCES["Crab Stick"].description,
   },
   "Furikake Sprinkle": {
     image: furikakeSprinkle,
@@ -4060,6 +4075,62 @@ export const ITEM_DETAILS: Items = {
   Nana: {
     image: nana,
     description: translate("description.nana"),
+  },
+  "Speckled Kissing Fish": {
+    image: speckledKissingFish,
+    description: "",
+  },
+  "Dark Eyed Kissing Fish": {
+    image: darkEyedKissingFish,
+    description: "",
+  },
+  "Fisherman's Boat": {
+    image: fishermansBoat,
+    description: "",
+  },
+  "Sea Arch": {
+    image: seaArch,
+    description: "",
+  },
+  "Crabs and Fish Rug": {
+    image: crabsAndFishRug,
+    description: "",
+  },
+  "Fish Flags": {
+    image: fishFlags,
+    description: "",
+  },
+  "Fish Drying Rack": {
+    image: fishDryingRack,
+    description: "",
+  },
+  "Yellow Submarine Trophy": {
+    image: yellowSubmarineTrophy,
+    description: "",
+  },
+  Oaken: {
+    image: oaken,
+    description: "",
+  },
+  Meerkat: {
+    image: meerkat,
+    description: "",
+  },
+  "Pearl Bed": {
+    image: pearlBed,
+    description: "",
+  },
+  "Crimstone Clam": {
+    image: crimstoneClam,
+    description: "",
+  },
+  "Poseidon's Throne": {
+    image: poseidonsThrone,
+    description: "",
+  },
+  "Fish Kite": {
+    image: fishKite,
+    description: "",
   },
   "Time Warp Totem": {
     image: timeWarpTotem,
@@ -6839,5 +6910,9 @@ export const ITEM_DETAILS: Items = {
   "Crabs and Traps Raffle Ticket": {
     image: crabChapterRaffleTicket,
     description: "?",
+  },
+  "Diving Helmet": {
+    image: divingHelmet,
+    description: translate("description.divingHelmet"),
   },
 };

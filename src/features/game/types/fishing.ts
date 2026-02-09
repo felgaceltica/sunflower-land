@@ -11,6 +11,8 @@ import { PurchaseOptions } from "./buyOptionPurchaseItem";
 import { Decimal } from "decimal.js-light";
 import { isCollectibleBuilt } from "../lib/collectibleBuilt";
 import type { ChapterName } from "./chapters";
+import { getCurrentChapter } from "./chapters";
+import { hasVipAccess } from "../lib/vipAccess";
 import { CrustaceanChum } from "./crustaceans";
 
 export type PurchaseableBait = "Fishing Lure";
@@ -681,7 +683,10 @@ export function getDailyFishingCount(state: GameState): number {
   return state.fishing.dailyAttempts?.[today] ?? 0;
 }
 
-export function getDailyFishingLimit(game: GameState): {
+export function getDailyFishingLimit(
+  game: GameState,
+  createdAt: number,
+): {
   limit: number;
   boostsUsed: BoostName[];
 } {
@@ -698,6 +703,12 @@ export function getDailyFishingLimit(game: GameState): {
   if (isCollectibleBuilt({ name: "Reelmaster's Chair", game })) {
     limit += 5;
     boostsUsed.push("Reelmaster's Chair");
+  }
+
+  // +5 daily limit if player has Nautilus
+  if (isCollectibleBuilt({ name: "Nautilus", game })) {
+    limit += 5;
+    boostsUsed.push("Nautilus");
   }
 
   // +5 daily limit if player had Fisherman's 5 Fold skill
@@ -722,6 +733,13 @@ export function getDailyFishingLimit(game: GameState): {
   if (isWearableActive({ name: "Saw Fish", game })) {
     limit += 5;
     boostsUsed.push("Saw Fish");
+  }
+
+  if (
+    hasVipAccess({ game, now: createdAt }) &&
+    getCurrentChapter(createdAt) === "Crabs and Traps"
+  ) {
+    limit += 5;
   }
 
   return { limit, boostsUsed };
@@ -769,20 +787,8 @@ export const GUARANTEED_CATCH_BY_BAIT: Record<GuaranteedBait, FishName[]> = {
     "Sunfish",
     "Cobia",
   ],
-  "Fish Oil": [
-    "Barred Knifejaw",
-    "Trout",
-    "Coelacanth",
-    "Saw Shark",
-    "Sunfish",
-  ],
-  "Crab Stick": [
-    "Barred Knifejaw",
-    "Whale Shark",
-    "White Shark",
-    "Parrotfish",
-    "Mahi Mahi",
-  ],
+  "Fish Oil": ["Barred Knifejaw", "Trout", "Coelacanth", "Saw Shark"],
+  "Crab Stick": ["Barred Knifejaw", "Whale Shark", "White Shark", "Parrotfish"],
 };
 
 export const isGuaranteedBait = (
@@ -792,10 +798,7 @@ export const isGuaranteedBait = (
   return GUARANTEED_BAIT.includes(bait as GuaranteedBait);
 };
 
-export const getSeasonalGuaranteedCatch = (
-  bait: FishingBait,
-  season: TemperateSeasonName,
-) => {
+export const getSeasonalGuaranteedCatch = (bait: FishingBait) => {
   if (!isGuaranteedBait(bait)) return [];
 
   return GUARANTEED_CATCH_BY_BAIT[bait];
@@ -812,79 +815,43 @@ export const BAIT: Record<FishingBait, true> = {
   "Crab Stick": true,
 };
 
-export type MapPieceDropTable = {
-  /**
-   * Fish that can drop map pieces for the marine marvel map.
-   * `odds` is the per-catch probability (0..1) of a map piece dropping
-   * when that fish is caught.
-   */
-  fish?: Partial<Record<FishName, { odds: number }>>;
-  /**
-   * Optional chapter gating for the marine marvel map.
-   * If set, this marine marvel map should only be shown during that chapter.
-   */
-  chapter?: ChapterName;
+export type MapPieceFishTrigger = {
+  marvel: MarineMarvelName;
+  odds: number;
 };
 
-export const MAP_PIECES: Partial<Record<MarineMarvelName, MapPieceDropTable>> =
-  {
-    "Starlight Tuna": {
-      fish: {
-        Halibut: { odds: 0.025 },
-        "Horse Mackerel": { odds: 0.36 },
-      },
-    },
-    "Twilight Anglerfish": {
-      fish: {
-        Clownfish: { odds: 0.025 },
-        Parrotfish: { odds: 0.21 },
-      },
-    },
-    "Gilded Swordfish": {
-      fish: {
-        "Rock Blackfish": { odds: 0.05 },
-        "White Shark": { odds: 0.3 },
-      },
-    },
-    "Radiant Ray": {
-      fish: {
-        Trout: { odds: 0.02 },
-        "Hammerhead shark": { odds: 0.05 },
-      },
-    },
-    "Phantom Barracuda": {
-      fish: {
-        "Mahi Mahi": { odds: 0.0018 },
-        Squid: { odds: 0.05 },
-      },
-    },
-    "Super Star": {
-      fish: {
-        "Red Snapper": { odds: 0.01 },
-        "Whale Shark": { odds: 0.1 },
-      },
-      chapter: "Paw Prints",
-    },
+export const MAP_PIECE_FISH_TRIGGERS: Partial<
+  Record<FishName, MapPieceFishTrigger>
+> = {
+  Halibut: { marvel: "Starlight Tuna", odds: 0.025 },
+  "Horse Mackerel": { marvel: "Starlight Tuna", odds: 0.36 },
+  Clownfish: { marvel: "Twilight Anglerfish", odds: 0.025 },
+  Parrotfish: { marvel: "Twilight Anglerfish", odds: 0.21 },
+  "Rock Blackfish": { marvel: "Gilded Swordfish", odds: 0.05 },
+  "White Shark": { marvel: "Gilded Swordfish", odds: 0.3 },
+  Trout: { marvel: "Radiant Ray", odds: 0.02 },
+  "Hammerhead shark": { marvel: "Radiant Ray", odds: 0.05 },
+  "Mahi Mahi": { marvel: "Phantom Barracuda", odds: 0.0018 },
+  Squid: { marvel: "Phantom Barracuda", odds: 0.05 },
+  "Red Snapper": { marvel: "Super Star", odds: 0.01 },
+  "Whale Shark": { marvel: "Super Star", odds: 0.1 },
+  Anchovy: { marvel: "Giant Isopod", odds: 0.008 },
+  Oarfish: { marvel: "Giant Isopod", odds: 0.03 },
+  "Sea Horse": { marvel: "Nautilus", odds: 0.01 },
+  Tuna: { marvel: "Nautilus", odds: 0.002 },
+  Sunfish: { marvel: "Dollocaris", odds: 0.005 },
+  "Football fish": { marvel: "Dollocaris", odds: 0.005 },
+};
 
-    "Giant Isopod": {
-      fish: {
-        Anchovy: { odds: 0.008 },
-        Oarfish: { odds: 0.03 },
-      },
-      chapter: "Crabs and Traps",
-    },
-    Nautilus: {
-      fish: {
-        "Sea Horse": { odds: 0.01 },
-        Tuna: { odds: 0.002 },
-      },
-      chapter: "Crabs and Traps",
-    },
-    Dollocaris: {
-      fish: {
-        Sunfish: { odds: 0.005 },
-        Oarfish: { odds: 0.005 },
-      },
-      chapter: "Crabs and Traps",
-    },
-  };
+export const MAP_PIECE_CHAPTERS: Partial<
+  Record<MarineMarvelName, ChapterName>
+> = {
+  "Super Star": "Paw Prints",
+  "Giant Isopod": "Crabs and Traps",
+  Nautilus: "Crabs and Traps",
+  Dollocaris: "Crabs and Traps",
+};
+
+export const MAP_PIECE_MARVELS: MarineMarvelName[] = [
+  ...new Set(Object.values(MAP_PIECE_FISH_TRIGGERS).map((t) => t.marvel)),
+];

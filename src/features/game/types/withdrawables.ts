@@ -536,6 +536,48 @@ export const BUMPKIN_RELEASES: Partial<Record<BumpkinItem, Releases>> = {
     tradeAt: CHAPTERS["Paw Prints"].endDate,
     withdrawAt: new Date("2026-03-04T00:00:00Z"),
   },
+  "Squirrel Onesie": {
+    tradeAt: CHAPTERS["Paw Prints"].endDate,
+    withdrawAt: new Date("2026-03-04T00:00:00Z"),
+  },
+
+  // Crabs and Traps
+  "Walrus Onesie": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Crimstone Spikes Hair": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Paw Aura": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Victoria's Apron": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Beast Shoes": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Fish Hook Hat": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Fish Hook Vest": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Fish Hook Waders": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
+  "Corn Silk Hair": {
+    tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+    withdrawAt: new Date("2026-06-04T00:00:00Z"),
+  },
 
   "Moonseeker Potion": {
     tradeAt: new Date("2025-11-06"),
@@ -592,6 +634,52 @@ export const BUMPKIN_RELEASES: Partial<Record<BumpkinItem, Releases>> = {
   "Wisp Aura": {
     tradeAt: new Date("2025-11-06"),
     withdrawAt: new Date("2025-11-06"),
+  },
+
+  // Christmas
+  "Diamond Snow Aura": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Comfy Xmas Sweater": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Comfy Xmas Pants": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Candy Halbred": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Xmas Top Hat": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Reindeer Mask": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Snowman Mask": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Cool Glasses": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Cookie Shield": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Holiday Feast Background": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
+  },
+  "Cozy Reindeer Onesie": {
+    tradeAt: new Date("2026-02-01"),
+    withdrawAt: new Date("2026-02-01"),
   },
 };
 
@@ -725,6 +813,7 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
     Anchor: CAN_WITHDRAW_AND_TRADE,
     "Rubber Ducky": CAN_WITHDRAW_AND_TRADE,
     "Kraken Head": CAN_WITHDRAW_AND_TRADE,
+    "Kraken Tentacle": CAN_WITHDRAW_AND_TRADE,
     "Blossom Royale": CAN_WITHDRAW_AND_TRADE,
     "Humming Bird": CAN_WITHDRAW_AND_TRADE,
     "Hungry Caterpillar": CAN_WITHDRAW_AND_TRADE,
@@ -967,6 +1056,10 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
       tradeAt: new Date("2024-12-13"),
       withdrawAt: CHAPTERS["Bull Run"].endDate,
     },
+    Wagon: {
+      tradeAt: new Date("2024-12-13"),
+      withdrawAt: CHAPTERS["Bull Run"].endDate,
+    },
     "Longhorn Cowfish": {
       tradeAt: new Date("2024-12-13"),
       withdrawAt: CHAPTERS["Bull Run"].endDate,
@@ -1080,6 +1173,10 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
       tradeAt: CHAPTERS["Winds of Change"].endDate,
       withdrawAt: CHAPTERS["Winds of Change"].endDate,
     },
+    "Mama Duck": {
+      tradeAt: CHAPTERS["Winds of Change"].endDate,
+      withdrawAt: CHAPTERS["Winds of Change"].endDate,
+    },
     Igloo: {
       tradeAt: CHAPTERS["Winds of Change"].endDate,
       withdrawAt: CHAPTERS["Winds of Change"].endDate,
@@ -1163,6 +1260,14 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
       withdrawAt: new Date("2025-05-01T00:00:00Z"),
     },
     "Orange Tunnel Bunny": {
+      tradeAt: new Date("2025-05-01T00:00:00Z"),
+      withdrawAt: new Date("2025-05-01T00:00:00Z"),
+    },
+    "White Tunnel Bunny": {
+      tradeAt: new Date("2025-05-01T00:00:00Z"),
+      withdrawAt: new Date("2025-05-01T00:00:00Z"),
+    },
+    "Easter Basket": {
       tradeAt: new Date("2025-05-01T00:00:00Z"),
       withdrawAt: new Date("2025-05-01T00:00:00Z"),
     },
@@ -1390,6 +1495,62 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
       tradeAt: CHAPTERS["Crabs and Traps"].endDate,
       withdrawAt: new Date("2026-06-04T00:00:00Z"),
     },
+    "Speckled Kissing Fish": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Dark Eyed Kissing Fish": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Fisherman's Boat": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Sea Arch": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Crabs and Fish Rug": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Fish Flags": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Fish Drying Rack": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Yellow Submarine Trophy": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    Oaken: {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    Meerkat: {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Pearl Bed": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Crimstone Clam": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Fish Kite": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
+    "Diving Helmet": {
+      tradeAt: CHAPTERS["Crabs and Traps"].endDate,
+      withdrawAt: new Date("2026-06-04T00:00:00Z"),
+    },
     "Paw Prints Rug": {
       tradeAt: CHAPTERS["Paw Prints"].endDate,
       withdrawAt: new Date("2026-03-04T00:00:00Z"),
@@ -1442,6 +1603,56 @@ export const INVENTORY_RELEASES: Partial<Record<InventoryItemName, Releases>> =
       tradeAt: CHAPTERS["Paw Prints"].endDate,
       withdrawAt: new Date("2026-03-04T00:00:00Z"),
     },
+    "Super Star": {
+      tradeAt: CHAPTERS["Paw Prints"].endDate,
+      withdrawAt: new Date("2026-03-04T00:00:00Z"),
+    },
+    "Squeaky Chicken": {
+      tradeAt: CHAPTERS["Paw Prints"].endDate,
+      withdrawAt: new Date("2026-03-04T00:00:00Z"),
+    },
     Cornucopia: undefined,
     "Messy Bed": undefined,
+
+    // Christmas 2025
+    "Holiday Decorative Totem": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Red Holiday Ornament": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Green Holiday Ornament": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Gift Turtle": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Red Nose Reindeer": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Tuxedo Claus": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Winter Alpaca": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Penguin Surprise": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Frozen Meat": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
+    "Ho Ho oh oh…": {
+      tradeAt: new Date("2026-02-01"),
+      withdrawAt: new Date("2026-02-01"),
+    },
   };
