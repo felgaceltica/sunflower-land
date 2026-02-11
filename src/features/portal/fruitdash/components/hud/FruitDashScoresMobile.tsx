@@ -19,7 +19,7 @@ export const FruitDashScoresMobile: React.FC = () => {
         <div
           className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
           style={{
-            height: "-webkit-fill-available",
+            height: "25px",
             top: "6px",
             bottom: "-3px",
           }}
@@ -28,7 +28,8 @@ export const FruitDashScoresMobile: React.FC = () => {
           className="flex items-center space-x-2 text-xs text-white text-shadow"
           style={{
             width: "160px",
-            paddingTop: "7px",
+            height: "25px",
+            paddingTop: "9px",
             paddingLeft: "3px",
             position: "relative",
           }}
@@ -47,8 +48,8 @@ export const FruitDashScoresMobile: React.FC = () => {
         <div
           className="h-12 w-full bg-black opacity-50 absolute coins-bb-hud-backdrop-reverse"
           style={{
-            height: "-webkit-fill-available",
-            top: "6px",
+            height: "25px",
+            top: "12px",
             bottom: "-3px",
           }}
         />
@@ -56,7 +57,8 @@ export const FruitDashScoresMobile: React.FC = () => {
           className="flex items-center space-x-2 text-xs text-white text-shadow"
           style={{
             width: "160px",
-            paddingTop: "7px",
+            height: "25px",
+            paddingTop: "20px",
             paddingLeft: "3px",
             position: "relative",
           }}
