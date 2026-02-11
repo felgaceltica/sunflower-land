@@ -293,7 +293,7 @@ export const MegaBountyBoardContent: React.FC<{ readonly?: boolean }> = ({
         </div>
       </InnerPanel>
       {!noBonusBountiesWeek && !readonly && (
-        <InnerPanel className="flex flex-col justify-center gap-2">
+        <InnerPanel className="flex flex-col justify-center gap-2 mb-1">
           <div className="flex items-center gap-2 justify-between">
             <Label
               type="default"
@@ -471,7 +471,7 @@ const Deal: React.FC<{
                 })}
                 {!!tickets && (
                   <Label type={"vibrant"} icon={chapterPoints}>
-                    {`+${getChapterTaskPoints({ task: "bounty", points: tickets })} ${chapter} points.`}
+                    {`+${getChapterTaskPoints({ task: "bounty", tickets: tickets })} ${chapter} points.`}
                   </Label>
                 )}
                 {BOUNTY_CATEGORIES["Obsidian Bounties"](bounty) &&

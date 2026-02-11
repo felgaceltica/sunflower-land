@@ -1326,7 +1326,7 @@ export type WaterTrap = {
   placedAt: number;
   chum?: CrustaceanChum;
   readyAt: number;
-  caught?: Partial<Record<InventoryItemName, number>>;
+  caught: Partial<Record<CrustaceanName, number>>;
 };
 
 export type CrabTrap = {
@@ -1546,7 +1546,10 @@ type Stores = "factionShop" | "treasureShop" | "megastore";
 export type KeysBought = Record<Stores, KeysBoughtAt>;
 
 export type AnimalBuildingKey = "henHouse" | "barn";
-export type UpgradableBuildingKey = AnimalBuildingKey | "waterWell";
+export type UpgradableBuildingKey =
+  | AnimalBuildingKey
+  | "waterWell"
+  | "petHouse";
 
 export type AnimalResource =
   | "Egg"
@@ -1579,6 +1582,10 @@ export type UpgradableBuilding = {
   level: number;
   upgradeReadyAt?: number;
   upgradedAt?: number;
+};
+
+export type PetHouseBuilding = UpgradableBuilding & {
+  pets: Partial<PlacedTypes<PetName>>;
 };
 
 export type Bank = {
@@ -1643,7 +1650,11 @@ export type BoostName =
   | BudNFTName
   | SpecialBoostName;
 
-export type SpecialBoostName = "Sunshower" | "Power hour";
+export type SpecialBoostName =
+  | "Sunshower"
+  | "Power hour"
+  | "VIP Access"
+  | "Faction Pet";
 
 export type BoostUsedAt = Partial<Record<BoostName, number>>;
 
@@ -1917,6 +1928,7 @@ export interface GameState {
   henHouse: AnimalBuilding;
   barn: AnimalBuilding;
   waterWell: UpgradableBuilding;
+  petHouse: PetHouseBuilding;
 
   craftingBox: {
     status: "pending" | "idle" | "crafting";
