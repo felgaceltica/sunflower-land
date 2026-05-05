@@ -1,4 +1,6 @@
 import { OFFLINE_FARM } from "features/game/lib/landData";
+import { GameState } from "features/game/types/game";
+import { FeatureFlag } from "lib/flags";
 import { useState } from "react";
 
 export function getIsTimedEvent(EVENT_NAME: string): boolean {
@@ -25,11 +27,11 @@ const FRUIT_DASH_FEATURE_FLAGS = {
   ),
 } satisfies Record<string, FeatureFlag>;
 
-//export type FeatureName = keyof typeof FEATURE_FLAGS;
+export type FeatureNameFruitDash = keyof typeof FRUIT_DASH_FEATURE_FLAGS;
 
 export const hasFeatureAccessFruitDash = (
   game: GameState,
-  featureName: FeatureName,
+  featureName: FeatureNameFruitDash,
 ) => {
   return FRUIT_DASH_FEATURE_FLAGS[featureName](game);
 };
