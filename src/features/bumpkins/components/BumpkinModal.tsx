@@ -90,7 +90,11 @@ export const BumpkinLevel: React.FC<{ experience?: number }> = ({
       <p className="font-secondary mt-0.5 ml-2">{`${formatNumber(
         currentExperienceProgress,
         { decimalPlaces: 0 },
-      )}/${maxLevel ? "-" : formatNumber(experienceToNextLevel, { decimalPlaces: 0 })} XP`}</p>
+      )}/${
+        maxLevel
+          ? "-"
+          : formatNumber(experienceToNextLevel, { decimalPlaces: 0 })
+      } XP`}</p>
     </div>
   );
 };

@@ -31,6 +31,10 @@ export type Scenes = {
   nightshade_house: Room<PlazaRoomState> | undefined;
   bumpkin_house: Room<PlazaRoomState> | undefined;
   portal_example: Room<PlazaRoomState> | undefined;
+  fruit_dash: Room<PlazaRoomState> | undefined;
+  farmer_football: Room<PlazaRoomState> | undefined;
+  irrigate: Room<PlazaRoomState> | undefined;
+  "mine-whack": Room<PlazaRoomState> | undefined;
   infernos: Room<PlazaRoomState> | undefined;
   stream: Room<PlazaRoomState> | undefined;
   love_island: Room<PlazaRoomState> | undefined;

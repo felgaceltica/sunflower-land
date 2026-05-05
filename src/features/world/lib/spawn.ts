@@ -10,6 +10,30 @@ const randomXOffset = Math.random() * 60;
 const randomYOffset = Math.random() * 20;
 
 export const SPAWNS: () => SpawnLocation = () => ({
+  farmer_football: {
+    default: {
+      x: 400 + randomXOffset,
+      y: 450 - randomYOffset,
+    },
+  },
+  fruit_dash: {
+    default: {
+      x: 400 + randomXOffset,
+      y: 450 - randomYOffset,
+    },
+  },
+  "mine-whack": {
+    default: {
+      x: 400 + randomXOffset,
+      y: 450 - randomYOffset,
+    },
+  },
+  irrigate: {
+    default: {
+      x: 400 + randomXOffset,
+      y: 450 - randomYOffset,
+    },
+  },
   love_island: {
     default: {
       x: 608,

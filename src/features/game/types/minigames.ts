@@ -12,6 +12,8 @@ export type MinigameName =
   | "crops-and-chickens"
   | "farmer-football"
   | "fruit-dash"
+  | "irrigate"
+  | "mine-whack"
   | "halloween"
   | "christmas-delivery"
   | "easter-eggstravaganza"
@@ -35,6 +37,8 @@ export const SUPPORTED_MINIGAMES: MinigameName[] = [
   "crops-and-chickens",
   "farmer-football",
   "fruit-dash",
+  "irrigate",
+  "mine-whack",
   "halloween",
   "christmas-delivery",
   "easter-eggstravaganza",

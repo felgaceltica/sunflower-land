@@ -1642,7 +1642,7 @@ export class BeachScene extends BaseScene {
     this.currentSelectedItem = this.selectedItem;
   };
 
-  public update() {
+  public update(time: number, delta: number) {
     if (!this.currentPlayer) return;
 
     this.handleDigbyAlertSprite();
@@ -1669,7 +1669,7 @@ export class BeachScene extends BaseScene {
       // this.noToolHoverBox?.setVisible(false);
       this.alreadyWarnedOfNoDigs = false;
       this.alreadyNotifiedOfClaim = false;
-      super.update();
+      super.update(time, delta);
     }
 
     this.handleOtherDiggersPositions();
