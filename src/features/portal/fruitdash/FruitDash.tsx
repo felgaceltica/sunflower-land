@@ -24,9 +24,9 @@ import {
   FRUIT_DASH_NPC_NAME,
   FRUIT_DASH_NPC_WEREABLES,
 } from "./util/FruitDashConstants";
-import { hasFeatureAccess } from "lib/flags";
 import { OFFLINE_FARM } from "features/game/lib/landData";
 import { useIsHalloweenMode } from "./util/useIsHalloweenMode";
+import { hasFeatureAccessFruitDash } from "./util/useIsTimedEvent";
 
 const _sflBalance = (state: PortalMachineState) => state.context.state?.balance;
 const _isError = (state: PortalMachineState) => state.matches("error");
@@ -47,7 +47,7 @@ const _isReadEntranceMessage = hasReadFruitEntranceMessage();
 const _isReadTimedEventMessage = hasReadFruitDashTimedEventMessage();
 
 export function hasReadFruitDashTimedEventMessage() {
-  if (hasFeatureAccess(OFFLINE_FARM, "FRUIT_DASH_TIMED_EVENT"))
+  if (hasFeatureAccessFruitDash(OFFLINE_FARM, "FRUIT_DASH_TIMED_EVENT"))
     return !!localStorage.getItem(_timedEventName);
   else return true;
 }
